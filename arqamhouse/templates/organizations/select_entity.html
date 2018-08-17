@@ -1,0 +1,98 @@
+{% extends "backend/base.html" %}
+
+{% block title %}
+Verification | {{ organization.name }}
+{% endblock title %}
+
+{% block page_title %}
+{{ organization.name }}
+{% endblock page_title %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item">
+		<a href="{{ profile.get_update_url }}" class="m-nav__link">
+			<span class="m-nav__link-text">Identity Verification</span>
+		</a>
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+<form method="POST">{% csrf_token %}
+<div class="m-portlet">
+	<div class="m-portlet__head">
+		<div class="m-portlet__head-caption">
+			<div class="m-portlet__head-title">
+				<span class="m-portlet__head-icon">
+				<i class="fas fa-id-card"></i>
+				</span>
+				<h3 class="m-portlet__head-text">
+					1. Choose Your Legal Entity Type
+				</h3>
+			</div>
+		</div>
+	</div>
+	<div class="m-portlet__body">
+		<div class="m-pricing-table-1 m-pricing-table-1--fixed">
+			<div class="m-pricing-table-1__items row">
+				<div class="col-md-12" style="padding-bottom: 30px;">
+					<h3>Why do we ask for this?</h3>
+					<p class="lead">Good question. In order for us to safely deposit money to your account we have to know we can trust you!</p>
+				</div>
+				<div class="col-md-12" style="padding-bottom: 60px;">
+					<h3>Will you store my personal information?</h3>
+					<p class="lead">No. We do not store any personal data on Arqam House servers. For that process we have partnered with <a href="https://stripe.com/ca">stripe.com</a> to handle all identity verification and payment security that occurs on Arqam House.</p>
+					<a href="https://stripe.com/ca"><i class="fab fa-stripe" style="font-size: 3em;"></i></a>
+				</div>
+				<div class="m-pricing-table-1__item col-lg-6">
+					<div class="m-pricing-table-1__visual">
+						<div class="m-pricing-table-1__hexagon1"></div>
+						<div class="m-pricing-table-1__hexagon2"></div>
+						<span class="m-pricing-table-1__icon m--font-brand"><i class="fas fa-user"></i></span>
+					</div>
+					<span class="m-pricing-table-1__price">Individual</span>
+					<span class="m-pricing-table-1__description">
+						Personal use.<br>
+						usually recommended for smaller operations.<br> 
+					</span>	
+					<div class="m-pricing-table-1__btn">
+						<button type="submit" name="Individual" value="Individual" class="btn m-btn--pill  btn-brand m-btn--wide m-btn--uppercase m-btn--bolder m-btn--sm">Individual</button>
+					</div>
+				</div>
+				<div class="m-pricing-table-1__item col-lg-6">
+					<div class="m-pricing-table-1__visual">
+						<div class="m-pricing-table-1__hexagon1"></div>
+						<div class="m-pricing-table-1__hexagon2"></div>
+						<span class="m-pricing-table-1__icon m--font-brand"><i class="fas fa-building"></i></span>
+					</div>
+					<span class="m-pricing-table-1__price">Company</span>
+					<span class="m-pricing-table-1__description">
+						Requires significant ownership and control over company.<br>
+						If you are unsure if this option is right, contact us.<br>
+					</span>				 
+					<div class="m-pricing-table-1__btn">
+						<button type="submit" name="Company" value="Company" class="btn m-btn--pill  btn-brand m-btn--wide m-btn--uppercase m-btn--bolder m-btn--sm">Company</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</form>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,349 @@
+{% extends "backend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Verification | {{ organization.name }}
+{% endblock title %}
+
+{% block page_title %}
+{{ organization.name }}
+{% endblock page_title %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+<!--begin::Page Resources --> 
+<!-- <script src="https://js.stripe.com/v3/"></script>
+
+<script type="text/javascript">
+const stripe = Stripe('pk_test_UTsltdQjI0p1WDbvUpVh4lN9');
+const myForm = document.querySelector('.my-form');
+myForm.addEventListener('submit', handleForm);
+
+async function handleForm(event) {
+  event.preventDefault();
+
+  const result = await stripe.createToken('account', {
+    legal_entity: {
+      first_name: document.querySelector('.inp-first-name').value,
+      last_name: document.querySelector('.inp-last-name').value,
+      personal_id_number: document.querySelector('.inp-personal-id-number').value,
+      type: 'individual',
+
+      address: {
+        line1: document.querySelector('.inp-street-address1').value,
+        city: document.querySelector('.inp-city').value,
+        state: document.querySelector('.inp-state').value,
+        postal_code: document.querySelector('.inp-zip').value,
+      },
+
+      dob: {
+      	day: parseInt(document.querySelector('.inp-dob-day').value),
+      	month: parseInt(document.querySelector('.inp-dob-month').value),
+      	year: parseInt(document.querySelector('.inp-dob-year').value),
+      },
+
+    },
+    tos_shown_and_accepted: true,
+  });
+
+  if (result.token) {
+    document.querySelector('#token').value = result.token.id;
+    myForm.submit();
+  }
+}
+</script> -->
+<!--end::Page Resources -->
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item">
+		<a href="{{ profile.get_update_url }}" class="m-nav__link">
+			<span class="m-nav__link-text">Identity Verification</span>
+		</a>
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-10">
+		<!--begin::Portlet-->
+		<div class="m-portlet m-portlet--tab">
+			<!--begin::Form-->
+			<form class="m-form m-form--fit m-form--label-align-right my-form" method="POST" enctype="multipart/form-data">{% csrf_token %}
+				
+				<input type="hidden" name="token" id="token">
+				
+				<div class="m-portlet__body">
+
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								<a href="{% url 'change_entity' %}" name="Change Entity Type" value="Change Entity Type" class="btn btn-primary btn-block">Change Entity Type</a>
+							</div>
+						</div>
+					</div>
+
+
+					{% if form.non_field_errors %}
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								{% for error in form.non_field_errors %}
+								<div class="alert alert-danger" role="alert">
+								  	<strong>Oh snap!</strong> {{ error }}
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+					{% endif %}
+
+
+					{% if business %}
+					<div class="form-group m-form__group m--margin-top-10">
+						<div class="alert alert-info" role="alert">
+							Starting with your business's information.
+						</div>
+					</div>
+					<div class="row row-padder">
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5 {% if form.business_name.errors %}style="color:red;"{% endif %}>Business Name</h5>
+								{{ form.business_name }}
+								<br>
+								{% for error in form.business_name.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5 {% if form.business_number.errors %}style="color:red;"{% endif %}>Business Number (Tax ID)</h5>
+								{{ form.business_number }}
+								<br>
+								{% for error in form.business_number.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+					{% endif %}
+					
+
+					<div class="form-group m-form__group m--margin-top-10">
+						<div class="alert alert-info" role="alert">
+							Onto your first and last name. Remember, you must be a significant member or have permission in the company to be able to register on it's behalf.
+						</div>
+					</div>
+					<div class="row row-padder">
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5 {% if form.first_name.errors %}style="color:red;"{% endif %}>First Name</h5>
+								{{ form.first_name }}
+								<br>
+								{% for error in form.first_name.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5 {% if form.last_name.errors %}style="color:red;"{% endif %}>Last Name</h5>
+								{{ form.last_name }}
+								<br>
+								{% for error in form.last_name.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+
+					<div class="form-group m-form__group m--margin-top-10">
+						<div class="alert alert-info" role="alert">
+							Now your primary email address, so we can contact you for important updates.  
+						</div>
+					</div>
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								<h5>Email</h5>
+								{{ form.primary_email }}
+							</div>
+						</div>
+					</div>
+
+
+					<div class="form-group m-form__group m--margin-top-10">
+						<div class="alert alert-info" role="alert">
+							Moving on to your Date of Birth.
+						</div>
+					</div>
+					<div class="row row-padder">
+						<div class="col-md-4">
+							<div class="form-group m-form__group">
+								<h5>Day</h5>
+								{{ form.dob_day }}
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group m-form__group">
+								<h5>Month</h5>
+								{{ form.dob_month }}
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group m-form__group">
+								<h5>Year</h5>
+								{{ form.dob_year }}
+							</div>
+						</div>
+					</div>
+
+
+					<div class="form-group m-form__group m--margin-top-10">
+						<div class="alert alert-info" role="alert">
+							Information on your locality
+						</div>
+					</div>
+					<div class="row row-padder">
+						<div class="col-md-4">
+							<div class="form-group m-form__group">
+								<h5>Province</h5>
+								{{ form.province }}
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group m-form__group">
+								<h5 {% if form.city.errors %}style="color:red;"{% endif %}>City</h5>
+								{{ form.city }}
+								<br>
+								{% for error in form.city.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group m-form__group">
+								<h5 {% if form.postal_code.errors %}style="color:red;"{% endif %}>Postal Code</h5>
+								{{ form.postal_code }}
+								<br>
+								{% for error in form.postal_code.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								<h5>Address</h5>
+								{{ form.line_1 }}
+							</div>
+						</div>
+					</div>
+
+
+					<div class="form-group m-form__group m--margin-top-10">
+						<div class="alert alert-info" role="alert">
+							Personal Identification Number
+						</div>
+					</div>
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								<h5 {% if form.personal_id_number.errors %}style="color:red;"{% endif %}>SIN Number</h5>
+								{{ form.personal_id_number }}
+								<br>
+								{% for error in form.personal_id_number.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+
+					<div class="form-group m-form__group m--margin-top-10">
+						<div class="alert alert-info" role="alert">
+							Verification Document
+						</div>
+					</div>
+					<div class="row row-padder">
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5>Front Side Drivers License</h5>
+								{{ form.front_side_drivers_license }}
+								<br>
+								<br>
+								<img id="front-side-pic" src="{% static 'images/connect-verification/front_side.png' %}" alt="your image" width="100%"/>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5>Back Side Drivers License</h5>
+								{{ form.back_side_drivers_license }}
+								<br>
+								<br>
+								<img id="back-side-pic" src="{% static 'images/connect-verification/back_side.png' %}" alt="your image" width="100%"/>
+							</div>
+						</div>
+					</div>
+
+
+
+				</div>
+				<div class="m-portlet__foot m-portlet__foot--fit" style="padding-top: 60px;padding-bottom: 50px;">
+					<div class="m-form__actions">
+						<p class="lead text-center">By clicking, you agree to <a href="#">our terms</a> and the <a href="/connect-account/legal">Stripe Connected Account Agreement</a>.</p>
+						<button type="submit" name="Create" value="Create" class="btn btn-primary btn-block">Register Your Account</button>
+					</div>
+				</div>
+
+			</form>
+			<!--end::Form-->			
+		</div>
+		<!--end::Portlet-->
+	</div>
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

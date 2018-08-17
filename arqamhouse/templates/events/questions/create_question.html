@@ -1,0 +1,261 @@
+{% extends "backend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+{% if update %}Update{% else %}Create{% endif %} Question
+{% endblock title %}
+
+{% block page_title %}
+<a href="{{ event.list_questions_view }}" style="text-decoration: none;"><i style="font-size: 30px;" class="fas fa-long-arrow-alt-left"></i> Back To All Questions</a>
+{% endblock page_title %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+
+<script type="text/javascript">
+
+function updateCountdown() {
+    // 140 is the max message length
+    var remaining = 100 - jQuery('.message').val().length;
+    jQuery('.countdown').text(remaining + ' characters remaining.');
+}
+
+jQuery(document).ready(function($) {
+    updateCountdown();
+    $('.message').change(updateCountdown);
+    $('.message').keyup(updateCountdown);
+
+
+});
+
+</script>
+<!--end::Page Resources -->
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item">
+		<span class="m-nav__link-text">{% if update %}Update{% else %}Create{% endif %} Question</span>
+	</li>
+	<li class="m-nav__separator">-</li>
+	<li class="m-nav__item">
+		<a href="{{ event.list_questions_view }}" class="m-nav__link">
+			<span class="m-nav__link-text">{{ event.title }}</span>
+		</a>
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="m-alert m-alert--icon m-alert--outline alert alert-info alert-dismissible fade show" role="alert">
+			<div class="m-alert__text">
+
+				{% if event_question %}
+					{% include "events/questions/create_question_snippets/event_question_message.html" with simple=simple paragraph=paragraph multiple_choice=multiple_choice %}
+				{% elif all_ticket_question %}
+					{% include "events/questions/create_question_snippets/all_ticket_question_message.html" with simple=simple paragraph=paragraph multiple_choice=multiple_choice %}
+				{% else %}
+					{% include "events/questions/create_question_snippets/ticket_question_message.html" with simple=simple paragraph=paragraph multiple_choice=multiple_choice ticket=ticket %}
+				{% endif %}
+			  	<br>	
+			</div>		  	
+		</div>
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-md-10">
+		<!--begin::Portlet-->
+		<div class="m-portlet m-portlet--tab">
+			<!--begin::Form-->
+			<form class="m-form m-form--fit m-form--label-align-right my-form" method="POST" enctype="multipart/form-data">{% csrf_token %}
+				
+				<input type="hidden" name="token" id="token">
+				
+				<div class="m-portlet__body">
+
+
+					{% if form.non_field_errors %}
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								{% for error in form.non_field_errors %}
+								<div class="alert alert-danger" role="alert">
+								  	<strong>Oh snap!</strong> {{ error }}
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+					{% endif %}
+					
+
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								<h5 {% if form.title.errors %}style="color:red;"{% endif %}>Question Title <i class="fas fa-asterisk" style="color: red;"></i></h5>
+								{{ form.title }}
+								<br>
+								<span class="countdown m--font-primary"></span>
+								<br>
+								{% for error in form.title.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+
+					<div class="row row-padder">
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5>Required Question</h5>
+								<span class="m-switch m-switch--lg m-switch--icon">
+									<label>
+			                        {{ form.required }}
+			                        <span></span>
+			                        </label>
+			                    </span>
+			                    <br>
+			                    <span class="m-form__help">Turn on if this question is required to be answered by ticket buyers or off if it is not required.</span>
+			                </div>
+			            </div>
+			            <div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5 {% if form.order.errors %}style="color:red;"{% endif %}>Order</h5>
+								{{ form.order }}
+								<span class="m-form__help">Choose an order number you want this question to appear to the buyer.</span>
+								<br>
+								{% for error in form.order.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+			        </div>
+
+
+			        <div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								<h5 {% if form.help_text.errors %}style="color:red;"{% endif %}>Help Text</h5>
+								{{ form.help_text }}
+								<span class="m-form__help">This will be the help text to guide the ticket buyer on how to answer the question. As a matter of fact this is help text!</span>
+								<br>
+								{% for error in form.help_text.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+
+					{% if event_question_multiple_choice_options %}
+						
+						
+						<div class="row">
+							<div class="col-sm-12" style="padding-top: 20px;">
+								<div class="form-group m-form__group">
+									<h5>Options</h5>
+									{% for option in event_question_multiple_choice_options %}
+										{% if all_ticket %}
+										<a class="lead" style="text-decoration: none;" href="{{ option.update_all_ticket_muliple_choice_question_option_view }}">{{ option.title }}</a>
+										{% elif single_ticket %}
+										<a class="lead" style="text-decoration: none;" href="{{ option.update_ticket_muliple_choice_question_option_view }}">{{ option.title }}</a>
+										{% else %}
+										<a class="lead" style="text-decoration: none;" href="{{ option.update_event_muliple_choice_question_option_view }}">{{ option.title }}</a>
+										{% endif %}
+									<br>
+									{% endfor %}
+								</div>
+							</div>
+						</div>
+						
+						
+					
+					{% else %}
+						{% if multiple_choice %}
+						<div class="row">
+							<div class="col-sm-12" style="padding-top: 20px;">
+								<div class="form-group m-form__group">
+									<p class="lead">Looks like you haven't added any options yet. Please add options to make this question active.</p>
+								</div>
+							</div>
+						</div>
+						{% endif %}
+					{% endif %}
+
+					{% if multiple_choice %}
+					<div class="row">
+						<div class="col-sm-12" style="padding-top: 20px;">
+							<div class="form-group m-form__group">
+								{% if all_ticket %}
+								<a href="{{ question.create_all_ticket_multiple_choice_question_option_view }}" class="btn btn-primary">Add Option</a>
+								{% elif single_ticket %}
+								<a href="{{ question.create_ticket_multiple_choice_question_option_view }}" class="btn btn-primary">Add Option</a>
+								{% else %}
+								<a href="{{ question.create_event_multiple_choice_question_option_view }}" class="btn btn-primary">Add Option</a>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					{% endif %}
+
+				</div>
+				<div class="m-portlet__foot m-portlet__foot--fit" style="padding-top: 20px;padding-bottom: 20px;">
+					<div class="m-form__actions">
+						<div class="row">
+							<div class="col-md-6">
+								<button type="submit" name="Draft" value="Draft" class="btn btn-primary btn-block">{% if update %}Update{% else %}Create{% endif %} Question</button>
+							</div>
+							<div class="col-md-6">
+								{% if update %}
+								<button type="submit" name="delete" value="delete" class="btn btn-danger btn-block">Delete Question</button>
+								{% endif %}
+							</div>
+						</div>
+						
+					</div>
+				</div>
+
+			</form>
+			<!--end::Form-->			
+		</div>
+		<!--end::Portlet-->
+	</div>
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

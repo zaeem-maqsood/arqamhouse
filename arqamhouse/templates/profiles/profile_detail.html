@@ -1,0 +1,102 @@
+{% extends "backend/base.html" %}
+
+{% block title %}
+{{ profile.name|title }} | Profile
+{% endblock title %}
+
+{% block page_title %}
+{{ profile.name }}
+{% endblock page_title %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item m-nav__item--home">
+		<a href="#" class="m-nav__link m-nav__link--icon">
+		   <i class="fas fa-user"></i>
+		</a>
+	</li>
+	<li class="m-nav__separator">-</li>
+	<li class="m-nav__item">
+		<a href="" class="m-nav__link">
+			<span class="m-nav__link-text">Profile</span>
+		</a>
+	</li>
+	{% if does_profile_belong_to_user %}
+	<li class="m-nav__separator">-</li>
+	<li class="m-nav__item">
+		<a href="{{ profile.get_update_url }}" class="m-nav__link">
+			<span class="m-nav__link-text">Update Profile</span>
+		</a>
+	</li>
+	{% endif %}
+</ul>
+{% endblock page_crumbs %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-10">
+		<!--begin::Portlet-->
+		<div class="m-portlet m-portlet--tab">
+			
+			<div class="m-portlet__body">
+				<div class="row row-padder">
+					<div class="col-md-6">
+						<div class="form-group m-form__group">
+							<h5>Name</h5>
+							{{ profile.name|title }}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group m-form__group">
+							<h5>Email</h5>
+							{{ profile.email }}
+						</div>
+					</div>
+				</div>
+
+				
+				<div class="row row-padder">
+					<div class="col-md-4">
+						<div class="form-group m-form__group">
+							<h5>Region</h5>
+							{{ profile.region }}
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group m-form__group">
+							<h5>City</h5>
+							{{ profile.city }}
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group m-form__group">
+							<h5>Timezone</h5>
+							{{ profile.timezone }}
+						</div>
+					</div>
+				</div>
+
+				<div class="row row-padder">
+					{% for organization in organizations %}
+					<a href="{{ organization.get_absolute_url }}" class="btn btn-block btn-outline-info btn-lg">{{ organization.name }}</a>
+					{% endfor %}
+				</div>
+
+			</div>
+
+
+		</div>
+		<!--end::Portlet-->
+	</div>
+</div>
+{% endblock content %}

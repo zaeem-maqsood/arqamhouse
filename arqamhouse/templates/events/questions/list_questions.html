@@ -1,0 +1,474 @@
+{% extends "backend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Questions | {{ event.title }}
+{% endblock title %}
+
+{% block page_title %}
+Questions
+{% endblock page_title %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+<!--begin::Page Resources --> 
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#id_first_name').change(function(){
+        if(this.checked)
+            $('#first_name_warning').fadeOut('slow');
+        else
+        	$('#first_name_warning').fadeIn('slow');
+
+    });
+
+    $('#id_first_name_required').change(function(){
+        if(this.checked)
+            $('#first_name_warning').fadeOut('slow');
+        else
+        	$('#first_name_warning').fadeIn('slow');
+
+    });
+});
+
+$(document).ready(function(){
+    $('#id_last_name').change(function(){
+        if(this.checked)
+            $('#last_name_warning').fadeOut('slow');
+        else
+        	$('#last_name_warning').fadeIn('slow');
+
+    });
+
+    $('#id_last_name_required').change(function(){
+        if(this.checked)
+            $('#last_name_warning').fadeOut('slow');
+        else
+        	$('#last_name_warning').fadeIn('slow');
+
+    });
+});
+</script>
+<!--end::Page Resources -->
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item">
+		<a href="{{ profile.get_update_url }}" class="m-nav__link">
+			<span class="m-nav__link-text">Questions for {{ event.title }}</span>
+		</a>
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+
+
+<form method="POST">{% csrf_token %}
+
+<div class="row" style="padding-top: 50px;">
+	<div class="col-md-12">
+		<div class="m-alert m-alert--icon m-alert--outline alert alert-info alert-dismissible fade show" role="alert">
+			<div class="m-alert__text">
+			  	<strong><h3>Frequently Asked Order Questions</h3></strong>
+		  		These questions will be asked once per order.
+			  	<br>	
+			</div>		  	
+		</div>
+	</div>
+</div>
+
+
+<div class="row" style="padding-bottom: 30px;">
+	<div class="col-lg-12">
+		<div class="m-portlet m-portlet--full-height ">
+			<div class="m-portlet__body">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="row">
+							<div class="col-md-5">
+								<h5>Notes</h5>
+								<span class="m-switch m-switch--lg m-switch--icon">
+									<label>
+			                        {{ event_general_questions_form.notes }}
+			                        <span></span>
+			                        </label>
+			                    </span>
+							</div>
+							<div class="col-md-5">
+								<h5>Required</h5>
+								<span class="m-switch m-switch--lg m-switch--icon">
+									<label>
+			                        {{ event_general_questions_form.notes_required }}
+			                        <span></span>
+			                        </label>
+			                    </span>
+							</div>
+							<div class="col-md-2">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						
+					</div>
+				</div>
+
+				<div class="row" style="padding-top: 30px;">
+					<div class="col-md-12">
+						<button type="submit" class="btn btn-primary btn-block">Save</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="m-alert m-alert--icon m-alert--outline alert alert-info alert-dismissible fade show" role="alert">
+			<div class="m-alert__text">
+			  	<strong><h3>Custom Order Questions</h3></strong>
+		  		These questions will be asked once per order.
+			  	<br>	
+			</div>		  	
+		</div>
+	</div>
+</div>
+
+
+<div class="row" style="padding-bottom: 30px;">
+	<div class="col-lg-12">
+    <!--begin:: Widgets/Support Tickets -->
+		<div class="m-portlet m-portlet--full-height ">
+			<div class="m-portlet__body">
+				{% for question in event_questions %}
+					<div class="row">
+						<div class="col-sm-1">
+							<h1>{{ question.order }}</h1>
+							<p>Order Number</p>
+						</div>
+						<div class="col-sm-4" style="padding-top: 20px;">
+							<a style="text-decoration: none;" href="{{ question.update_event_question_view }}"><h1 style="font-size: 1.5em;color: #7c96ad;">{{ question.title }}</h1></a>
+						</div>
+						<div class="col-sm-3" style="padding-top: 10px;">
+							<p class="lead" style="margin-top: 0px;margin-bottom: 0px;">Required: {% if required %}Yes{% else %}No{% endif %}</p>
+							<p class="lead">Type: {% if question.simple_question %} Standard {% elif question.paragraph_question %} Paragraph {% elif question.multiple_choice_question %} Multiple Choice {% endif %}</p>
+						</div>
+						<div class="col-sm-4" style="padding-top: 15px;">
+							<h5>Help Text</h5>
+							<p>{{ question.help_text }}</p>
+						</div>
+					</div>
+					<br>
+				{% endfor %}
+				
+				<div class="row" style="padding-top: 40px;">
+					<div class="col-md-4">
+						<a href="{{ event.create_simple_question }}" class="btn btn-info btn-block">Add Standard Question</a>
+					</div>
+					<div class="col-md-4">
+						<a href="{{ event.create_paragraph_question }}" class="btn btn-info btn-block">Add Paragraph Question</a>
+					</div>
+					<div class="col-md-4">
+						<a href="{{ event.create_multiple_choice_question }}" class="btn btn-info btn-block">Add Mulitiple Choice Question</a>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	<!--end:: Widgets/Support Tickets -->  
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="m-alert m-alert--icon m-alert--outline alert alert-info alert-dismissible fade show" role="alert">
+			<div class="m-alert__text">
+			  	<strong><h3>Frequently Asked Attendee Questions</h3></strong>
+		  		These questions will be asked for each ticket in every order.
+			  	<br>	
+			</div>		  	
+		</div>
+	</div>
+</div>
+
+
+<div class="row" style="padding-bottom: 30px;">
+	<div class="col-lg-12">
+
+		<div class="m-portlet m-portlet--full-height ">
+			<div class="m-portlet__body">
+				<div class="row">
+					<div class="col-md-6 col-sm-6">
+						<div class="row" style="padding-top: 10px;">
+							<div class="col-md-5 col-sm-5 col-5">
+								<h5>First Name</h5>
+								<span class="m-switch m-switch--lg m-switch--icon">
+									<label>
+			                        {{ attendee_general_questions_form.first_name }}
+			                        <span></span>
+			                        </label>
+			                    </span>
+							</div>
+							<div class="col-md-5 col-sm-5 col-5">
+								<h5>Required</h5>
+								<span class="m-switch m-switch--lg m-switch--icon">
+									<label>
+			                        {{ attendee_general_questions_form.first_name_required }}
+			                        <span></span>
+			                        </label>
+			                    </span>
+							</div>
+							<div class="col-md-2 col-sm-2 d-none d-sm-block">
+							</div>
+						</div>
+						<div class="row" id="first_name_warning" style="display: none;">
+							<div class="col-md-12 col-sm-12 col-12">
+								<div class="alert m-alert--outline alert-danger" role="alert">
+								  	Warning: We do not force you to ask your attendees their first name, however it is used to identify an attendee with a ticket.
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 col-sm-6">
+						<div class="row" style="padding-top: 10px;">
+							<div class="col-md-2 col-sm-2 d-none d-sm-block">
+							</div>
+							<div class="col-md-5 col-sm-5 col-5">
+								<h5>Last Name</h5>
+								<span class="m-switch m-switch--lg m-switch--icon">
+									<label>
+			                        {{ attendee_general_questions_form.last_name }}
+			                        <span></span>
+			                        </label>
+			                    </span>
+							</div>
+							<div class="col-md-5 col-sm-5 col-5">
+								<h5>Required</h5>
+								<span class="m-switch m-switch--lg m-switch--icon">
+									<label>
+			                        {{ attendee_general_questions_form.last_name_required }}
+			                        <span></span>
+			                        </label>
+			                    </span>
+							</div>
+						</div>
+						<div class="row" id="last_name_warning" style="display: none;">
+							<div class="col-md-12 col-sm-12 col-12">
+								<div class="alert m-alert--outline alert-danger" role="alert">
+								  	Warning: We do not force you to ask your attendees their last name, however it is used to identify an attendee with a ticket.
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row" style="padding-top: 30px;">
+					<div class="col-md-6 col-sm-6">
+						<div class="row" style="padding-top: 10px;">
+							<div class="col-md-5 col-sm-5 col-5">
+								<h5>Gender</h5>
+								<span class="m-switch m-switch--lg m-switch--icon">
+									<label>
+			                        {{ attendee_general_questions_form.gender }}
+			                        <span></span>
+			                        </label>
+			                    </span>
+							</div>
+							<div class="col-md-5 col-sm-5 col-5">
+							</div>
+							<div class="col-md-2 col-sm-2 d-none d-sm-block">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 col-sm-6">
+						<div class="row" style="padding-top: 10px;">
+							<div class="col-md-2 col-sm-2 d-none d-sm-block">
+							</div>
+							<div class="col-md-5 col-sm-5 col-5">
+								<h5>Email</h5>
+								<span class="m-switch m-switch--lg m-switch--icon">
+									<label>
+			                        {{ attendee_general_questions_form.email }}
+			                        <span></span>
+			                        </label>
+			                    </span>
+							</div>
+							<div class="col-md-5 col-sm-5 col-5">
+								<h5>Required</h5>
+								<span class="m-switch m-switch--lg m-switch--icon">
+									<label>
+			                        {{ attendee_general_questions_form.email_required }}
+			                        <span></span>
+			                        </label>
+			                    </span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row" style="padding-top: 30px;">
+					<div class="col-md-12">
+						<button type="submit" class="btn btn-primary btn-block">Save</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="m-alert m-alert--icon m-alert--outline alert alert-info alert-dismissible fade show" role="alert">
+			<div class="m-alert__text">
+			  	<strong><h3>Custom Ticket Questions</h3></strong>
+		  		These questions will be asked for each ticket in every order.
+			  	<br>	
+			</div>		  	
+		</div>
+	</div>
+</div>
+
+
+<div class="row" style="padding-bottom: 30px;">
+	<div class="col-lg-12">
+    <!--begin:: Widgets/Support Tickets -->
+		<div class="m-portlet m-portlet--full-height ">
+			<div class="m-portlet__body">
+				{% for question in all_ticket_questions %}
+					<div class="row">
+						<div class="col-sm-1">
+							<h1>{{ question.order }}</h1>
+							<p>Order Number</p>
+						</div>
+						<div class="col-sm-4" style="padding-top: 20px;">
+							<a style="text-decoration: none;" href="{{ question.update_all_ticket_question_view }}"><h1 style="font-size: 1.5em;color: #7c96ad;">{{ question.title }}</h1></a>
+						</div>
+						<div class="col-sm-3" style="padding-top: 10px;">
+							<p class="lead" style="margin-top: 0px;margin-bottom: 0px;">Required: {% if required %}Yes{% else %}No{% endif %}</p>
+							<p class="lead">Type: {% if question.simple_question %} Standard {% elif question.paragraph_question %} Paragraph {% elif question.multiple_choice_question %} Multiple Choice {% endif %}</p>
+						</div>
+						<div class="col-sm-4" style="padding-top: 15px;">
+							<h5>Help Text</h5>
+							<p>{{ question.help_text }}</p>
+						</div>
+					</div>
+					<br>
+				{% endfor %}
+				
+				<div class="row" style="padding-top: 40px;">
+					<div class="col-md-4">
+						<a href="{{ event.create_all_ticket_simple_question }}" class="btn btn-info btn-block">Add Standard Question</a>
+					</div>
+					<div class="col-md-4">
+						<a href="{{ event.create_all_ticket_paragraph_question }}" class="btn btn-info btn-block">Add Paragraph Question</a>
+					</div>
+					<div class="col-md-4">
+						<a href="{{ event.create_all_ticket_multiple_choice_question }}" class="btn btn-info btn-block">Add Mulitiple Choice Question</a>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	<!--end:: Widgets/Support Tickets -->  
+	</div>
+</div>
+
+
+
+{% for ticket in tickets %}
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="m-alert m-alert--icon m-alert--outline alert alert-info alert-dismissible fade show" role="alert">
+			<div class="m-alert__text">
+			  	<strong><h3>Questions for ticket "{{ ticket.title }}"</h3></strong>
+		  		These questions will be asked for each "{{ ticket.title }}" ticket in every order.
+			  	<br>	
+			</div>		  	
+		</div>
+	</div>
+</div>
+
+
+<div class="row" style="padding-bottom: 40px;">
+	<div class="col-lg-12">
+    <!--begin:: Widgets/Support Tickets -->
+		<div class="m-portlet m-portlet--full-height ">
+			<div class="m-portlet__body">
+				{% for question in ticket.get_ticket_questions %}
+					<div class="row">
+						<div class="col-sm-1">
+							<h1>{{ question.order }}</h1>
+							<p>Order Number</p>
+						</div>
+						<div class="col-sm-4" style="padding-top: 20px;">
+							<a style="text-decoration: none;" href="{{ question.update_ticket_question_view }}"><h1 style="font-size: 1.5em;color: #7c96ad;">{{ question.title }}</h1></a>
+						</div>
+						<div class="col-sm-3" style="padding-top: 10px;">
+							<p class="lead" style="margin-top: 0px;margin-bottom: 0px;">Required: {% if required %}Yes{% else %}No{% endif %}</p>
+							<p class="lead">Type: {% if question.simple_question %} Standard {% elif question.paragraph_question %} Paragraph {% elif question.multiple_choice_question %} Multiple Choice {% endif %}</p>
+						</div>
+						<div class="col-sm-4" style="padding-top: 15px;">
+							<h5>Help Text</h5>
+							<p>{{ question.help_text }}</p>
+						</div>
+					</div>
+					<br>
+				{% endfor %}
+				
+				<div class="row" style="padding-top: 40px;">
+					<div class="col-md-4">
+						<a href="{{ ticket.create_ticket_simple_question }}" class="btn btn-info btn-block">Add Standard Question</a>
+					</div>
+					<div class="col-md-4">
+						<a href="{{ ticket.create_ticket_paragraph_question }}" class="btn btn-info btn-block">Add Paragraph Question</a>
+					</div>
+					<div class="col-md-4">
+						<a href="{{ ticket.create_ticket_multiple_choice_question }}" class="btn btn-info btn-block">Add Mulitiple Choice Question</a>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	<!--end:: Widgets/Support Tickets -->  
+	</div>
+</div>
+{% endfor %}
+
+
+
+</form>
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

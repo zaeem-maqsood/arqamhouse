@@ -1,0 +1,95 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}
+Create Organization
+{% endblock title %}
+
+{% block navigation %}
+	{% include "frontend/navigation.html" %}
+{% endblock navigation %}
+
+{% block footer %}
+	{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <h1>Get what you <u>need</u> from an online payment system.</h1>
+                <p class="lead">
+                    Start By Creating Your Own Organization -- Then
+                    <br class="hidden-xs hidden-sm" /> Create Stores, Products, Subscriptions and Tickets! 
+                </p>
+
+                <form class="row justify-content-center" action="" method="POST">{% csrf_token %}
+                	
+                	{% if form.non_field_errors %}
+                	<div class="col-md-12">
+                        <div class="alert bg--error">
+							<div class="alert__body">
+								{% for error in form.non_field_errors %}
+                                <span>{{ error|escape }}</span>
+                            	{% endfor %}
+							</div>
+							<div class="alert__close">×</div>
+						</div>
+                	</div>
+                	{% endif %}
+
+                	{% if form.email.errors %}
+                	<div class="col-md-12">
+                        <div class="alert bg--error">
+							<div class="alert__body">
+								{% for error in form.email.errors %}
+                                <span>{{ error|escape }}</span>
+                            	{% endfor %}
+							</div>
+							<div class="alert__close">×</div>
+						</div>
+					</div>
+                	{% endif %}
+
+                    <div class="col-md-12">
+                    	{{ form.name }}
+                    </div>
+                    <hr>
+                    <div class="col-md-12">
+                        {{ form.users_name }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.email }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.password }}
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn--primary type--uppercase">Create Organization</button>
+                    </div>
+                    <div class="col-md-12">
+                    	<div class="input-checkbox">
+                			{{ form.agree }}
+                			<label for="checkbox"></label>
+                		</div>
+                        <span>I have read and agree to the
+                            <a href="#">terms and conditions</a>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endblock content %}

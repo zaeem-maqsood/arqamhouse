@@ -1,0 +1,26 @@
+<section class="switchable feature-large">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 col-sm-3 hidden-xs">
+                {% if event.public %}
+                    <i class="fas fa-lock-open" style="font-size: 4em;color: #4a90e2;"></i>
+                    <p class="lead" style="padding-top: 10px;">Public</p>
+                {% else %}
+                    <i class="fas fa-lock"></i>
+                {% endif %}
+            </div>
+            <div class="col-md-3 col-sm-3 hidden-xs">
+                <i class="fab fa-facebook-square" style="font-size: 4em;color: #4a90e2;"></i>
+                <p class="lead" style="padding-top: 10px;">Page</p>
+            </div>
+            <div class="col-md-3 col-sm-3 hidden-xs">
+                <i class="fas fa-link" style="font-size: 4em;color: #4a90e2;"></i>
+                <p class="lead" style="padding-top: 10px;">Website</p>
+            </div>
+            <div class="col-md-3 col-sm-3 hidden-xs">
+                <i class="fab fa-instagram" style="font-size: 4em;color: #4a90e2;"></i>
+                <p class="lead" style="padding-top: 10px;">Insta</p>
+            </div>
+        </div>
+    </div>
+</section>

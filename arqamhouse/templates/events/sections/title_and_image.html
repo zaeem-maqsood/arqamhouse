@@ -1,0 +1,37 @@
+<section class="switchable feature-large">
+    <div class="container">
+        <div class="row justify-content-around">
+            <div class="col-md-7 col-lg-7">
+                <div class="switchable__text">
+                    <h2 class="text-center">{{ event.title }}</h2>
+                    <p class="text-center">{{ event.short_description }}</p>
+                    <a class="btn btn--primary btn--icon btn-block" href="{{ event.choose_tickets_view }}">
+                        <span class="btn__text"><i class="fas fa-ticket-alt"></i>Get Tickets</span>
+                    </a>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="boxed boxed--border">
+                                <h3><i class="far fa-clock"></i>  When</h3>
+                                <p style="margin-bottom: 0;">Start: {{ event.start }}</p>
+                                <p style="margin-bottom: 0;">End: {{ event.end }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="boxed boxed--border">
+                                <h3><i class="fas fa-map-marker-alt"></i>  Where</h3>
+                                <p style="margin-bottom: 0;">{{ event.venue_name }}</p>
+                                <p style="margin-bottom: 0;">{{ event.venue_address }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 col-lg-5">
+                <img alt="Image" class="border--round box-shadow-wide" src="{{ event.image.url }}" />
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>

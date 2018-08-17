@@ -1,0 +1,86 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}
+Login | Arqam House 
+{% endblock title %}
+
+{% block navigation %}
+	{% include "frontend/navigation.html" %}
+{% endblock navigation %}
+
+{% block footer %}
+	{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 col-lg-6">
+                <h2>Login to continue</h2>
+                <p class="lead">
+                    Welcome back, sign in with your existing Arqam House account credentials
+                </p>
+                <form class="boxed boxed--border" action="" method="POST">{% csrf_token %}
+                    <div class="row">
+
+                        {% if form.non_field_errors %}
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.non_field_errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if form.email.errors %}
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.email.errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="col-md-12">
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-12">
+                            {{ form.password }}
+                        </div>
+                        <div class="col-md-12">
+                            <button class="btn btn--primary type--uppercase" type="submit">Login</button>
+                        </div>
+                    </div>
+                    <!--end of row-->
+                </form>
+                <span class="type--fine-print block">Dont have an account yet?
+                    <a href="page-accounts-create-1.html">Create account</a>
+                </span>
+                <span class="type--fine-print block">Forgot your username or password?
+                    <a href="page-accounts-recover.html">Recover account</a>
+                </span>
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endblock content %}

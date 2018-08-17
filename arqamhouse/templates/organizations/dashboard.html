@@ -1,0 +1,74 @@
+{% extends "backend/base.html" %}
+
+{% block title %}
+Dashboard | {{ organization.name }}
+{% endblock title %}
+
+{% block page_title %}
+{{ organization.name }}
+{% endblock page_title %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item m-nav__item--home">
+		
+		<a class="m-nav__link m-nav__link--icon">
+		   <i class="m-nav__link-icon la la-home"></i>
+		</a>
+	</li>
+	{% if profile.name %}
+	<li class="m-nav__separator">-</li>
+	<li class="m-nav__item">
+		<a href="{{ profile.get_update_url }}" class="m-nav__link">
+			<span class="m-nav__link-text">Welcome {{ profile.name }}</span>
+		</a>
+	</li>
+	{% endif %}
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+{% if not profile.name %}
+<div class="row">
+	<div class="col-md-12">
+		<div class="alert alert-info alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+		  	<strong>Hello Stranger!</strong> We would love if you gave us some information about yourself <a href="{{ profile.get_update_url }}" style="color: white;">here</a>
+		</div>
+	</div>
+</div>
+{% endif %}
+<div class="row">
+	<div class="col-md-12">
+		<div class="m-alert m-alert--icon m-alert--outline alert alert-success alert-dismissible fade show" role="alert">
+			<div class="m-alert__icon">
+				<i class="fas fa-poo" style="font-size: 3em;"></i>
+			</div>
+			<div class="m-alert__text">
+			  	<strong>Annoying Reminder:</strong>
+			  	<br>
+			  	Although you can ignore this message and continue on to sell tickets, in order for us to pay you we need to verify your identity.
+			  	<br>
+			  	<br>
+			  	<a href="" class="btn btn-outline-success">Let's Fix It</a>		
+			</div>		  	
+		</div>
+	</div>
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,43 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}
+{{ organization.name }}
+{% endblock title %}
+
+{% block navigation %}
+	{% include "frontend/navigation.html" %}
+{% endblock navigation %}
+
+{% block footer %}
+	{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <h1>{{ organization.name }}</h1>
+                <hr>
+                {% for profile in profiles %}
+                <p class="lead">
+                    <a href="{{ profile.get_absolute_url }}">{{ profile.name|title }}</a> 
+                </p>
+                {% endfor %}
+
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endblock content %}

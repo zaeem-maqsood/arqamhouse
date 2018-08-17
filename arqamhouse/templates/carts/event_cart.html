@@ -1,0 +1,185 @@
+{% extends "frontend/base.html" %}
+{% load ticket_form_tags %}
+
+{% block title %}
+Create Organization
+{% endblock title %}
+
+{% block navigation %}
+	{% include "frontend/navigation.html" %}
+{% endblock navigation %}
+
+{% block footer %}
+	{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script type="text/javascript">
+
+function calculatePrice() {
+
+	var total = 0.00;
+	var donation_input_value = 0.00;
+
+	{% for ticket in tickets %}
+
+		{% if ticket.donation %}
+
+			donation_input_value = document.getElementById('id_{{ ticket.id }}_donation').value;
+
+			console.log(donation_input_value)
+			
+			if (donation_input_value != '') {
+				donation_input_value = donation_input_value;
+			}
+			else {
+				donation_input_value = 0.00;
+			}
+
+			var e = document.getElementById("id_{{ ticket.id }}");
+		    total += parseFloat(donation_input_value) * parseFloat(e.options[e.selectedIndex].value);
+
+		    if (total != null) {
+				total = total
+			}
+			else {
+				total = 0.00;
+			}
+
+		    console.log(total)
+
+		{% else %}
+
+			var e = document.getElementById("id_{{ ticket.id }}");
+			total += parseFloat(e.options[e.selectedIndex].value) * parseFloat({{ ticket.buyer_price }});
+
+			console.log(total)
+
+		{% endif %}
+
+		console.log(total);
+
+	{% endfor %}
+
+	if (isNaN(total)) {
+    	total = 0.00;
+    }
+	total = total.toFixed(2);
+
+	total = total.toString()
+    document.getElementById("new_price_div").innerHTML = "Order Total $" + total;
+
+}
+	
+{% for ticket in tickets %}
+
+	{% if ticket.donation %}
+		$('#id_{{ ticket.id }}_donation').change(function() {
+			calculatePrice()
+		});
+	{% endif %}
+ 
+$('#id_{{ ticket.id }}').change(function() {
+	calculatePrice()
+});
+
+{%  endfor %}
+	
+</script>
+{% endblock scripts %}
+
+
+{% block content %}
+
+<section class="text-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <h2>Choose Tickets For {{ event.title }}</h2>
+                <p class="lead">
+                    Whether you’re building a welcome mat for your SaaS or a clean, corporate portfolio, Stack has your design needs covered.
+                </p>
+                <a class="btn btn--primary" href="{{ event.get_landing_view }}">
+					<span class="btn__text">Back To Event Page</span>
+				</a>
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+
+
+<section class="switchable feature-large">
+    <div class="container">
+    	
+    	<form method="POST">{% csrf_token %}
+
+        <div class="row justify-content-around">
+            <div class="col-md-12 col-lg-8 col-sm-12">
+
+            	{% for ticket in tickets %}
+            	<div class="boxed boxed--border bg--secondary boxed--lg box-shadow">
+            		<div class="row" style="padding: 10px;">
+            			<div class="col-md-8">
+            				<h3>{{ ticket }} - {% if ticket.buyer_price != 0.00 %}${{ ticket.buyer_price }}{% else %}Free{% endif %}</h3>
+							<p>{{ ticket.description }}</p>
+            			</div>
+            			<div class="col-md-4">
+            				{% if ticket.donation %}
+            					<h5 style="margin-bottom: 10px;">Enter Amount</h5>
+            					{% get_ticket_related_form_field_donation form ticket %}
+            				{% endif %}
+            				<h5 style="margin-bottom: 10px;margin-top: 10px;">Quantity</h5>
+            				<div class="input-select">
+            					{% get_ticket_related_form_field form ticket %}
+            				</div>
+            			</div>
+            		</div>
+				</div>
+				{% endfor %}
+				
+            </div>
+        </div>
+
+        <div class="row justify-content-center text-center" style="padding-top: 30px;">
+            <div class="col-md-10 col-lg-8">
+                <h2 class="m--font-info color--info" id="new_price_div">Order Total $0.00</h2>
+                <button type="submit" name="checkout" value="checkout" class="btn btn--primary">Checkout</button>
+            </div>
+        </div>
+
+        </form>
+
+    </div>
+</section>
+
+
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

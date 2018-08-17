@@ -1,0 +1,61 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+
+        <title>{% block title %}{% endblock title %}</title>
+
+        {% include "frontend/header.html" %}
+
+        {% block styles %}
+        {% endblock styles %}
+
+        {% block top_page_scripts %}
+        {% endblock top_page_scripts %}
+    </head>
+    <body class=" ">
+        <a id="start"></a>
+        <div class="nav-container ">
+            <div class="bar bar--sm visible-xs">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-3 col-md-2">
+                            <a href="index.html">
+                                <img class="logo logo-dark"  alt="logo" src="{% static 'images/logo.png' %}" />
+                                <img class="logo logo-light" alt="logo" src="{% static 'images/logo_light.png' %}" />
+                            </a>
+                        </div>
+                        <div class="col-9 col-md-10 text-right">
+                            <a href="#" class="hamburger-toggle" data-toggle-class="#menu1;hidden-xs">
+                                <i class="icon icon--sm stack-interface stack-menu"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!--end of row-->
+                </div>
+                <!--end of container-->
+            </div>
+            <!--end bar-->
+            {% block navigation %}
+            
+            {% endblock navigation %}
+            <!--end bar-->
+        </div>
+        <div class="main-container">
+            {% block content %}
+            {% endblock content %}
+
+            {% block footer %}
+            {% endblock footer %}
+        </div>
+        <!--<div class="loader"></div>-->
+        <a class="back-to-top inner-link" href="#start" data-scroll-class="100vh:active">
+            <i class="stack-interface stack-up-open-big"></i>
+        </a>
+        {% include "frontend/footer_scripts.html" %}
+
+        {% block scripts %}
+        {% endblock scripts %}
+
+    </body>
+</html>

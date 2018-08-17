@@ -1,0 +1,305 @@
+{% extends "backend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Create Event | {{ organization.name }}
+{% endblock title %}
+
+{% block page_title %}
+New Event
+{% endblock page_title %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+<!--begin::Page Resources --> 
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVgFLTnIgdwTPmWhaisvDoi6uHKow9j88&libraries=places"></script>
+<script src="{% static 'assets/demo/default/custom/components/forms/widgets/bootstrap-datetimepicker.js' %}" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+
+function initialize() {
+  var input = document.getElementById('autocomplete');
+  new google.maps.places.Autocomplete(input);
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+
+$('#id_url').bind('input propertychange', function() {
+    value = $(this).val();
+    new_value = value.replace(/\s/g, '-');
+    $('#output').html(new_value);
+});
+
+function updateCountdown() {
+    // 140 is the max message length
+    var remaining = 100 - jQuery('.message').val().length;
+    jQuery('.countdown').text(remaining + ' characters remaining.');
+}
+
+jQuery(document).ready(function($) {
+    updateCountdown();
+    $('.message').change(updateCountdown);
+    $('.message').keyup(updateCountdown);
+});
+
+
+$(document).ready(function(){
+    $('.publish').attr('disabled',true);
+    $('#id_title').keyup(function(){
+        if($(this).val().length !=3)
+            $('.publish').attr('disabled', false);            
+        else
+            $('.publish').attr('disabled',true);
+    })
+});
+
+
+$('#id_start').datetimepicker({
+    format: 'mm/dd/yyyy HH:ii P',
+    todayBtn: true,
+    
+    pickerPosition: 'bottom-right',
+    showMeridian: true
+});
+
+
+$('#id_end').datetimepicker({
+    format: 'mm/dd/yyyy HH:ii P',
+    todayBtn: true,
+    
+    pickerPosition: 'bottom-right',
+    showMeridian: true
+});
+
+
+</script>
+<!--end::Page Resources -->
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item">
+		<a href="{{ profile.get_update_url }}" class="m-nav__link">
+			<span class="m-nav__link-text">arqamhouse.com/events/<span id="output">new-event</span></span>
+		</a>
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-10">
+		<!--begin::Portlet-->
+		<div class="m-portlet m-portlet--tab">
+			<!--begin::Form-->
+			<form class="m-form m-form--fit m-form--label-align-right my-form" method="POST" enctype="multipart/form-data">{% csrf_token %}
+				
+				<input type="hidden" name="token" id="token">
+				
+				<div class="m-portlet__body">
+
+
+					{% if form.non_field_errors %}
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								{% for error in form.non_field_errors %}
+								<div class="alert alert-danger" role="alert">
+								  	<strong>Oh snap!</strong> {{ error }}
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+					{% endif %}
+					
+					
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								<h5 {% if form.url.errors %}style="color:red;"{% endif %}>Event URL</h5>
+								{{ form.url }}
+								<span class="m-form__help">Create your own event url or leave it blank if you'd like us to make a generic o for you.</span>
+								<br>
+								{% for error in form.url.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								<h5 {% if form.title.errors %}style="color:red;"{% endif %}>Event Title <i class="fas fa-asterisk" style="color: red;"></i></h5>
+								{{ form.title }}
+								<br>
+								<span class="countdown m--font-primary"></span>
+								<br>
+								{% for error in form.title.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+
+					<div class="row row-padder">
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5 {% if form.start.errors %}style="color:red;"{% endif %}>Start <i class="fas fa-asterisk" style="color: red;"></i></h5>
+								{{ form.start }}
+								<br>
+								{% for error in form.start.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5 {% if form.end.errors %}style="color:red;"{% endif %}>End <i class="fas fa-asterisk" style="color: red;"></i></h5>
+								{{ form.end }}
+								<br>
+								{% for error in form.end.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+
+					<div class="row row-padder">
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5 {% if form.venue_name.errors %}style="color:red;"{% endif %}>Venue Name</h5>
+								{{ form.venue_name }}
+								<span class="m-form__help">Leave blank if there is no venue (virtual event)</span>
+								<br>
+								{% for error in form.venue_name.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5 {% if form.venue_address.errors %}style="color:red;"{% endif %}>Venue Address</h5>
+								{{ form.venue_address }}
+								<span class="m-form__help">Leave blank if there is no venue (virtual event)</span>
+								<br>
+								{% for error in form.venue_address.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								<h5 {% if form.short_description.errors %}style="color:red;"{% endif %}>Short Description</h5>
+								{{ form.short_description }}
+								<br>
+								{% for error in form.short_description.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+
+
+					<div class="row row-padder">
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5 {% if form.image.errors %}style="color:red;"{% endif %}>Event Image</h5>
+								{{ form.image }}
+								<br>
+								{% for error in form.image.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+								<p class="lead text-center" style="padding-top: 30px;">We suggest a standard 8.5" X 11" flyer but you can use any image you'd like.</p>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<img id="image-placeholder" src="{% static 'images/event-form/arqam_flyer.jpg' %}" alt="Event Image" width="100%"/>
+							</div>
+						</div>
+					</div>
+
+
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								<h5>Public Event</h5>
+								<span class="m-switch m-switch--lg m-switch--icon">
+									<label>
+			                        {{ form.public }}
+			                        <span></span>
+			                        </label>
+			                    </span>
+			                    <span class="m-form__help">Public event (On) means your subscribers and the rest of the world can view your event and buy tickets for it. Private event (off) means only people with a link to your event can view it or buy tickets for it.</span>
+			                </div>
+			            </div>
+			        </div>
+
+
+				</div>
+				<div class="m-portlet__foot m-portlet__foot--fit" style="padding-top: 60px;padding-bottom: 50px;">
+					<div class="m-form__actions">
+						<button type="submit" name="Draft" value="Draft" class="btn btn-primary btn-block">Save Event As Draft</button>
+						<br>
+						<button type="submit" name="Create" value="Create" class="btn btn-success btn-block publish">Publish Event and Make Live</button>
+					</div>
+				</div>
+
+			</form>
+			<!--end::Form-->			
+		</div>
+		<!--end::Portlet-->
+	</div>
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

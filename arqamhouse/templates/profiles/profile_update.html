@@ -1,0 +1,99 @@
+{% extends "backend/base.html" %}
+
+{% block title %}
+Profile Update | {{ profile.name }}
+{% endblock title %}
+
+{% block page_title %}
+{{ profile.name }}
+{% endblock page_title %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item m-nav__item--home">
+		<a href="#" class="m-nav__link m-nav__link--icon">
+		   <i class="fas fa-user"></i>
+		</a>
+	</li>
+	<li class="m-nav__separator">-</li>
+	<li class="m-nav__item">
+		<a href="" class="m-nav__link">
+			<span class="m-nav__link-text">Profile Update</span>
+		</a>
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-10">
+		<!--begin::Portlet-->
+		<div class="m-portlet m-portlet--tab">
+			<!--begin::Form-->
+			<form class="m-form m-form--fit m-form--label-align-right" method="POST">{% csrf_token %}
+				<div class="m-portlet__body">
+
+
+					<div class="row row-padder">
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5>Name</h5>
+								{{ form.name }}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5>Email</h5>
+								{{ form.email }}
+							</div>
+						</div>
+					</div>
+
+					
+					<div class="row row-padder">
+						<div class="col-md-4">
+							<div class="form-group m-form__group">
+								<h5>Region</h5>
+								{{ form.region }}
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group m-form__group">
+								<h5>City</h5>
+								{{ form.city }}
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group m-form__group">
+								<h5>Timezone</h5>
+								{{ form.timezone }}
+							</div>
+						</div>
+					</div>
+
+
+				</div>
+
+				<div class="m-portlet__foot m-portlet__foot--fit">
+					<div class="m-form__actions">
+						<button type="submit" name="Create" value="Create" class="btn btn-primary btn-block">Update Profile</button>
+					</div>
+				</div>
+
+			</form>
+			<!--end::Form-->			
+		</div>
+		<!--end::Portlet-->
+	</div>
+</div>
+{% endblock content %}

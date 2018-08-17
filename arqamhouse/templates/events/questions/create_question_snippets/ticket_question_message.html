@@ -1,0 +1,10 @@
+{% if simple %}
+<strong><h3>Simple Order Question</h3></strong>
+This is a simple order question and will be asked by each attendee associated with the ticket {{ ticket.title }}
+{% elif paragraph %}
+<strong><h3>Paragrap Question</h3></strong>
+This is a paragraph question and will be asked by each attendee associated with the ticket {{ ticket.title }}
+{% elif multiple_choice %}
+<strong><h3>Multiple Choice Question</h3></strong>
+This is a multiple choice question and will be asked by each attendee associated with the ticket {{ ticket.title }}
+{% endif %}

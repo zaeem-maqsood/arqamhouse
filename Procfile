@@ -1,0 +1,1 @@
+web: gunicorn arqamhouse.wsgi --log-file -

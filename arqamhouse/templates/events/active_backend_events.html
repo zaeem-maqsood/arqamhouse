@@ -1,0 +1,152 @@
+{% extends "backend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+My Events | {{ organization.name }}
+{% endblock title %}
+
+{% block page_title %}
+Active Events
+{% endblock page_title %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+<!--begin::Page Resources --> 
+<script type="text/javascript">
+</script>
+<!--end::Page Resources -->
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item">
+		<a href="{{ profile.get_update_url }}" class="m-nav__link">
+			<span class="m-nav__link-text">{{ organization.name }}'s Active Events</span>
+		</a>
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+
+<div class="row">
+
+	{% for event in events %}
+	<div class="col-lg-6">
+	<!--begin::Portlet-->
+		<div class="m-portlet m-portlet--brand m-portlet--head-solid-bg m-portlet--bordered" style="background-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};border-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};">
+			<div class="m-portlet__head" style="background-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};border-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};">
+				<div class="m-portlet__head-caption">
+					<div class="m-portlet__head-title">
+						<span class="m-portlet__head-icon">
+							<i class="far fa-calendar-alt"></i>
+						</span>
+						<h3 class="m-portlet__head-text" style="font-weight: 400;">
+							{{ event.title }}
+						</h3>
+					</div>			
+				</div>
+				<div class="m-portlet__head-tools">
+					<ul class="m-portlet__nav">
+						<li class="m-portlet__nav-item">
+							<a href="" class="m-portlet__nav-link m-portlet__nav-link--icon">{% if event.public %}<i class="fas fa-lock-open" style="user-select: auto;"></i>{% else %}<i class="fas fa-lock"></i>{% endif %}</a>	
+						</li>						
+					</ul>
+				</div>
+			</div>
+			<div class="m-portlet__body">
+				<div class="row text-center">
+					<div class="col-md-12">
+						<p class="lead" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">Starts on {{ event.start }}</p>
+					</div>
+				</div>
+				<br>
+				<div class="row text-center">
+					<div class="col-sm-3 text-center">
+						<a href="{{ event.list_tickets_view }}" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<i class="flaticon-file" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Tickets</p>
+						</a>
+					</div>
+					<div class="col-sm-3 text-center">
+						<a href="{{ event.list_orders_view }}" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<i class="flaticon-diagram" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Orders</p>
+						</a>
+					</div>
+					<div class="col-sm-3 text-center">
+						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<i class="flaticon-users" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Attendees</p>
+						</a>
+					</div>
+					<div class="col-sm-3 text-center">
+						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<i class="flaticon-coins" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Pay-Out</p>
+						</a>
+					</div>
+				</div>
+				<br>
+				<div class="row text-center">
+					<div class="col-sm-3 text-center">
+						<a href="{{ event.list_questions_view }}" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<i class="flaticon-chat" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Questions</p>
+						</a>
+					</div>
+					<div class="col-sm-3 text-center">
+						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<i class="flaticon-interface-5" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Confirmation Email</p>
+						</a>
+					</div>
+					<div class="col-sm-3 text-center">
+						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<i class="flaticon-placeholder" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Check-Ins</p>
+						</a>
+					</div>
+					<div class="col-sm-3 text-center">
+						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<i class="flaticon-list-2" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Answers</p>
+						</a>
+					</div>
+				</div>
+				<br>
+				<a href="" class="btn btn-secondary  btn-block">Edit Content</a>
+				<a href="" class="btn btn-primary btn-block" style="background-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};border-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};">Edit Event</a>
+			</div>
+		</div>	
+		<!--end::Portlet-->
+	</div>
+	{% endfor %}
+
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

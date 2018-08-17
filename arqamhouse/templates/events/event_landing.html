@@ -1,0 +1,78 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}
+Create Organization
+{% endblock title %}
+
+{% block navigation %}
+	{% include "frontend/navigation.html" %}
+{% endblock navigation %}
+
+{% block footer %}
+	{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+{% block content %}
+
+{% if messages %}
+<section class="elements-title space--xxs text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+            	{% for message in messages %}
+                <div class="alert bg--{{ message.tags }}">
+					<div class="alert__body">
+						<span>{{ message.tags|upper }}: {{ message }}</span>
+					</div>
+					<div class="alert__close"> × </div>
+				</div>
+				{% endfor %}
+			</div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endif %}
+
+{% if event.image %}
+    {% include "events/sections/title_and_image.html" with event=event %}
+{% else %}
+    {% include "events/sections/only_title.html" with event=event %}
+{% endif %}
+
+
+{% include "events/sections/external_links.html" with event=event %}
+
+
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

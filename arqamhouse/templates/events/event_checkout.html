@@ -1,0 +1,353 @@
+{% extends "frontend/base.html" %}
+{% load event_checkout_form_tags %}
+
+{% block title %}
+{{ event.title }} Checkout
+{% endblock title %}
+
+{% block navigation %}
+	{% include "frontend/navigation.html" %}
+{% endblock navigation %}
+
+{% block footer %}
+	{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+<script src="https://checkout.stripe.com/checkout.js"></script>
+
+
+{% endblock top_page_scripts %}
+
+
+
+{% block scripts %}
+<script>
+var handler = StripeCheckout.configure({
+  key: '{{ public_key }}',
+  image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+  locale: 'auto',
+  token: function(token) {
+    // You can access the token ID with `token.id`.
+    // Get the token ID to your server-side code for use.
+    console.log(token.id)
+    document.getElementById("token").value = token.id;
+    document.getElementById("checkoutForm").submit();
+  }
+});
+
+
+
+document.getElementById('customButton').addEventListener('click', function(e) {
+  // Open Checkout with further options:
+  handler.open({
+    name: 'Arqam House Inc.',
+    description: '{{ cart_items.count }} ticket{% if cart_items.count > 1 %}s{% else %}{% endif %} for "{{ event.title }}"',
+    zipCode: true,
+    billingAddress: true,
+    amount: {{ total }},
+  });
+  e.preventDefault();
+});
+
+// Close Checkout on page navigation:
+window.addEventListener('popstate', function() {
+  handler.close();
+});
+</script>
+{% endblock scripts %}
+
+
+
+{% block content %}
+
+<section class="text-center" style="padding-bottom: 50px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <h2>Checkout Form for {{ event.title }}</h2>
+                <p class="lead">
+                    Let's Checkout Please.
+                </p>
+                <a class="btn btn--primary" href="{{ event.choose_tickets_view}}">
+					<span class="btn__text">Change Ticket Selection</span>
+				</a>
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+
+
+<section>
+    <div class="container">
+        <div class="row justify-content-around">
+            <div class="col-md-8">
+                <form id="checkoutForm" class="row" method="POST">{% csrf_token %}
+
+                    <div class="col-md-12" style="padding-bottom: 40px;padding: 10px;">
+                        <div class="boxed boxed--border cart-total">
+                            {% for cart_item in cart_items %}
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>{{ cart_item.ticket.title }} - ${{ cart_item.ticket_price }}</span>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <span>X {{ cart_item.quantity }}</span>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <span>${{ cart_item.cart_item_total }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <hr />
+                            <div class="row" style="padding-right: 10px;padding-left: 10px;">
+                                <div class="col-6">
+                                    <h2>Total:</h2>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <h2>${{ cart.total }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Begin Non Form Field Errors -->
+                    {% if form.non_field_errors %}
+                    <div class="col-md-12" style="padding-top: 20px;">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.non_field_errors %}
+                                <span>{{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <!-- End Non Form Field Errors -->
+
+                    
+
+                    <div class="col-md-12" style="padding-top: 20px;">
+                        <h3 class="color--primary-1" style="margin-bottom: 0px;">Order Information</h3>
+                    </div>
+
+
+                    <!-- Name Feild required No matter what -->
+                    {% if form.name.errors %}
+                    <div class="col-md-12">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.name.errors %}
+                                <span>Oh snap! There are errors within the name field. {{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if cart.total == 0.00 %}
+                    <div class="col-md-12" style="padding-bottom: 10px;">
+                        <label><i class="fas fa-asterisk" style="color: red;"></i>  Name</label>
+                        {{ form.name }}
+
+                        <label>Please enter your name.</label>
+                    </div>
+                    {% endif %}
+                    <!-- Name Feild required -->
+
+
+                    <!-- Email Feild required No matter what -->
+                    {% if form.email.errors %}
+                    <div class="col-md-12">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.email.errors %}
+                                <span>Oh snap! There are errors within the email field. {{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="col-md-12" style="padding-bottom: 10px;">
+                        <label><i class="fas fa-asterisk" style="color: red;"></i>  Email</label>
+                        {{ form.email }}
+
+                        <label>Tickets will be sent to this email address.</label>
+                    </div>
+                    <!-- Email Feild required -->
+
+
+                    <!-- Frequently Asked Order Questions -->
+                    {% if form.notes.errors %}
+                    <div class="col-md-12">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.notes.errors %}
+                                <span>Oh snap! There are errors within the notes field. {{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if event_general_questions.notes %}
+                    <div class="col-md-12" style="padding-bottom: 10px;">
+                        <label>{% if event_general_questions.notes_required %}<i class="fas fa-asterisk" style="color: red;"></i>{% endif %}  Notes</label>
+                        {{ form.notes }}
+                    </div>
+                    {% endif %}
+                    <!-- End Frequently Asked Order Questions -->
+
+
+                    <!-- Begin Event Question custom question fields  -->
+                    {% for question in event_questions %}
+
+                        <!-- Event Question Error -->
+                        {% autoescape off %}
+                            {% get_event_question_related_form_field_error form question %}
+                        {% endautoescape %}
+
+                        <!-- Check if Event Question is required or not -->
+                        <div class="col-md-12" style="padding-bottom: 20px;">
+                            <label>{% if question.required %}<i class="fas fa-asterisk" style="color: red;"></i>{% endif %}  {{ question.title }}</label>
+                            
+                            <!-- If the event question is a multiple choice question wrap the question in a 
+                            input-select div -->
+                            {% if question.multiple_choice_question %}
+                                <div class="input-select">
+                                    {% get_event_question_related_form_field form question %}
+                                </div>
+
+                            <!-- Otherwise just display the form field -->
+                            {% else %}
+                                {% get_event_question_related_form_field form question %}
+                            {% endif %}
+
+                            <!-- Event Question Help text -->
+                            <label>{{ question.help_text }}</label>
+                        </div>
+
+                    {% endfor %}
+                    <!-- End Event Questions custom question fields -->
+
+
+
+                    <div class="col-md-12" style="padding-top: 20px;">
+                        <h3 class="color--primary-1" style="margin-bottom: 0px;">Attendee Information</h3>
+                    </div>
+
+                    <!-- Begin Ticket Questions Fields -->
+                    {% for all_cart_item in all_cart_items %}
+
+                        <div class="col-md-12" style="padding-top: 30px;">
+                            <h5 style="margin-bottom: 0px;color: #00627f;" data-tooltip="{% if all_cart_item.cart_item.ticket.description %}{{ all_cart_item.cart_item.ticket.title }}: {{ all_cart_item.cart_item.ticket.description }}{% endif %}">Ticket {{ forloop.counter }} - {{ all_cart_item.cart_item.ticket.title }}</h5>
+                        </div>
+
+                        <!-- Attendee First Name Question -->
+                        {% if attendee_general_questions.name %}
+                            {% autoescape off %}
+                                {% get_ticket_name_form_field_errors form all_cart_item.cart_item all_cart_item.quantity %}
+                            {% endautoescape %}
+                            <div class="col-md-12" style="padding-bottom: 10px;">
+                                <label>{% if attendee_general_questions.name_required %}<i class="fas fa-asterisk" style="color: red;"></i>{% endif %}  Full Name</label>
+                                {% get_ticket_name_form_field form all_cart_item.cart_item all_cart_item.quantity %}
+                            </div>
+                        {% endif %}
+
+
+                        <!-- Attendee Gender Question -->
+                        {% if attendee_general_questions.gender %}
+                        <div class="col-md-12" style="padding-bottom: 10px;">
+                            <label>Gender</label>
+                            
+                            <br>
+                            {% for x in "xx" %}
+                            <div class="input-radio input-radio--innerlabel">
+                                <input type="radio" name="{% get_ticket_gender_option_form_field_name form all_cart_item.cart_item all_cart_item.quantity forloop.counter0 %}" id="{% get_ticket_gender_option_form_field_id form all_cart_item.cart_item all_cart_item.quantity forloop.counter0 %}" value="{% get_ticket_gender_option_form_field_value form all_cart_item.cart_item all_cart_item.quantity forloop.counter0 %}" checked="{% get_ticket_gender_option_form_field_checked form all_cart_item.cart_item all_cart_item.quantity forloop.counter0 %}">
+                                <label for='{% get_ticket_gender_option_form_field_id form all_cart_item.cart_item all_cart_item.quantity forloop.counter0 %}'>{% get_ticket_gender_option_form_field_label form all_cart_item.cart_item all_cart_item.quantity forloop.counter0 %}</label>
+                            </div>
+                            {% endfor %}
+
+                        </div>
+                        {% endif %}
+
+                        <!-- Attendee Email Question -->
+                        {% if attendee_general_questions.email %}
+                            {% autoescape off %}
+                                {% get_ticket_email_form_field_errors form all_cart_item.cart_item all_cart_item.quantity %}
+                            {% endautoescape %}
+
+                            <div class="col-md-12" style="padding-bottom: 10px;">
+                                <label>{% if attendee_general_questions.email_required %}<i class="fas fa-asterisk" style="color: red;"></i>{% endif %}  Email</label>
+                                {% get_ticket_email_form_field form all_cart_item.cart_item all_cart_item.quantity %}
+                            </div>
+                        {% endif %}
+
+
+                        {% for question in all_cart_item.cart_item.ticket.get_ticket_questions %}
+
+                            <!-- Question Error -->
+                            {% autoescape off %}
+                            {% get_ticket_question_related_form_field_error form question all_cart_item.cart_item all_cart_item.quantity %}
+                            {% endautoescape %}
+
+                            <div class="col-md-12" style="padding-bottom: 10px;">
+                                <label>{% if question.required %}<i class="fas fa-asterisk" style="color: red;"></i>{% endif %}  {{ question.title }}</label>
+                                {% get_ticket_question_related_form_field form question all_cart_item.cart_item all_cart_item.quantity %}
+                                <label>{{ question.help_text }}</label>
+                            </div>
+
+                        {% endfor %}
+
+                    {% endfor %}
+
+
+                    
+                    <div class="col-md-12">
+                        <input type="hidden" name="token" id="token" value="">
+                        <button id="customButton" type="submit" class="btn btn--primary">Enter Payment Details</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+
+
+
+
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
