@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cities',
     'storages',
     'organizations',
     'profiles',
@@ -92,13 +91,23 @@ WSGI_APPLICATION = 'arqamhouse.wsgi.application'
 # }
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         'NAME': 'arqamhouse',
+#         'USER': 'arqamhouse',
+#         'PASSWORD': 'Ed81ae9600!',
+#         'HOST': 'localhost',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'arqamhouse',
-        'USER': 'arqamhouse',
-        'PASSWORD': 'Ed81ae9600!',
-        'HOST': 'localhost',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 
@@ -107,8 +116,6 @@ db_from_env = dj_database_url.config()
 DATABASES['default'].update(db_from_env)
 
 
-GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')
-GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH')
 
 
 # Password validation

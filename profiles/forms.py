@@ -1,8 +1,6 @@
 from django import forms
 from .models import Profile
 
-from cities.models import (Country, Region, City, District, PostalCode)
-
 
 
 class LoginForm(forms.Form):
@@ -21,8 +19,6 @@ class ProfileForm(forms.ModelForm):
 			"name",
 			"email",
 			"timezone",
-			"region",
-			"city"
 		]
 
 
@@ -58,17 +54,6 @@ class ProfileForm(forms.ModelForm):
 						}
 					),
 			}
-
-	def __init__(self, *args, **kwargs):
-		super(ProfileForm, self).__init__(*args, **kwargs)
-		self.fields['region'] = forms.ModelChoiceField(queryset=Region.objects.filter(country__name="Canada"), empty_label=None, widget=forms.Select(attrs={
-						"required" : True,
-						"class":"form-control input",
-					}))
-		self.fields['city'] = forms.ModelChoiceField(queryset=City.objects.filter(country__name="Canada"), empty_label=None, widget=forms.Select(attrs={
-						"required" : True,
-						"class":"form-control input",
-					}))
 
 
 

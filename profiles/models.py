@@ -6,7 +6,6 @@ from django.urls import reverse
 
 from django.contrib.auth.models import User
 from core.models import TimestampedModel
-from cities.models import (Country, Region, City, District, PostalCode)
 
 
 
@@ -31,8 +30,6 @@ class Profile(TimestampedModel):
 	slug = models.SlugField(unique = False, blank=True)
 	email = models.EmailField(max_length=254, null=True, blank=True)
 	timezone = models.CharField(max_length=150, choices=timezones, default = 'Canada/Eastern')
-	city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=True)
-	region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=False, null=True)
 	country = models.CharField(max_length=150, default='Canada', blank=False, null=True)
 
 
