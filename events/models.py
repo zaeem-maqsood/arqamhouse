@@ -20,7 +20,13 @@ def image_location(instance, filename):
 class EventManager(models.Manager):
 
 	def active_events(self, **kwargs):
-		return self.filter(Q(active=True))
+		return self.filter(Q(active=True, deleted=False))
+
+	def inactive_events(self, **kwargs):
+		return self.filter(Q(active=False, deleted=False))
+
+	def deleted_events(self, **kwargs):
+		return self.filter(Q(deleted=True))
 
 
 class Event(TimestampedModel):
@@ -37,6 +43,7 @@ class Event(TimestampedModel):
 	image = models.ImageField(upload_to=image_location, null=True, blank=True)
 	public = models.BooleanField(default=True)
 	active = models.BooleanField(default=False)
+	deleted = models.BooleanField(default=False)
 	objects = EventManager()
 
 	def __str__(self):
@@ -44,6 +51,14 @@ class Event(TimestampedModel):
 
 	def get_landing_view(self):
 		view_name = "events:landing"
+		return reverse(view_name, kwargs={"slug": self.slug})
+
+	def get_update_view(self):
+		view_name = "events:update"
+		return reverse(view_name, kwargs={"slug": self.slug})
+
+	def get_event_dashboard(self):
+		view_name = "events:dashboard"
 		return reverse(view_name, kwargs={"slug": self.slug})
 
 	def create_free_ticket(self):
@@ -98,6 +113,18 @@ class Event(TimestampedModel):
 		view_name = "events:orders:list"
 		return reverse(view_name, kwargs={"slug": self.slug})
 
+	def list_attendees_view(self):
+		view_name = "events:attendees:list"
+		return reverse(view_name, kwargs={"slug": self.slug})
+
+	def payout_view(self):
+		view_name = "events:payouts:event_payout"
+		return reverse(view_name, kwargs={"slug": self.slug})
+
+	def create_checkin_view(self):
+		view_name = "events:create_checkin"
+		return reverse(view_name, kwargs={"slug": self.slug})
+
 
 def create_slug(instance, new_slug=None):
 
@@ -138,7 +165,7 @@ post_save.connect(event_post_save_reciever, sender=Event)
 
 
 
-# Event Select Question --------------------------------------
+# Frequently Asked General Questions --------------------------------------
 class EventGeneralQuestions(models.Model):
 	event = models.OneToOneField(Event, on_delete=models.CASCADE, blank=False, null=False)
 	
@@ -148,12 +175,9 @@ class EventGeneralQuestions(models.Model):
 	def __str__(self):
 		return ("%s" % self.event.title)
 
-
+# Frequently Asked Attendee Questions --------------------------------------
 class AttendeeGeneralQuestions(models.Model):
 	event = models.OneToOneField(Event, on_delete=models.CASCADE, blank=False, null=False)
-	
-	name = models.BooleanField(default=True)
-	name_required = models.BooleanField(default=True)
 
 	gender = models.BooleanField(default=True)
 
@@ -162,6 +186,22 @@ class AttendeeGeneralQuestions(models.Model):
 
 	def __str__(self):
 		return ("%s" % self.event.title)
+
+
+
+# Checkin Model -------------------------
+# Check attendee app for corresponding 'CheckinAttendee' model
+
+class Checkin(models.Model):
+	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=False, null=False)
+	title = models.CharField(max_length=120, null=True, blank=False)
+	auto_add_new_attendees = models.BooleanField(default=True)
+	password_protected = models.BooleanField(default=True)
+	password = models.CharField(max_length=120, null=True, blank=False)
+
+	def __str__(self):
+		return ("%s" % self.event.title)
+
 
 
 

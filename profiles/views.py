@@ -80,6 +80,9 @@ class LoginView(FormView):
 		email = form.cleaned_data.get("email")
 		password = form.cleaned_data.get("password")
 
+		print(email)
+		print(password)
+
 		# Create a user with this email and password
 		try:
 			user = authenticate(request, username=email, password=password)
@@ -87,12 +90,15 @@ class LoginView(FormView):
 			print(e)
 			form.add_error("email", "Invalid username/password combination")
 			return self.render_to_response(self.get_context_data(form=form))
-		
+		print("---")
+		print(authenticate(request, username=email, password=password))
+		print("---")
 		# Make sure user is authenticated, log them in or diplay 404 error
 		if user is not None:
 			login(request, user)
 			messages.success(request, 'Logged in as %s' % (user.username))
 		else:
+			print("Error Happended")
 			raise Http404
 
 		valid_data = super(LoginView, self).form_valid(form)

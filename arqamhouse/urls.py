@@ -19,9 +19,11 @@ from django.contrib import admin
 from django.urls import path, include
 
 from organizations.views import DashboardView, ConnectVerificationView, ChangeEntityTypeView
+from .views import HomePageView
 
 urlpatterns = [
 
+    path('', HomePageView.as_view(), name='home'),
     path('change-entity', ChangeEntityTypeView.as_view(), name='change_entity'),
     path('verification', ConnectVerificationView.as_view(), name='verification'),
     path('dashboard', DashboardView.as_view(), name='dashboard'),

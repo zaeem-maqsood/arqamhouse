@@ -29,7 +29,7 @@ Orders
 <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
 	<li class="m-nav__item">
 		<a href="{{ profile.get_update_url }}" class="m-nav__link">
-			<span class="m-nav__link-text">{{ orders.count }} Orders for "{{ event.title }}"</span>
+			<span class="m-nav__link-text">{{ orders.count }} Order{% if orders.count > 1 %}s{% endif %} for "{{ event.title }}"</span>
 		</a>
 	</li>
 </ul>

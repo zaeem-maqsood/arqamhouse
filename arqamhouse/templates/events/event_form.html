@@ -3,11 +3,15 @@
 {% load static %}
 
 {% block title %}
-Create Event | {{ organization.name }}
+Update Event | {{ organization.name }}
 {% endblock title %}
 
 {% block page_title %}
+{% if update_event %}
+{{ event.title }}
+{% else %}
 New Event
+{% endif %}
 {% endblock page_title %}
 
 {% block styles %}
@@ -53,16 +57,6 @@ jQuery(document).ready(function($) {
 });
 
 
-$(document).ready(function(){
-    $('.publish').attr('disabled',true);
-    $('#id_title').keyup(function(){
-        if($(this).val().length !=3)
-            $('.publish').attr('disabled', false);            
-        else
-            $('.publish').attr('disabled',true);
-    })
-});
-
 
 $('#id_start').datetimepicker({
     format: 'mm/dd/yyyy HH:ii P',
@@ -91,13 +85,15 @@ $('#id_end').datetimepicker({
 <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
 	<li class="m-nav__item">
 		<a href="{{ profile.get_update_url }}" class="m-nav__link">
-			<span class="m-nav__link-text">arqamhouse.com/events/<span id="output">new-event</span></span>
+			<span class="m-nav__link-text">arqamhouse.com/events/<span id="output">{% if update_event_tab %}{{ event.slug }}{% else %}new-event{% endif %}</span></span>
 		</a>
 	</li>
 </ul>
 {% endblock page_crumbs %}
 
 {% block content %}
+
+{% if not event.deleted %}
 <div class="row">
 	<div class="col-md-10">
 		<!--begin::Portlet-->
@@ -130,7 +126,7 @@ $('#id_end').datetimepicker({
 							<div class="form-group m-form__group">
 								<h5 {% if form.url.errors %}style="color:red;"{% endif %}>Event URL</h5>
 								{{ form.url }}
-								<span class="m-form__help">Create your own event url or leave it blank if you'd like us to make a generic o for you.</span>
+								<span class="m-form__help">Create your own event url or leave it blank if you'd like us to make a generic one for you.</span>
 								<br>
 								{% for error in form.url.errors %}
 									<div class="alert m-alert--outline alert-danger" role="alert">
@@ -251,7 +247,11 @@ $('#id_end').datetimepicker({
 						</div>
 						<div class="col-md-6">
 							<div class="form-group m-form__group">
+								{% if form.instance.image %}
+								<img id="image-placeholder" src="{{ form.instance.image.url }}" alt="Event Image" width="100%"/>
+								{% else %}
 								<img id="image-placeholder" src="{% static 'images/event-form/arqam_flyer.jpg' %}" alt="Event Image" width="100%"/>
+								{% endif %}
 							</div>
 						</div>
 					</div>
@@ -260,14 +260,16 @@ $('#id_end').datetimepicker({
 					<div class="row row-padder">
 						<div class="col-md-12">
 							<div class="form-group m-form__group">
-								<h5>Public Event</h5>
+								<h5>Ready To Launch?</h5>
 								<span class="m-switch m-switch--lg m-switch--icon">
 									<label>
 			                        {{ form.public }}
 			                        <span></span>
 			                        </label>
 			                    </span>
-			                    <span class="m-form__help">Public event (On) means your subscribers and the rest of the world can view your event and buy tickets for it. Private event (off) means only people with a link to your event can view it or buy tickets for it.</span>
+			                    <br>
+			                    <span class="m-form__help">On means your event is ready for the world.
+			                    	<br>Off means your event isn't quite ready yet.</span>
 			                </div>
 			            </div>
 			        </div>
@@ -276,9 +278,35 @@ $('#id_end').datetimepicker({
 				</div>
 				<div class="m-portlet__foot m-portlet__foot--fit" style="padding-top: 60px;padding-bottom: 50px;">
 					<div class="m-form__actions">
-						<button type="submit" name="Draft" value="Draft" class="btn btn-primary btn-block">Save Event As Draft</button>
-						<br>
-						<button type="submit" name="Create" value="Create" class="btn btn-success btn-block publish">Publish Event and Make Live</button>
+
+						{% if event.active %}
+						<div class="row" style="padding-bottom: 30px;">
+							<div class="col-md-12">
+								<button type="submit" name="Create" value="Create" class="btn btn-primary btn-block">{% if update_event %}Update{% else %}Create{% endif %} Event</button>
+							</div>
+						</div>
+						{% else %}
+						<div class="row text-center" style="padding-bottom: 30px;">
+							<div class="col-md-12">
+								<p class="lead" style="color: #9798a2;">This event is archived. If you'd like to re-open it simply click "Re-Open".</p>
+							</div>
+						</div>
+						{% endif %}
+						
+						{% if update_event %}
+						<div class="row">
+							<div class="col-md-6">
+								{% if event.active %}
+								<button type="submit" name="Archive Event" value="Archive Event" class="btn btn-warning btn-block">Archive Event</button>
+								{% else %}
+								<button type="submit" name="Re-Open Event" value="Re-Open Event" class="btn btn-warning btn-block">Re-Open Event</button>
+								{% endif %}
+							</div>
+							<div class="col-md-6">
+								<button type="submit" name="Delete Event" value="Delete Event" class="btn btn-danger btn-block">Delete Event</button>
+							</div>
+						</div>
+						{% endif %}
 					</div>
 				</div>
 
@@ -288,6 +316,22 @@ $('#id_end').datetimepicker({
 		<!--end::Portlet-->
 	</div>
 </div>
+{% else %}
+<form class="m-form m-form--fit m-form--label-align-right my-form" method="POST" enctype="multipart/form-data">{% csrf_token %}
+<div class="row">
+	<div class="col-md-12 text-center">
+		<br>
+		<br>
+		<i class="fas fa-house-damage" style="font-size: 20em;color: #adc1ce;"></i>
+		<br>
+		<br>
+		<h1 style="color: #adc1ce;">This event has been deleted.</h1>
+		<br>
+		<button type="submit" name="Undo Delete" value="Undo Delete" class="btn btn-danger btn-lg">Undo Delete</button>
+	</div>
+</div>
+</form>
+{% endif %}
 {% endblock content %}
 
 

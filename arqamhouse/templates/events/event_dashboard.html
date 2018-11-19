@@ -1,0 +1,383 @@
+{% extends "backend/base.html" %}
+{% load static %}
+{% block title %}
+Dashboard | {{ event.title }}
+{% endblock title %}
+
+{% block page_title %}
+{{ event.title }}
+{% endblock page_title %}
+
+{% block styles %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js" rel="stylesheet" type="text/css" />
+<style type="text/css">
+	.btn-outline-metal {
+    color: #727272;
+    background-color: transparent;
+    background-image: none;
+    border-color: #4599d8;
+}
+
+
+/*#all_ticket_and_sales {
+    	font-size: 2.6em;
+    }
+
+@media only screen and (max-width: 768px) {
+    #all_ticket_and_sales {
+    	font-size: 1.6em;
+    }
+}*/
+
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+<script src="{% static 'assets/demo/default/custom/components/datatables/base/html-table.js' %}" type="text/javascript"></script>
+
+<script type="text/javascript">
+	var ctx = document.getElementById("myChart");
+	var myChart = new Chart(ctx, {
+	    type: 'line',
+	    aspectRatio: 2,
+	    data: {
+	        labels: {{ fifteen_days_ticket_and_sales_data.day_label|safe }},
+	        datasets: [{
+	            label: 'Sales $',
+	            data: {{ fifteen_days_ticket_and_sales_data.sales_label|safe }},
+	            backgroundColor: 'rgba(68, 153, 216, 0.2)',
+	            borderColor:'rgba(68, 153, 216, 1)',
+	            borderWidth: 4,
+	            lineTension: 0.1,
+	            borderCapStyle: 'butt',
+	            borderDashOffset: 3.0,
+            	borderJoinStyle: 'miter',
+            	pointBorderWidth: 6,
+            	pointHoverRadius: 5,
+            	pointHoverBorderWidth: 2,
+            	pointRadius: 0.5,
+            	pointHitRadius: 7,
+            	xPadding: 25,
+
+	        }]
+	    },
+	    options: {
+
+	    	legend: {
+	            display: false,
+	        },
+
+	        animation: {
+	            duration: 4000,
+	        },
+
+	        maintainAspectRatio: false,
+
+	        scales: {
+	            yAxes: [{
+
+	            	gridLines: {
+	                    display:false,
+	                },
+
+	                ticks: {
+
+	                    beginAtZero: true,
+	                    {% if fifteen_days_ticket_and_sales_data.use_large_scale %}
+	                    {% else %}
+	                    stepSize : 1,
+	                    {% endif %}
+	                    suggestedMin: 0,
+                    	beginAtZero: true,
+                    	fontSize: 15,
+	                },
+
+	            }],
+
+	            xAxes: [{
+
+	                gridLines: {
+	                    display:false,
+	                },
+
+	                ticks: {
+                    	fontSize: 15,
+	                },
+
+	                stepSize: 5,
+	                position: 'bottom',
+	            }],
+
+	        },
+
+
+	        responsive: true,
+	    }
+	});
+</script>
+
+
+<script type="text/javascript">
+	var ctx2 = document.getElementById("myChart2");
+	var myChart2 = new Chart(ctx2, {
+	    type: 'line',
+	    aspectRatio: 2,
+	    data: {
+	        labels: {{ fifteen_days_ticket_and_sales_data.day_label|safe }},
+	        datasets: [{
+	            label: 'Tickets',
+	            data: {{ fifteen_days_ticket_and_sales_data.tickets_label|safe }},
+	            backgroundColor: 'rgba(68, 153, 216, 0.2)',
+	            borderColor:'rgba(68, 153, 216, 1)',
+	            borderWidth: 4,
+	            lineTension: 0.1,
+	            borderCapStyle: 'butt',
+	            borderDashOffset: 3.0,
+            	borderJoinStyle: 'miter',
+            	pointBorderWidth: 6,
+            	pointHoverRadius: 5,
+            	pointHoverBorderWidth: 2,
+            	pointRadius: 0.5,
+            	pointHitRadius: 7,
+            	xPadding: 25,
+
+	        }]
+	    },
+	    options: {
+
+	    	legend: {
+	            display: false,
+	        },
+
+	        animation: {
+	            duration: 4000,
+	        },
+
+	        maintainAspectRatio: false,
+
+	        scales: {
+	            yAxes: [{
+
+	            	gridLines: {
+	                    display:false,
+	                },
+
+	                ticks: {
+
+	                    beginAtZero: true,
+	                    {% if fifteen_days_ticket_and_sales_data.use_large_scale %}
+	                    {% else %}
+	                    stepSize : 1,
+	                    {% endif %}
+	                    suggestedMin: 0,
+                    	beginAtZero: true,
+                    	fontSize: 15,
+	                },
+
+	            }],
+
+	            xAxes: [{
+
+	                gridLines: {
+	                    display:false,
+	                },
+
+	                ticks: {
+                    	fontSize: 15,
+	                },
+
+	                stepSize: 5,
+	                position: 'bottom',
+
+	            }],
+
+	        },
+
+
+	        responsive: true,
+	    }
+	});
+</script>
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item">
+		<span class="m-nav__link-text">Starts on {{ event.start }}</span>	
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+
+{% if actions.show_actions %}
+<div class="row">
+	<div class="col-12" style="padding-bottom: 10px;">
+		<h3 style="font-weight: 200;color: #a2a2a2;">Suggestions</h3>
+	</div>
+</div>
+
+<div class="row" style="padding-bottom: 60px;">
+	{% if not actions.tickets_present %}
+	<div class="col-lg-4 col-md-6 text-center" style="">
+		<a href="{{ event.list_tickets_view }}" class="btn btn-outline-info btn-block">Add Tickets For {{ event.title }}</a>
+	</div>
+	{% endif %}
+</div>
+{% endif %}
+
+<div class="row">
+	<div class="col-12">
+		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height ">
+			<div class="m-portlet__body">
+				<div class="row text-center">
+					<div class="col-4" style="padding-top: 10px;">
+						<h3 id="all_ticket_and_sales" style="font-size:2.5vmax;font-weight: 400;color:#4499d5;">${{ all_ticket_and_sales_data.sales_sum }}</h3>
+						<p>Sales</p>
+					</div>
+					<div class="col-4" style="padding-top: 10px;">
+						<h3 id="all_ticket_and_sales" style="font-size:2.5vmax;font-weight: 400;color:#4499d5;">{{ all_ticket_and_sales_data.order_sum }}</h3>
+						<p>Orders</p>
+					</div>
+					<div class="col-4" style="padding-top: 10px;">
+						<h3 id="all_ticket_and_sales" style="font-size:2.5vmax;font-weight: 400;color:#4499d5;">{{ all_ticket_and_sales_data.tickets_sum }}</h3>
+						<p>Tickets</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-4 col-md-12">
+		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height ">
+			<div class="m-portlet__body">
+				<div class="row">
+					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
+						<a href="{{ event.list_tickets_view }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
+							<span>
+								<i class="flaticon-file"></i>
+								<span>Tickets</span>
+							</span>
+						</a>
+					</div>
+					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
+						<a href="{{ event.list_orders_view }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
+							<span>
+								<i class="flaticon-diagram"></i>
+								<span>Orders</span>
+							</span>
+						</a>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
+						<a href="{{ event.list_attendees_view }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
+							<span>
+								<i class="flaticon-users"></i>
+								<span>Attendees</span>
+							</span>
+						</a>
+					</div>
+					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
+						<a href="{{ event.payout_view }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
+							<span>
+								<i class="flaticon-coins"></i>
+								<span>Pay-Out</span>
+							</span>
+						</a>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
+						<a href="{{ event.list_questions_view }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
+							<span>
+								<i class="flaticon-chat"></i>
+								<span>Questions</span>
+							</span>
+						</a>
+					</div>
+					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
+						<a href="" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
+							<span>
+								<i class="flaticon-interface-5"></i>
+								<span>Email</span>
+							</span>
+						</a>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
+						<a href="" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg ">
+							<span>
+								<i class="flaticon-placeholder"></i>
+								<span>Check-Ins</span>
+							</span>
+						</a>
+					</div>
+					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
+						<a href="" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
+							<span>
+								<i class="flaticon-list-2"></i>
+								<span>Answers</span>
+							</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-lg-8 col-md-12">
+		<!--begin:: Widgets/Product Sales-->
+		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height ">
+			<div class="m-portlet__body">
+				<div class="row text-center">
+					<div class="col-md-12">
+						<p class="lead">Tickets</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<canvas id="myChart2" width="400" height="250"></canvas>
+					</div>
+				</div>
+				<br>
+				<hr>
+				<br>
+				<div class="row text-center">
+					<div class="col-md-12">
+						<p class="lead">Sales</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<canvas id="myChart" width="400" height="250"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--end:: Widgets/Product Sales-->
+	</div>
+</div>
+
+
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

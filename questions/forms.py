@@ -26,13 +26,10 @@ class AttendeeGeneralQuestionsForm(forms.ModelForm):
 	class Meta:
 		model = AttendeeGeneralQuestions
 		fields = [
-			"name", "name_required", "gender", "email", "email_required"
+			"gender", "email", "email_required"
 		]
 
 		widgets = {
-
-				"name": forms.CheckboxInput(),
-				"name_required": forms.CheckboxInput(),
 
 				"gender": forms.CheckboxInput(),
 

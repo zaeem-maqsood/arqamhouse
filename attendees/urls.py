@@ -19,14 +19,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import AttendeeListView
+from .views import AttendeeListView, AttendeeDetailView
 
 app_name="attendees"
 
 urlpatterns = [
 
     path('', AttendeeListView.as_view(), name='list'),
-
+    path('<slug:attendee_slug>/', AttendeeDetailView.as_view(), name='detail'),
 
     
 ]

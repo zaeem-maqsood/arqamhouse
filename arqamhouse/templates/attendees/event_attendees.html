@@ -61,19 +61,19 @@ Attendees
 		<table class="m-datatable" id="html_table" width="100%">
 			<thead>
 			<tr>
-				<th class="text-center" title="Number">More Info</th>
-				<th class="text-center" title="Number">Ticket</th>
 				<th class="text-center" title="Name">Name</th>
-				<th class="text-center" title="Payment Method">Order</th>
+				<th class="text-center" title="Number">Ticket</th>
+				<th class="text-center" title="Payment Method">View Order</th>
+				<th class="text-center" title="Number">View/Edit Details</th>
 			</tr>
 			</thead>
 			<tbody>
 				{% for attendee in attendees %}
 				<tr>
-					<td><div class="text-center"><button class="btn btn-outline-brand btn-sm btn-block">More Info</button></div></td>
-					<td><p class="lead text-center" style="color: #7069cb;margin:0 auto;">{{ attendee.ticket }}</p></td>
 					<td><p class="lead text-center" style="margin:0 auto;">{{ attendee.name }}</p></td>
+					<td><p class="lead text-center" style="color: #7069cb;margin:0 auto;">{{ attendee.ticket }}</p></td>
 					<td><div class="text-center"><button class="btn btn-outline-brand btn-sm btn-block">View Order</button></div></td>
+					<td><div class="text-center"><a href="{{ attendee.get_attendee_view }}" class="btn btn-outline-brand btn-sm btn-block">View/Edit Details</a></div></td>
 				</tr>
 				{% endfor %}
 			</tbody>

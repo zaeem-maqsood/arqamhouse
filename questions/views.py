@@ -158,7 +158,7 @@ class TicketQuestionCreateView(OrganizationAccountMixin, CreateView):
 		data = request.POST
 
 		# Check to make sure event slug is correct
-		event = self.get_event(kwargs['slug'])
+		event = get_event(kwargs['slug'])
 		ticket = get_ticket(kwargs['ticket_slug'])
 
 		# Get the ticket type from the kwargs
@@ -204,7 +204,7 @@ class TicketQuestionCreateView(OrganizationAccountMixin, CreateView):
 	def get(self, request, *args, **kwargs):
 		
 		# Check to make sure event slug is correct
-		event = self.get_event(kwargs['slug'])
+		event = get_event(kwargs['slug'])
 		ticket = get_ticket(kwargs['ticket_slug'])
 
 		self.object = None

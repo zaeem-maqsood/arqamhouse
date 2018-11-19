@@ -1,0 +1,188 @@
+{% extends "backend/base.html" %}
+{% load payout_template_tags %}
+{% load static %}
+
+{% block title %}
+Payout | {{ event.title }}
+{% endblock title %}
+
+{% block page_title %}
+Payout
+{% endblock page_title %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+<script type="text/javascript">
+
+
+function calculatePayout() {
+
+	var payout = 0.00;
+
+	{% for order in orders %}
+		var order_{{ order.id }} = document.getElementById("id_{{ order.id }}_order");
+
+		// If the checkbox is checked, display the output text
+		  if (order_{{ order.id }}.checked == true){
+		    order_amount = parseFloat({{ order.amount }});
+		    payout = payout + order_amount
+		  } else {
+		    payout = payout
+		  }
+
+	{% endfor %}
+
+	payout = payout.toFixed(2);
+	payout = payout.toString()
+	document.getElementById("payout").innerHTML = "$" + payout;
+}
+
+
+
+function myFunction() {
+
+
+  {% for order in orders %}
+	var order_{{ order.id }} = document.getElementById("id_{{ order.id }}_order");
+	if (order_{{ order.id }}.checked == true){
+      calculatePayout()
+    } else {
+    calculatePayout()
+  }
+  {% endfor %}
+}
+
+
+</script>
+<script src="{% static 'assets/demo/default/custom/components/datatables/base/html-table.js' %}" type="text/javascript"></script>
+
+
+
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item">
+		<a href="{{ profile.get_update_url }}" class="m-nav__link">
+			<span class="m-nav__link-text">{{ orders.count }} Order{% if orders.count > 1 %}s{% endif %} for "{{ event.title }}"</span>
+		</a>
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data">{% csrf_token %}
+<div class="m-portlet m-portlet--mobile">
+	<div class="m-portlet__body">
+
+
+		<div class="row text-center row-padder">
+			<div class="col-12">
+				<h1 class="m--font-success" id="payout">${% if payout_amount.amount__sum %}{{ payout_amount.amount__sum }}{% else %}0.00{% endif %}</h1>
+				<p class="lead">Eligable Payout Amount</p>
+				{% if orders %}
+				<p>You can add or remove orders you would like to be added or removed from the payout.</p>
+				{% else %}
+				<p>No sales as of yet!</p>
+				{% endif %}
+			</div>
+		</div>
+
+
+		{% if orders %}
+		<div class="row row-padder text-center">
+			<div class="col-md-12">
+				<button type="submit" name="payout" value="payout" class="btn btn-primary">Request Payout</button>
+			</div>
+		</div>
+
+
+		<!--begin: Search Form -->
+		<div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+			<div class="row align-items-center row-padder">
+				<div class="col-xl-6 order-2 order-xl-1">
+					<div class="form-group m-form__group row align-items-center">
+						<div class="col-md-12">
+							<div class="m-input-icon m-input-icon--left">
+								<input type="text" class="form-control m-input" placeholder="Search..." id="generalSearch">
+								<span class="m-input-icon__icon m-input-icon__icon--left">
+									<span><i class="la la-search"></i></span>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--end: Search Form -->
+
+		<!--begin: Datatable -->
+		<table class="table m-table m-table--head-bg-brand table-responsive" id="html_table" width="100%">
+			<thead>
+			<tr>
+				<th class="text-center" title="Number">No.</th>
+				<th class="text-center" title="Number">Time Created</th>
+				<th class="text-center" title="Name">Name</th>
+				<th class="text-center" title="Amount">Amount</th>
+				<th class="text-center" title="Payment Method">Payment Method</th>
+				<th class="text-center" title="Tickets">Tickets</th>
+				<th class="text-center" title="View Order">View Order</th>
+				<th class="text-center" title="View Order">Add/Remove</th>
+			</tr>
+			</thead>
+			<tbody>
+				{% for order in orders %}
+				<tr class="text-center">
+					<td><p class="lead text-center" style="margin:0 auto;">{{ forloop.counter }}</p></td>
+					<td><p class="text-center" style="margin:0 auto;">{{ order.created_at }}</p></td>
+					<td><p class="text-center" style="margin:0 auto;">{{ order.name }}</p></td>
+					<td><p class="lead text-center" style="color: {% if order.failed %}red{% else %}green{% endif %};margin:0 auto;">{% if order.failed %}----{% else %}{% if order.amount > 0 %}${{ order.amount }}{% else %}$0{% endif %}{% endif %}</p></td>
+					<td><div class="text-center">{% include "orders/brands.html" with order=order %}</div></td>
+					<td><h3 class="text-center" style="color: #7777a7;font-weight: 300;margin:0 auto;">{{ order.attendee_set.all.count }}</h3></td>
+					<td><div class="text-center"><a href="{{ order.get_order_view }}" class="btn btn-outline-brand btn-sm btn-block">View Order</a></div></td>
+					<td>
+						<div class="text-center">
+							<span class="m-switch m-switch--lg m-switch--icon">
+								<label>
+                        			{% get_order_related_form_field form order %}
+                        			<span></span>
+                        		</label>
+                    		</span>
+                		</div>
+            		</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		<!--end: Datatable -->
+		{% endif %}
+		
+	</div>	    
+</div>
+</form>
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

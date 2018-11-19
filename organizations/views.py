@@ -1,4 +1,6 @@
 import stripe
+import random
+import decimal
 import numpy as np
 import sys
 import time
@@ -8,6 +10,8 @@ from django.conf import settings
 from io import BytesIO
 from django.core.files.base import ContentFile
 
+from django.db.models import Sum
+from django.utils.timezone import datetime, timedelta
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect
@@ -26,7 +30,11 @@ from profiles.models import Profile
 from .models import Organization, OrganizationUser, SelectedUserOrganization
 from .forms import OrganizationAndUserCreateForm, ConnectIndividualVerificationForm, ConnectCompanyVerificationForm
 
-
+from events.models import Event
+from tickets.models import Ticket
+from orders.models import EventOrder
+from attendees.models import Attendee
+from carts.models import EventCart, EventCartItem
 
 # Create your views here.
 
@@ -249,19 +257,105 @@ class ConnectVerificationView(OrganizationAccountMixin, FormView):
 		return self.render_to_response(self.get_context_data(form=form))
 
 
+
 class DashboardView(OrganizationAccountMixin, DetailView):
 	model = Organization
 	template_name = "organizations/dashboard.html"
 
+	def get_events(self, organization):
+		events = Event.objects.active_events(organization=organization)
+		return events
+
+	def get_attendees(self, organization):
+		now = datetime.today()
+		fifteen_days_earlier = now - timedelta(days=15)
+		attendees = Attendee.objects.filter(order__event__organization=organization, order__created_at__range=(fifteen_days_earlier, now)).select_related("order", "ticket", "order__event").prefetch_related("order", "ticket", "order__event")
+		return attendees
+
+	def get_actions(self, events):
+		actions = {}
+
+		# Get events that don't have tickets yet
+		events_without_tickets = []
+		for event in events:
+			tickets = event.ticket_set.all().count()
+			if tickets < 1:
+				events_without_tickets.append(event)
+		actions["events_without_tickets"] = events_without_tickets
+		return actions
+
+
+	def get_sales(self, attendees):
+		day_label = []
+		sales_label = []
+		fifteen_days_sum = []
+		fifteen_days_order_sum = []
+		fifteen_days_tickets_sum = []
+		use_large_scale = False
+		today = datetime.today()
+		for x in range(15):
+			one_day_earlier = today - timedelta(days=x)
+			attendees_for_day = attendees.filter(order__created_at__day=one_day_earlier.day)
+			order_ids = set()
+			sales_sum = decimal.Decimal(0.00)
+			for attendee in attendees_for_day:
+				if not int(attendee.order.id) in order_ids:
+					order_ids.add(attendee.order.id)
+					sales_sum += attendee.order.amount
+					if sales_sum > 20:
+						use_large_scale = True
+
+			fifteen_days_tickets_sum.append(len(attendees_for_day))
+			fifteen_days_order_sum.append(len(order_ids))
+			sales_label.append("%.2f" % sales_sum)
+			fifteen_days_sum.append(sales_sum)		
+			day_label.append("%s %s" % (one_day_earlier.strftime('%b'), one_day_earlier.day))
+
+		sales_label = list(reversed(sales_label))
+		day_label = list(reversed(day_label))
+
+		data_set_dict = {"sales_label": sales_label, "day_label": day_label, "use_large_scale": use_large_scale, "fifteen_days_sum": fifteen_days_sum, "fifteen_days_order_sum": fifteen_days_order_sum, "fifteen_days_tickets_sum": fifteen_days_tickets_sum}
+		return data_set_dict
+
+
 
 	def get(self, request, *args, **kwargs):
+
+
+		# Generate 2000 attendees
+		# event = Event.objects.get(id=3)
+		# ticket = Ticket.objects.get(id=4)
+		# for x in range(100):
+		# 	today = datetime.today()
+		# 	random_date = today - timedelta(days=random.randint(0, 15))
+		# 	event_cart = EventCart.objects.create(event=event, processed=True, total=52.80, stripe_charge=1.83)
+		# 	event_cart_item = EventCartItem.objects.create(event_cart=event_cart, ticket=ticket, quantity=1, paid_ticket=True, pass_fee=True, ticket_price=52.80, cart_item_total=52.80) 
+		# 	order = EventOrder.objects.create(event=event, event_cart=event_cart, email="zaeem.maqsood@gmail.com", amount=52.80, payment_id="ch_1DS7mHHblWxAI5San4koFles", last_four="4242", brand="Visa", network_status="approved_by_network", risk_level="normal", seller_message="Payment complete.", outcome_type="authorized", name="Zaeem Maqsood", address_line_1="$7 Denny Street", address_state="ON", address_postal_code="L1Z0S3", address_city="Ajax", address_country="Canada")
+		# 	attendee = Attendee.objects.create(order=order, ticket=ticket, name="Zaeem Maqsood")
+		# 	attendee.created_at = random_date
+		# 	order.created_at = random_date
+		# 	order.save()
+		# 	attendee.save()
+
+
 		context = {}
 		organization = self.get_organization()
 		profile = self.get_profile()
+		attendees = self.get_attendees(organization)
+		events = self.get_events(organization)
+		sales_data = self.get_sales(attendees)
+		actions = self.get_actions(events)
+
+		context["events"] = events
+		context["actions"] = actions
 		context["profile"] = profile
 		context["organization"] = organization
-
-
+		context["attendees"] = attendees[:5]
+		context["data_set_dict"] = sales_data
+		context["dashboard_tab"] = True
+		context["fifteen_day_sales"] = sum(sales_data["fifteen_days_sum"])
+		context["fifteen_days_order_sum"] = sum(sales_data["fifteen_days_order_sum"])
+		context["fifteen_days_tickets_sum"] = sum(sales_data["fifteen_days_tickets_sum"])
 		return render(request, self.template_name, context)
 
 

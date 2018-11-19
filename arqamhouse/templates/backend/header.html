@@ -56,14 +56,14 @@
 								<span class="m-menu__arrow m-menu__arrow--adjust"></span>
 								<ul class="m-menu__subnav">
 									<li class="m-menu__item "  aria-haspopup="true">
-										<a  href="header/actions.html" class="m-menu__link ">
+										<a  href="{% url 'events:create' %}" class="m-menu__link ">
 											<i class="m-menu__link-icon flaticon-file"></i>
 											<span class="m-menu__link-text">
-												Create New Post
+												Create New Event
 											</span>
 										</a>
 									</li>
-									<li class="m-menu__item "  data-redirect="true" aria-haspopup="true">
+									<!-- <li class="m-menu__item "  data-redirect="true" aria-haspopup="true">
 										<a  href="header/actions.html" class="m-menu__link ">
 											<i class="m-menu__link-icon flaticon-diagram"></i>
 											<span class="m-menu__link-title">
@@ -79,8 +79,8 @@
 												</span>
 											</span>
 										</a>
-									</li>
-									<li class="m-menu__item  m-menu__item--submenu"  data-menu-submenu-toggle="hover" data-redirect="true" aria-haspopup="true">
+									</li> -->
+									<!-- <li class="m-menu__item  m-menu__item--submenu"  data-menu-submenu-toggle="hover" data-redirect="true" aria-haspopup="true">
 										<a  href="#" class="m-menu__link m-menu__toggle">
 											<i class="m-menu__link-icon flaticon-business"></i>
 											<span class="m-menu__link-text">
@@ -136,69 +136,11 @@
 												</li>
 											</ul>
 										</div>
-									</li>
-									<li class="m-menu__item  m-menu__item--submenu"  data-menu-submenu-toggle="hover" data-redirect="true" aria-haspopup="true">
-										<a  href="#" class="m-menu__link m-menu__toggle">
-											<i class="m-menu__link-icon flaticon-chat-1"></i>
-											<span class="m-menu__link-text">
-												Customer Feedbacks
-											</span>
-											<i class="m-menu__hor-arrow la la-angle-right"></i>
-											<i class="m-menu__ver-arrow la la-angle-right"></i>
-										</a>
-										<div class="m-menu__submenu m-menu__submenu--classic m-menu__submenu--right">
-											<span class="m-menu__arrow "></span>
-											<ul class="m-menu__subnav">
-												<li class="m-menu__item "  data-redirect="true" aria-haspopup="true">
-													<a  href="header/actions.html" class="m-menu__link ">
-														<span class="m-menu__link-text">
-															Customer Feedbacks
-														</span>
-													</a>
-												</li>
-												<li class="m-menu__item "  data-redirect="true" aria-haspopup="true">
-													<a  href="header/actions.html" class="m-menu__link ">
-														<span class="m-menu__link-text">
-															Supplier Feedbacks
-														</span>
-													</a>
-												</li>
-												<li class="m-menu__item "  data-redirect="true" aria-haspopup="true">
-													<a  href="header/actions.html" class="m-menu__link ">
-														<span class="m-menu__link-text">
-															Reviewed Feedbacks
-														</span>
-													</a>
-												</li>
-												<li class="m-menu__item "  data-redirect="true" aria-haspopup="true">
-													<a  href="header/actions.html" class="m-menu__link ">
-														<span class="m-menu__link-text">
-															Resolved Feedbacks
-														</span>
-													</a>
-												</li>
-												<li class="m-menu__item "  data-redirect="true" aria-haspopup="true">
-													<a  href="header/actions.html" class="m-menu__link ">
-														<span class="m-menu__link-text">
-															Feedback Reports
-														</span>
-													</a>
-												</li>
-											</ul>
-										</div>
-									</li>
-									<li class="m-menu__item "  data-redirect="true" aria-haspopup="true">
-										<a  href="header/actions.html" class="m-menu__link ">
-											<i class="m-menu__link-icon flaticon-users"></i>
-											<span class="m-menu__link-text">
-												Register Member
-											</span>
-										</a>
-									</li>
+									</li> -->
 								</ul>
 							</div>
 						</li>
-						<li class="m-menu__item  m-menu__item--submenu m-menu__item--rel"  data-menu-submenu-toggle="click" data-redirect="true" aria-haspopup="true">
+						<!-- <li class="m-menu__item  m-menu__item--submenu m-menu__item--rel"  data-menu-submenu-toggle="click" data-redirect="true" aria-haspopup="true">
 							<a  href="#" class="m-menu__link m-menu__toggle">
 								<i class="m-menu__link-icon flaticon-line-graph"></i>
 								<span class="m-menu__link-text">
@@ -456,8 +398,8 @@
 									</ul>
 								</div>
 							</div>
-						</li>
-						<li class="m-menu__item  m-menu__item--submenu m-menu__item--rel"  data-menu-submenu-toggle="click" data-redirect="true" aria-haspopup="true">
+						</li> -->
+						<!-- <li class="m-menu__item  m-menu__item--submenu m-menu__item--rel"  data-menu-submenu-toggle="click" data-redirect="true" aria-haspopup="true">
 							<a  href="#" class="m-menu__link m-menu__toggle">
 								<i class="m-menu__link-icon flaticon-paper-plane"></i>
 								<span class="m-menu__link-title">
@@ -624,14 +566,14 @@
 									</li>
 								</ul>
 							</div>
-						</li>
+						</li> -->
 					</ul>
 				</div>
 				<!-- END: Horizontal Menu -->								<!-- BEGIN: Topbar -->
 				<div id="m_header_topbar" class="m-topbar  m-stack m-stack--ver m-stack--general">
 					<div class="m-stack__item m-topbar__nav-wrapper">
 						<ul class="m-topbar__nav m-nav m-nav--inline">
-							<li class="
+							<!-- <li class="
 m-nav__item m-dropdown m-dropdown--large m-dropdown--arrow m-dropdown--align-center m-dropdown--mobile-full-width m-dropdown--skin-light	m-list-search m-list-search--skin-light" 
 data-dropdown-toggle="click" data-dropdown-persistent="true" id="m_quicksearch" data-search-type="dropdown">
 								<a href="#" class="m-nav__link m-dropdown__toggle">
@@ -661,8 +603,8 @@ data-dropdown-toggle="click" data-dropdown-persistent="true" id="m_quicksearch" 
 										</div>
 									</div>
 								</div>
-							</li>
-							<li class="m-nav__item m-topbar__notifications m-topbar__notifications--img m-dropdown m-dropdown--large m-dropdown--header-bg-fill m-dropdown--arrow m-dropdown--align-center 	m-dropdown--mobile-full-width" data-dropdown-toggle="click" data-dropdown-persistent="true">
+							</li> -->
+							<!-- <li class="m-nav__item m-topbar__notifications m-topbar__notifications--img m-dropdown m-dropdown--large m-dropdown--header-bg-fill m-dropdown--arrow m-dropdown--align-center 	m-dropdown--mobile-full-width" data-dropdown-toggle="click" data-dropdown-persistent="true">
 								<a href="#" class="m-nav__link m-dropdown__toggle" id="m_topbar_notification_icon">
 									<span class="m-nav__link-badge m-badge m-badge--dot m-badge--dot-small m-badge--danger"></span>
 									<span class="m-nav__link-icon">
@@ -870,8 +812,8 @@ data-dropdown-toggle="click" data-dropdown-persistent="true" id="m_quicksearch" 
 										</div>
 									</div>
 								</div>
-							</li>
-							<li class="m-nav__item m-topbar__quick-actions m-topbar__quick-actions--img m-dropdown m-dropdown--large m-dropdown--header-bg-fill m-dropdown--arrow m-dropdown--align-right m-dropdown--align-push m-dropdown--mobile-full-width m-dropdown--skin-light"  data-dropdown-toggle="click">
+							</li> -->
+							<!-- <li class="m-nav__item m-topbar__quick-actions m-topbar__quick-actions--img m-dropdown m-dropdown--large m-dropdown--header-bg-fill m-dropdown--arrow m-dropdown--align-right m-dropdown--align-push m-dropdown--mobile-full-width m-dropdown--skin-light"  data-dropdown-toggle="click">
 								<a href="#" class="m-nav__link m-dropdown__toggle">
 									<span class="m-nav__link-badge m-badge m-badge--dot m-badge--info m--hide"></span>
 									<span class="m-nav__link-icon">
@@ -927,8 +869,8 @@ data-dropdown-toggle="click" data-dropdown-persistent="true" id="m_quicksearch" 
 										</div>
 									</div>
 								</div>
-							</li>
-							<li class="m-nav__item m-topbar__user-profile m-topbar__user-profile--img  m-dropdown m-dropdown--medium m-dropdown--arrow m-dropdown--header-bg-fill m-dropdown--align-right m-dropdown--mobile-full-width m-dropdown--skin-light" data-dropdown-toggle="click">
+							</li> -->
+							<!-- <li class="m-nav__item m-topbar__user-profile m-topbar__user-profile--img  m-dropdown m-dropdown--medium m-dropdown--arrow m-dropdown--header-bg-fill m-dropdown--align-right m-dropdown--mobile-full-width m-dropdown--skin-light" data-dropdown-toggle="click">
 								<a href="#" class="m-nav__link m-dropdown__toggle">
 									<span class="m-topbar__userpic">
 										<img src="assets/app/media/img/users/user4.jpg" class="m--img-rounded m--marginless m--img-centered" alt=""/>
@@ -1024,14 +966,14 @@ data-dropdown-toggle="click" data-dropdown-persistent="true" id="m_quicksearch" 
 										</div>
 									</div>
 								</div>
-							</li>
-							<li id="m_quick_sidebar_toggle" class="m-nav__item">
+							</li> -->
+							<!-- <li id="m_quick_sidebar_toggle" class="m-nav__item">
 								<a href="#" class="m-nav__link m-dropdown__toggle">
 									<span class="m-nav__link-icon">
 										<i class="flaticon-grid-menu"></i>
 									</span>
 								</a>
-							</li>
+							</li> -->
 						</ul>
 					</div>
 				</div>

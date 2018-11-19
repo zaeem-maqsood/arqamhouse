@@ -3,11 +3,11 @@
 {% load static %}
 
 {% block title %}
-My Events | {{ organization.name }}
+Past Events | {{ organization.name }}
 {% endblock title %}
 
 {% block page_title %}
-Active Events
+Past Events
 {% endblock page_title %}
 
 {% block styles %}
@@ -32,7 +32,7 @@ Active Events
 <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
 	<li class="m-nav__item">
 		<a href="{{ profile.get_update_url }}" class="m-nav__link">
-			<span class="m-nav__link-text">{{ organization.name }}'s Active Events</span>
+			<span class="m-nav__link-text">{{ organization.name }}'s Past Events</span>
 		</a>
 	</li>
 </ul>
@@ -40,7 +40,9 @@ Active Events
 
 {% block content %}
 
-<div class="row">
+
+{% if events %}
+<div class="row" style="padding-bottom: 50px;">
 
 	{% for event in events %}
 	<div class="col-lg-6">
@@ -53,7 +55,7 @@ Active Events
 							<i class="far fa-calendar-alt"></i>
 						</span>
 						<h3 class="m-portlet__head-text" style="font-weight: 400;">
-							{{ event.title }}
+							<a href="{{ event.get_landing_view }}" style="color: #fff;">{{ event.title }}</a>
 						</h3>
 					</div>			
 				</div>
@@ -68,31 +70,31 @@ Active Events
 			<div class="m-portlet__body">
 				<div class="row text-center">
 					<div class="col-md-12">
-						<p class="lead" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">Starts on {{ event.start }}</p>
+						<p class="lead" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">Ended on {{ event.end }}</p>
 					</div>
 				</div>
 				<br>
 				<div class="row text-center">
 					<div class="col-sm-3 text-center">
-						<a href="{{ event.list_tickets_view }}" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<a href="{{ event.list_tickets_view }}" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}; text-decoration: none;">
 						<i class="flaticon-file" style="user-select: auto;font-size: 3em;"></i>
 						<p class="">Tickets</p>
 						</a>
 					</div>
 					<div class="col-sm-3 text-center">
-						<a href="{{ event.list_orders_view }}" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<a href="{{ event.list_orders_view }}" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
 						<i class="flaticon-diagram" style="user-select: auto;font-size: 3em;"></i>
 						<p class="">Orders</p>
 						</a>
 					</div>
 					<div class="col-sm-3 text-center">
-						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<a href="{{ event.list_attendees_view }}" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
 						<i class="flaticon-users" style="user-select: auto;font-size: 3em;"></i>
 						<p class="">Attendees</p>
 						</a>
 					</div>
 					<div class="col-sm-3 text-center">
-						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<a href="{{ event.payout_view }}" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
 						<i class="flaticon-coins" style="user-select: auto;font-size: 3em;"></i>
 						<p class="">Pay-Out</p>
 						</a>
@@ -101,33 +103,32 @@ Active Events
 				<br>
 				<div class="row text-center">
 					<div class="col-sm-3 text-center">
-						<a href="{{ event.list_questions_view }}" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<a href="{{ event.list_questions_view }}" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
 						<i class="flaticon-chat" style="user-select: auto;font-size: 3em;"></i>
 						<p class="">Questions</p>
 						</a>
 					</div>
 					<div class="col-sm-3 text-center">
-						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
 						<i class="flaticon-interface-5" style="user-select: auto;font-size: 3em;"></i>
 						<p class="">Confirmation Email</p>
 						</a>
 					</div>
 					<div class="col-sm-3 text-center">
-						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
 						<i class="flaticon-placeholder" style="user-select: auto;font-size: 3em;"></i>
 						<p class="">Check-Ins</p>
 						</a>
 					</div>
 					<div class="col-sm-3 text-center">
-						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
+						<a href="" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
 						<i class="flaticon-list-2" style="user-select: auto;font-size: 3em;"></i>
 						<p class="">Answers</p>
 						</a>
 					</div>
 				</div>
 				<br>
-				<a href="" class="btn btn-secondary  btn-block">Edit Content</a>
-				<a href="" class="btn btn-primary btn-block" style="background-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};border-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};">Edit Event</a>
+				<a href="{{ event.get_update_view }}" class="btn btn-primary btn-block" style="background-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};border-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};">Edit Event</a>
 			</div>
 		</div>	
 		<!--end::Portlet-->
@@ -135,6 +136,46 @@ Active Events
 	{% endfor %}
 
 </div>
+{% else %}
+<div class="row">
+	<div class="col-md-12 text-center" style="padding-top: 40px;padding-bottom: 30px;">
+		<i class="far fa-grin-beam-sweat" style="font-size: 10em;color: #adc1ce;"></i>
+		<br>
+		<br>
+		<h1 style="color: #adc1ce;">No Past Events</h1>
+	</div>
+</div>
+{% endif %}
+
+<div class="row">
+	<div class="col-md-12">
+		<h2 style="font-weight: 200;">Deleted Events</h2>
+		<hr>
+	</div>
+</div>
+
+
+{% if deleted_events %}
+<div class="row" style="padding-bottom: 30px;">
+	{% for event in deleted_events %}
+	<div class="col-lg-4">
+		<a href="{{ event.get_update_view }}" class="btn btn-outline-danger btn-lg btn-block">{{ event.title }}</a>
+	</div>
+	{% endfor %}
+</div>
+
+
+{% else %}
+
+<div class="row" style="padding-top: 30px;padding-bottom: 40px;">
+	<div class="col-md-12 text-center" style="padding-top: 40px;">
+		<i class="far fa-grin-beam-sweat" style="font-size: 10em;color: #adc1ce;"></i>
+		<br>
+		<br>
+		<h1 style="color: #adc1ce;">No Deleted Events</h1>
+	</div>
+</div>
+{% endif %}
 {% endblock content %}
 
 

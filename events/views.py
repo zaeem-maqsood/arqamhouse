@@ -6,8 +6,9 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.urls import reverse
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
+from django.utils.timezone import datetime, timedelta
 
 from organizations.mixins import OrganizationAccountMixin
 from questions.models import EventQuestion, AllTicketQuestionControl, TicketQuestion
@@ -16,8 +17,8 @@ from carts.models import EventCart, EventCartItem
 from attendees.models import Attendee
 from orders.models import EventOrder
 from .mixins import EventMixin
-from .models import Event, EventGeneralQuestions, AttendeeGeneralQuestions
-from .forms import EventForm, EventCheckoutForm
+from .models import Event, EventGeneralQuestions, AttendeeGeneralQuestions, Checkin
+from .forms import EventForm, EventCheckoutForm, CheckinForm
 
 
 
@@ -175,6 +176,9 @@ class EventCheckoutView(FormView):
 				ticket_questions = TicketQuestion.objects.filter(event=event, deleted=False, approved=True).order_by('order')
 				cart_items = EventCartItem.objects.filter(event_cart=cart)
 
+				# Get Attendee General Questions
+				attendee_general_questions = AttendeeGeneralQuestions.objects.get(event=event)
+
 				# Save Event Questions
 				for question in event_questions:
 					value = form.cleaned_data['%s_eventquestion' % (question.id)]
@@ -185,7 +189,8 @@ class EventCheckoutView(FormView):
 
 						name = form.cleaned_data['%s_%s_name' % (x, cart_item.id)]
 						gender = form.cleaned_data['%s_%s_gender' % (x, cart_item.id)]
-						email = form.cleaned_data['%s_%s_email' % (x, cart_item.id)]
+						if attendee_general_questions.email:
+							email = form.cleaned_data['%s_%s_email' % (x, cart_item.id)]
 						attendee = Attendee.objects.create(ticket=cart_item.ticket, name=name, gender=gender, order=order)
 
 						for question in ticket_questions:
@@ -231,6 +236,133 @@ class EventCheckoutView(FormView):
 
 
 
+class EventDashboardView(OrganizationAccountMixin, DetailView):
+	model = Event
+	template_name = "events/event_dashboard.html"
+
+	def get_event(self, slug):
+		try:
+			event = Event.objects.get(slug=slug)
+			return event
+		except Exception as e:
+			raise Http404
+
+
+	def get_actions(self, event):
+		actions = {}
+
+		show_actions = True
+
+		# Get events that don't have tickets yet
+		tickets_present = False
+		tickets = event.ticket_set.all().count()
+		if tickets > 1:
+			tickets_present = True
+			show_actions = False
+
+		actions["show_actions"] = show_actions
+		actions["tickets_present"] = tickets_present
+		return actions
+
+	def get_attendees(self, event):
+		attendees = Attendee.objects.filter(order__event=event).select_related("order", "ticket", "order__event").prefetch_related("order", "ticket", "order__event")
+		return attendees
+
+	def get_all_ticket_and_sales_data(self, attendees):
+		order_ids = set()
+		tickets_sum = 0
+		sales_sum = decimal.Decimal(0.00)
+		order_sum = 0
+		for attendee in attendees:
+			tickets_sum += 1
+			if not int(attendee.order.id) in order_ids:
+				order_ids.add(attendee.order.id)
+				order_sum += 1
+				sales_sum += attendee.order.amount
+
+		data = {"tickets_sum": tickets_sum, "sales_sum": sales_sum, "order_sum": order_sum}
+		return data
+
+
+	def get_fifteen_day_ticket_and_sales_data(self, attendees):
+
+		# Get Todays Date
+		now = datetime.today()
+
+		# Get 15 days earlier date
+		fifteen_days_earlier = now - timedelta(days=15)
+
+		# Filter all attendees to only 15 days
+		attendees = attendees.filter(order__created_at__range=(fifteen_days_earlier, now))
+
+		# Day label for both graphs
+		day_label = []
+
+		# 15 days sales label
+		sales_label = []
+
+		# 15 days tickets label
+		tickets_label = []
+
+		# Booleans to use a large scale or not
+		use_large_scale_tickets = False
+		use_large_scale = False
+
+		# Calculate sales and ticket labels 
+		today = datetime.today()
+		for x in range(15):
+			one_day_earlier = today - timedelta(days=x)
+			attendees_for_day = attendees.filter(order__created_at__day=one_day_earlier.day)
+			order_ids = set()
+			sales_sum = decimal.Decimal(0.00)
+			tickets_sum = 0
+			for attendee in attendees_for_day:
+				tickets_sum += 1
+				if not int(attendee.order.id) in order_ids:
+					order_ids.add(attendee.order.id)
+					sales_sum += attendee.order.amount
+					if sales_sum > 20:
+						use_large_scale = True
+
+			sales_label.append("%.2f" % sales_sum)
+			tickets_label.append("%s" % (tickets_sum))	
+			day_label.append("%s %s" % (one_day_earlier.strftime('%b'), one_day_earlier.day))
+
+		sales_label = list(reversed(sales_label))
+		day_label = list(reversed(day_label))
+		tickets_label = list(reversed(tickets_label))
+
+		data = {"tickets_label":tickets_label, "sales_label": sales_label, "day_label": day_label, "use_large_scale": use_large_scale}
+		return data
+
+
+
+	def get(self, request, *args, **kwargs):
+		context = {}
+		slug = kwargs['slug']
+		organization = self.get_organization()
+		event = self.get_event(slug)
+		events = self.get_events()
+		attendees = self.get_attendees(event)
+		all_ticket_and_sales_data = self.get_all_ticket_and_sales_data(attendees)
+		fifteen_days_ticket_and_sales_data = self.get_fifteen_day_ticket_and_sales_data(attendees)
+		actions = self.get_actions(event)
+
+		if event.active == False:
+			context["inactive_event_tab"] = True
+			context["events_tab"] = False
+		else:
+			context["events_tab"] = True
+
+		context["events"] = events
+
+		context["actions"] = actions
+		context["all_ticket_and_sales_data"] = all_ticket_and_sales_data
+		context["fifteen_days_ticket_and_sales_data"] = fifteen_days_ticket_and_sales_data
+		context["organization"] = organization
+		context["event"] = event
+		context["request"] = request
+		return render(request, self.template_name, context)
 
 
 
@@ -253,27 +385,118 @@ class EventLandingView(DetailView):
 		return render(request, self.template_name, context)
 
 
-class ActiveEventsBackendListView(OrganizationAccountMixin, EventMixin, ListView):
+class PastEventsView(OrganizationAccountMixin, EventMixin, ListView):
 	model = Event
-	template_name = "events/active_backend_events.html"
+	template_name = "events/past_events.html"
 
 
 	def get_context_data(self, *args, **kwargs):
 		context = {}
 		organization = self.get_organization()
-		active_events = self.get_active_events(organization)
-		print(active_events)
-		context["events"] = active_events
+		inactive_events = self.get_inactive_events(organization=organization)
+		deleted_events = self.get_deleted_events(organization=organization)
+		context["events"] = inactive_events
+		context["deleted_events"] = deleted_events
 		context["organization"] = organization
-		context["events_tab"] = True
-		context["active_event_tab"] = True
+		context["inactive_event_tab"] = True
 		return context
+
+
+
+
+class EventCheckinCreateView(OrganizationAccountMixin, CreateView):
+	model = Checkin
+	form_class = CheckinForm
+	template_name = "events/checkin/checkin_create.html"
+
+	def get_event(self, slug):
+		try:
+			event = Event.objects.get(slug=slug)
+			return event
+		except Exception as e:
+			raise Http404
+
+	def get_orders(self, event):
+		orders = EventOrder.objects.filter(event=event, failed=False, payout=None).order_by('created_at')
+		return orders
+
+	def get_attendees(self, orders):
+		attendees = Attendee.objects.filter(order__in=orders)
+		return orders
+
+	def get_context_data(self, form, event, request, *args, **kwargs):
+		context = {}
+		orders = self.get_orders(event)
+		attendees = self.get_attendees(orders)
+		context["event"] = event
+		context["form"] = form
+		context["attendees"] = attendees
+
+		return context
+
+	def get(self, request, *args, **kwargs):
+		context = {}
+		slug = kwargs['slug']
+		event = self.get_event(slug)
+		orders = self.get_orders(event)
+		attendees = self.get_attendees(orders)
+		form = CheckinForm(attendees=attendees)
+		return self.render_to_response(self.get_context_data(form=form, event=event, request=request))
+
+
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+		slug = kwargs['slug']
+		event = self.get_event(slug)
+		orders = self.get_orders(event) 
+
+		form = EventPayoutForm(orders=orders, data=data)
+		
+		if form.is_valid():
+			messages.success(request, 'Payout Sent!')
+			return self.form_valid(form, orders, request, event)
+		else:
+			messages.warning(request, 'Oops! Something went wrong.')
+			return self.form_invalid(form, request, event)
+
+
+	def form_valid(self, form, orders, request, event):
+
+		event_payout = EventPayout.objects.create(event=event)
+		event_payout.save()
+		amount = decimal.Decimal(0.00)
+
+		for order in orders:
+			order_value = form.cleaned_data['%s_order' % (order.id)]
+			if order_value == True:
+				try:
+					order.payout = event_payout
+					amount = amount + order.amount
+					order.save()
+				except:
+					pass
+			else:
+				pass
+
+		event_payout.amount = amount
+		event_payout.save()
+
+		valid_data = super(EventPayoutView, self).form_valid(form)
+		return valid_data
+
+
+	def form_invalid(self, form, request, event):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form, request=request, event=event))
+
+
+
 
 
 class EventCreateView(OrganizationAccountMixin, CreateView):
 	model = Event
 	form_class = EventForm
-	template_name = "events/event_create.html"
+	template_name = "events/event_form.html"
 
 	def get_success_url(self):
 		view_name = "dashboard"
@@ -284,8 +507,8 @@ class EventCreateView(OrganizationAccountMixin, CreateView):
 		organization = self.get_organization()
 		context["form"] = form
 		context["organization"] = organization
-		context["events_tab"] = True
 		context["create_event_tab"] = True
+		context["events"] = self.get_events()
 		return context
 
 	def get(self, request, *args, **kwargs):
@@ -295,7 +518,6 @@ class EventCreateView(OrganizationAccountMixin, CreateView):
 
 	def post(self, request, *args, **kwargs):
 		data = request.POST
-		
 		form = self.get_form()
 		if form.is_valid():
 			return self.form_valid(form, request)
@@ -307,12 +529,99 @@ class EventCreateView(OrganizationAccountMixin, CreateView):
 		organization = self.get_organization()
 		form.instance.organization = organization
 		self.object = form.save()
+		self.object.active = True
+		self.object.save()
+		messages.success(request, 'Event Published')
+		valid_data = super(EventCreateView, self).form_valid(form)
+		return valid_data
 
-		if "Create" in data:
+	def form_invalid(self, form):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form))
+
+
+
+class EventUpdateView(OrganizationAccountMixin, UpdateView):
+	model = Event
+	form_class = EventForm
+	template_name = "events/event_form.html"
+
+	def get_success_url(self):
+		view_name = "events:update"
+		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
+
+	def get_success_delete_url(self):
+		view_name = "events:past"
+		return reverse(view_name)
+
+	def get_event(self, slug):
+		try:
+			event = Event.objects.get(slug=slug)
+			return event
+		except Exception as e:
+			raise Http404
+
+	def get_context_data(self, form, *args, **kwargs):
+		context = {}
+		organization = self.get_organization()
+		context["form"] = form
+		context["organization"] = organization
+		context["event"] = self.object
+		
+		if self.object.active == False:
+			context["inactive_event_tab"] = True
+			context["events_tab"] = False
+		else:
+			context["events_tab"] = True
+
+		context["update_event"] = True
+		context["events"] = self.get_events()
+		return context
+
+	def get(self, request, *args, **kwargs):
+		slug = kwargs['slug']
+		self.object = self.get_event(slug)
+		form = EventForm(instance=self.object, initial={"start": self.object.start.strftime("%m/%d/%Y %I:%M %p"), "end": self.object.end.strftime("%m/%d/%Y %I:%M %p")})
+		return self.render_to_response(self.get_context_data(form=form))
+
+	def post(self, request, *args, **kwargs):
+		slug = kwargs['slug']
+		self.object = self.get_event(slug)
+		data = request.POST
+
+		# Undoing a deletion of an event
+		if "Undo Delete" in data:
+			self.object.deleted = False
+			self.object.save()
+			return HttpResponseRedirect(self.get_success_url())
+
+		form = self.get_form()
+		if form.is_valid():
+			return self.form_valid(form, request)
+		else:
+			return self.form_invalid(form)
+
+	def form_valid(self, form, request):
+		data = request.POST
+		self.object = form.save()
+
+		if "Archive Event" in data:
+			self.object.active = False
+			self.object.save()
+
+		if "Re-Open Event" in data:
 			self.object.active = True
 			self.object.save()
-			messages.success(request, 'Event Published')
-		valid_data = super(EventCreateView, self).form_valid(form)
+
+		if "Delete Event" in data:
+			self.object.active = False
+			self.object.deleted = True
+			self.object.save()
+			messages.warning(request, 'Event Deleted Successfully')
+			return HttpResponseRedirect(self.get_success_delete_url())
+
+		messages.success(request, 'Event Updated')
+		valid_data = super(EventUpdateView, self).form_valid(form)
 		return valid_data
 
 	def form_invalid(self, form):

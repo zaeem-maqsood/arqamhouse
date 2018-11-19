@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from celery.schedules import crontab
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'storages',
     'organizations',
     'profiles',
+    'payouts',
     'events',
     'tickets',
     'questions',
@@ -60,6 +62,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'arqamhouse.urls'
+
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 102400
+
 
 TEMPLATES = [
     {
@@ -115,6 +121,22 @@ import dj_database_url
 db_from_env = dj_database_url.config()
 DATABASES['default'].update(db_from_env)
 
+
+# Celery stuff 
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+
+# System wide Cron jobs using Celery 
+CELERY_BEAT_SCHEDULE = {
+    'hello': {
+        'task': 'events.tasks.hello',
+        'schedule': crontab()  # execute every minute
+    }
+}
 
 
 

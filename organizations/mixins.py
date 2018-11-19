@@ -3,7 +3,7 @@ from core.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from .models import Organization, OrganizationUser, SelectedUserOrganization
 from profiles.models import Profile
-
+from events.models import Event
 
 
 
@@ -36,6 +36,12 @@ class OrganizationAccountMixin(LoginRequiredMixin, object):
 			return profile
 		except:
 			return None
+
+
+	def get_events(self):
+		organization = self.get_organization()
+		events = Event.objects.active_events(organization=organization)
+		return events
 		
 
 

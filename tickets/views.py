@@ -31,14 +31,15 @@ class TicketListView(OrganizationAccountMixin, ListView):
 	def get_context_data(self, *args, **kwargs):
 		context = {}
 		organization = self.get_organization()
+		events = self.get_events()
 		event = self.get_event(self.kwargs['slug'])
 		tickets = Ticket.objects.filter(event=event, deleted=False)
 		
+		context["events"] = events
 		context["tickets"] = tickets
 		context["event"] = event
 		context["organization"] = organization
 		context["events_tab"] = True
-		context["active_event_tab"] = True
 		return context
 
 

@@ -12,19 +12,28 @@ from organizations.mixins import OrganizationAccountMixin
 from .models import Attendee
 from events.models import Event
 
+from .forms import AttendeeForm
+from answers.models import TicketAnswer
+from questions.models import TicketQuestion
+
+
+
+# Generic functions
+
+# Get Event Function
+def get_event(slug):
+	try:
+		event = Event.objects.get(slug=slug)
+	except Exception as e:
+		print(e)
+		raise Http404
+	return event
+
 
 # Create your views here.
 class AttendeeListView(OrganizationAccountMixin, ListView):
 	model = Attendee
 	template_name = "attendees/event_attendees.html"
-
-	def get_event(self, slug):
-		try:
-			event = Event.objects.get(slug=slug)
-			return event
-		except Exception as e:
-			print(e)
-			raise Http404
 
 	def get(self, request, *args, **kwargs):
 		return render(request, self.template_name, self.get_context_data())
@@ -32,7 +41,7 @@ class AttendeeListView(OrganizationAccountMixin, ListView):
 	def get_context_data(self, *args, **kwargs):
 		context = {}
 		organization = self.get_organization()
-		event = self.get_event(self.kwargs['slug'])
+		event = get_event(self.kwargs['slug'])
 		attendees = Attendee.objects.filter(order__event=event)
 		print(attendees)
 		
@@ -40,3 +49,96 @@ class AttendeeListView(OrganizationAccountMixin, ListView):
 		context["attendees"] = attendees
 		context["event"] = event
 		return context
+
+
+
+
+class AttendeeDetailView(OrganizationAccountMixin, FormView):
+	model = Attendee
+	template_name = "attendees/event_attendees_detail.html"
+
+	def get_success_url(self):
+		view_name = "events:attendees:detail"
+
+		return reverse(view_name, kwargs={"slug": self.kwargs['slug'], "attendee_slug": self.kwargs['attendee_slug']})
+
+	def get_attendee(self, attende_slug):
+		try:
+			attendee = Attendee.objects.get(slug=attende_slug)
+			return attendee
+		except Exception as e:
+			print(e)
+			raise Http404
+
+	def get_context_data(self, event, attendee, request, form, *args, **kwargs):
+		context = {}
+		context["event"] = event
+		context["attendee"] = attendee
+		context["questions"] = TicketQuestion.objects.filter(event=event)
+		context["form"] = form
+		return context
+
+	def get(self, request, *args, **kwargs):
+		context = {}
+		slug = kwargs['slug']
+		attendee_slug = kwargs['attendee_slug']
+		event = get_event(slug)
+		attendee = self.get_attendee(attendee_slug)
+		answers = TicketAnswer.objects.filter(attendee=attendee)
+		data = {}
+		for answer in answers:
+			data["%s_question" % (answer.question.id)] = answer.value
+		form = AttendeeForm(event=event, initial=data, instance=attendee)
+		return self.render_to_response(self.get_context_data(event=event, request=request, attendee=attendee, form=form))
+
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+		slug = kwargs['slug']
+		attendee_slug = kwargs['attendee_slug']
+		event = get_event(slug)
+		attendee = self.get_attendee(attendee_slug)
+
+		form = AttendeeForm(event=event, initial=data, instance=attendee, data=data)
+		if form.is_valid():
+			messages.success(request, 'Attendee updated successfully!')
+			return self.form_valid(form, request, event, attendee)
+		else:
+			messages.warning(request, 'Oops! Something went wrong.')
+			return self.form_invalid(form, request, event, attendee)
+
+	def form_valid(self, form, request, event, attendee):
+		questions = TicketQuestion.objects.filter(event=event)
+		answers = TicketAnswer.objects.filter(attendee=attendee)
+
+		name = form.cleaned_data['name']
+		gender = form.cleaned_data['gender']
+		email = form.cleaned_data['email']
+
+		attendee.name = name
+		attendee.gender = gender
+		attendee.email = email
+
+		attendee.save()
+
+		for question in questions:
+			value = form.cleaned_data['%s_question' % (question.id)]
+			print(value)
+			if str(value) is not None:
+				print(value)
+				answer = TicketAnswer.objects.create(attendee=attendee, question=question, value=value)
+				answer.save()
+				print(answer)
+		valid_data = super(AttendeeDetailView, self).form_valid(form)
+		return valid_data
+
+	def form_invalid(self, form, request, event, attendee):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form, request=request, event=event, attendee=attendee))
+
+
+
+
+
+
+
+

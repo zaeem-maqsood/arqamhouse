@@ -1,5 +1,5 @@
 {% extends "backend/base.html" %}
-
+{% load static %}
 {% block title %}
 Dashboard | {{ organization.name }}
 {% endblock title %}
@@ -7,6 +7,91 @@ Dashboard | {{ organization.name }}
 {% block page_title %}
 {{ organization.name }}
 {% endblock page_title %}
+
+{% block styles %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js" rel="stylesheet" type="text/css" />
+{% endblock styles %}
+
+
+{% block scripts %}
+<script src="{% static 'assets/demo/default/custom/components/datatables/base/html-table.js' %}" type="text/javascript"></script>
+
+<script type="text/javascript">
+	var ctx = document.getElementById("myChart");
+	var myChart = new Chart(ctx, {
+	    type: 'line',
+	    aspectRatio: 2,
+	    data: {
+	        labels: {{ data_set_dict.day_label|safe }},
+	        datasets: [{
+	            label: 'Sales $',
+	            data: {{ data_set_dict.sales_label|safe }},
+	            backgroundColor: 'rgba(68, 153, 216, 0.2)',
+	            borderColor:'rgba(68, 153, 216, 1)',
+	            borderWidth: 4,
+	            lineTension: 0.1,
+	            borderCapStyle: 'butt',
+	            borderDashOffset: 3.0,
+            	borderJoinStyle: 'miter',
+            	pointBorderWidth: 6,
+            	pointHoverRadius: 5,
+            	pointHoverBorderWidth: 2,
+            	pointRadius: 0.5,
+            	pointHitRadius: 7,
+            	xPadding: 25,
+
+	        }]
+	    },
+	    options: {
+
+	    	legend: {
+	            display: false,
+	        },
+
+	        animation: {
+	            duration: 4000,
+	        },
+
+	        maintainAspectRatio: false,
+
+	        scales: {
+	            yAxes: [{
+
+	            	gridLines: {
+	                    display:false,
+	                },
+
+	                ticks: {
+
+	                    beginAtZero: true,
+	                    {% if data_set_dict.use_large_scale %}
+	                    {% else %}
+	                    stepSize : 1,
+	                    {% endif %}
+	                    suggestedMin: 0,
+                    	beginAtZero: true,
+	                },
+
+	            }],
+
+	            xAxes: [{
+
+	                gridLines: {
+	                    display:false,
+	                },
+
+	                stepSize: 5,
+	                position: 'bottom',
+	            }],
+
+	        },
+
+
+	        responsive: true,
+	    }
+	});
+</script>
+{% endblock scripts %}
 
 
 {% block page_crumbs %}
@@ -40,23 +125,190 @@ Dashboard | {{ organization.name }}
 	</div>
 </div>
 {% endif %}
+
+
+{% if actions %}
 <div class="row">
-	<div class="col-md-12">
-		<div class="m-alert m-alert--icon m-alert--outline alert alert-success alert-dismissible fade show" role="alert">
-			<div class="m-alert__icon">
-				<i class="fas fa-poo" style="font-size: 3em;"></i>
-			</div>
-			<div class="m-alert__text">
-			  	<strong>Annoying Reminder:</strong>
-			  	<br>
-			  	Although you can ignore this message and continue on to sell tickets, in order for us to pay you we need to verify your identity.
-			  	<br>
-			  	<br>
-			  	<a href="" class="btn btn-outline-success">Let's Fix It</a>		
-			</div>		  	
-		</div>
+	<div class="col-12" style="padding-bottom: 10px;">
+		<h3 style="font-weight: 200;color: #a2a2a2;">Suggestions</h3>
 	</div>
 </div>
+
+<div class="row" style="padding-bottom: 60px;">
+	{% for event in actions.events_without_tickets %}
+	<div class="col-lg-4 col-md-6 text-center" style="">
+		<a href="{{ event.list_tickets_view }}" class="btn btn-outline-info btn-block">Add Tickets For {{ event.title }}</a>
+	</div>
+	{% endfor %}
+</div>
+{% endif %}
+
+<div class="row">
+	<div class="col-12" style="padding-bottom: 10px;">
+		<h3 style="font-weight: 200;color: #a2a2a2;">15 Day Overview</h3>
+	</div>
+</div>
+
+<div class="row" style="padding-bottom: 40px;">
+	<div class="col-lg-10 col-md-12">
+		<canvas id="myChart" width="400" height="200"></canvas>
+	</div>
+</div>
+
+<div class="row" style="padding-bottom: 60px;margin-left: 30px;">
+	<div class="col-4">
+		<span class="m-badge m-badge--info m-badge--wide" style="font-size: 1.3em;padding: 5px;">Sales: ${{ fifteen_day_sales }}</span>
+	</div>
+	<div class="col-4">
+		<span class="m-badge m-badge--info m-badge--wide" style="font-size: 1.3em;padding: 5px;">Orders: {{ fifteen_days_order_sum }}</span>
+	</div>
+	<div class="col-4">
+		<span class="m-badge m-badge--info m-badge--wide" style="font-size: 1.3em;padding: 5px;">Tickets: {{ fifteen_days_tickets_sum }}</span>
+	</div>
+</div>
+
+		
+
+
+<div class="row" style="padding-bottom: 10px;">
+	<div class="col-12">
+		<h3 style="font-weight: 200;color: #a2a2a2;">Attendees</h3>
+	</div>
+</div>
+
+<div class="row" style="padding-bottom: 30px;">
+	<div class="col-lg-10 col-md-12 col-12">
+		<!--begin: Datatable -->
+		<table class="table m-table m-table--head-bg-brand table-responsive" id="html_table" width="100%">
+			<thead>
+			<tr>
+				<th title="Number">Time Created</th>
+				<th title="Name">Name</th>
+				<th  title="Amount">Amount</th>
+				<th  title="Tickets">Tickets</th>
+				<th  title="View Order">View Order</th>
+			</tr>
+			</thead>
+			<tbody>
+				{% for attendee in attendees %}
+				<tr >
+					<td><p  style="margin:0 auto;">{{ attendee.order.created_at }}</p></td>
+					<td><p  style="margin:0 auto;">{{ attendee.order.name }}</p></td>
+					<td><div >{% include "orders/brands.html" with order=attendee.order %}</div></td>
+					<td><h3  style="color: #7777a7;font-weight: 300;margin:0 auto;">{{ attendee.order.attendee_set.all.count }}</h3></td>
+					<td><div><a href="{{ attendee.order.get_order_view }}" class="btn btn-outline-brand btn-sm btn-block">View Order</a></div></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		<!--end: Datatable -->
+	</div>
+</div>
+
+
+<div class="row" style="padding-bottom: 10px;">
+	<div class="col-12">
+		<h3 style="font-weight: 200;color: #a2a2a2;">Events</h3>
+	</div>
+</div>
+
+
+<div class="row" style="padding-bottom: 40px;">
+	{% for event in events %}
+	<div class="col-lg-5">
+	<!--begin::Portlet-->
+		<div class="m-portlet m-portlet--brand m-portlet--head-solid-bg m-portlet--bordered" style="background-color: {% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};border-color: {% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};">
+			<div class="m-portlet__head" style="background-color: {% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};border-color: {% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};">
+				<div class="m-portlet__head-caption">
+					<div class="m-portlet__head-title">
+						<span class="m-portlet__head-icon">
+							<i class="far fa-calendar-alt"></i>
+						</span>
+						<h3 class="m-portlet__head-text" style="font-weight: 400;">
+							<a href="{{ event.get_landing_view }}" style="color: #fff;">{{ event.title }}</a>
+						</h3>
+					</div>			
+				</div>
+				<div class="m-portlet__head-tools">
+					<ul class="m-portlet__nav">
+						<li class="m-portlet__nav-item">
+							<a href="" class="m-portlet__nav-link m-portlet__nav-link--icon">{% if event.public %}<i class="fas fa-lock-open" style="user-select: auto;"></i>{% else %}<i class="fas fa-lock"></i>{% endif %}</a>	
+						</li>						
+					</ul>
+				</div>
+			</div>
+			<div class="m-portlet__body">
+				<div class="row text-center">
+					<div class="col-md-12">
+						<p class="lead" style="color:{% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">Starts on {{ event.start }}</p>
+					</div>
+				</div>
+				<br>
+				<div class="row text-center">
+					<div class="col-sm-3 text-center">
+						<a href="{{ event.list_tickets_view }}" style="color:{% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}; text-decoration: none;">
+						<i class="flaticon-file" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Tickets</p>
+						</a>
+					</div>
+					<div class="col-sm-3 text-center">
+						<a href="{{ event.list_orders_view }}" style="color:{% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
+						<i class="flaticon-diagram" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Orders</p>
+						</a>
+					</div>
+					<div class="col-sm-3 text-center">
+						<a href="{{ event.list_attendees_view }}" style="color:{% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
+						<i class="flaticon-users" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Attendees</p>
+						</a>
+					</div>
+					<div class="col-sm-3 text-center">
+						<a href="{{ event.payout_view }}" style="color:{% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
+						<i class="flaticon-coins" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Pay-Out</p>
+						</a>
+					</div>
+				</div>
+				<br>
+				<div class="row text-center">
+					<div class="col-sm-3 text-center">
+						<a href="{{ event.list_questions_view }}" style="color:{% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
+						<i class="flaticon-chat" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Questions</p>
+						</a>
+					</div>
+					<div class="col-sm-3 text-center">
+						<a href="" style="color:{% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
+						<i class="flaticon-interface-5" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Confirmation Email</p>
+						</a>
+					</div>
+					<div class="col-sm-3 text-center">
+						<a href="" style="color:{% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
+						<i class="flaticon-placeholder" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Check-Ins</p>
+						</a>
+					</div>
+					<div class="col-sm-3 text-center">
+						<a href="" style="color:{% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};text-decoration: none;">
+						<i class="flaticon-list-2" style="user-select: auto;font-size: 3em;"></i>
+						<p class="">Answers</p>
+						</a>
+					</div>
+				</div>
+				<br>
+				<a href="" class="btn btn-secondary  btn-block">Edit Content</a>
+				<a href="" class="btn btn-primary btn-block" style="background-color: {% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};border-color: {% cycle '#4499d5' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};">Edit Event</a>
+			</div>
+		</div>	
+		<!--end::Portlet-->
+	</div>
+	{% endfor %}
+</div>
+
+
+
 {% endblock content %}
 
 

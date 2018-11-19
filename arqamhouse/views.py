@@ -1,7 +1,14 @@
-from django.shortcuts import render
-from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic import View
+from django.views import View
+from django.shortcuts import render, redirect
 
-from organizations.models import Organization
+
+
+class HomePageView(View):
+	template_name = "frontend/home.html"
+
+	def get(self, request, *args, **kwargs):
+		context = {}
+		context["title"] = "Arqam House"
+		return render(request, self.template_name, context)
 
 

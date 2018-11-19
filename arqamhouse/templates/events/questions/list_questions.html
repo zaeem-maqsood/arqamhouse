@@ -22,43 +22,7 @@ Questions
 
 {% block scripts %}
 <!--begin::Page Resources --> 
-<script type="text/javascript">
-$(document).ready(function(){
-    $('#id_first_name').change(function(){
-        if(this.checked)
-            $('#first_name_warning').fadeOut('slow');
-        else
-        	$('#first_name_warning').fadeIn('slow');
 
-    });
-
-    $('#id_first_name_required').change(function(){
-        if(this.checked)
-            $('#first_name_warning').fadeOut('slow');
-        else
-        	$('#first_name_warning').fadeIn('slow');
-
-    });
-});
-
-$(document).ready(function(){
-    $('#id_last_name').change(function(){
-        if(this.checked)
-            $('#last_name_warning').fadeOut('slow');
-        else
-        	$('#last_name_warning').fadeIn('slow');
-
-    });
-
-    $('#id_last_name_required').change(function(){
-        if(this.checked)
-            $('#last_name_warning').fadeOut('slow');
-        else
-        	$('#last_name_warning').fadeIn('slow');
-
-    });
-});
-</script>
 <!--end::Page Resources -->
 {% endblock scripts %}
 
@@ -214,71 +178,6 @@ $(document).ready(function(){
 		<div class="m-portlet m-portlet--full-height ">
 			<div class="m-portlet__body">
 				<div class="row">
-					<div class="col-md-6 col-sm-6">
-						<div class="row" style="padding-top: 10px;">
-							<div class="col-md-5 col-sm-5 col-5">
-								<h5>First Name</h5>
-								<span class="m-switch m-switch--lg m-switch--icon">
-									<label>
-			                        {{ attendee_general_questions_form.first_name }}
-			                        <span></span>
-			                        </label>
-			                    </span>
-							</div>
-							<div class="col-md-5 col-sm-5 col-5">
-								<h5>Required</h5>
-								<span class="m-switch m-switch--lg m-switch--icon">
-									<label>
-			                        {{ attendee_general_questions_form.first_name_required }}
-			                        <span></span>
-			                        </label>
-			                    </span>
-							</div>
-							<div class="col-md-2 col-sm-2 d-none d-sm-block">
-							</div>
-						</div>
-						<div class="row" id="first_name_warning" style="display: none;">
-							<div class="col-md-12 col-sm-12 col-12">
-								<div class="alert m-alert--outline alert-danger" role="alert">
-								  	Warning: We do not force you to ask your attendees their first name, however it is used to identify an attendee with a ticket.
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-6 col-sm-6">
-						<div class="row" style="padding-top: 10px;">
-							<div class="col-md-2 col-sm-2 d-none d-sm-block">
-							</div>
-							<div class="col-md-5 col-sm-5 col-5">
-								<h5>Last Name</h5>
-								<span class="m-switch m-switch--lg m-switch--icon">
-									<label>
-			                        {{ attendee_general_questions_form.last_name }}
-			                        <span></span>
-			                        </label>
-			                    </span>
-							</div>
-							<div class="col-md-5 col-sm-5 col-5">
-								<h5>Required</h5>
-								<span class="m-switch m-switch--lg m-switch--icon">
-									<label>
-			                        {{ attendee_general_questions_form.last_name_required }}
-			                        <span></span>
-			                        </label>
-			                    </span>
-							</div>
-						</div>
-						<div class="row" id="last_name_warning" style="display: none;">
-							<div class="col-md-12 col-sm-12 col-12">
-								<div class="alert m-alert--outline alert-danger" role="alert">
-								  	Warning: We do not force you to ask your attendees their last name, however it is used to identify an attendee with a ticket.
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="row" style="padding-top: 30px;">
 					<div class="col-md-6 col-sm-6">
 						<div class="row" style="padding-top: 10px;">
 							<div class="col-md-5 col-sm-5 col-5">

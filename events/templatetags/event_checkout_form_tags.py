@@ -7,6 +7,23 @@ from django.utils.html import escape, mark_safe
 register = template.Library()
 
 
+@register.simple_tag
+def get_attendee_related_form_field(form, attendee):
+
+	print()
+	for field in form:
+		try:
+			if int(field.name.split('_')[0]) == int(attendee.id) and field.name.split('_')[1] == "attendee":
+				print("This is the id")
+				print(attendee.id)
+				return field
+			else:
+				pass
+		except Exception as e:
+			print(e)
+			pass
+
+
 def create_errors_string(field):
 	error_string = ""
 	for error in field.errors:

@@ -1,0 +1,168 @@
+{% extends "backend/base.html" %}
+{% load attendee_form_tags %}
+{% load static %}
+
+{% block title %}
+Attendee | {{ attendee.name }}
+{% endblock title %}
+
+{% block page_title %}
+<a style="text-decoration: none;" href="{{ event.list_attendees_view }}"><i style="font-size: 30px;" class="fas fa-long-arrow-alt-left"></i> Back To Attendees</a>
+{% endblock page_title %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+<!--begin::Page Resources --> 
+
+<!--end::Page Resources -->
+{% endblock scripts %}
+
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item">
+		
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-10">
+		<!--begin::Portlet-->
+		<div class="m-portlet m-portlet--tab">
+			<!--begin::Form-->
+			<form class="m-form m-form--fit m-form--label-align-right my-form" method="POST" enctype="multipart/form-data">{% csrf_token %}
+				
+				
+				<div class="m-portlet__body">
+
+
+					{% if form.non_field_errors %}
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								{% for error in form.non_field_errors %}
+								<div class="alert alert-danger" role="alert">
+								  	<strong>Oh snap!</strong> {{ error }}
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+					{% endif %}
+					
+					
+					<div class="row row-padder">
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								<h5 {% if form.name.errors %}style="color:red;"{% endif %}><i class="fas fa-asterisk" style="color: red;"></i> Name</h5>
+								{{ form.name }}
+								<br>
+								{% for error in form.name.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+
+					<div class="row row-padder">
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5 {% if form.name.errors %}style="color:red;"{% endif %}>Email</h5>
+								{{ form.email }}
+								<br>
+								{% for error in form.email.errors %}
+									<div class="alert m-alert--outline alert-danger" role="alert">
+									  	{{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group m-form__group">
+								<h5 {% if form.name.errors %}style="color:red;"{% endif %}>Gender</h5>
+								{{ form.gender }}
+							</div>
+						</div>
+					</div>
+
+
+
+					<div class="row row-padder">
+						<!-- Begin Event Question custom question fields  -->
+	                    {% for question in questions %}
+
+	                        <!-- Event Question Error -->
+	                        {% autoescape off %}
+	                            {% get_question_related_form_field_error form question %}
+	                        {% endautoescape %}
+
+	                        <!-- Check if Event Question is required or not -->
+	                        <div class="col-md-12" style="padding-bottom: 20px;">
+	                        	<div class="form-group m-form__group">
+		                            <h5>{% if question.required %}<i class="fas fa-asterisk" style="color: red;"></i>{% endif %}  {{ question.title }} {% if not question.all_ticket_question_control %}- "{{ question.ticket }}" question only{% endif %} </h5>
+		                            
+		                            <!-- If the event question is a multiple choice question wrap the question in a 
+		                            input-select div -->
+		                            {% if question.multiple_choice_question %}
+		                                <!-- <div class="input-select"> -->
+		                                    {% get_question_related_form_field form question %}
+		                                <!-- </div> -->
+
+		                            <!-- Otherwise just display the form field -->
+		                            {% else %}
+		                                {% get_question_related_form_field form question %}
+		                            {% endif %}
+
+		                        </div>
+	                        </div>
+
+	                    {% endfor %}
+	                    <!-- End Event Questions custom question fields -->
+                	</div>
+
+
+
+				</div>
+				<div class="m-portlet__foot m-portlet__foot--fit" style="padding-top: 60px;padding-bottom: 50px;">
+					<div class="m-form__actions">
+						<button type="submit" name="Create" value="Create" class="btn btn-success btn-block publish">Update Attendee</button>
+					</div>
+				</div>
+
+			</form>
+			<!--end::Form-->			
+		</div>
+		<!--end::Portlet-->
+	</div>
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

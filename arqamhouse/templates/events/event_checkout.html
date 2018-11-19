@@ -254,15 +254,13 @@ window.addEventListener('popstate', function() {
                         </div>
 
                         <!-- Attendee First Name Question -->
-                        {% if attendee_general_questions.name %}
-                            {% autoescape off %}
-                                {% get_ticket_name_form_field_errors form all_cart_item.cart_item all_cart_item.quantity %}
-                            {% endautoescape %}
-                            <div class="col-md-12" style="padding-bottom: 10px;">
-                                <label>{% if attendee_general_questions.name_required %}<i class="fas fa-asterisk" style="color: red;"></i>{% endif %}  Full Name</label>
-                                {% get_ticket_name_form_field form all_cart_item.cart_item all_cart_item.quantity %}
-                            </div>
-                        {% endif %}
+                        {% autoescape off %}
+                            {% get_ticket_name_form_field_errors form all_cart_item.cart_item all_cart_item.quantity %}
+                        {% endautoescape %}
+                        <div class="col-md-12" style="padding-bottom: 10px;">
+                            <label><i class="fas fa-asterisk" style="color: red;"></i>  Full Name</label>
+                            {% get_ticket_name_form_field form all_cart_item.cart_item all_cart_item.quantity %}
+                        </div>
 
 
                         <!-- Attendee Gender Question -->

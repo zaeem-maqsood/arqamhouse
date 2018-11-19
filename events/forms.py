@@ -1,10 +1,61 @@
 from django import forms
+from django.utils import timezone
 
-from .models import Event, EventGeneralQuestions, AttendeeGeneralQuestions
+from .models import Event, EventGeneralQuestions, AttendeeGeneralQuestions, Checkin
 from questions.models import (EventQuestion, AllTicketQuestionControl, TicketQuestion, 
 								EventQuestionMultipleChoiceOption, TicketQuestionMultipleChoiceOption)
 from carts.models import EventCart, EventCartItem
 from core.constants import genders
+
+
+
+class CheckinForm(forms.ModelForm):
+
+	def __init__(self, attendees, *args, **kwargs):
+		
+		super(CheckinForm, self).__init__(*args, **kwargs)
+
+		for attendee in attendees:
+			self.fields["%s_attendee" % (attendee.id)] = forms.BooleanField(label=str(attendee.name), required=False, initial=True, widget=forms.CheckboxInput(attrs={"class":"", "onclick":"myFunction()"}))
+
+
+	class Meta:
+		model = Checkin
+		fields = [
+			"title", "auto_add_new_attendees", "password_protected", "password",
+		]
+
+		widgets = {
+
+				"title": forms.TextInput(
+						attrs={
+							"class":"form-control m-input message",
+							"placeholder":"Main Registration Checkin",
+							"required": True,
+							"maxlength": '100',
+						}
+					),
+
+				"password": forms.TextInput(
+						attrs={
+							"class":"form-control m-input message",
+							"placeholder":"secretpassword",
+							"required": False,
+							"maxlength": '100',
+						}
+					),
+
+				"auto_add_new_attendees": forms.CheckboxInput(
+						attrs={
+						}
+					),
+
+				"password_protected": forms.CheckboxInput(
+						attrs={
+						}
+					),
+			}
+
 
 
 class EventCheckoutForm(forms.Form):
@@ -14,7 +65,7 @@ class EventCheckoutForm(forms.Form):
 		super(EventCheckoutForm, self).__init__(*args, **kwargs)
 
 		general_questions = EventGeneralQuestions.objects.get(event=event)
-	
+
 		self.fields["email"] = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"class":"validate-required"}), required=True)
 		if cart.total == 0.00:
 			self.fields["name"] = forms.CharField(label="Name", widget=forms.TextInput(attrs={"class":"validate-required"}), required=True)
@@ -47,14 +98,14 @@ class EventCheckoutForm(forms.Form):
 			for x in range(cart_item.quantity):
 
 				attendee_general_questions = AttendeeGeneralQuestions.objects.get(event=event)
-				if attendee_general_questions.name:
-					self.fields["%s_%s_name" % (x, cart_item.id)] = forms.CharField(label="Name", widget=forms.TextInput(attrs={"class":"validate-required", "placeholder":"Full Name"}), required=attendee_general_questions.name_required)
+
+				self.fields["%s_%s_name" % (x, cart_item.id)] = forms.CharField(label="Name", widget=forms.TextInput(attrs={"class":"validate-required", "placeholder":"Full Name"}), required=True)
 				
 				if attendee_general_questions.gender:
 					self.fields["%s_%s_gender" % (x, cart_item.id)] = forms.ChoiceField(label="Gender", widget=forms.RadioSelect(attrs={"class":""}), choices=genders)
 				
 				if attendee_general_questions.email:
-					self.fields["%s_%s_email" % (x, cart_item.id)] = forms.EmailField(label="Email", widget=forms.TextInput(attrs={"class":"validate-required", "placeholder":"you@somedomain.com"}))
+					self.fields["%s_%s_email" % (x, cart_item.id)] = forms.EmailField(label="Email", widget=forms.TextInput(attrs={"class":"validate-required", "placeholder":"you@somedomain.com"}), required=attendee_general_questions.email_required)
 
 				ticket_questions = TicketQuestion.objects.filter(event=event, ticket=cart_item.ticket, deleted=False, approved=True).order_by('order')
 				for question in ticket_questions:
@@ -76,8 +127,8 @@ class EventCheckoutForm(forms.Form):
 
 class EventForm(forms.ModelForm):
 
-	start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], widget=forms.DateTimeInput(attrs={"class":"form-control m-input", "placeholder":"MM/DD/YYYY 00:00 AM/PM", "required": True,}))
-	end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], widget=forms.DateTimeInput(attrs={"class":"form-control m-input", "placeholder":"MM/DD/YYYY 00:00 AM/PM", "required": True,}))
+	start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], widget=forms.DateTimeInput(attrs={"class":"form-control m-input", "placeholder":"MM/DD/YYYY 00:00 AM/PM", "required": True, "autocomplete": "off",}))
+	end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], widget=forms.DateTimeInput(attrs={"class":"form-control m-input", "placeholder":"MM/DD/YYYY 00:00 AM/PM", "required": True, "autocomplete": "off"}))
 
 	class Meta:
 		model = Event
@@ -128,7 +179,7 @@ class EventForm(forms.ModelForm):
 						}
 					),
 
-				"image": forms.ClearableFileInput(
+				"image": forms.FileInput(
 						attrs={
 							"onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
 							"class":"form-control m-input",
@@ -149,7 +200,7 @@ class EventForm(forms.ModelForm):
 			image_extensions = ['.jpg', '.png', '.JPG', '.PNG', '.JPEG', '.jpeg']
 			error = True
 			for extension in image_extensions:
-				if image.name.lower().endswith(extension):
+				if image.name.lower().endswith(extension) or image.name != self.instance.slug:
 					error = False
 
 			if error:
@@ -157,6 +208,22 @@ class EventForm(forms.ModelForm):
 			return image
 		else:
 			return image
+
+
+	def clean_end(self):
+		start = self.cleaned_data.get('start')
+		end = self.cleaned_data.get('end')
+		today = timezone.now()
+		if start and end and start >= end:
+			print("Did it even come here")		
+			raise forms.ValidationError('The start date cannot be after the end date')
+		elif end <= today:
+			 raise forms.ValidationError('Please change the end date of your event to be after today!')
+		else:
+			return end
+
+
+
 
 
 
