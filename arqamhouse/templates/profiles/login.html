@@ -1,12 +1,10 @@
 {% extends "frontend/base.html" %}
 
+{% load static %}
+
 {% block title %}
 Login | Arqam House 
 {% endblock title %}
-
-{% block navigation %}
-	{% include "frontend/navigation.html" %}
-{% endblock navigation %}
 
 {% block footer %}
 	{% include "frontend/footer.html" %}
@@ -26,9 +24,9 @@ Login | Arqam House
     <div class="container">
         <div class="row">
             <div class="col-md-9 col-lg-6">
-                <h2>Login to continue</h2>
-                <p class="lead">
-                    Welcome back, sign in with your existing Arqam House account credentials
+                <img src="{% static 'images/Arqam.png' %}" style="max-height: 6em;">
+                <p>
+                    Welcome back! Sign in with your existing Arqam House account credentials.
                 </p>
                 <form class="boxed boxed--border" action="" method="POST">{% csrf_token %}
                     <div class="row">
@@ -66,7 +64,7 @@ Login | Arqam House
                             {{ form.password }}
                         </div>
                         <div class="col-md-12">
-                            <button class="btn btn--primary type--uppercase" type="submit">Login</button>
+                            <button class="btn btn--primary type--uppercase" type="submit">Sign in</button>
                         </div>
                     </div>
                     <!--end of row-->

@@ -1,0 +1,127 @@
+<html>
+ <head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <!-- Latest compiled and minified CSS -->
+ </head>
+ <body>
+
+<div class="row">
+  <div class="col-md-12">
+    <h1 style="font-weight: 300;color: grey;">{{ attendee.order.event.title }}</h1>
+    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;">Presented by {{ attendee.order.event.organization }}</p>
+    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;">Start Date: {{ attendee.order.event.start }}</p>
+    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;">Venue: {{ attendee.order.event.venue_name }}, located at {{ attendee.order.event.venue_address }}</p>
+  </div>
+</div>
+
+<br>
+<br>
+
+<div class="row">
+  <div class="col-md-12">
+
+    <h3 style="font-weight: 200;color: grey;">Order Details</h3>
+    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;">Order ID: {{ attendee.order.id }}</p>
+    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;">Buyer: {{ attendee.order.name|title }}</p>
+
+    <br>
+    
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th style="color: grey;">Ticket</th>
+          <th style="color: grey;">Price</th>
+          <th style="color: grey;">Quantity</th>
+          <th style="color: grey;">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cart_item in attendee.order.event_cart.eventcartitem_set.all %}
+        <tr>
+          <td style="color: grey;">{{ cart_item.ticket.title }}</td>
+          <td style="color: grey;">${{ cart_item.ticket_price }}</td>
+          <td style="color: grey;">{{ cart_item.quantity }}</td>
+          <td style="color: grey;">${{ cart_item.cart_item_total }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td style="color: grey;">Total</td>
+            <td style="color: grey;">${{ attendee.order.event_cart.total }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td style="color: grey;">Promo Code</td>
+            <td style="color: grey;">None</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td style="color: grey;">Order Total</td>
+            <td style="color: grey;">${{ attendee.order.amount }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<br>
+<br>
+
+<div class="row">
+  <div class="col-md-12">
+
+    <h3 style="font-weight: 200;color: grey;">Tickets</h3>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th style="color: grey;">Attendee Name</th>
+          <th style="color: grey;">Ticket</th>
+          <th style="color: grey;">Gender</th>
+          <th style="color: grey;">Age</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color: grey;">{{ attendee.name }}</td>
+          <td style="color: grey;">{{ attendee.ticket }}</td>
+          {% if attendee.gender %}
+          <td style="color: grey;">{{ attendee.gender }}</td>
+          {% else %}
+          <td style="color: grey;">-----</td>
+          {% endif %}
+          {% if attendee.age %}
+          <td style="color: grey;">{{ attendee.age }}</td>
+          {% else %}
+          <td style="color: grey;">-----</td>
+          {% endif %}
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<br>
+<br>
+
+<div class="row" style="float:right;">
+  <div class="col-md-12">
+      <img src="https://s3-us-west-1.amazonaws.com/arqam-static/static/images/Arqam.png" style="height: 150px;">
+  </div>
+</div>
+
+
+
+ </body>
+</html>

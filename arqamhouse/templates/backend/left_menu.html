@@ -71,14 +71,21 @@
 					</span>
 				</a>
 			</li>
-			<li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true"  data-menu-submenu-toggle="hover">
-				<a  href="#" class="m-menu__link m-menu__toggle">
-					<i class="m-menu__link-icon fas fa-ticket-alt"></i>
+			<li class="m-menu__section">
+				<h4 class="m-menu__section-text">
+					Payments
+				</h4>
+				<i class="m-menu__section-icon flaticon-more-v3"></i>
+			</li>
+			<li class="m-menu__item  m-menu__item--submenu {% if payout_history %} m-menu__item--active {% endif %}" aria-haspopup="true"  data-menu-submenu-toggle="hover">
+				<a  href="{% url 'payouts:all_payouts' %}" class="m-menu__link m-menu__toggle">
+					<i class="m-menu__link-icon far fa-money-bill-alt"></i>
 					<span class="m-menu__link-text">
-						Tickets
+						Payouts
 					</span>
 				</a>
 			</li>
+
 			<li class="m-menu__section">
 				<h4 class="m-menu__section-text">
 					Settings

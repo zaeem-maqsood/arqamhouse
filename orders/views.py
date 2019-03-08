@@ -43,6 +43,8 @@ class OrderListView(OrganizationAccountMixin, ListView):
 		context["organization"] = organization
 		context["orders"] = orders
 		context["event"] = event
+		context["events_tab"] = True
+		context["events"] = self.get_events()
 		return context
 
 

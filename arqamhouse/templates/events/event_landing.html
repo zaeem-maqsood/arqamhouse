@@ -54,6 +54,35 @@ Create Organization
 {% include "events/sections/external_links.html" with event=event %}
 
 
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+
+            {% for description_element in description_elements %}
+                
+                {% if description_element.h1title %}
+                     <h1>{{ description_element.h1title.title }}</h1>
+                {% endif %}
+
+                {% if description_element.h2title %}
+                    <h2>{{ description_element.h2title.title }}</h2>
+                {% endif %}
+
+                {% if description_element.h3title %}
+                    <h3>{{ description_element.h3title.title }}</h3>
+                {% endif %}
+
+                {% if description_element.paragraph %}
+                    <p>{{ description_element.paragraph.text }}</p>
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
 
 {% endblock content %}
 

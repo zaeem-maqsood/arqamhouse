@@ -9,6 +9,11 @@ from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from django.utils.timezone import datetime, timedelta
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from weasyprint import HTML, CSS
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.storage import FileSystemStorage
 
 from organizations.mixins import OrganizationAccountMixin
 from questions.models import EventQuestion, AllTicketQuestionControl, TicketQuestion
@@ -16,6 +21,7 @@ from answers.models import EventAnswer, TicketAnswer
 from carts.models import EventCart, EventCartItem
 from attendees.models import Attendee
 from orders.models import EventOrder
+from descriptions.models import EventDescription, DescriptionElement
 from .mixins import EventMixin
 from .models import Event, EventGeneralQuestions, AttendeeGeneralQuestions, Checkin
 from .forms import EventForm, EventCheckoutForm, CheckinForm
@@ -24,6 +30,43 @@ from .forms import EventForm, EventCheckoutForm, CheckinForm
 
 
 # Create your views here.
+
+class EventDescriptionView(OrganizationAccountMixin, EventMixin, ListView):
+	model = Event
+	template_name = "events/event_description.html"
+
+	def get_event(self, slug):
+		try:
+			event = Event.objects.get(slug=slug)
+			return event
+		except Exception as e:
+			print(e)
+			raise Http404
+
+	def get_event_description(self, event):
+		event_description = EventDescription.objects.get(event=event)
+		return event_description
+
+	def get_description_elements(self, event_description):
+		description_element = DescriptionElement.objects.filter(description=event_description).order_by("order")
+		return description_element
+
+
+	def get_context_data(self, *args, **kwargs):
+		context = {}
+		slug = self.kwargs['slug']
+		event = self.get_event(slug)
+		event_description = self.get_event_description(event)
+		description_elements = self.get_description_elements(event_description)
+
+		organization = self.get_organization()
+		context["description_elements"] = description_elements
+		context["event"] = event
+		context["events_tab"] = True
+		context["events"] = self.get_events()
+		context["organization"] = organization
+		return context
+
 
 
 class EventCheckoutView(FormView):
@@ -191,7 +234,11 @@ class EventCheckoutView(FormView):
 						gender = form.cleaned_data['%s_%s_gender' % (x, cart_item.id)]
 						if attendee_general_questions.email:
 							email = form.cleaned_data['%s_%s_email' % (x, cart_item.id)]
-						attendee = Attendee.objects.create(ticket=cart_item.ticket, name=name, gender=gender, order=order)
+						else:
+							email = None
+						attendee = Attendee.objects.create(ticket=cart_item.ticket, name=name, gender=gender, order=order, email=email)
+						attendee.create_slug()
+						attendee.save()
 
 						for question in ticket_questions:
 							try:
@@ -338,6 +385,21 @@ class EventDashboardView(OrganizationAccountMixin, DetailView):
 
 
 	def get(self, request, *args, **kwargs):
+
+		# send_mail('subject', 'body of the message', 'info@arqamhouse.com', ['zaeem@arqamhouse.com'])
+		# Test
+		# attendee = Attendee.objects.get(id=2110)
+		# context_dict = {}
+		# context_dict["attendee"] = attendee
+		# html_string = render_to_string('pdfs/ticket.html', context_dict)
+		# css_string = render_to_string('pdfs/ticket.css')
+		# html = HTML(string=html_string)
+		# css_styles = CSS(string=css_string)
+		# css_bootstrap = CSS(url="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css")
+		# attendee.pdf = SimpleUploadedFile(attendee.name +'.pdf', html.write_pdf(stylesheets=[css_bootstrap, css_styles]), content_type='application/pdf')
+		# attendee.save()
+
+
 		context = {}
 		slug = kwargs['slug']
 		organization = self.get_organization()
@@ -372,14 +434,31 @@ class EventLandingView(DetailView):
 	model = Event
 	template_name = "events/event_landing.html"
 
+	def get_event(self, slug):
+		try:
+			event = Event.objects.get(slug=slug)
+			return event
+		except Exception as e:
+			raise Http404
+
+	def get_event_description(self, event):
+		event_description = EventDescription.objects.get(event=event)
+		return event_description
+
+	def get_description_elements(self, event_description):
+		description_elements = DescriptionElement.objects.filter(description=event_description)
+		return description_elements
+
 	def get(self, request, *args, **kwargs):
 		context = {}
 		slug = kwargs['slug']
-		try:
-			event = Event.objects.get(slug=slug)
-		except:
-			raise Http404
+		
+		event = self.get_event(slug)
+		event_description = self.get_event_description(event)
+		description_elements = self.get_description_elements(event_description)
 
+		context["event_description"] = event_description
+		context["description_elements"] = description_elements
 		context["event"] = event
 		context["request"] = request
 		return render(request, self.template_name, context)

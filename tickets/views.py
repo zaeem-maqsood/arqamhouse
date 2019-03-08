@@ -236,8 +236,7 @@ class TicketUpdateView(OrganizationAccountMixin, UpdateView):
 			self.form_class = FreeTicketForm
 			form = self.get_form()
 		elif ticket.paid == True:
-			self.form_class = PaidTicketForm
-			form = self.get_form()
+			form = PaidTicketForm(instance=self.object, initial={"sale_start": self.object.sale_start.strftime("%m/%d/%Y %I:%M %p"), "sale_end": self.object.sale_end.strftime("%m/%d/%Y %I:%M %p")})
 		elif ticket.donation == True:
 			self.form_class = DonationTicketForm
 			form = self.get_form()
@@ -280,20 +279,19 @@ class TicketUpdateView(OrganizationAccountMixin, UpdateView):
 
 		form.instance.event = event
 
-		title = form.cleaned_data.get("title")
 		price = form.cleaned_data.get("price")
 		sale_price = form.cleaned_data.get("sale_price")
 
 		if "delete" in data:
 			self.object.deleted = True
 			self.object.save()
-			messages.success(request, 'Ticket %s Deleted Successfully!' % (title))
+			messages.success(request, 'Ticket Deleted Successfully!')
 
 		else:
 			form.instance.price = price
 			form.instance.sale_price = sale_price
 			self.object = form.save()
-			messages.success(request, 'Ticket %s Updated Successfully!' % (title))
+			messages.success(request, 'Ticket Updated Successfully!')
 
 
 		valid_data = super(TicketUpdateView, self).form_valid(form)

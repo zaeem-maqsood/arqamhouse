@@ -12,10 +12,15 @@ from events.models import Checkin
 
 # Create your models here.
 
+def download_pdf_location(instance, filename):
+	return "%s/%s/%s/%s" % (slugify(instance.order.event.organization), slugify(instance.order.event), "tickets", filename)
+
+
 class Attendee(TimestampedModel):
 
 	order = models.ForeignKey(EventOrder, on_delete=models.CASCADE, blank=False, null=False)
 	ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, blank=False, null=False)
+	pdf = models.FileField(upload_to=download_pdf_location, max_length=600, null=True, blank=True)
 	name = models.CharField(max_length=150, null=True, blank=True)
 	slug = models.SlugField(max_length = 375, unique = False, blank=True)
 	email = models.EmailField(max_length=120, null=True, blank=True)
@@ -30,17 +35,19 @@ class Attendee(TimestampedModel):
 		return reverse(view_name, kwargs={"slug": self.order.event.slug, "attendee_slug": self.slug})
 
 
-def create_slug(instance):
 
-	slug = slugify(instance.name)
-	slug = slug + '-%s' % (instance.id)
-	return slug
+	def create_slug(instance):
+
+		slug = slugify(instance.name)
+		slug = slug + '-%s' % (instance.id)
+		instance.slug = slug
+		return instance.slug
 
 
-def attendee_pre_save_reciever(sender, instance, *args, **kwargs):
-	instance.slug = create_slug(instance)
+# def attendee_pre_save_reciever(sender, instance, *args, **kwargs):
+# 	instance.slug = create_slug(instance)
 
-pre_save.connect(attendee_pre_save_reciever, sender=Attendee)
+# pre_save.connect(attendee_pre_save_reciever, sender=Attendee)
 
 
 

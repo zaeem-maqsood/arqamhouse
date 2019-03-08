@@ -129,45 +129,63 @@ Dashboard | {{ organization.name }}
 
 {% if actions %}
 <div class="row">
-	<div class="col-12" style="padding-bottom: 10px;">
-		<h3 style="font-weight: 200;color: #a2a2a2;">Suggestions</h3>
-	</div>
-</div>
+	<div class="col-12">
+		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height ">
+			<div class="m-portlet__body">
 
-<div class="row" style="padding-bottom: 60px;">
-	{% for event in actions.events_without_tickets %}
-	<div class="col-lg-4 col-md-6 text-center" style="">
-		<a href="{{ event.list_tickets_view }}" class="btn btn-outline-info btn-block">Add Tickets For {{ event.title }}</a>
+				<div class="row">
+					<div class="col-12" style="padding-bottom: 10px;">
+						<h3 style="font-weight: 200;color: #a2a2a2;">Suggestions</h3>
+					</div>
+				</div>
+
+				<div class="row" style="padding-bottom: 60px;">
+					{% for event in actions.events_without_tickets %}
+					<div class="col-lg-4 col-md-6 text-center" style="">
+						<a href="{{ event.list_tickets_view }}" class="btn btn-outline-info btn-block">Add Tickets For {{ event.title }}</a>
+					</div>
+					{% endfor %}
+				</div>
+
+			</div>
+		</div>
 	</div>
-	{% endfor %}
 </div>
 {% endif %}
 
 <div class="row">
-	<div class="col-12" style="padding-bottom: 10px;">
-		<h3 style="font-weight: 200;color: #a2a2a2;">15 Day Overview</h3>
+	<div class="col-12">
+		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height ">
+			<div class="m-portlet__body">
+				
+				<div class="row">
+					<div class="col-12" style="padding-bottom: 10px;">
+						<h3 style="font-weight: 200;color: #a2a2a2;">15 Day Overview</h3>
+					</div>
+				</div>
+
+				<div class="row" style="padding-bottom: 40px;">
+					<div class="col-lg-10 col-md-12">
+						<canvas id="myChart" width="400" height="200"></canvas>
+					</div>
+				</div>
+
+				<div class="row" style="padding-bottom: 60px;margin-left: 30px;">
+					<div class="col-4">
+						<span class="m-badge m-badge--info m-badge--wide" style="font-size: 1.3em;padding: 5px;">Sales: ${{ fifteen_day_sales }}</span>
+					</div>
+					<div class="col-4">
+						<span class="m-badge m-badge--info m-badge--wide" style="font-size: 1.3em;padding: 5px;">Orders: {{ fifteen_days_order_sum }}</span>
+					</div>
+					<div class="col-4">
+						<span class="m-badge m-badge--info m-badge--wide" style="font-size: 1.3em;padding: 5px;">Tickets: {{ fifteen_days_tickets_sum }}</span>
+					</div>
+				</div>
+
+			</div>
+		</div>
 	</div>
 </div>
-
-<div class="row" style="padding-bottom: 40px;">
-	<div class="col-lg-10 col-md-12">
-		<canvas id="myChart" width="400" height="200"></canvas>
-	</div>
-</div>
-
-<div class="row" style="padding-bottom: 60px;margin-left: 30px;">
-	<div class="col-4">
-		<span class="m-badge m-badge--info m-badge--wide" style="font-size: 1.3em;padding: 5px;">Sales: ${{ fifteen_day_sales }}</span>
-	</div>
-	<div class="col-4">
-		<span class="m-badge m-badge--info m-badge--wide" style="font-size: 1.3em;padding: 5px;">Orders: {{ fifteen_days_order_sum }}</span>
-	</div>
-	<div class="col-4">
-		<span class="m-badge m-badge--info m-badge--wide" style="font-size: 1.3em;padding: 5px;">Tickets: {{ fifteen_days_tickets_sum }}</span>
-	</div>
-</div>
-
-		
 
 
 <div class="row" style="padding-bottom: 10px;">

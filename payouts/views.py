@@ -2,25 +2,72 @@ import decimal
 from django.db.models import Sum
 from django.shortcuts import render
 from django.urls import reverse
+from django.views import View
 from django.views.generic.edit import FormView
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from django.contrib import messages
 
 from organizations.mixins import OrganizationAccountMixin
 
 from events.models import Event
 from orders.models import EventOrder
-from .models import EventPayout
+from .models import Payout, EventPayout
 from .forms import EventPayoutForm
 
 
 # Create your views here.
+
+class PayoutDetailView(OrganizationAccountMixin, DetailView):
+	template_name = "payouts/detail.html"
+	model = Payout
+
+	def get_context_data(self, *args, **kwargs):
+		context = {}
+		payout = kwargs['object']
+		organization = self.get_organization()
+		events = self.get_events()
+		context["payout"] = payout
+		context["organization"] = organization
+		context["events"] = events
+		context["payout_history"] = True
+		return context
+
+
+class PayoutHistoryView(OrganizationAccountMixin, ListView):
+	template_name = "payouts/history.html"
+	model = Payout
+
+	def payouts_total(self, payouts):
+		total = payouts.aggregate(Sum('amount'))
+		return total['amount__sum']
+
+	def get_payouts(self, organization):
+		payouts = Payout.objects.filter(organization=organization)
+		return payouts
+
+	def get_context_data(self, *args, **kwargs):
+		context = {}
+		organization = self.get_organization()
+		payouts = self.get_payouts(organization)
+		payouts_total = self.payouts_total(payouts)
+		events = self.get_events()
+		context["organization"] = organization
+		context["events"] = events
+		context["payouts_total"] = payouts_total
+		context["payouts"] = payouts
+		context["payout_history"] = True
+		return context
+
+
+
+
 class EventPayoutView(OrganizationAccountMixin, FormView):
 	template_name = "payouts/event_payouts.html"
 
 	def get_success_url(self):
-		view_name = "events:payouts:event_payout"
+		view_name = "payouts:event_payout"
 		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
-
 
 	def get_event(self, slug):
 		try:
@@ -76,7 +123,7 @@ class EventPayoutView(OrganizationAccountMixin, FormView):
 
 	def form_valid(self, form, orders, request, event):
 
-		event_payout = EventPayout.objects.create(event=event)
+		event_payout = EventPayout.objects.create(event=event, organization=event.organization)
 		event_payout.save()
 		amount = decimal.Decimal(0.00)
 

@@ -31,6 +31,8 @@ urlpatterns = [
     path('profile/', include('profiles.urls')),
     path('admin/', admin.site.urls),
     path('events/', include('events.urls')),
+    path('payouts/', include('payouts.urls')),
+    path('descriptions/', include('descriptions.urls')),
 ]
 
 if settings.DEBUG:

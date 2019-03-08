@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'orders',
     'attendees',
     'answers',
+    'descriptions',
 ]
 
 MIDDLEWARE = [
@@ -137,6 +138,17 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab()  # execute every minute
     }
 }
+
+
+# Sendgrid Email Backend
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+# SENDGRID_API_KEY = os.environ["SENDGRID_API_KEY"]
+SENDGRID_API_KEY = "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"
+
+# To err on the side of caution, this defaults to True, so emails sent in DEBUG mode will not be delivered,
+ # unless this setting is explicitly set to False.
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
 
 
 

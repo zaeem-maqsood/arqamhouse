@@ -7,7 +7,7 @@ Attendee | {{ attendee.name }}
 {% endblock title %}
 
 {% block page_title %}
-<a style="text-decoration: none;" href="{{ event.list_attendees_view }}"><i style="font-size: 30px;" class="fas fa-long-arrow-alt-left"></i> Back To Attendees</a>
+<a style="text-decoration: none;font-size: 0.7em;color: #4499d5;" href="{{ event.list_attendees_view }}"><i style="font-size: 1em;" class="fas fa-long-arrow-alt-left"></i> Back To Attendees</a>
 {% endblock page_title %}
 
 {% block styles %}
@@ -103,7 +103,7 @@ Attendee | {{ attendee.name }}
 
 
 
-					<div class="row row-padder">
+					<div class="row">
 						<!-- Begin Event Question custom question fields  -->
 	                    {% for question in questions %}
 
@@ -113,7 +113,7 @@ Attendee | {{ attendee.name }}
 	                        {% endautoescape %}
 
 	                        <!-- Check if Event Question is required or not -->
-	                        <div class="col-md-12" style="padding-bottom: 20px;">
+	                        <div class="col-md-12">
 	                        	<div class="form-group m-form__group">
 		                            <h5>{% if question.required %}<i class="fas fa-asterisk" style="color: red;"></i>{% endif %}  {{ question.title }} {% if not question.all_ticket_question_control %}- "{{ question.ticket }}" question only{% endif %} </h5>
 		                            
@@ -137,14 +137,15 @@ Attendee | {{ attendee.name }}
                 	</div>
 
 
+                	<div class="row row-padder">
+                		<div class="col-md-12">
+                			<div class="m-form__actions">
+								<button type="submit" name="Create" value="Create" class="btn btn-success btn-block publish">Update Attendee</button>
+							</div>
+						</div>
+                	</div>
 
 				</div>
-				<div class="m-portlet__foot m-portlet__foot--fit" style="padding-top: 60px;padding-bottom: 50px;">
-					<div class="m-form__actions">
-						<button type="submit" name="Create" value="Create" class="btn btn-success btn-block publish">Update Attendee</button>
-					</div>
-				</div>
-
 			</form>
 			<!--end::Form-->			
 		</div>

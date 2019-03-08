@@ -48,6 +48,8 @@ class AttendeeListView(OrganizationAccountMixin, ListView):
 		context["organization"] = organization
 		context["attendees"] = attendees
 		context["event"] = event
+		context["events_tab"] = True
+		context["events"] = self.get_events()
 		return context
 
 
@@ -76,6 +78,8 @@ class AttendeeDetailView(OrganizationAccountMixin, FormView):
 		context["attendee"] = attendee
 		context["questions"] = TicketQuestion.objects.filter(event=event)
 		context["form"] = form
+		context["events_tab"] = True
+		context["events"] = self.get_events()
 		return context
 
 	def get(self, request, *args, **kwargs):

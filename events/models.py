@@ -61,6 +61,10 @@ class Event(TimestampedModel):
 		view_name = "events:dashboard"
 		return reverse(view_name, kwargs={"slug": self.slug})
 
+	def get_event_description(self):
+		view_name = "events:description"
+		return reverse(view_name, kwargs={"slug": self.slug})
+
 	def create_free_ticket(self):
 		view_name = "events:tickets:create_free_ticket"
 		return reverse(view_name, kwargs={"slug": self.slug, "type":"free"})
@@ -118,8 +122,9 @@ class Event(TimestampedModel):
 		return reverse(view_name, kwargs={"slug": self.slug})
 
 	def payout_view(self):
-		view_name = "events:payouts:event_payout"
+		view_name = "payouts:event_payout"
 		return reverse(view_name, kwargs={"slug": self.slug})
+
 
 	def create_checkin_view(self):
 		view_name = "events:create_checkin"

@@ -2,11 +2,12 @@ from django.db import models
 from django.urls import reverse
 from events.models import Event
 from carts.models import EventCart
-from payouts.models import EventPayout
+from payouts.models import Payout
 
 
 # Create your models here.
 class Order(models.Model):
+	payout = models.ForeignKey(Payout, on_delete=models.CASCADE, blank=True, null=True)
 	created_at = models.DateTimeField(auto_now_add=True, null=True)
 	amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	payment_id = models.CharField(max_length=150, null=True, blank=True)
@@ -32,7 +33,6 @@ class Order(models.Model):
 class EventOrder(Order):
 	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=False, null=False)
 	event_cart = models.ForeignKey(EventCart, on_delete=models.CASCADE, blank=False, null=False)
-	payout = models.ForeignKey(EventPayout, on_delete=models.CASCADE, blank=True, null=True)
 	email = models.EmailField(max_length=300, blank=False, null=False)
 	note = models.TextField(blank=True, null=True)
 

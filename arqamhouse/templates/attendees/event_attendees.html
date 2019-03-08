@@ -72,7 +72,7 @@ Attendees
 				<tr>
 					<td><p class="lead text-center" style="margin:0 auto;">{{ attendee.name }}</p></td>
 					<td><p class="lead text-center" style="color: #7069cb;margin:0 auto;">{{ attendee.ticket }}</p></td>
-					<td><div class="text-center"><button class="btn btn-outline-brand btn-sm btn-block">View Order</button></div></td>
+					<td><div class="text-center"><a href="{{ attendee.order.get_order_view }}" class="btn btn-outline-brand btn-sm btn-block">View Order</a></div></td>
 					<td><div class="text-center"><a href="{{ attendee.get_attendee_view }}" class="btn btn-outline-brand btn-sm btn-block">View/Edit Details</a></div></td>
 				</tr>
 				{% endfor %}

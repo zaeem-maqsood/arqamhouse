@@ -1,0 +1,168 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}
+Paragraph Element
+{% endblock title %}
+
+{% block navigation %}
+	{% include "frontend/navigation.html" %}
+{% endblock navigation %}
+
+{% block footer %}
+	{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script type="text/javascript">
+
+$('#id_text').bind('input propertychange', function() {
+    value = $(this).val();
+    $('#output').html(value);
+});
+
+</script>
+{% endblock scripts %}
+
+{% block content %}
+
+{% if messages %}
+<section class="elements-title space--xxs text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+            	{% for message in messages %}
+                <div class="alert bg--{{ message.tags }}">
+					<div class="alert__body">
+						<span>{{ message.tags|upper }}: {{ message }}</span>
+					</div>
+					<div class="alert__close"> × </div>
+				</div>
+				{% endfor %}
+			</div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endif %}
+
+
+<section class="text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 col-lg-12">
+
+                <form action="" method="POST">{% csrf_token %}
+                	
+
+                		<div class="row justify-content-center" style="padding-bottom: 30px;">
+		                	<div class="col-md-8">
+		                		{% if entity_type == 'event' %}
+                					<a href="{% url 'events:description' slug %}"> <i class="fas fa-arrow-left"></i> Back to Description</a>
+		                		{% endif %}
+                			</div>
+                		</div>
+                	
+                		
+                		{% if form.non_field_errors %}
+                		<div class="row justify-content-center">
+		                	<div class="col-md-8">
+		                        <div class="alert bg--error">
+									<div class="alert__body">
+										{% for error in form.non_field_errors %}
+		                                <span>{{ error|escape }}</span>
+		                            	{% endfor %}
+									</div>
+									<div class="alert__close">×</div>
+								</div>
+		                	</div>
+		                </div>
+	                	{% endif %}
+
+	                	{% if form.text.errors %}
+	                	<div class="row justify-content-center">
+		                	<div class="col-md-8">
+		                        <div class="alert bg--error">
+									<div class="alert__body">
+										{% for error in form.text.errors %}
+		                                <span>{{ error|escape }}</span>
+		                            	{% endfor %}
+									</div>
+									<div class="alert__close">×</div>
+								</div>
+							</div>
+						</div>
+	                	{% endif %}
+
+	                	<div class="row justify-content-center" style="padding-bottom: 50px;">
+		                    <div class="col-md-2 justify-content-center">
+		                    	{{ form.order }}
+		                    </div>
+		                </div>
+
+	                	<div class="row justify-content-center" style="padding-bottom: 50px;">
+		                    <div class="col-md-8 justify-content-center">
+		                    	{{ form.text }}
+		                    	<p>Paragraph text</p>
+		                    </div>
+		                </div>
+
+	                    <div class="row justify-content-center" style="padding-top: 20px;padding-bottom: 20px;">
+	                    	{% if update %}
+
+		                    	<div class="col-md-4 justify-content-center">
+			                        <button type="submit" class="btn btn--primary type--uppercase">Update Paragraph</button>
+			                    </div>
+
+			                    <div class="col-md-4 justify-content-center">
+			                        <button type="submit" class="btn btn--primary type--uppercase" style="background: #e24a4a; border-color: #e24a4a;" name="Delete Element">Delete Element</button>
+		                    	</div>
+
+	                    	{% else %}
+
+	                    		<div class="col-md-4 justify-content-center">
+			                        <button type="submit" class="btn btn--primary type--uppercase">Create Paragraph</button>
+			                    </div>
+
+	                    	{% endif %}
+		                </div>
+                	
+                		<hr>
+
+		                <div class="row">
+		                    <div class="col-md-12 " style="padding-top: 40px;padding-bottom: 40px;">
+		                    	<p id="output" class="text-lg-right">This is an example of pragraph text.</p>
+		                	</div>
+		                </div>
+
+                </form>
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+
+
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

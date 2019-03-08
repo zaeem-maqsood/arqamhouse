@@ -19,14 +19,16 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import EventPayoutView
+from .views import PayoutHistoryView, EventPayoutView, PayoutDetailView
 
 app_name="payouts"
 
 urlpatterns = [
 
-    # path('', OrderListView.as_view(), name='list'),
-    path('', EventPayoutView.as_view(), name='event_payout'),
+    path('', PayoutHistoryView.as_view(), name='all_payouts'),
+    path('<int:pk>', PayoutDetailView.as_view(), name='detail'),
+
+    path('event/<slug:slug>', EventPayoutView.as_view(), name='event_payout'),
 
 
     

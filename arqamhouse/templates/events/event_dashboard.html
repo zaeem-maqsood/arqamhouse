@@ -252,6 +252,23 @@ Dashboard | {{ event.title }}
 </div>
 
 <div class="row">
+	<div class="col-12">
+		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height">
+			<div class="m-portlet__body">
+				<div class="row text-center">
+					<div class="col-6" style="padding-top: 10px;">
+						<a href="{{ event.get_update_view }}" class="btn-block btn btn-info">Edit Event</a>
+					</div>
+					<div class="col-6" style="padding-top: 10px;">
+						<a href="{{ event.get_landing_view }}" class="btn-block btn btn-info">View Event</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
 	<div class="col-lg-4 col-md-12">
 		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height ">
 			<div class="m-portlet__body">
@@ -283,10 +300,10 @@ Dashboard | {{ event.title }}
 						</a>
 					</div>
 					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
-						<a href="{{ event.payout_view }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
+						<a href="{{ event.get_event_description }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg ">
 							<span>
-								<i class="flaticon-coins"></i>
-								<span>Pay-Out</span>
+								<i class="flaticon-rocket"></i>
+								<span>Description</span>
 							</span>
 						</a>
 					</div>
@@ -303,26 +320,26 @@ Dashboard | {{ event.title }}
 					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
 						<a href="" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
 							<span>
-								<i class="flaticon-interface-5"></i>
-								<span>Email</span>
+								<i class="flaticon-list-2"></i>
+								<span>Answers</span>
 							</span>
 						</a>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
-						<a href="" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg ">
+						<a href="" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
 							<span>
-								<i class="flaticon-placeholder"></i>
-								<span>Check-Ins</span>
+								<i class="flaticon-folder-1"></i>
+								<span>Email</span>
 							</span>
 						</a>
 					</div>
 					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
-						<a href="" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
+						<a href="{{ event.payout_view }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
 							<span>
-								<i class="flaticon-list-2"></i>
-								<span>Answers</span>
+								<i class="flaticon-coins"></i>
+								<span>Pay-Out</span>
 							</span>
 						</a>
 					</div>

@@ -39,8 +39,10 @@ function updateCountdown() {
 
 jQuery(document).ready(function($) {
     updateCountdown();
+
     $('.message').change(updateCountdown);
     $('.message').keyup(updateCountdown);
+    calculateBuyerTicketCostAndOrganizerTicketValue()
 
 
 });
@@ -314,7 +316,7 @@ $('#id_sale_price').bind('input', function() {
 
 			        {% if not donation_ticket %}
 			        <div class="row row-padder">
-						<div class="col-md-6">
+						<div class="col-md-4">
 							<div class="form-group m-form__group">
 								<h5>Min Amount</h5>
 								{{ form.min_amount }}
@@ -327,7 +329,7 @@ $('#id_sale_price').bind('input', function() {
 								<span class="m-form__help">The minimum amount of these tickets that can be bought per order.</span>
 							</div>
 						</div>
-						<div class="col-md-6">
+						<div class="col-md-4">
 							<div class="form-group m-form__group">
 								<h5>Max Amount</h5>
 								{{ form.max_amount }}
@@ -340,12 +342,7 @@ $('#id_sale_price').bind('input', function() {
 								<span class="m-form__help">The maximum amount of these tickets that can be bought per order.</span>
 							</div>
 						</div>
-					</div>
-					{% endif %}
-
-
-					<div class="row row-padder">
-						<div class="col-md-12">
+						<div class="col-md-4">
 							<div class="form-group m-form__group">
 								<h5>Amount Available</h5>
 								{{ form.amount_available }}
@@ -359,7 +356,7 @@ $('#id_sale_price').bind('input', function() {
 							</div>
 						</div>
 					</div>
-
+					{% endif %}
 
 
 			        <div class="row row-padder">
@@ -378,14 +375,27 @@ $('#id_sale_price').bind('input', function() {
 					</div>
 
 
-				</div>
-				<div class="m-portlet__foot m-portlet__foot--fit" style="padding-top: 60px;padding-bottom: 50px;">
-					<div class="m-form__actions">
-						{% if button_text == "Update Ticket" %}
-						<button type="submit" name="delete" value="delete" class="btn btn-primary btn-block">Delete Ticket</button>
-						{% endif %}
-						<button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">{{ button_text }}</button>
+					<div class="row row-padder">
+					{% if button_text == "Update Ticket" %}
+							<div class="col-md-6">
+								<div class="form-group m-form__group">
+									<button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">{{ button_text }}</button>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group m-form__group">
+									<button type="submit" name="delete" value="delete" class="btn btn-danger btn-block">Delete Ticket</button>
+								</div>
+							</div>
+					{% else %}
+						<div class="col-md-12">
+							<div class="form-group m-form__group">
+								<button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">{{ button_text }}</button>
+							</div>
+						</div>
+					{% endif %}
 					</div>
+
 				</div>
 
 			</form>
