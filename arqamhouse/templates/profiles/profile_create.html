@@ -23,7 +23,7 @@ Create Organization
         <div class="row justify-content-center">
             <div class="col-md-10 col-lg-8">
                 <p class="lead">
-                    Start By Creating Your Own Organization
+                    Make an account with us 
                 </p>
 
                 <form class="row justify-content-center" action="" method="POST">{% csrf_token %}
@@ -59,8 +59,9 @@ Create Organization
                     </div>
                     <hr>
                     <div class="col-md-12">
-                        {{ form.users_name }}
+                        {{ form.timezone }}
                     </div>
+                    <hr>
                     <div class="col-md-4">
                         {{ form.email }}
                     </div>
@@ -68,7 +69,7 @@ Create Organization
                         {{ form.password }}
                     </div>
                     <div class="col-md-4">
-                        <button type="submit" class="btn btn--primary type--uppercase">Create Organization</button>
+                        <button type="submit" class="btn btn--primary type--uppercase">Create Profile</button>
                     </div>
                     <div class="col-md-12">
                     	<div class="input-checkbox">

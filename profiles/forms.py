@@ -13,6 +13,9 @@ class LoginForm(forms.Form):
 
 class ProfileForm(forms.ModelForm):
 
+	password = forms.CharField(max_length=100, required=True, widget=forms.PasswordInput(attrs={'class': 'validate-required', 'placeholder': 'Password'}))
+	agree = forms.BooleanField(widget=forms.CheckboxInput)
+
 	class Meta:
 		model = Profile
 		fields = [
@@ -24,35 +27,25 @@ class ProfileForm(forms.ModelForm):
 
 		widgets = {
 				"name": forms.TextInput(
-						attrs={
-							"required" : True,
-							"type": "text",
-							"class":"form-control m-input",
-						}
-					),
+					attrs={
+						"class":"validate-required",
+						"placeholder":"Name",
+						"required": True
+					}
+				),
 				"email": forms.TextInput(
-						attrs={
-							"class":"form-control",
-						}
-					),
+					attrs={
+						"class":"validate-required",
+						"placeholder":"Email",
+						"required": True
+					}
+				),
 				"timezone": forms.Select(
 						attrs={
 							"required" : True,
-							"class":"form-control m-input",
+							"class":"validate-required",
 						}
-					),
-				"region": forms.Select(
-						attrs={
-							"required" : True,
-							"class":"form-control m-input",
-						}
-					),
-				"city": forms.Select(
-						attrs={
-							"required" : True,
-							"class":"form-control m-input",
-						}
-					),
+					)
 			}
 
 

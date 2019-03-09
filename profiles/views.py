@@ -16,6 +16,85 @@ from .mixins import ProfileMixin
 
 
 
+
+class ProfileCreateView(CreateView):
+	model = Profile
+	form_class = ProfileForm
+	template_name = "profiles/profile_create.html"
+
+	def get_success_url(self):
+		slug = self.kwargs['slug']
+		view_name = "profiles:update"
+		return reverse(view_name, kwargs={"slug": slug})
+
+
+	def get_context_data(self, request, *args, **kwargs):
+		context = {}
+		form = self.get_form()
+		context["form"] = form
+		return context
+
+
+	def get(self, request, *args, **kwargs):
+		self.object = None
+		return self.render_to_response(self.get_context_data(request))
+
+
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+		form = self.get_form()
+
+		if form.is_valid():
+			messages.success(request, 'Updated!')
+			return self.form_valid(form)
+		else:
+			print(form.errors)
+			messages.warning(request, 'There seems to be a problem')
+			return self.form_invalid(form, request)
+
+
+	def form_valid(self, form):
+		
+		# Get email and password from the form
+		email = form.cleaned_data.get("email")
+		password = form.cleaned_data.get("password")
+
+		# Create a user with this email and password
+		try:
+			user = User.objects.create_user(email, email, password)
+		except:
+			form.add_error("email", "It seems this email is already in use, please login or user use a different email.")
+			return self.render_to_response(self.get_context_data(form=form))
+
+		# Authenticate user 
+		user = authenticate(request, username=email, password=password)
+
+		# Make sure user is authenticated, log them in or diplay 404 error
+		if user is not None:
+			login(request, user)
+			messages.success(request, 'Logged in as %s' % (user.username))
+		else:
+			raise Http404
+
+		# link user to profile
+		form.instance.user = user
+		
+		# Save form
+		self.object = form.save()
+
+		valid_data = super(ProfileCreateView, self).form_valid(form)
+		return valid_data
+
+
+	def form_invalid(self, form, request):
+		print("Didint work")
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form, request=request))
+
+
+
+
+
 # Create your views here.
 class LogoutView(View):
 
@@ -80,9 +159,6 @@ class LoginView(FormView):
 		email = form.cleaned_data.get("email")
 		password = form.cleaned_data.get("password")
 
-		print(email)
-		print(password)
-
 		# Create a user with this email and password
 		try:
 			user = authenticate(request, username=email, password=password)
@@ -90,9 +166,7 @@ class LoginView(FormView):
 			print(e)
 			form.add_error("email", "Invalid username/password combination")
 			return self.render_to_response(self.get_context_data(form=form))
-		print("---")
-		print(authenticate(request, username=email, password=password))
-		print("---")
+		
 		# Make sure user is authenticated, log them in or diplay 404 error
 		if user is not None:
 			login(request, user)
@@ -106,8 +180,6 @@ class LoginView(FormView):
 
 
 	def form_invalid(self, form, request):
-		print("Didint work")
-		print(form.errors)
 		return self.render_to_response(self.get_context_data(form=form))
 
 
