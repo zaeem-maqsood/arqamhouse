@@ -1,5 +1,6 @@
 from django import forms
 from .models import Profile
+from cities_light.models import City, Region, Country
 
 
 
@@ -21,7 +22,9 @@ class ProfileForm(forms.ModelForm):
 		fields = [
 			"name",
 			"email",
-			"timezone",
+			"country",
+			"region",
+			"city"
 		]
 
 
@@ -40,13 +43,49 @@ class ProfileForm(forms.ModelForm):
 						"required": True
 					}
 				),
-				"timezone": forms.Select(
+				"country": forms.Select(
 						attrs={
 							"required" : True,
 							"class":"validate-required",
 						}
-					)
+					),
+				"region": forms.Select(
+						attrs={
+							"required" : True,
+							"class":"validate-required",
+						}
+					),
+				"city": forms.Select(
+						attrs={
+							"required" : True,
+							"class":"validate-required",
+						}
+					),
 			}
+
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self.fields['country'].empty_label = "Country"
+		self.fields['city'].empty_label = "City"
+		self.fields['region'].empty_label = "Region"
+
+		self.fields['city'].queryset = City.objects.all()
+		self.fields['region'].queryset = Region.objects.all()
+
+		if 'country' in self.data:
+			try:
+				country_id = int(self.data.get('country'))
+				region_id = int(self.data.get('region'))
+				self.fields['region'].queryset = Region.objects.filter(country_id=country_id).order_by('name')
+				self.fields['city'].queryset = City.objects.filter(region_id=region_id).order_by('name')
+			except (ValueError, TypeError):
+				pass  # invalid input from the client; ignore and fallback to empty City queryset
+
+		elif self.instance.pk:
+			self.fields['region'].queryset = self.instance.country.region_set.order_by('name')
+			self.fields['city'].queryset = self.instance.country.city_set.order_by('name')
 
 
 

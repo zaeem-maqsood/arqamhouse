@@ -16,11 +16,17 @@ from organizations.models import Organization
 def image_location(instance, filename):
 	return "event_images/%s/%s" % (instance.organization.slug, instance.slug)
 
+class EventQuerySet(models.QuerySet):
+	
+	def active_events(self):
+		return self.filter(active=True)
+
 
 class EventManager(models.Manager):
 
 	def active_events(self, **kwargs):
-		return self.filter(Q(active=True, deleted=False))
+		# return self.filter(Q(active=True, deleted=False))
+		return EventQuerySet(self.model, using=self._db)
 
 	def inactive_events(self, **kwargs):
 		return self.filter(Q(active=False, deleted=False))
@@ -42,7 +48,7 @@ class Event(TimestampedModel):
 	short_description = models.TextField(blank=True, null=True)
 	image = models.ImageField(upload_to=image_location, null=True, blank=True)
 	public = models.BooleanField(default=True)
-	active = models.BooleanField(default=False)
+	active = models.BooleanField(default=True)
 	deleted = models.BooleanField(default=False)
 	objects = EventManager()
 
@@ -209,20 +215,6 @@ class Checkin(models.Model):
 
 
 
-
-# Description Model ------------------------------
-class DescriptionItem(models.Model):
-	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=False, null=False)
-	order_number = models.IntegerField(blank=False, null=True)
-	
-
-	def __str__(self):
-		return self.event
-
-
-class ParagraphElement(models.Model):
-	description_item = models.OneToOneField(DescriptionItem, on_delete=models.CASCADE)
-	text = models.TextField(blank=False, null=True)
 
 
 

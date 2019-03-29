@@ -1,8 +1,8 @@
 
 from core.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from .models import Organization, OrganizationUser, SelectedUserOrganization
-from profiles.models import Profile
+from .models import Organization, OrganizationUser
+from profiles.models import Profile, SelectedOrganization
 from events.models import Event
 
 
@@ -14,16 +14,10 @@ class OrganizationAccountMixin(LoginRequiredMixin, object):
 
 
 	def get_organization(self):
-		# Get user 
 		user = self.request.user
-		# Find which organization is selected by the user 
-		selected_organization_account = SelectedUserOrganization.objects.filter(user=user)
-		# Make sure it exits
-		if selected_organization_account.exists() and selected_organization_account.count() == 1:
-			self.selected_organization_account = selected_organization_account.first()
-			self.organization = selected_organization_account.first().organization
-			return selected_organization_account.first().organization
-		return None
+		selected_organization = SelectedOrganization.objects.get(user=user)
+		organization = selected_organization.organization
+		return organization
 
 
 	def get_profile(self):
@@ -40,7 +34,7 @@ class OrganizationAccountMixin(LoginRequiredMixin, object):
 
 	def get_events(self):
 		organization = self.get_organization()
-		events = Event.objects.active_events(organization=organization)
+		events = Event.objects.active_events().filter(organization=organization)
 		return events
 		
 

@@ -27,16 +27,212 @@ from .mixins import OrganizationAccountMixin, OrganizationLandingMixin
 
 from django.contrib.auth.models import User
 from profiles.models import Profile
-from .models import Organization, OrganizationUser, SelectedUserOrganization
-from .forms import OrganizationAndUserCreateForm, ConnectIndividualVerificationForm, ConnectCompanyVerificationForm
+from .models import Organization, OrganizationUser
+from .forms import OrganizationForm, ConnectIndividualVerificationForm, ConnectCompanyVerificationForm
 
 from events.models import Event
 from tickets.models import Ticket
 from orders.models import EventOrder
 from attendees.models import Attendee
 from carts.models import EventCart, EventCartItem
+from profiles.models import Profile, SelectedOrganization
+
+
 
 # Create your views here.
+
+
+
+class DashboardView(DetailView):
+	model = Organization
+	template_name = "organizations/new_dashboard.html"
+
+
+	def get_organization(self):
+		user = self.request.user
+		selected_organization = SelectedOrganization.objects.get(user=user)
+		organization = selected_organization.organization
+		return organization
+
+	def get_profile(self): 
+		user = self.request.user
+		profile = Profile.objects.get(user=user)
+		return profile
+
+	def get_events(self, organization):
+		events = Event.objects.active_events().filter(organization=organization)
+		return events
+
+	def get_attendees(self, organization):
+		now = datetime.today()
+		fifteen_days_earlier = now - timedelta(days=15)
+		attendees = Attendee.objects.filter(order__event__organization=organization, order__created_at__range=(fifteen_days_earlier, now)).select_related("order", "ticket", "order__event").prefetch_related("order", "ticket", "order__event")
+		return attendees
+
+
+	def get_sales(self, attendees):
+		day_label = []
+		sales_label = []
+		fifteen_days_sum = []
+		fifteen_days_order_sum = []
+		fifteen_days_tickets_sum = []
+		use_large_scale = False
+		today = datetime.today()
+		for x in range(15):
+			one_day_earlier = today - timedelta(days=x)
+			attendees_for_day = attendees.filter(order__created_at__day=one_day_earlier.day)
+			order_ids = set()
+			sales_sum = decimal.Decimal(0.00)
+			for attendee in attendees_for_day:
+				if not int(attendee.order.id) in order_ids:
+					order_ids.add(attendee.order.id)
+					sales_sum += attendee.order.amount
+					if sales_sum > 20:
+						use_large_scale = True
+
+			fifteen_days_tickets_sum.append(len(attendees_for_day))
+			fifteen_days_order_sum.append(len(order_ids))
+			sales_label.append("%.2f" % sales_sum)
+			fifteen_days_sum.append(sales_sum)		
+			day_label.append("%s %s" % (one_day_earlier.strftime('%b'), one_day_earlier.day))
+
+		sales_label = list(reversed(sales_label))
+		day_label = list(reversed(day_label))
+
+		data_set_dict = {"sales_label": sales_label, "day_label": day_label, "use_large_scale": use_large_scale, "fifteen_days_sum": fifteen_days_sum, "fifteen_days_order_sum": fifteen_days_order_sum, "fifteen_days_tickets_sum": fifteen_days_tickets_sum}
+		return data_set_dict
+
+
+
+	def get(self, request, *args, **kwargs):
+
+
+		# Generate 2000 attendees
+		# event = Event.objects.get(id=3)
+		# ticket = Ticket.objects.get(id=4)
+		# for x in range(100):
+		# 	today = datetime.today()
+		# 	random_date = today - timedelta(days=random.randint(0, 15))
+		# 	event_cart = EventCart.objects.create(event=event, processed=True, total=52.80, stripe_charge=1.83)
+		# 	event_cart_item = EventCartItem.objects.create(event_cart=event_cart, ticket=ticket, quantity=1, paid_ticket=True, pass_fee=True, ticket_price=52.80, cart_item_total=52.80) 
+		# 	order = EventOrder.objects.create(event=event, event_cart=event_cart, email="zaeem.maqsood@gmail.com", amount=52.80, payment_id="ch_1DS7mHHblWxAI5San4koFles", last_four="4242", brand="Visa", network_status="approved_by_network", risk_level="normal", seller_message="Payment complete.", outcome_type="authorized", name="Zaeem Maqsood", address_line_1="$7 Denny Street", address_state="ON", address_postal_code="L1Z0S3", address_city="Ajax", address_country="Canada")
+		# 	attendee = Attendee.objects.create(order=order, ticket=ticket, name="Zaeem Maqsood")
+		# 	attendee.created_at = random_date
+		# 	order.created_at = random_date
+		# 	order.save()
+		# 	attendee.save()
+
+
+		context = {}
+		# organization = self.get_organization()
+		# print(organization)
+		# profile = self.get_profile()
+		# attendees = self.get_attendees(organization)
+		# events = self.get_events(organization)
+		# sales_data = self.get_sales(attendees)
+
+		# print(events)
+		# context["events"] = events
+		# context["profile"] = profile
+		# context["organization"] = organization
+		# context["attendees"] = attendees[:5]
+		# context["data_set_dict"] = sales_data
+		# context["dashboard_tab"] = True
+		# context["fifteen_day_sales"] = sum(sales_data["fifteen_days_sum"])
+		# context["fifteen_days_order_sum"] = sum(sales_data["fifteen_days_order_sum"])
+		# context["fifteen_days_tickets_sum"] = sum(sales_data["fifteen_days_tickets_sum"])
+		return render(request, self.template_name, context)
+
+
+
+class OrganizationLandingView(OrganizationLandingMixin, DetailView):
+	model = Organization
+	template_name = "organizations/organization_landing.html"
+
+	def get(self, request, *args, **kwargs):
+		context = {}
+		slug = self.kwargs['slug']
+		organization = self.get_organization(slug)
+		if not organization:
+			raise Http404
+		users = self.get_users(organization)
+		print(users)
+		profiles = self.get_profiles(users)
+
+		context["profiles"] = profiles
+		context["users"] = users
+		context["organization"] = organization
+		return render(request, self.template_name, context)
+
+
+
+
+
+
+class OrganizationCreateView(CreateView):
+	model = Organization
+	template_name = "organizations/organization_create.html"
+
+	def get_success_url(self):
+		view_name = "organizations:dashboard"
+		return reverse(view_name, kwargs={'slug': self.object.slug})
+
+	def get_context_data(self, form, *args, **kwargs):
+		context = {}
+		context["form"] = form
+		return context
+
+	def get(self, request, *args, **kwargs):
+		self.object = None
+
+		user = self.request.user
+		profile = Profile.objects.get(user=user)
+		print(profile)
+		initial_location_data = {"country":profile.country, "region":profile.region, "city":profile.city}
+		form = OrganizationForm(initial=initial_location_data)
+		return self.render_to_response(self.get_context_data(form=form))
+
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+		form = OrganizationForm(data=data)
+		if form.is_valid():
+			messages.success(request, 'Organization Created!')
+			return self.form_valid(form, request)
+		else:
+			return self.form_invalid(form)
+
+	def form_valid(self, form, request):
+		
+		# Save the organization
+		self.object = form.save()
+
+		# get user
+		user = request.user
+
+		# Create Organization User
+		organization_user = OrganizationUser.objects.create(organization=self.object, user=user, role="admin")
+		organization_user.save()
+
+		# Create Selected Organization object and assign this organization
+		selected_organization = SelectedOrganization.objects.create(user=user, organization=self.object)
+		selected_organization.save()
+
+		valid_data = super(OrganizationCreateView, self).form_valid(form)
+		return valid_data
+
+	def form_invalid(self, form):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form))
+
+
+
+
+
+
+
+
+
+
 
 def merge_images(file1, file2):
 	"""Merge two images into one, displayed side by side
@@ -258,201 +454,11 @@ class ConnectVerificationView(OrganizationAccountMixin, FormView):
 
 
 
-class DashboardView(OrganizationAccountMixin, DetailView):
-	model = Organization
-	template_name = "organizations/dashboard.html"
-
-	def get_events(self, organization):
-		events = Event.objects.active_events(organization=organization)
-		return events
-
-	def get_attendees(self, organization):
-		now = datetime.today()
-		fifteen_days_earlier = now - timedelta(days=15)
-		attendees = Attendee.objects.filter(order__event__organization=organization, order__created_at__range=(fifteen_days_earlier, now)).select_related("order", "ticket", "order__event").prefetch_related("order", "ticket", "order__event")
-		return attendees
-
-	def get_actions(self, events):
-		actions = {}
-
-		# Get events that don't have tickets yet
-		events_without_tickets = []
-		for event in events:
-			tickets = event.ticket_set.all().count()
-			if tickets < 1:
-				events_without_tickets.append(event)
-		actions["events_without_tickets"] = events_without_tickets
-		return actions
-
-
-	def get_sales(self, attendees):
-		day_label = []
-		sales_label = []
-		fifteen_days_sum = []
-		fifteen_days_order_sum = []
-		fifteen_days_tickets_sum = []
-		use_large_scale = False
-		today = datetime.today()
-		for x in range(15):
-			one_day_earlier = today - timedelta(days=x)
-			attendees_for_day = attendees.filter(order__created_at__day=one_day_earlier.day)
-			order_ids = set()
-			sales_sum = decimal.Decimal(0.00)
-			for attendee in attendees_for_day:
-				if not int(attendee.order.id) in order_ids:
-					order_ids.add(attendee.order.id)
-					sales_sum += attendee.order.amount
-					if sales_sum > 20:
-						use_large_scale = True
-
-			fifteen_days_tickets_sum.append(len(attendees_for_day))
-			fifteen_days_order_sum.append(len(order_ids))
-			sales_label.append("%.2f" % sales_sum)
-			fifteen_days_sum.append(sales_sum)		
-			day_label.append("%s %s" % (one_day_earlier.strftime('%b'), one_day_earlier.day))
-
-		sales_label = list(reversed(sales_label))
-		day_label = list(reversed(day_label))
-
-		data_set_dict = {"sales_label": sales_label, "day_label": day_label, "use_large_scale": use_large_scale, "fifteen_days_sum": fifteen_days_sum, "fifteen_days_order_sum": fifteen_days_order_sum, "fifteen_days_tickets_sum": fifteen_days_tickets_sum}
-		return data_set_dict
 
 
 
-	def get(self, request, *args, **kwargs):
 
 
-		# Generate 2000 attendees
-		# event = Event.objects.get(id=3)
-		# ticket = Ticket.objects.get(id=4)
-		# for x in range(100):
-		# 	today = datetime.today()
-		# 	random_date = today - timedelta(days=random.randint(0, 15))
-		# 	event_cart = EventCart.objects.create(event=event, processed=True, total=52.80, stripe_charge=1.83)
-		# 	event_cart_item = EventCartItem.objects.create(event_cart=event_cart, ticket=ticket, quantity=1, paid_ticket=True, pass_fee=True, ticket_price=52.80, cart_item_total=52.80) 
-		# 	order = EventOrder.objects.create(event=event, event_cart=event_cart, email="zaeem.maqsood@gmail.com", amount=52.80, payment_id="ch_1DS7mHHblWxAI5San4koFles", last_four="4242", brand="Visa", network_status="approved_by_network", risk_level="normal", seller_message="Payment complete.", outcome_type="authorized", name="Zaeem Maqsood", address_line_1="$7 Denny Street", address_state="ON", address_postal_code="L1Z0S3", address_city="Ajax", address_country="Canada")
-		# 	attendee = Attendee.objects.create(order=order, ticket=ticket, name="Zaeem Maqsood")
-		# 	attendee.created_at = random_date
-		# 	order.created_at = random_date
-		# 	order.save()
-		# 	attendee.save()
-
-
-		context = {}
-		organization = self.get_organization()
-		profile = self.get_profile()
-		attendees = self.get_attendees(organization)
-		events = self.get_events(organization)
-		sales_data = self.get_sales(attendees)
-		actions = self.get_actions(events)
-
-		context["events"] = events
-		context["actions"] = actions
-		context["profile"] = profile
-		context["organization"] = organization
-		context["attendees"] = attendees[:5]
-		context["data_set_dict"] = sales_data
-		context["dashboard_tab"] = True
-		context["fifteen_day_sales"] = sum(sales_data["fifteen_days_sum"])
-		context["fifteen_days_order_sum"] = sum(sales_data["fifteen_days_order_sum"])
-		context["fifteen_days_tickets_sum"] = sum(sales_data["fifteen_days_tickets_sum"])
-		return render(request, self.template_name, context)
-
-
-
-class OrganizationLandingView(OrganizationLandingMixin, DetailView):
-	model = Organization
-	template_name = "organizations/organization_landing.html"
-
-	def get(self, request, *args, **kwargs):
-		context = {}
-		slug = self.kwargs['slug']
-		organization = self.get_organization(slug)
-		if not organization:
-			raise Http404
-		users = self.get_users(organization)
-		print(users)
-		profiles = self.get_profiles(users)
-
-		context["profiles"] = profiles
-		context["users"] = users
-		context["organization"] = organization
-		return render(request, self.template_name, context)
-
-
-
-class OrganizationAndUserCreateView(CreateView):
-	model = Organization
-	form_class = OrganizationAndUserCreateForm
-	template_name = "organizations/organization_detail.html"
-
-	def get_success_url(self):
-		view_name = "dashboard"
-		return reverse(view_name)
-
-	def get_context_data(self, form, *args, **kwargs):
-		context = {}
-		context["form"] = form
-		return context
-
-	def get(self, request, *args, **kwargs):
-		self.object = None
-		form = self.get_form()
-		return self.render_to_response(self.get_context_data(form=form))
-
-	def post(self, request, *args, **kwargs):
-		form = self.get_form()
-		if form.is_valid():
-			messages.success(request, 'Organization Created!')
-			return self.form_valid(form, request)
-		else:
-			return self.form_invalid(form)
-
-	def form_valid(self, form, request):
-		
-		# Get email and password from the form
-		email = form.cleaned_data.get("email")
-		password = form.cleaned_data.get("password")
-		users_name = form.cleaned_data.get("users_name")
-
-		# Create a user with this email and password
-		try:
-			user = User.objects.create_user(email, email, password)
-		except:
-			form.add_error("email", "It seems this email is already in use, please use a different email if you are creating a new organization.")
-			return self.render_to_response(self.get_context_data(form=form))
-
-		# Save the organization
-		self.object = form.save()
-
-		# Authenticate user 
-		user = authenticate(request, username=email, password=password)
-		
-		# Make sure user is authenticated, log them in or diplay 404 error
-		if user is not None:
-			login(request, user)
-			messages.success(request, 'Logged in as %s' % (user.username))
-		else:
-			raise Http404
-
-		# Create User Profile
-		profile = Profile.objects.create(user=user, name=users_name)
-		profile.save()
-
-		# Create Organization User
-		organization_user = OrganizationUser.objects.create(organization=self.object, user=user, role="admin")
-		organization_user.save()
-
-		# Create Selected User Organization
-		selected_user_organization = SelectedUserOrganization.objects.create(organization=self.object, user=user)
-		selected_user_organization.save()
-
-		valid_data = super(OrganizationAndUserCreateView, self).form_valid(form)
-		return valid_data
-
-	def form_invalid(self, form):
-		print(form.errors)
-		return self.render_to_response(self.get_context_data(form=form))
 
 
 

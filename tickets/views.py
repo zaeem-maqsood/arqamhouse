@@ -59,7 +59,7 @@ class TicketCreateView(OrganizationAccountMixin, CreateView):
 		return event
 
 	def get_success_url(self):
-		view_name = "dashboard"
+		view_name = "organizations:dashboard"
 		return reverse(view_name)
 
 	def get_context_data(self, form, ticket_type, event, *args, **kwargs):
@@ -85,6 +85,7 @@ class TicketCreateView(OrganizationAccountMixin, CreateView):
 		context["ticket_type"] = ticket_type
 		context["organization"] = organization
 		context["event"] = event
+		context["events"] = self.get_events()
 		context["events_tab"] = True
 		return context
 

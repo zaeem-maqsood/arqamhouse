@@ -1,6 +1,6 @@
 from core.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from organizations.models import Organization, OrganizationUser, SelectedUserOrganization
+from organizations.models import Organization, OrganizationUser
 from profiles.models import Profile
 
 

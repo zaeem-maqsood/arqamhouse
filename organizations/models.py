@@ -6,6 +6,8 @@ from core.models import TimestampedModel
 from django.contrib.auth.models import User
 from django.urls import reverse
 
+from cities_light.models import City, Region, Country
+
 
 # ------------------------------------------- Constants -----------------------------------------
 roles = (
@@ -32,6 +34,11 @@ def temp_file_upload_location(instance, filename):
 class Organization(TimestampedModel):
 	name = models.CharField(max_length=120, null=True, blank=False)
 	slug = models.SlugField(unique = False, blank=True)
+	country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=False, null=True)
+	region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=False, null=True)
+	city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=True)
+
+
 	entity = models.CharField(max_length=150, choices=entity_types, default = 'individual', null=True, blank=True)
 	connect_account_created = models.BooleanField(default=False)
 	connected_stripe_account_id = models.CharField(max_length=200, null=True, blank=False)
@@ -42,6 +49,10 @@ class Organization(TimestampedModel):
 
 	def __str__(self):
 		return str(self.name)
+
+	def get_dashboard_url(self):
+		view_name = "organizations:dashboard"
+		return reverse(view_name, kwargs={"slug": self.slug})
 
 	def get_absolute_url(self):
 		view_name = "organizations:detail"
@@ -72,6 +83,7 @@ pre_save.connect(organization_pre_save_reciever, sender=Organization)
 
 
 
+
 # ------------------------------------------- Organization User Model -----------------------------------------
 # The organization user model links user accounts with organizations. It also assigns roles those users have in  
 # the organizations that they are associated with. 
@@ -83,21 +95,6 @@ class OrganizationUser(TimestampedModel):
 
 	def __str__(self):
 		return "%s - %s - %s" % (self.user, self.organization, self.role)
-
-
-
-
-
-# ------------------------------------- Selected Organization For User Model -----------------------------------------
-# The selected organization for user model is the model that tells the application which organization the user is 
-# currently viewing 
-
-class SelectedUserOrganization(TimestampedModel):
-	user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-	organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=False, null=False)
-
-	def __str__(self):
-		return "%s - %s" % (self.user, self.organization)
 
 
 

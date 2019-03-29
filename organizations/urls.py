@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import OrganizationAndUserCreateView, OrganizationLandingView
+from .views import (OrganizationCreateView, OrganizationLandingView, DashboardView)
 
 
 app_name="organizations"
@@ -28,10 +28,10 @@ urlpatterns = [
 
 
 	# Create Organization And User View
-	path('new', OrganizationAndUserCreateView.as_view(), name='create'),
+	path('new', OrganizationCreateView.as_view(), name='create'),
 
 	# Langing Page For Organization
-	path('<slug:slug>/', OrganizationLandingView.as_view(), name='detail'),
+	path('<slug:slug>/dashboard', DashboardView.as_view(), name='dashboard'),
 
 	# Update Organization
 	# path('<slug:slug>/update', EventDetailView.as_view(), name='update'),

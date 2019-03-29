@@ -4,6 +4,8 @@
 Create Organization
 {% endblock title %}
 
+{% load static %}
+
 {% block footer %}
 	{% include "frontend/footer.html" %}
 {% endblock footer %}
@@ -15,6 +17,48 @@ Create Organization
 {% endblock top_page_scripts %}
 
 {% block scripts %}
+
+<script>
+    $("#id_country").change(function () {
+      
+      var url = $("#profileForm").attr("data-regions-url");  // get the url of the `load_cities` view
+      
+      var countryId = $(this).val();  // get the selected country ID from the HTML input
+
+      $.ajax({                       // initialize an AJAX request
+        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+        data: {
+          'country': countryId       // add the country id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_cities` view function
+            console.log(data)
+          $("#id_region").html(data);  // replace the contents of the city input with the data that came from the server
+        }
+      });
+
+    });
+</script>
+
+<script>
+    $("#id_region").change(function () {
+      
+      var url = $("#profileForm").attr("data-cities-url");  // get the url of the `load_cities` view
+      
+      var regionId = $(this).val();  // get the selected country ID from the HTML input
+
+      $.ajax({                       // initialize an AJAX request
+        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+        data: {
+          'region': regionId       // add the country id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_cities` view function
+            console.log(data)
+          $("#id_city").html(data);  // replace the contents of the city input with the data that came from the server
+        }
+      });
+
+    });
+</script>
 {% endblock scripts %}
 
 {% block content %}
@@ -22,11 +66,12 @@ Create Organization
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-10 col-lg-8">
+                <img src="{% static 'images/Arqam.png' %}" style="max-height: 6em;">
                 <p class="lead">
                     Make an account with us 
                 </p>
 
-                <form class="row justify-content-center" action="" method="POST">{% csrf_token %}
+                <form class="row justify-content-center" action="" method="POST" id="profileForm" data-regions-url="{% url 'profiles:ajax_load_regions' %}" data-cities-url="{% url 'profiles:ajax_load_cities' %}">{% csrf_token %}
                 	
                 	{% if form.non_field_errors %}
                 	<div class="col-md-12">
@@ -54,24 +99,83 @@ Create Organization
 					</div>
                 	{% endif %}
 
+                    {% if form.password.errors %}
                     <div class="col-md-12">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.password.errors %}
+                                <span>{{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="col-md-4">
                     	{{ form.name }}
                     </div>
-                    <hr>
-                    <div class="col-md-12">
-                        {{ form.timezone }}
-                    </div>
-                    <hr>
                     <div class="col-md-4">
                         {{ form.email }}
                     </div>
                     <div class="col-md-4">
                         {{ form.password }}
                     </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn--primary type--uppercase">Create Profile</button>
-                    </div>
+
+                    <hr>
+
+
+                    {% if form.country.errors %}
                     <div class="col-md-12">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.country.errors %}
+                                <span>Country | {{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.region.errors %}
+                    <div class="col-md-12">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.region.errors %}
+                                <span>Province/State | {{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.city.errors %}
+                    <div class="col-md-12">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.city.errors %}
+                                <span>City | {{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="col-md-4">
+                        {{ form.country }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.region }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.city }}
+                    </div>
+
+
+                    <div class="col-md-12" style="padding-top: 30px;">
                     	<div class="input-checkbox">
                 			{{ form.agree }}
                 			<label for="checkbox"></label>
@@ -80,6 +184,11 @@ Create Organization
                             <a href="#">terms and conditions</a>
                         </span>
                     </div>
+
+                    <div class="col-md-12" style="padding-top: 30px;">
+                        <button type="submit" class="btn btn--primary type--uppercase">Create Profile</button>
+                    </div>
+
                 </form>
             </div>
         </div>

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 from celery.schedules import crontab
+from arqamhouse.aws.conf import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -201,45 +202,45 @@ PLATFORM_FEE = 5
 PLATFORM_BASE_FEE = 0.30
 
 
-AWS_ACCESS_KEY_ID = "AKIAJLQ5COLYAR6REXEQ"
-AWS_SECRET_ACCESS_KEY = "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"
+# AWS_ACCESS_KEY_ID = "AKIAJLQ5COLYAR6REXEQ"
+# AWS_SECRET_ACCESS_KEY = "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"
 
 
 
-AWS_FILE_EXPIRE = 200
-AWS_PRELOAD_METADATA = True
-AWS_QUERYSTRING_AUTH = True
+# AWS_FILE_EXPIRE = 200
+# AWS_PRELOAD_METADATA = True
+# AWS_QUERYSTRING_AUTH = True
 
-DEFAULT_FILE_STORAGE = 'arqamhouse.utils.MediaRootS3BotoStorage'
-STATICFILES_STORAGE = 'arqamhouse.utils.StaticRootS3BotoStorage'
-AWS_STORAGE_BUCKET_NAME = 'arqam-static'
-AWS_S3_REGION_NAME = 'us-west-1'
+# DEFAULT_FILE_STORAGE = 'arqamhouse.utils.MediaRootS3BotoStorage'
+# STATICFILES_STORAGE = 'arqamhouse.utils.StaticRootS3BotoStorage'
+# AWS_STORAGE_BUCKET_NAME = 'arqam-static'
+# AWS_S3_REGION_NAME = 'us-west-1'
 
-S3_URL = '//%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
-MEDIA_URL = '//%s.s3.amazonaws.com/media/' % AWS_STORAGE_BUCKET_NAME
-MEDIA_ROOT = MEDIA_URL
-STATIC_URL = S3_URL + 'static/'
-ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+# S3_URL = '//%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
+# MEDIA_URL = '//%s.s3.amazonaws.com/media/' % AWS_STORAGE_BUCKET_NAME
+# MEDIA_ROOT = MEDIA_URL
+# STATIC_URL = S3_URL + 'static/'
+# ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 
-import datetime
+# import datetime
 
-two_months = datetime.timedelta(days=61)
-date_two_months_later = datetime.date.today() + two_months
-expires = date_two_months_later.strftime("%A, %d %B %Y 20:00:00 GMT")
+# two_months = datetime.timedelta(days=61)
+# date_two_months_later = datetime.date.today() + two_months
+# expires = date_two_months_later.strftime("%A, %d %B %Y 20:00:00 GMT")
 
-AWS_HEADERS = { 
-    'Expires': expires,
-    'Cache-Control': 'max-age=%d' % (int(two_months.total_seconds()), ),
-}
+# AWS_HEADERS = { 
+#     'Expires': expires,
+#     'Cache-Control': 'max-age=%d' % (int(two_months.total_seconds()), ),
+# }
 
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-# STATICFILES_DIRS = [
-#      os.path.join(BASE_DIR, "static"),
-#  ]
+STATICFILES_DIRS = [
+     os.path.join(BASE_DIR, "static"),
+ ]
 
 # STATIC_URL = '/static/'
 # MEDIA_URL = '/media/'

@@ -295,22 +295,6 @@ class EventDashboardView(OrganizationAccountMixin, DetailView):
 			raise Http404
 
 
-	def get_actions(self, event):
-		actions = {}
-
-		show_actions = True
-
-		# Get events that don't have tickets yet
-		tickets_present = False
-		tickets = event.ticket_set.all().count()
-		if tickets > 1:
-			tickets_present = True
-			show_actions = False
-
-		actions["show_actions"] = show_actions
-		actions["tickets_present"] = tickets_present
-		return actions
-
 	def get_attendees(self, event):
 		attendees = Attendee.objects.filter(order__event=event).select_related("order", "ticket", "order__event").prefetch_related("order", "ticket", "order__event")
 		return attendees
@@ -403,12 +387,12 @@ class EventDashboardView(OrganizationAccountMixin, DetailView):
 		context = {}
 		slug = kwargs['slug']
 		organization = self.get_organization()
+		print(organization.get_dashboard_url)
 		event = self.get_event(slug)
 		events = self.get_events()
 		attendees = self.get_attendees(event)
 		all_ticket_and_sales_data = self.get_all_ticket_and_sales_data(attendees)
 		fifteen_days_ticket_and_sales_data = self.get_fifteen_day_ticket_and_sales_data(attendees)
-		actions = self.get_actions(event)
 
 		if event.active == False:
 			context["inactive_event_tab"] = True
@@ -417,8 +401,6 @@ class EventDashboardView(OrganizationAccountMixin, DetailView):
 			context["events_tab"] = True
 
 		context["events"] = events
-
-		context["actions"] = actions
 		context["all_ticket_and_sales_data"] = all_ticket_and_sales_data
 		context["fifteen_days_ticket_and_sales_data"] = fifteen_days_ticket_and_sales_data
 		context["organization"] = organization
@@ -578,8 +560,9 @@ class EventCreateView(OrganizationAccountMixin, CreateView):
 	template_name = "events/event_form.html"
 
 	def get_success_url(self):
-		view_name = "dashboard"
-		return reverse(view_name)
+		organization = self.get_organization()
+		view_name = "organizations:dashboard"
+		return reverse(view_name, kwargs={'slug': organization.slug})
 
 	def get_context_data(self, form, *args, **kwargs):
 		context = {}
@@ -610,6 +593,11 @@ class EventCreateView(OrganizationAccountMixin, CreateView):
 		self.object = form.save()
 		self.object.active = True
 		self.object.save()
+
+		# Create the event description object 
+		event_description = EventDescription.objects.create(event=self.object)
+		event_description.save()
+
 		messages.success(request, 'Event Published')
 		valid_data = super(EventCreateView, self).form_valid(form)
 		return valid_data

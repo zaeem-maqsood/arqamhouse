@@ -1,0 +1,38 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Profile Dashboard 
+{% endblock title %}
+
+{% block footer %}
+	{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center">
+    <div class="container" style="padding-bottom: 60px;">
+        <div class="row">
+            <div class="col-md-12 col-lg-9">
+                <img src="{% static 'images/Arqam.png' %}" style="max-height: 6em;">
+                <p style="margin-bottom: 5px;">Hello {{ profile.name }}. We are working very hard to make individual accounts on Arqam House powerful.</p>
+                <p>In the mean time please consider creating an organization account.</p>
+                <a href="{% url 'organizations:create' %}" class="btn btn--primary" style="color: white;">Create Organization</a>
+                <a href="{% url 'profiles:logout' %}" class="btn btn--info" >Logout</a>
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endblock content %}

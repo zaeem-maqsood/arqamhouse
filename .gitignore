@@ -4,6 +4,8 @@ pip-selfcheck.json
 
 arqamhouse/settings/local.py
 
+celerybeat.pid
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

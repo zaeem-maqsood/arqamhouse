@@ -212,22 +212,6 @@ Dashboard | {{ event.title }}
 
 {% block content %}
 
-{% if actions.show_actions %}
-<div class="row">
-	<div class="col-12" style="padding-bottom: 10px;">
-		<h3 style="font-weight: 200;color: #a2a2a2;">Suggestions</h3>
-	</div>
-</div>
-
-<div class="row" style="padding-bottom: 60px;">
-	{% if not actions.tickets_present %}
-	<div class="col-lg-4 col-md-6 text-center" style="">
-		<a href="{{ event.list_tickets_view }}" class="btn btn-outline-info btn-block">Add Tickets For {{ event.title }}</a>
-	</div>
-	{% endif %}
-</div>
-{% endif %}
-
 <div class="row">
 	<div class="col-12">
 		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height ">
