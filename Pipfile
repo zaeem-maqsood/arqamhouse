@@ -1,0 +1,27 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+django = "*"
+boto3 = "*"
+celery = "*"
+dj-database-url = "*"
+django-cities-light = "*"
+django-sendgrid-v5 = "*"
+django-storages = "*"
+gunicorn = "*"
+numpy = "*"
+openpyxl = "*"
+pillow = "*"
+psycopg2 = "*"
+pytz = "*"
+redis = "*"
+requests = "*"
+stripe = "*"
+
+[requires]
+python_version = "3.7"

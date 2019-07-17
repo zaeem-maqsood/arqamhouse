@@ -29,7 +29,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,11 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'storages',
     'cities_light',
-    'organizations',
+    'houses',
     'profiles',
     'payouts',
     'events',
-    'tickets',
     'questions',
     'carts',
     'orders',
@@ -92,12 +90,12 @@ WSGI_APPLICATION = 'arqamhouse.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
 
 # DATABASES = {
@@ -110,15 +108,15 @@ WSGI_APPLICATION = 'arqamhouse.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'db',
-        'PORT': 5432,
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'HOST': 'db',
+#         'PORT': 5432,
+#     }
+# }
 
 import dj_database_url
 db_from_env = dj_database_url.config()
@@ -128,7 +126,7 @@ DATABASES['default'].update(db_from_env)
 
 # Django cities settings
 CITIES_LIGHT_TRANSLATION_LANGUAGES = ['fr', 'en']
-CITIES_LIGHT_INCLUDE_COUNTRIES = ['CA', 'US']
+CITIES_LIGHT_INCLUDE_COUNTRIES = ['CA']
 CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG', 'PPLL', 'PPLR', 'PPLS', 'STLMT',]
 
 
@@ -194,6 +192,12 @@ USE_L10N = True
 USE_TZ = True
 
 LOGIN_URL = 'profiles:login'
+
+AUTH_USER_MODEL = 'profiles.Profile'
+
+AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+    )
 
 
 STRIPE_FEE = 2.9

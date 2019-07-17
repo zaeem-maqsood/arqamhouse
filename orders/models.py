@@ -4,9 +4,12 @@ from events.models import Event
 from carts.models import EventCart
 from payouts.models import Payout
 
+from houses.models import House
+
 
 # Create your models here.
 class Order(models.Model):
+	house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=False)
 	payout = models.ForeignKey(Payout, on_delete=models.CASCADE, blank=True, null=True)
 	created_at = models.DateTimeField(auto_now_add=True, null=True)
 	amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)

@@ -18,7 +18,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from organizations.views import DashboardView, ConnectVerificationView, ChangeEntityTypeView
+from houses.views import DashboardView, ConnectVerificationView, ChangeEntityTypeView
 from .views import HomePageView
 
 urlpatterns = [
@@ -26,7 +26,7 @@ urlpatterns = [
     path('', HomePageView.as_view(), name='home'),
     path('change-entity', ChangeEntityTypeView.as_view(), name='change_entity'),
     path('verification', ConnectVerificationView.as_view(), name='verification'),
-    path('organization/', include('organizations.urls')),
+    path('house/', include('houses.urls')),
     path('profile/', include('profiles.urls')),
     path('admin/', admin.site.urls),
     path('events/', include('events.urls')),

@@ -21,8 +21,8 @@
                     <div class="row">
                         <div class="col-3 col-md-2">
                             <a href="index.html">
-                                <img style="max-height: 3em;" class="logo logo-dark"  alt="logo" src="{% static 'images/Arqam.png' %}" />
-                                <img style="max-height: 3em;" class="logo logo-light" alt="logo" src="{% static 'images/Arqam_light.png' %}" />
+                                <img style="max-height: 3em;" class="logo logo-dark"  alt="logo" src="{% static 'images/logo.png' %}" />
+                                <img style="max-height: 3em;" class="logo logo-light" alt="logo" src="{% static 'images/logo_light.png' %}" />
                             </a>
                         </div>
                         <div class="col-9 col-md-10 text-right">
@@ -52,10 +52,33 @@
         <a class="back-to-top inner-link" href="#start" data-scroll-class="100vh:active">
             <i class="stack-interface stack-up-open-big"></i>
         </a>
+
+        
+
         {% include "frontend/footer_scripts.html" %}
 
         {% block scripts %}
         {% endblock scripts %}
+        
+
+        <script type='text/javascript'> 
+        {% for message in messages %}
+        $.notify({
+            // options
+            title: '{{ message.tags|upper }}',
+            message: '{{ message }}', 
+        },{
+            // settings
+            type: '{{ message.tags }}',
+            delay: 5000,
+            timer: 1000,
+            animate: {
+                enter: 'animated fadeInDown',
+                exit: 'animated fadeOutUp'
+            },
+        });
+        {% endfor %}
+        </script>
 
     </body>
 </html>

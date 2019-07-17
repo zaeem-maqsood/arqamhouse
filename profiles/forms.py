@@ -1,5 +1,6 @@
 from django import forms
 from .models import Profile
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from cities_light.models import City, Region, Country
 
 
@@ -12,12 +13,14 @@ class LoginForm(forms.Form):
 
 
 
-class ProfileForm(forms.ModelForm):
+class ProfileForm(UserCreationForm):
 
-	password = forms.CharField(max_length=100, required=True, widget=forms.PasswordInput(attrs={'class': 'validate-required', 'placeholder': 'Password'}))
+	email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={"required" : True, "class":"validate-required", "placeholder": "Email"}))
+	password1 = forms.CharField(max_length=100, required=True, widget=forms.PasswordInput(attrs={'class': 'validate-required', 'placeholder': 'Enter Password'}))
+	password2 = forms.CharField(max_length=100, required=True, widget=forms.PasswordInput(attrs={'class': 'validate-required', 'placeholder': 'Enter Password Again'}))
 	agree = forms.BooleanField(widget=forms.CheckboxInput)
 
-	class Meta:
+	class Meta(UserCreationForm):
 		model = Profile
 		fields = [
 			"name",
@@ -33,13 +36,6 @@ class ProfileForm(forms.ModelForm):
 					attrs={
 						"class":"validate-required",
 						"placeholder":"Name",
-						"required": True
-					}
-				),
-				"email": forms.TextInput(
-					attrs={
-						"class":"validate-required",
-						"placeholder":"Email",
 						"required": True
 					}
 				),

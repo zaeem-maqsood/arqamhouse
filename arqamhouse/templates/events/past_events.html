@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-Past Events | {{ organization.name }}
+Past Events | {{ House.name }}
 {% endblock title %}
 
 {% block page_title %}
@@ -32,7 +32,7 @@ Past Events
 <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
 	<li class="m-nav__item">
 		<a href="{{ profile.get_update_url }}" class="m-nav__link">
-			<span class="m-nav__link-text">{{ organization.name }}'s Past Events</span>
+			<span class="m-nav__link-text">{{ House.name }}'s Past Events</span>
 		</a>
 	</li>
 </ul>

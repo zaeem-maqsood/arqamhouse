@@ -18,17 +18,6 @@ Dashboard | {{ event.title }}
     border-color: #4599d8;
 }
 
-
-/*#all_ticket_and_sales {
-    	font-size: 2.6em;
-    }
-
-@media only screen and (max-width: 768px) {
-    #all_ticket_and_sales {
-    	font-size: 1.6em;
-    }
-}*/
-
 </style>
 {% endblock styles %}
 
@@ -42,10 +31,10 @@ Dashboard | {{ event.title }}
 	    type: 'line',
 	    aspectRatio: 2,
 	    data: {
-	        labels: {{ fifteen_days_ticket_and_sales_data.day_label|safe }},
+	        labels: {{ get_ten_day_ticket_and_sales_data.day_label|safe }},
 	        datasets: [{
 	            label: 'Sales $',
-	            data: {{ fifteen_days_ticket_and_sales_data.sales_label|safe }},
+	            data: {{ get_ten_day_ticket_and_sales_data.sales_label|safe }},
 	            backgroundColor: 'rgba(68, 153, 216, 0.2)',
 	            borderColor:'rgba(68, 153, 216, 1)',
 	            borderWidth: 4,
@@ -84,7 +73,7 @@ Dashboard | {{ event.title }}
 	                ticks: {
 
 	                    beginAtZero: true,
-	                    {% if fifteen_days_ticket_and_sales_data.use_large_scale %}
+	                    {% if get_ten_day_ticket_and_sales_data.use_large_scale %}
 	                    {% else %}
 	                    stepSize : 1,
 	                    {% endif %}
@@ -124,10 +113,10 @@ Dashboard | {{ event.title }}
 	    type: 'line',
 	    aspectRatio: 2,
 	    data: {
-	        labels: {{ fifteen_days_ticket_and_sales_data.day_label|safe }},
+	        labels: {{ get_ten_day_ticket_and_sales_data.day_label|safe }},
 	        datasets: [{
 	            label: 'Tickets',
-	            data: {{ fifteen_days_ticket_and_sales_data.tickets_label|safe }},
+	            data: {{ get_ten_day_ticket_and_sales_data.tickets_label|safe }},
 	            backgroundColor: 'rgba(68, 153, 216, 0.2)',
 	            borderColor:'rgba(68, 153, 216, 1)',
 	            borderWidth: 4,
@@ -166,7 +155,7 @@ Dashboard | {{ event.title }}
 	                ticks: {
 
 	                    beginAtZero: true,
-	                    {% if fifteen_days_ticket_and_sales_data.use_large_scale %}
+	                    {% if get_ten_day_ticket_and_sales_data.use_large_scale_tickets %}
 	                    {% else %}
 	                    stepSize : 1,
 	                    {% endif %}
@@ -213,21 +202,27 @@ Dashboard | {{ event.title }}
 {% block content %}
 
 <div class="row">
-	<div class="col-12">
-		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height ">
-			<div class="m-portlet__body">
+	<div class="col-12 col-lg-8">
+		<div class="kt-portlet kt-portlet--skin-solid kt-portlet-- kt-bg-brand">
+			<div class="kt-portlet__body">
+				<div class="row">
+					<div class="col-12">
+						<h1>{{ event.title }}</h1>
+						<p>{{ event.short_description }}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-12 col-lg-2">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
 				<div class="row text-center">
-					<div class="col-4" style="padding-top: 10px;">
-						<h3 id="all_ticket_and_sales" style="font-size:2.5vmax;font-weight: 400;color:#4499d5;">${{ all_ticket_and_sales_data.sales_sum }}</h3>
-						<p>Sales</p>
-					</div>
-					<div class="col-4" style="padding-top: 10px;">
-						<h3 id="all_ticket_and_sales" style="font-size:2.5vmax;font-weight: 400;color:#4499d5;">{{ all_ticket_and_sales_data.order_sum }}</h3>
-						<p>Orders</p>
-					</div>
-					<div class="col-4" style="padding-top: 10px;">
-						<h3 id="all_ticket_and_sales" style="font-size:2.5vmax;font-weight: 400;color:#4499d5;">{{ all_ticket_and_sales_data.tickets_sum }}</h3>
-						<p>Tickets</p>
+					<div class="col-12">
+						<a href="{{ event.get_landing_view }}">
+							<i class="la la-share-square" style="font-size:3em;"></i>
+							<h5 style="padding-top: 10px;">View Event</h5>
+						</a>
 					</div>
 				</div>
 			</div>
@@ -235,16 +230,20 @@ Dashboard | {{ event.title }}
 	</div>
 </div>
 
-<div class="row">
-	<div class="col-12">
-		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height">
-			<div class="m-portlet__body">
-				<div class="row text-center">
-					<div class="col-6" style="padding-top: 10px;">
-						<a href="{{ event.get_update_view }}" class="btn-block btn btn-info">Edit Event</a>
+<div class="row text-center">
+	<div class="col-12 col-lg-10">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+				
+				<div class="row">
+					<div class="col-12" style="padding-bottom: 10px;">
+						<h3 style="font-weight: 200;color: #a2a2a2;">Tickets Sold</h3>
 					</div>
-					<div class="col-6" style="padding-top: 10px;">
-						<a href="{{ event.get_landing_view }}" class="btn-block btn btn-info">View Event</a>
+				</div>
+						
+				<div class="row">
+					<div class="col-12">
+						<canvas id="myChart2" width="400" height="150"></canvas>
 					</div>
 				</div>
 			</div>
@@ -252,116 +251,195 @@ Dashboard | {{ event.title }}
 	</div>
 </div>
 
-<div class="row">
-	<div class="col-lg-4 col-md-12">
-		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height ">
-			<div class="m-portlet__body">
-				<div class="row">
-					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
-						<a href="{{ event.list_tickets_view }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
-							<span>
-								<i class="flaticon-file"></i>
-								<span>Tickets</span>
-							</span>
-						</a>
-					</div>
-					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
-						<a href="{{ event.list_orders_view }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
-							<span>
-								<i class="flaticon-diagram"></i>
-								<span>Orders</span>
-							</span>
-						</a>
+<div class="row text-center">
+	<div class="col-12 col-lg-10">
+
+		<div class="row">
+			<div class="col-2">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a href="{{ event.list_orders_view }}">
+									<h5>Orders</h5>
+									<h1 style="color:rgba(68, 153, 216, 1);">{{ all_ticket_and_sales_data.order_sum }}</h1>
+								</a>
+							</div>
+						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
-						<a href="{{ event.list_attendees_view }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
-							<span>
-								<i class="flaticon-users"></i>
-								<span>Attendees</span>
-							</span>
-						</a>
-					</div>
-					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
-						<a href="{{ event.get_event_description }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg ">
-							<span>
-								<i class="flaticon-rocket"></i>
-								<span>Description</span>
-							</span>
-						</a>
+			</div>
+
+			<div class="col-2">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a href="{{ event.list_attendees_view }}">
+									<h5>Attendees</h5>
+									<h1 style="color:rgba(68, 153, 216, 1);">{{ attendees.count }}</h1>
+								</a>
+							</div>
+						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
-						<a href="{{ event.list_questions_view }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
-							<span>
-								<i class="flaticon-chat"></i>
-								<span>Questions</span>
-							</span>
-						</a>
-					</div>
-					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
-						<a href="" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
-							<span>
-								<i class="flaticon-list-2"></i>
-								<span>Answers</span>
-							</span>
-						</a>
+			</div>
+
+			<div class="col-2">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<h5>Answers</h5>
+								<h1 style="color:rgba(68, 153, 216, 1);">0</h1>
+							</div>
+						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
-						<a href="" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
-							<span>
-								<i class="flaticon-folder-1"></i>
-								<span>Email</span>
-							</span>
-						</a>
+			</div>
+
+			<div class="col-6">
+				<div class="kt-portlet kt-portlet--skin-solid kt-bg-success">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<h5>Payout</h5>
+								<h1>${{ all_ticket_and_sales_data.sales_sum }}</h1>
+							</div>
+						</div>
 					</div>
-					<div class="col-lg-12 col-md-6" style="padding-bottom: 25px;">
-						<a href="{{ event.payout_view }}" class="btn btn-outline-metal m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air btn-block btn-lg">
-							<span>
-								<i class="flaticon-coins"></i>
-								<span>Pay-Out</span>
-							</span>
-						</a>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<div class="row text-center">
+	<div class="col-12 col-lg-10">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+				<div class="row">
+					<div class="col-12" style="padding-bottom: 10px;">
+						<h3 style="font-weight: 200;color: #a2a2a2;">Sales</h3>
+					</div>
+				</div>
+				<div class="row text-center">
+					<div class="col-12">
+						<canvas id="myChart" width="400" height="150"></canvas>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
 
-	<div class="col-lg-8 col-md-12">
-		<!--begin:: Widgets/Product Sales-->
-		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height ">
-			<div class="m-portlet__body">
-				<div class="row text-center">
-					<div class="col-md-12">
-						<p class="lead">Tickets</p>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<canvas id="myChart2" width="400" height="250"></canvas>
-					</div>
-				</div>
-				<br>
-				<hr>
-				<br>
-				<div class="row text-center">
-					<div class="col-md-12">
-						<p class="lead">Sales</p>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<canvas id="myChart" width="400" height="250"></canvas>
+
+<div class="row text-center">
+	<div class="col-12 col-lg-12">
+
+		<div class="row">
+
+			<div class="col-4">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a href="{{ event.list_tickets_view }}">
+									<i class="la la-share-square" style="font-size:2em;"></i>
+									<h5>Tickets</h5>
+									<p>Manage event tickets</p>
+									<br>
+								</a>
+
+								{% for ticket in tickets %}
+								<div class="row text-center" style="padding-bottom:20px;">
+									<div class="col-12">
+										<p>{{ ticket.title }}</p>
+										<div class="progress">
+											<div class="progress-bar progress-bar-striped progress-bar-animated {{ ticket.percentage_color }}" role="progressbar" aria-valuenow="{{ ticket.amount_sold }}" aria-valuemin="0" aria-valuemax="{{ ticket.amount_available }}" style="width: {{ ticket.percentage_sold }}"></div>
+										</div>
+									</div>
+								</div>
+								{% endfor %}
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
+
+
+			<div class="col-4">
+				<div class="kt-portlet kt-portlet--solid-warning">
+					<div class="kt-portlet__body">
+						<div class="row text-center" style="padding-top:30px;">
+							<div class="col-12">
+								<a href="{{ event.get_update_view }}">
+									<i class="la la-cog" style="font-size:2em;"></i>
+									<h5>Details</h5>
+									<p>Edit event details</p>
+								</a>
+								<br>
+								<p>Starts | <span style="font-weight:600;">{{ event.start }}</span></p>
+								<p>Ends | <span style="font-weight:600;">{{ event.end }}</span></p>
+								<p>Venue | <span style="font-weight:600;">{{ event.venue_name }}</span></p>
+								<p>Location | <span style="font-weight:600;">{{ event.venue_address }}</span></p>
+								<br>
+								<p><i style="font-weight:600;color:green;" class="la la-check-circle-o"></i> Public</p>
+								<br>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-2">
+
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a href="{{ event.get_event_description }}">
+									<i class="la la-code-fork" style="font-size:2em;"></i>
+									<h5>Description</h2>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a href="{{ event.get_landing_view }}">
+									<i class="la la-envelope" style="font-size:2em;"></i>
+									<h5>Email</h5>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a href="{{ event.list_questions_view }}">
+									<i class="la la-question-circle" style="font-size:2em;"></i>
+									<h5>Questions</h5>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+
 		</div>
-		<!--end:: Widgets/Product Sales-->
+
 	</div>
 </div>
 

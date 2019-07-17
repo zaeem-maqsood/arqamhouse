@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-{{ button_text }} | {{ organization.name }}
+{{ button_text }} | {{ House.name }}
 {% endblock title %}
 
 {% block page_title %}
@@ -179,231 +179,194 @@ $('#id_sale_price').bind('input', function() {
 {% endblock page_crumbs %}
 
 {% block content %}
-<div class="row">
-	<div class="col-md-10">
-		<!--begin::Portlet-->
-		<div class="m-portlet m-portlet--tab">
-			<!--begin::Form-->
-			<form class="m-form m-form--fit m-form--label-align-right my-form" method="POST" enctype="multipart/form-data">{% csrf_token %}
-				
-				<input type="hidden" name="token" id="token">
-				
-				<div class="m-portlet__body">
 
 
+
+<form method="POST" enctype="multipart/form-data">{% csrf_token %}
+	<div class="row">
+		<div class="col-8">
+			<div class="kt-portlet kt-portlet--mobile">
+				<div class="kt-portlet__body">
+
+					<input type="hidden" name="token" id="token">
+					
 					{% if form.non_field_errors %}
-					<div class="row row-padder">
+					<div class="row">
 						<div class="col-md-12">
-							<div class="form-group m-form__group">
-								{% for error in form.non_field_errors %}
-								<div class="alert alert-danger" role="alert">
-								  	<strong>Oh snap!</strong> {{ error }}
-								</div>
-								{% endfor %}
+							{% for error in form.non_field_errors %}
+							<div class="alert alert-danger" role="alert">
+								<strong>Oh snap!</strong> {{ error }}
 							</div>
+							{% endfor %}
 						</div>
 					</div>
 					{% endif %}
-					
 
-					<div class="row row-padder">
+					<div class="row" style="padding-bottom: 30px;">
 						<div class="col-md-12">
-							<div class="form-group m-form__group">
-								<h5 {% if form.title.errors %}style="color:red;"{% endif %}>Ticket Title <i class="fas fa-asterisk" style="color: red;"></i></h5>
-								{{ form.title }}
-								<br>
-								<span class="countdown m--font-primary"></span>
-								<br>
-								{% for error in form.title.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
+							<h5 {% if form.title.errors %}style="color:red;"{% endif %}>Ticket Title <i class="fas fa-asterisk" style="color: red;"></i></h5>
+							{{ form.title }}
+							<br>
+							{% for error in form.title.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+									{{ error }}
+								</div>
+							{% endfor %}
 						</div>
 					</div>
-
 
 					{% if paid_ticket %}
-					<div class="row row-padder">
+					<div class="row" style="padding-bottom: 30px;">
 						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5 {% if form.price.errors %}style="color:red;"{% endif %}>Price <i class="fas fa-asterisk" style="color: red;"></i></h5>
-								{{ form.price }}
-								<br>
-								{% for error in form.price.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
+							<h5 {% if form.price.errors %}style="color:red;"{% endif %}>Price <i class="fas fa-asterisk" style="color: red;"></i></h5>
+							{{ form.price }}
+							<br>
+							{% for error in form.price.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+									{{ error }}
+								</div>
+							{% endfor %}
 						</div>
 						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5 {% if form.sale_price.errors %}style="color:red;"{% endif %}>Sale Price</h5>
-								{{ form.sale_price }}
-								<br>
-								{% for error in form.sale_price.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
+							<h5 {% if form.sale_price.errors %}style="color:red;"{% endif %}>Sale Price</h5>
+							{{ form.sale_price }}
+							<br>
+							{% for error in form.sale_price.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+									{{ error }}
+								</div>
+							{% endfor %}
 						</div>
 					</div>
 
-
-					<div class="row row-padder show_hide" >
+					<div class="row show_hide" style="padding-bottom: 30px;">
 						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5 {% if form.sale_start.errors %}style="color:red;"{% endif %}>Sale Start <i class="fas fa-asterisk" style="color: red;"></i></h5>
-								{{ form.sale_start }}
-								<br>
-								{% for error in form.sale_start.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
+							<h5 {% if form.sale_start.errors %}style="color:red;"{% endif %}>Sale Start <i class="fas fa-asterisk" style="color: red;"></i></h5>
+							{{ form.sale_start }}
+							<br>
+							{% for error in form.sale_start.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+										{{ error }}
+								</div>
+							{% endfor %}
 						</div>
 						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5 {% if form.sale_end.errors %}style="color:red;"{% endif %}>Sale End <i class="fas fa-asterisk" style="color: red;"></i></h5>
-								{{ form.sale_end }}
-								<br>
-								{% for error in form.sale_end.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
-						</div>
-					</div>
-		
-
-					<div class="row row-padder">
-						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5>Ticket Price Shown To Buyer</h5>
-								<h2 class="m--font-info" id="new_price_div">$0.00</h2>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5>Amount You Will Receive</h5>
-								<h2 class="m--font-success" id="amount_received_div">$0.00</h2>
-							</div>
+							<h5 {% if form.sale_end.errors %}style="color:red;"{% endif %}>Sale End <i class="fas fa-asterisk" style="color: red;"></i></h5>
+							{{ form.sale_end }}
+							<br>
+							{% for error in form.sale_end.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+										{{ error }}
+								</div>
+							{% endfor %}
 						</div>
 					</div>
 
-					
-					<div class="row row-padder">
+					<div class="row text-center" style="padding-bottom: 50px;">
+						<div class="col-md-6">
+							<h1 class="m--font-info" id="new_price_div" style="font-size: 4.5em;">$0.00</h1>
+							<p>Ticket Price Shown To Buyer</p>
+						</div>
+						<div class="col-md-6">
+							<h1 class="m--font-success" id="amount_received_div" style="font-size: 4.5em;">$0.00</h1>
+							<p>Amount You Will Receive</p>
+						</div>
+					</div>
+
+					<div class="row text-center justify-content-center" style="padding-bottom: 50px;">
 						<div class="col-md-12">
-							<div class="form-group m-form__group">
-								<h5>Platform Fee</h5>
-								<span class="m-switch m-switch--lg m-switch--icon">
-									<label>
-			                        {{ form.pass_fee }}
-			                        <span></span>
-			                        </label>
-			                    </span>
-			                    <span class="m-form__help">Pass Fee onto buyer (on) absorb fee (off). The Arqam Platform fee + Credit Card Processing Fee is %{{ platform_fee }} of the ticket price plus a ${{ platform_base_fee }} base fee for each ticket sold.</span>
-			                </div>
-			            </div>
-			        </div>
-			        {% endif %}
-
-
-			        {% if not donation_ticket %}
-			        <div class="row row-padder">
-						<div class="col-md-4">
-							<div class="form-group m-form__group">
-								<h5>Min Amount</h5>
-								{{ form.min_amount }}
-								<br>
-								{% for error in form.min_amount.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-								<span class="m-form__help">The minimum amount of these tickets that can be bought per order.</span>
+							<h5>Platform Fee</h5>
+							<div class="row">
+								<div class="col-md-3 mx-auto">
+									<span class="kt-switch kt-switch--icon mx-auto" style="user-select: auto;">
+										<label style="user-select: auto;">
+											{{ form.pass_fee }}
+											<span style="user-select: auto;"></span>
+										</label>
+									</span>
+								</div>
 							</div>
-						</div>
-						<div class="col-md-4">
-							<div class="form-group m-form__group">
-								<h5>Max Amount</h5>
-								{{ form.max_amount }}
-								<br>
-								{% for error in form.max_amount.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-								<span class="m-form__help">The maximum amount of these tickets that can be bought per order.</span>
-							</div>
-						</div>
-						<div class="col-md-4">
-							<div class="form-group m-form__group">
-								<h5>Amount Available</h5>
-								{{ form.amount_available }}
-								<br>
-								{% for error in form.amount_available.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-								<span class="m-form__help">Total amount of this ticket available. You have sold {{ form.instance.amount_sold }} ticket so far.</span>
-							</div>
+							<br>
+							<p>Pass Fee onto buyer (on) absorb fee (off). <br>The Arqam Platform fee + Credit Card Processing Fee is %{{ platform_fee }} of the ticket price plus a ${{ platform_base_fee }} base fee for each ticket sold.</p>
 						</div>
 					</div>
 					{% endif %}
 
 
-			        <div class="row row-padder">
+					{% if not donation_ticket %}
+			        <div class="row" style="padding-bottom: 30px;">
+						<div class="col-md-4">
+							<h5>Min Amount</h5>
+							{{ form.min_amount }}
+							<br>
+							{% for error in form.min_amount.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+									{{ error }}
+								</div>
+							{% endfor %}
+						</div>
+						<div class="col-md-4">
+							<h5>Max Amount</h5>
+							{{ form.max_amount }}
+							<br>
+							{% for error in form.max_amount.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+									{{ error }}
+								</div>
+							{% endfor %}
+						</div>
+						<div class="col-md-4">
+							<h5>Amount Available</h5>
+							{{ form.amount_available }}
+							<br>
+							{% for error in form.amount_available.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+									{{ error }}
+								</div>
+							{% endfor %}
+							{% if button_text == "Update Ticket" %}
+								<p>You have sold {{ form.instance.amount_sold }} ticket so far.</p>
+							{% endif %}
+						</div>
+					</div>
+					{% endif %}
+
+					<div class="row">
 						<div class="col-md-12">
-							<div class="form-group m-form__group">
-								<h5 {% if form.description.errors %}style="color:red;"{% endif %}>Description</h5>
-								{{ form.description }}
-								<br>
-								{% for error in form.description.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
+							<h5 {% if form.description.errors %}style="color:red;"{% endif %}>Description</h5>
+							{{ form.description }}
+							<br>
+							{% for error in form.description.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+										{{ error }}
+								</div>
+							{% endfor %}
 						</div>
 					</div>
 
 
-					<div class="row row-padder">
+					<div class="row">
 					{% if button_text == "Update Ticket" %}
 							<div class="col-md-6">
-								<div class="form-group m-form__group">
-									<button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">{{ button_text }}</button>
-								</div>
+								<button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">{{ button_text }}</button>
 							</div>
 							<div class="col-md-6">
-								<div class="form-group m-form__group">
-									<button type="submit" name="delete" value="delete" class="btn btn-danger btn-block">Delete Ticket</button>
-								</div>
+								<button type="submit" name="delete" value="delete" class="btn btn-danger btn-block">Delete Ticket</button>
 							</div>
 					{% else %}
 						<div class="col-md-12">
-							<div class="form-group m-form__group">
-								<button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">{{ button_text }}</button>
-							</div>
+							<button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">{{ button_text }}</button>
 						</div>
 					{% endif %}
 					</div>
 
-				</div>
 
-			</form>
-			<!--end::Form-->			
+
+				</div>
+			</div>
 		</div>
-		<!--end::Portlet-->
 	</div>
-</div>
+</form>
 {% endblock content %}
 
 

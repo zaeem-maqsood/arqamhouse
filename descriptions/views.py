@@ -6,7 +6,7 @@ from django.http import Http404, HttpResponseRedirect, HttpResponse
 
 
 
-from organizations.mixins import OrganizationAccountMixin
+from houses.mixins import HouseAccountMixin
 
 from .forms import (H1TitleForm, H2TitleForm, H3TitleForm, ParagraphForm)
 from .models import (EventDescription, H1Title, H2Title, H3Title, Paragraph)
@@ -21,7 +21,7 @@ from events.models import Event
 
 
 # -------------------------------------------------------------- Paragraph Description Element ----------------------------
-class ParagraphCreateView(OrganizationAccountMixin, CreateView):
+class ParagraphCreateView(HouseAccountMixin, CreateView):
 	model = Paragraph
 	form_class = ParagraphForm
 	template_name = "descriptions/paragraph_form.html"
@@ -95,7 +95,7 @@ class ParagraphCreateView(OrganizationAccountMixin, CreateView):
 		return self.render_to_response(self.get_context_data(form=form))
 
 
-class ParagraphUpdateView(OrganizationAccountMixin, CreateView):
+class ParagraphUpdateView(HouseAccountMixin, CreateView):
 	model = Paragraph
 	form_class = ParagraphForm
 	template_name = "descriptions/paragraph_form.html"
@@ -175,7 +175,7 @@ class ParagraphUpdateView(OrganizationAccountMixin, CreateView):
 
 
 # -------------------------------------------------------------- H3 Title Description Element ----------------------------
-class H3TitleCreateView(OrganizationAccountMixin, CreateView):
+class H3TitleCreateView(HouseAccountMixin, CreateView):
 	model = H3Title
 	form_class = H3TitleForm
 	template_name = "descriptions/h3_title_form.html"
@@ -249,7 +249,7 @@ class H3TitleCreateView(OrganizationAccountMixin, CreateView):
 		return self.render_to_response(self.get_context_data(form=form))
 
 
-class H3TitleUpdateView(OrganizationAccountMixin, CreateView):
+class H3TitleUpdateView(HouseAccountMixin, CreateView):
 	model = H3Title
 	form_class = H3TitleForm
 	template_name = "descriptions/h3_title_form.html"
@@ -327,7 +327,7 @@ class H3TitleUpdateView(OrganizationAccountMixin, CreateView):
 
 
 # -------------------------------------------------------------- H2 Title Description Element ----------------------------
-class H2TitleCreateView(OrganizationAccountMixin, CreateView):
+class H2TitleCreateView(HouseAccountMixin, CreateView):
 	model = H2Title
 	form_class = H2TitleForm
 	template_name = "descriptions/h2_title_form.html"
@@ -401,7 +401,7 @@ class H2TitleCreateView(OrganizationAccountMixin, CreateView):
 		return self.render_to_response(self.get_context_data(form=form))
 
 
-class H2TitleUpdateView(OrganizationAccountMixin, CreateView):
+class H2TitleUpdateView(HouseAccountMixin, CreateView):
 	model = H2Title
 	form_class = H2TitleForm
 	template_name = "descriptions/h2_title_form.html"
@@ -479,7 +479,7 @@ class H2TitleUpdateView(OrganizationAccountMixin, CreateView):
 
 
 # -------------------------------------------------------------- H1 Title Description Element ----------------------------
-class H1TitleCreateView(OrganizationAccountMixin, CreateView):
+class H1TitleCreateView(HouseAccountMixin, CreateView):
 	model = H1Title
 	form_class = H1TitleForm
 	template_name = "descriptions/h1_title_form.html"
@@ -553,7 +553,7 @@ class H1TitleCreateView(OrganizationAccountMixin, CreateView):
 		return self.render_to_response(self.get_context_data(form=form))
 
 
-class H1TitleUpdateView(OrganizationAccountMixin, CreateView):
+class H1TitleUpdateView(HouseAccountMixin, CreateView):
 	model = H1Title
 	form_class = H1TitleForm
 	template_name = "descriptions/h1_title_form.html"

@@ -7,10 +7,9 @@ from django.views.generic.base import RedirectView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from organizations.mixins import OrganizationAccountMixin
+from houses.mixins import HouseAccountMixin
 
-from django.contrib.auth.models import User
-from .models import Profile, SelectedOrganization
+from .models import Profile
 from .forms import ProfileForm, LoginForm
 from .mixins import ProfileMixin
 from cities_light.models import City, Region, Country
@@ -35,34 +34,26 @@ class UserDashboardView(ProfileMixin, View):
 	model = Profile
 	template_name = "profiles/dashboard.html"
 
-	def check_for_organization(self, user):
+	def check_for_house(self, profile):
 		try:
-			selected_organization = SelectedOrganization.objects.get(user=user)
-			organization = selected_organization.organization
-			return organization
+			house = profile.house
+			return house
 		except Exception as e:
 			print(e)
+			print("Did it come here")
 			return None
 
-	def get_profile(self, user):
-		try:
-			profile = Profile.objects.get(user=user)
-			print(profile)
-		except Exception as e:
-			print("This")
-			print(e)
-			print("This")
-			raise Http404
-		return profile
 
 	def get(self, request, *args, **kwargs):
 		context = {}
-		user = request.user
-		profile = self.get_profile(user)
-		organization = self.check_for_organization(user)
-		if organization:
-			view_name = "organizations:dashboard"
-			return HttpResponseRedirect(reverse(view_name, kwargs={'slug': organization.slug}))
+		profile = request.user
+		print(profile)
+		print(profile.house)
+		house = self.check_for_house(profile)
+		print(house)
+		if house:
+			view_name = "houses:dashboard"
+			return HttpResponseRedirect(reverse(view_name, kwargs={'slug': house.slug}))
 		context["profile"] = profile
 		return render(request, self.template_name, context)
 
@@ -94,11 +85,8 @@ class ProfileCreateView(CreateView):
 		form = self.get_form()
 
 		if form.is_valid():
-			messages.success(request, 'Updated!')
 			return self.form_valid(form, request)
 		else:
-			print(form.errors)
-			messages.warning(request, 'There seems to be a problem')
 			return self.form_invalid(form, request)
 
 
@@ -114,26 +102,13 @@ class ProfileCreateView(CreateView):
 
 		# Create a user with this email and password
 		try:
-			user = User.objects.get(username=email)
+			profile = Profile.objects.get(email=email)
 			form.add_error("email", "It seems this email is already in use, please login or use a different email.")
 			return self.render_to_response(self.get_context_data(form=form, request=request))
 		except Exception as e:
 			print(e)
-			user = User.objects.create_user(email, email, password)
+			print("errors")
 
-		# Authenticate user 
-		user = authenticate(request, username=email, password=password)
-
-		# Make sure user is authenticated, log them in or diplay 404 error
-		if user is not None:
-			login(request, user)
-			messages.success(request, 'Logged in as %s' % (user.username))
-		else:
-			raise Http404
-
-		# link user to profile
-		form.instance.user = user
-		
 		# Save form
 		self.object = form.save()
 
@@ -217,21 +192,24 @@ class LoginView(FormView):
 		email = form.cleaned_data.get("email")
 		password = form.cleaned_data.get("password")
 
-		# Create a user with this email and password
+		# Authenticate user with this email and password
 		try:
-			user = authenticate(request, username=email, password=password)
+			print("Came to Login")
+			print(email)
+			print(password)
+			profile = authenticate(request, username=None, email=email, password=password)
+			print(profile)
 		except Exception as e:
 			print(e)
 			form.add_error("email", "Invalid username/password combination")
 			return self.render_to_response(self.get_context_data(form=form))
 		
 		# Make sure user is authenticated, log them in or diplay 404 error
-		if user is not None:
-			login(request, user)
-			messages.success(request, 'Logged in as %s' % (user.username))
+		if profile is not None:
+			login(request, profile)
 		else:
-			print("Error Happended")
-			raise Http404
+			form.add_error("email", "Invalid email. Please check for typos or create an account with us.")
+			return self.render_to_response(self.get_context_data(form=form))
 
 		valid_data = super(LoginView, self).form_valid(form)
 		return valid_data
@@ -255,18 +233,18 @@ class ProfileDetailView(ProfileMixin, DetailView):
 		if not profile:
 			raise Http404
 		user = self.get_user(profile)
-		organizations = self.get_organizations(user)
+		houses = self.get_houses(user)
 		does_profile_belong_to_user = self.does_profile_belong_to_user(profile)
 
 		context["does_profile_belong_to_user"] = does_profile_belong_to_user
 		context["profile"] = profile
-		context["organizations"] = organizations
+		context["houses"] = houses
 		return render(request, self.template_name, context)
 
 
 
 
-class ProfileUpdateView(OrganizationAccountMixin, UpdateView):
+class ProfileUpdateView(HouseAccountMixin, UpdateView):
 	model = Profile
 	form_class = ProfileForm
 	template_name = "profiles/profile_update.html"
@@ -311,11 +289,8 @@ class ProfileUpdateView(OrganizationAccountMixin, UpdateView):
 		form = self.get_form()
 
 		if form.is_valid():
-			messages.success(request, 'Updated!')
 			return self.form_valid(form)
 		else:
-			print(form.errors)
-			messages.warning(request, 'There seems to be a problem')
 			return self.form_invalid(form, request)
 
 

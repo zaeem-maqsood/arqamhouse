@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-Update Event | {{ organization.name }}
+Update Event | {{ House.name }}
 {% endblock title %}
 
 {% block page_title %}
@@ -92,232 +92,167 @@ $('#id_end').datetimepicker({
 {% endblock page_crumbs %}
 
 {% block content %}
-
 {% if not event.deleted %}
+
 <div class="row">
-	<div class="col-md-10">
-		<!--begin::Portlet-->
-		<div class="m-portlet m-portlet--tab">
-			<!--begin::Form-->
-			<form class="m-form m-form--fit m-form--label-align-right my-form" method="POST" enctype="multipart/form-data">{% csrf_token %}
+    <div class="col-12 col-lg-7">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
 				
-				<input type="hidden" name="token" id="token">
-				
-				<div class="m-portlet__body">
+				<form method="POST" enctype="multipart/form-data">{% csrf_token %}
+					<div class="row" style="margin-left:20px;">
+						<div class="col-12">
 
+							<input type="hidden" name="token" id="token">
 
-					{% if form.non_field_errors %}
-					<div class="row row-padder">
-						<div class="col-md-12">
-							<div class="form-group m-form__group">
-								{% for error in form.non_field_errors %}
-								<div class="alert alert-danger" role="alert">
-								  	<strong>Oh snap!</strong> {{ error }}
+							{% if form.non_field_errors %}
+							<div class="row">
+								<div class="col-md-12">
+									{% for error in form.non_field_errors %}
+									<div class="alert alert-danger" role="alert">
+										<strong>Oh snap!</strong> {{ error }}
+									</div>
+									{% endfor %}
 								</div>
-								{% endfor %}
 							</div>
+							{% endif %}
+
+							<div class="row" style="padding-bottom: 30px;">
+								<div class="col-md-12">
+									<h5 {% if form.title.errors %}style="color:red;"{% endif %}>Event Title <i class="fas fa-asterisk" style="color: red;font-size: 0.6em;vertical-align: top;"></i></h5>
+									{{ form.title }}
+									{% for error in form.title.errors %}
+										<div class="alert m-alert--outline alert-danger" role="alert">
+											{{ error }}
+										</div>
+									{% endfor %}
+								</div>
+							</div>
+
+							<div class="row" style="padding-bottom: 30px;">
+								<div class="col-md-12">
+									<h5 {% if form.url.errors %}style="color:red;"{% endif %}>Event URL <span class="m-nav__link-text" style="font-weight: 200;font-size: 0.7em;vertical-align: middle;">| arqamhouse.com/events/<span id="output">{% if update_event_tab %}{{ event.slug }}{% else %}new-event{% endif %}</span></span></h5>
+									{{ form.url }}
+									{% for error in form.url.errors %}
+										<div class="alert m-alert--outline alert-danger" role="alert">
+											{{ error }}
+										</div>
+									{% endfor %}
+								</div>
+							</div>
+
+							<div class="row" style="padding-bottom: 30px;">
+								<div class="col-md-6">
+									<h5 {% if form.start.errors %}style="color:red;"{% endif %}>Start <i class="fas fa-asterisk" style="color: red;font-size: 0.6em;vertical-align: top;"></i></h5>
+									{{ form.start }}
+									<br>
+									{% for error in form.start.errors %}
+										<div class="alert m-alert--outline alert-danger" role="alert">
+											{{ error }}
+										</div>
+									{% endfor %}
+								</div>
+								<div class="col-md-6">
+									<h5 {% if form.end.errors %}style="color:red;"{% endif %}>End <i class="fas fa-asterisk" style="color: red;font-size: 0.6em;vertical-align: top;"></i></h5>
+									{{ form.end }}
+									<br>
+									{% for error in form.end.errors %}
+										<div class="alert m-alert--outline alert-danger" role="alert">
+											{{ error }}
+										</div>
+									{% endfor %}
+								</div>
+							</div>
+
+							<div class="row" style="padding-bottom: 50px;">
+								<div class="col-md-6">
+									<h5 {% if form.venue_name.errors %}style="color:red;"{% endif %}>Venue Name</h5>
+									{{ form.venue_name }}
+									{% for error in form.venue_name.errors %}
+										<div class="alert m-alert--outline alert-danger" role="alert">
+												{{ error }}
+										</div>
+									{% endfor %}
+								</div>
+								<div class="col-md-6">
+									<h5 {% if form.venue_address.errors %}style="color:red;"{% endif %}>Venue Address</h5>
+									{{ form.venue_address }}
+									{% for error in form.venue_address.errors %}
+										<div class="alert m-alert--outline alert-danger" role="alert">
+												{{ error }}
+										</div>
+									{% endfor %}
+								</div>
+							</div>
+
+							<div class="row" style="padding-bottom: 30px;">
+								<div class="col-md-12">
+									<h5 {% if form.short_description.errors %}style="color:red;"{% endif %}>Short Description</h5>
+									{{ form.short_description }}
+									<br>
+									{% for error in form.short_description.errors %}
+										<div class="alert m-alert--outline alert-danger" role="alert">
+												{{ error }}
+										</div>
+									{% endfor %}
+								</div>
+							</div>
+
+							<div class="row" style="padding-bottom: 50px;">
+								<div class="col-md-6">
+									<h5 {% if form.image.errors %}style="color:red;"{% endif %}>Event Image</h5>
+									{{ form.image }}
+									<br>
+									{% for error in form.image.errors %}
+										<div class="alert m-alert--outline alert-danger" role="alert">
+											{{ error }}
+										</div>
+									{% endfor %}
+									<p class="text-center" style="padding-top: 30px;">We suggest a standard 8.5" X 11" flyer but you can use any image you'd like.</p>
+								</div>
+								<div class="col-md-6">
+									{% if form.instance.image %}
+									<img id="image-placeholder" src="{{ form.instance.image.url }}" alt="Event Image" width="100%"/>
+									{% else %}
+									<img id="image-placeholder" src="{% static 'images/event_flyer_placeholder.jpg' %}" alt="Event Image" width="100%"/>
+									{% endif %}
+								</div>
+							</div>
+
+
+							<div class="row" style="padding-bottom: 30px;">
+								<div class="col-md-12">
+									<button type="submit" name="Create" value="Create" class="btn btn-info btn-block">{% if update_event %}Update{% else %}Create{% endif %} Event</button>
+								</div>
+							</div>
+								
+							{% if update_event %}
+							<div class="row">
+								<div class="col-md-6">
+									{% if event.active %}
+									<button type="submit" name="Archive Event" value="Archive Event" class="btn btn-warning btn-block">Archive Event</button>
+									{% else %}
+									<button type="submit" name="Re-Open Event" value="Re-Open Event" class="btn btn-warning btn-block">Re-Open Event</button>
+									{% endif %}
+								</div>
+								<div class="col-md-6">
+									<button type="submit" name="Delete Event" value="Delete Event" class="btn btn-danger btn-block">Delete Event</button>
+								</div>
+							</div>
+							{% endif %}
+							
 						</div>
 					</div>
-					{% endif %}
-					
-					
-					<div class="row row-padder">
-						<div class="col-md-12">
-							<div class="form-group m-form__group">
-								<h5 {% if form.url.errors %}style="color:red;"{% endif %}>Event URL</h5>
-								{{ form.url }}
-								<span class="m-form__help">Create your own event url or leave it blank if you'd like us to make a generic one for you.</span>
-								<br>
-								{% for error in form.url.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
-						</div>
-					</div>
+				</form>
+				
 
-
-					<div class="row row-padder">
-						<div class="col-md-12">
-							<div class="form-group m-form__group">
-								<h5 {% if form.title.errors %}style="color:red;"{% endif %}>Event Title <i class="fas fa-asterisk" style="color: red;"></i></h5>
-								{{ form.title }}
-								<br>
-								<span class="countdown m--font-primary"></span>
-								<br>
-								{% for error in form.title.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
-						</div>
-					</div>
-
-
-					<div class="row row-padder">
-						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5 {% if form.start.errors %}style="color:red;"{% endif %}>Start <i class="fas fa-asterisk" style="color: red;"></i></h5>
-								{{ form.start }}
-								<br>
-								{% for error in form.start.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5 {% if form.end.errors %}style="color:red;"{% endif %}>End <i class="fas fa-asterisk" style="color: red;"></i></h5>
-								{{ form.end }}
-								<br>
-								{% for error in form.end.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
-						</div>
-					</div>
-
-
-					<div class="row row-padder">
-						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5 {% if form.venue_name.errors %}style="color:red;"{% endif %}>Venue Name</h5>
-								{{ form.venue_name }}
-								<span class="m-form__help">Leave blank if there is no venue (virtual event)</span>
-								<br>
-								{% for error in form.venue_name.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5 {% if form.venue_address.errors %}style="color:red;"{% endif %}>Venue Address</h5>
-								{{ form.venue_address }}
-								<span class="m-form__help">Leave blank if there is no venue (virtual event)</span>
-								<br>
-								{% for error in form.venue_address.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
-						</div>
-					</div>
-
-
-					<div class="row row-padder">
-						<div class="col-md-12">
-							<div class="form-group m-form__group">
-								<h5 {% if form.short_description.errors %}style="color:red;"{% endif %}>Short Description</h5>
-								{{ form.short_description }}
-								<br>
-								{% for error in form.short_description.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-							</div>
-						</div>
-					</div>
-
-
-
-					<div class="row row-padder">
-						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5 {% if form.image.errors %}style="color:red;"{% endif %}>Event Image</h5>
-								{{ form.image }}
-								<br>
-								{% for error in form.image.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-									  	{{ error }}
-									</div>
-								{% endfor %}
-								<p class="lead text-center" style="padding-top: 30px;">We suggest a standard 8.5" X 11" flyer but you can use any image you'd like.</p>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								{% if form.instance.image %}
-								<img id="image-placeholder" src="{{ form.instance.image.url }}" alt="Event Image" width="100%"/>
-								{% else %}
-								<img id="image-placeholder" src="{% static 'images/event-form/event_flyer_placeholder.jpg' %}" alt="Event Image" width="100%"/>
-								{% endif %}
-							</div>
-						</div>
-					</div>
-
-
-					<div class="row row-padder">
-						<div class="col-md-12">
-							<div class="form-group m-form__group">
-								<h5>Ready To Launch?</h5>
-								<span class="m-switch m-switch--lg m-switch--icon">
-									<label>
-			                        {{ form.public }}
-			                        <span></span>
-			                        </label>
-			                    </span>
-			                    <br>
-			                    <span class="m-form__help">On means your event is ready for the world.
-			                    	<br>Off means your event isn't quite ready yet.</span>
-			                </div>
-			            </div>
-			        </div>
-
-
-				</div>
-				<div class="m-portlet__foot m-portlet__foot--fit" style="padding-top: 60px;padding-bottom: 50px;">
-					<div class="m-form__actions">
-
-						
-						<div class="row" style="padding-bottom: 30px;">
-							<div class="col-md-12">
-								<button type="submit" name="Create" value="Create" class="btn btn-info btn-block">{% if update_event %}Update{% else %}Create{% endif %} Event</button>
-							</div>
-						</div>
-						
-
-						<!-- <div class="row text-center" style="padding-bottom: 30px;">
-							<div class="col-md-12">
-								<p class="lead" style="color: #9798a2;">This event is archived. If you'd like to re-open it simply click "Re-Open".</p>
-							</div>
-						</div> -->
-						
-						
-						{% if update_event %}
-						<div class="row">
-							<div class="col-md-6">
-								{% if event.active %}
-								<button type="submit" name="Archive Event" value="Archive Event" class="btn btn-warning btn-block">Archive Event</button>
-								{% else %}
-								<button type="submit" name="Re-Open Event" value="Re-Open Event" class="btn btn-warning btn-block">Re-Open Event</button>
-								{% endif %}
-							</div>
-							<div class="col-md-6">
-								<button type="submit" name="Delete Event" value="Delete Event" class="btn btn-danger btn-block">Delete Event</button>
-							</div>
-						</div>
-						{% endif %}
-					</div>
-				</div>
-
-			</form>
-			<!--end::Form-->			
-		</div>
-		<!--end::Portlet-->
-	</div>
+            </div>
+        </div>
+    </div>
 </div>
+
 {% else %}
+
 <form class="m-form m-form--fit m-form--label-align-right my-form" method="POST" enctype="multipart/form-data">{% csrf_token %}
 <div class="row">
 	<div class="col-md-12 text-center">
@@ -332,6 +267,8 @@ $('#id_end').datetimepicker({
 	</div>
 </div>
 </form>
+
+
 {% endif %}
 {% endblock content %}
 

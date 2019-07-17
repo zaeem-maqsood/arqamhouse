@@ -1,4 +1,4 @@
-{% extends "backend/base.html" %}
+{% extends "backend/index.html" %}
 
 {% load static %}
 
@@ -21,7 +21,49 @@ Orders
 
 
 {% block scripts %}
-<script src="{% static 'assets/demo/default/custom/components/datatables/base/html-table.js' %}" type="text/javascript"></script>
+<script>
+
+function FocusOnInput()
+{
+    document.getElementById("product-search").focus();
+    
+}
+
+function GetProducts(object)
+{
+
+    console.log(object.value)
+    var search = object.value;
+    var token = '{{csrf_token}}';
+
+    $.ajax({
+        type:"POST",
+        headers: { "X-CSRFToken": token },
+        url: '{{ request.path }}',
+        data: {
+          'search': search,
+        },
+        
+        success: function (data) {
+            console.log("HELLOO")
+            document.getElementById("dynamic").innerHTML = data;
+            
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown)
+                {
+                    alert(errorThrown);
+                  //some stuff on failure
+                },
+    });
+    
+}
+
+jQuery(document).ready(function() {
+    // DataTableAjax();
+    FocusOnInput();
+
+});
+</script>
 {% endblock scripts %}
 
 
@@ -36,61 +78,58 @@ Orders
 {% endblock page_crumbs %}
 
 {% block content %}
-<div class="m-portlet m-portlet--mobile">
-	<div class="m-portlet__body">
-		<!--begin: Search Form -->
-		<div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
-			<div class="row align-items-center">
-				<div class="col-xl-6 order-2 order-xl-1">
-					<div class="form-group m-form__group row align-items-center">
-						<div class="col-md-12">
-							<div class="m-input-icon m-input-icon--left">
-								<input type="text" class="form-control m-input" placeholder="Search..." id="generalSearch">
-								<span class="m-input-icon__icon m-input-icon__icon--left">
-									<span><i class="la la-search"></i></span>
-								</span>
-							</div>
-						</div>
-					</div>
-				</div>
+<div class="kt-portlet kt-portlet--mobile">
+	<div class="kt-portlet__head kt-portlet__head--lg">
+		<div class="kt-portlet__head-label">
+			<span class="kt-portlet__head-icon">
+				<i class="kt-font-brand flaticon2-line-chart"></i>
+			</span>
+			<h3 class="kt-portlet__head-title">
+				Orders
+				<small>{{ event.title }}</small>
+			</h3>
+		</div>
+	</div>
+
+	<div class="kt-portlet__body">
+
+		<div class="row" style="padding-bottom:30px;">
+			<div class="col-12">
+				<input type="search" placeholder="Search For A Product" id="product-search" class="form-control m-input" onkeyup="GetProducts(this)">
+				<br>
 			</div>
 		</div>
-		<!--end: Search Form -->
-
-		<!--begin: Datatable -->
-		<table class="m-datatable" id="html_table" width="100%">
+			
+		<table class="table table-bordered table-hover">
 			<thead>
-			<tr>
-				<th class="text-center" title="Number">No.</th>
-				<th class="text-center" title="Number">Time Created</th>
-				<th class="text-center" title="Number">Status</th>
-				<th class="text-center" title="Name">Name</th>
-				<th class="text-center" title="Amount">Amount</th>
-				<th class="text-center" title="Payment Method">Payment Method</th>
-				<th class="text-center" title="Tickets">Tickets</th>
-				<th class="text-center" title="View Order">View Order</th>
-			</tr>
+				<tr>
+					<th>Detail</th>
+					<th>Order ID</th>
+					<th>Time</th>
+					<th>Name</th>
+					<th>Amount</th>
+					<th>Brand</th>
+					<th>Note</th>
+				</tr>
 			</thead>
-			<tbody>
+			<tbody id="dynamic">
 				{% for order in orders %}
-				<tr class="text-center">
-					<td><p class="lead text-center" style="margin:0 auto;">{{ forloop.counter }}</p></td>
-					<td><p class="text-center" style="margin:0 auto;">{{ order.created_at }}</p></td>
-					<td>{% if order.failed %} <p class="lead text-center" style="color: red;margin:0 auto;">Failed</p> {% else %} <p class="lead text-center" style="color: green;margin:0 auto;">Successful</p>{% endif %}</td>
-					<td><p class="text-center" style="margin:0 auto;">{{ order.name }}</p></td>
-					<td><p class="lead text-center" style="color: {% if order.failed %}red{% else %}green{% endif %};margin:0 auto;">{% if order.failed %}----{% else %}{% if order.amount > 0 %}${{ order.amount }}{% else %}$0{% endif %}{% endif %}</p></td>
-					<td><div class="text-center">{% include "orders/brands.html" with order=order %}</div></td>
-					<td><h3 class="text-center" style="color: #7777a7;font-weight: 300;margin:0 auto;">{{ order.attendee_set.all.count }}</h3></td>
-					<td><div class="text-center"><a href="{{ order.get_order_view }}" class="btn btn-outline-brand btn-sm btn-block">View Order</a></div></td>
+				<tr>
+					<td><a href="{{ order.get_order_view }}" class="btn btn-primary btn-wide">Details</a></td>
+					<td>{{ order.payment_id }}</td>
+					<td>{{ order.created_at }}</td>
+					<td>{{ order.name }}</td>
+					<td>${{ order.amount }}</td>
+					<td>{% include "orders/brands.html" with order=order %}</td>
+					<td>{{ order.note }}</td>
 				</tr>
 				{% endfor %}
 			</tbody>
-		</table>
-		<!--end: Datatable -->
+		</table>	
 		
-	</div>		        
+	</div>
+			
 </div>
-
 {% endblock content %}
 
 

@@ -8,9 +8,8 @@ from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.contrib import messages
 
-from organizations.mixins import OrganizationAccountMixin
-from events.models import Event, EventGeneralQuestions, AttendeeGeneralQuestions
-from tickets.models import Ticket
+from houses.mixins import HouseAccountMixin
+from events.models import Event, EventGeneralQuestions, AttendeeGeneralQuestions, Ticket
 from .models import (EventQuestion, TicketQuestion, EventQuestionMultipleChoiceOption, AllTicketQuestionControl, 
 					TicketQuestionMultipleChoiceOption, AllTicketQuestionMultipleChoiceOption)
 from .forms import (EventQuestionBaseForm, EventGeneralQuestionsForm, AttendeeGeneralQuestionsForm, 
@@ -41,16 +40,18 @@ def get_question_type(question_type, context):
 		context["simple"] = True
 	elif question_type == "paragraph":
 		context["paragraph"] = True
-	elif question_type == "mutiple choice":
+	elif question_type == "multiple choice":
 		context["multiple_choice"] = True
 	else:
+		print(question_type)
+		print(context)
 		raise Http404
 
 	return context
 
 
 
-class QuestionsListView(OrganizationAccountMixin, View):
+class QuestionsListView(HouseAccountMixin, View):
 
 	template_name = "events/questions/list_questions.html"
 
@@ -84,7 +85,7 @@ class QuestionsListView(OrganizationAccountMixin, View):
 
 	def get_context_data(self, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		house = self.get_House()
 		event = get_event(self.kwargs['slug'])
 
 		event_general_questions_instance = EventGeneralQuestions.objects.get(event=event)
@@ -104,7 +105,7 @@ class QuestionsListView(OrganizationAccountMixin, View):
 		context["all_ticket_questions"] = all_ticket_questions
 		context["ticket_questions"] = ticket_questions
 		context["event"] = event
-		context["organization"] = organization
+		context["house"] = house
 		context["events_tab"] = True
 		context["active_event_tab"] = True
 		return context
@@ -124,7 +125,7 @@ def get_ticket(ticket_slug):
 
 
 # This view creates questions for specific tickets 
-class TicketQuestionCreateView(OrganizationAccountMixin, CreateView):
+class TicketQuestionCreateView(HouseAccountMixin, CreateView):
 	model = TicketQuestion
 	form_class = TicketQuestionForm
 	template_name = "events/questions/create_question.html"
@@ -142,12 +143,12 @@ class TicketQuestionCreateView(OrganizationAccountMixin, CreateView):
 
 	def get_context_data(self, form, question_type, event, ticket, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		house = self.get_House()
 		context = get_question_type(question_type, context)
 		context["ticket"] = ticket
 		context["form"] = form
 		context["question_type"] = question_type
-		context["organization"] = organization
+		context["house"] = house
 		context["event"] = event
 		context["events_tab"] = True
 		return context
@@ -227,7 +228,7 @@ def get_ticket_question(event, ticket, question_slug):
 	return question
 
 
-class TicketQuestionUpdateView(OrganizationAccountMixin, UpdateView):
+class TicketQuestionUpdateView(HouseAccountMixin, UpdateView):
 	model = TicketQuestion
 	form_class = TicketQuestionForm
 	template_name = "events/questions/create_question.html"
@@ -240,7 +241,7 @@ class TicketQuestionUpdateView(OrganizationAccountMixin, UpdateView):
 	# Context variables
 	def get_context_data(self, form, question, event, ticket, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		house = self.get_house()
 
 		if question.simple_question:
 			context["simple"] = True
@@ -256,7 +257,7 @@ class TicketQuestionUpdateView(OrganizationAccountMixin, UpdateView):
 		context["ticket"] = ticket
 		context["form"] = form
 		context["question"] = question
-		context["organization"] = organization
+		context["house"] = house
 		context["event"] = event
 		context["events_tab"] = True
 		context["update"] = True
@@ -323,17 +324,17 @@ class TicketQuestionUpdateView(OrganizationAccountMixin, UpdateView):
 
 
 
-class TicketQuestionMultipleChoiceOptionUpdateView(OrganizationAccountMixin, UpdateView):
+class TicketQuestionMultipleChoiceOptionUpdateView(HouseAccountMixin, UpdateView):
 	model = TicketQuestionMultipleChoiceOption
 	form_class = TicketQuestionMutipleChoiceOptionForm
 	template_name = "events/questions/create_option.html"
 
 	def get_context_data(self, form, question, event, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		house = self.get_House()
 
 		context["form"] = form
-		context["organization"] = organization
+		context["house"] = house
 		context["event"] = event
 		context["question"] = question
 		context["update"] = True
@@ -432,17 +433,17 @@ class TicketQuestionMultipleChoiceOptionUpdateView(OrganizationAccountMixin, Upd
 
 
 
-class TicketQuestionMultipleChoiceOptionCreateView(OrganizationAccountMixin, CreateView):
+class TicketQuestionMultipleChoiceOptionCreateView(HouseAccountMixin, CreateView):
 	model = TicketQuestionMultipleChoiceOption
 	form_class = TicketQuestionMutipleChoiceOptionForm
 	template_name = "events/questions/create_option.html"
 
 	def get_context_data(self, form, question, event, ticket, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		house = self.get_House()
 
 		context["form"] = form
-		context["organization"] = organization
+		context["house"] = house
 		context["event"] = event
 		context["question"] = question
 		context["ticket"] = ticket
@@ -567,7 +568,7 @@ class TicketQuestionMultipleChoiceOptionCreateView(OrganizationAccountMixin, Cre
 
 
 # This view controls the creation of all ticket questions 
-class AllTicketQuestionCreateView(OrganizationAccountMixin, CreateView):
+class AllTicketQuestionCreateView(HouseAccountMixin, CreateView):
 	
 	model = AllTicketQuestionControl
 	form_class = AllTicketQuestionForm
@@ -587,12 +588,12 @@ class AllTicketQuestionCreateView(OrganizationAccountMixin, CreateView):
 
 	def get_context_data(self, form, question_type, event, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		house = self.get_House()
 		context = get_question_type(question_type, context)
 		context["all_ticket_question"] = True
 		context["form"] = form
 		context["question_type"] = question_type
-		context["organization"] = organization
+		context["house"] = house
 		context["event"] = event
 		context["events_tab"] = True
 		context["all_ticket"] = True
@@ -670,7 +671,7 @@ def get_all_ticket_question(event, question_slug):
 
 
 # This view updates the all ticket question models 
-class AllTicketQuestionUpdateView(OrganizationAccountMixin, UpdateView):
+class AllTicketQuestionUpdateView(HouseAccountMixin, UpdateView):
 	
 	model = AllTicketQuestionControl
 	form_class = AllTicketQuestionForm
@@ -702,12 +703,12 @@ class AllTicketQuestionUpdateView(OrganizationAccountMixin, UpdateView):
 	# Context variables
 	def get_context_data(self, form, question, event, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		house = self.get_House()
 		context = self.get_question_type(question, context)
 		context["all_ticket_question"] = True
 		context["form"] = form
 		context["question"] = question
-		context["organization"] = organization
+		context["house"] = house
 		context["event"] = event
 		context["events_tab"] = True
 		context["update"] = True
@@ -774,7 +775,7 @@ class AllTicketQuestionUpdateView(OrganizationAccountMixin, UpdateView):
 
 
 # This view creates options for the multiple choice question type
-class AllTicketQuestionMultipleChoiceOptionCreateView(OrganizationAccountMixin, CreateView):
+class AllTicketQuestionMultipleChoiceOptionCreateView(HouseAccountMixin, CreateView):
 	model = AllTicketQuestionMultipleChoiceOption
 	form_class = AllTicketQuestionMutipleChoiceOptionForm
 	template_name = "events/questions/create_option.html"
@@ -782,10 +783,10 @@ class AllTicketQuestionMultipleChoiceOptionCreateView(OrganizationAccountMixin, 
 	# Context Variables
 	def get_context_data(self, form, question, event, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		house = self.get_House()
 		context["all_ticket_question"] = True
 		context["form"] = form
-		context["organization"] = organization
+		context["house"] = house
 		context["event"] = event
 		context["question"] = question
 		context["events_tab"] = True
@@ -846,7 +847,7 @@ class AllTicketQuestionMultipleChoiceOptionCreateView(OrganizationAccountMixin, 
 
 
 # This view updates the options associated with multiple choice questions
-class AllTicketQuestionMultipleChoiceOptionUpdateView(OrganizationAccountMixin, UpdateView):
+class AllTicketQuestionMultipleChoiceOptionUpdateView(HouseAccountMixin, UpdateView):
 	model = AllTicketQuestionMultipleChoiceOption
 	form_class = AllTicketQuestionMutipleChoiceOptionForm
 	template_name = "events/questions/create_option.html"
@@ -854,10 +855,10 @@ class AllTicketQuestionMultipleChoiceOptionUpdateView(OrganizationAccountMixin, 
 	# Context variables
 	def get_context_data(self, form, question, event, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		house = self.get_House()
 		context["all_ticket_question"] = True
 		context["form"] = form
-		context["organization"] = organization
+		context["house"] = house
 		context["event"] = event
 		context["question"] = question
 		context["update"] = True
@@ -970,8 +971,8 @@ class AllTicketQuestionMultipleChoiceOptionUpdateView(OrganizationAccountMixin, 
 
 
 # Event Question Create View 
-# Takes in organization mixin for authentication 
-class EventQuestionCreateView(OrganizationAccountMixin, CreateView):
+# Takes in House mixin for authentication 
+class EventQuestionCreateView(HouseAccountMixin, CreateView):
 	model = EventQuestion
 	form_class = EventQuestionBaseForm
 	template_name = "events/questions/create_question.html"
@@ -994,12 +995,12 @@ class EventQuestionCreateView(OrganizationAccountMixin, CreateView):
 	# Get context data for template
 	def get_context_data(self, form, question_type, event, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		house = self.get_House()
 		context = get_question_type(question_type, context)
 		context["event_question"] = True 
 		context["form"] = form
 		context["question_type"] = question_type
-		context["organization"] = organization
+		context["house"] = house
 		context["event"] = event
 		context["events_tab"] = True
 		return context
@@ -1057,6 +1058,7 @@ class EventQuestionCreateView(OrganizationAccountMixin, CreateView):
 		# Get event
 		event = get_event(kwargs['slug'])
 
+
 		# set object to None
 		self.object = None
 
@@ -1070,8 +1072,8 @@ class EventQuestionCreateView(OrganizationAccountMixin, CreateView):
 
 
 # Event Question Update View 
-# Takes in organization mixin for authentication 
-class EventQuestionUpdateView(OrganizationAccountMixin, UpdateView):
+# Takes in House mixin for authentication 
+class EventQuestionUpdateView(HouseAccountMixin, UpdateView):
 	
 	model = EventQuestion
 	form_class = EventQuestionBaseForm
@@ -1113,7 +1115,7 @@ class EventQuestionUpdateView(OrganizationAccountMixin, UpdateView):
 	# Context Data for template
 	def get_context_data(self, form, question, event, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		house = self.get_House()
 
 		# Get the question type and send it to the template 
 		context = self.get_question_type(question, context)
@@ -1121,7 +1123,7 @@ class EventQuestionUpdateView(OrganizationAccountMixin, UpdateView):
 		context["event_question"] = True 
 		context["form"] = form
 		context["question"] = question
-		context["organization"] = organization
+		context["house"] = house
 		context["event"] = event
 		context["events_tab"] = True
 		context["update"] = True
@@ -1199,7 +1201,7 @@ def get_event_question(question_slug):
 
 
 # Event Multiple Choice Option Create View
-class EventQuestionMultipleChoiceOptionCreateView(OrganizationAccountMixin, CreateView):
+class EventQuestionMultipleChoiceOptionCreateView(HouseAccountMixin, CreateView):
 	model = EventQuestionMultipleChoiceOption
 	form_class = EventQuestionMutipleChoiceOptionForm
 	template_name = "events/questions/create_option.html"
@@ -1262,7 +1264,7 @@ class EventQuestionMultipleChoiceOptionCreateView(OrganizationAccountMixin, Crea
 
 
 # Event Question Multiple Choice Option Update View 
-class EventQuestionMultipleChoiceOptionUpdateView(OrganizationAccountMixin, CreateView):
+class EventQuestionMultipleChoiceOptionUpdateView(HouseAccountMixin, CreateView):
 	model = EventQuestionMultipleChoiceOption
 	form_class = EventQuestionMutipleChoiceOptionForm
 	template_name = "events/questions/create_option.html"
@@ -1270,11 +1272,11 @@ class EventQuestionMultipleChoiceOptionUpdateView(OrganizationAccountMixin, Crea
 	# Context data
 	def get_context_data(self, form, question, event, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		house = self.get_House()
 
 		context["event_question"] = True 
 		context["form"] = form
-		context["organization"] = organization
+		context["house"] = house
 		context["event"] = event
 		context["question"] = question
 		context["update"] = True

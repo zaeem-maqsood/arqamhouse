@@ -1,0 +1,188 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Create House
+{% endblock title %}
+
+{% block footer %}
+	{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+
+<script>
+    $("#id_country").change(function () {
+      
+      var url = $("#profileForm").attr("data-regions-url");  // get the url of the `load_cities` view
+      
+      var countryId = $(this).val();  // get the selected country ID from the HTML input
+
+      $.ajax({                       // initialize an AJAX request
+        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+        data: {
+          'country': countryId       // add the country id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_cities` view function
+            console.log(data)
+          $("#id_region").html(data);  // replace the contents of the city input with the data that came from the server
+        }
+      });
+
+    });
+</script>
+
+<script>
+    $("#id_region").change(function () {
+      
+      var url = $("#profileForm").attr("data-cities-url");  // get the url of the `load_cities` view
+      
+      var regionId = $(this).val();  // get the selected country ID from the HTML input
+
+      $.ajax({                       // initialize an AJAX request
+        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+        data: {
+          'region': regionId       // add the country id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_cities` view function
+            console.log(data)
+          $("#id_city").html(data);  // replace the contents of the city input with the data that came from the server
+        }
+      });
+
+    });
+</script>
+
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <img src="{% static 'images/logo.png' %}" style="max-height: 6em;">
+                <p class="lead">
+                    Give your House a name
+                </p>
+
+                <form class="row justify-content-center" action="" method="POST" id="profileForm" data-regions-url="{% url 'profiles:ajax_load_regions' %}" data-cities-url="{% url 'profiles:ajax_load_cities' %}">{% csrf_token %}
+                	
+                	{% if form.non_field_errors %}
+                	<div class="col-md-12">
+                        <div class="alert bg--error">
+							<div class="alert__body">
+								{% for error in form.non_field_errors %}
+                                <span>{{ error|escape }}</span>
+                            	{% endfor %}
+							</div>
+							<div class="alert__close">×</div>
+						</div>
+                	</div>
+                	{% endif %}
+
+                    <div class="col-md-12">
+                    	{{ form.name }}
+                    </div>
+                    <hr>
+
+                    <div class="col-md-12">
+                        <ul class="accordion accordion-2">
+                            <li>
+                                <div class="accordion__title">
+                                    <span class="h5">Change Location of House</span>
+                                </div>
+                                <div class="accordion__content">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {{ form.country }}
+                                        </div>
+                                        <br>
+                                        <div class="col-md-12">
+                                            {{ form.region }}
+                                        </div>
+                                        <br>
+                                        <div class="col-md-12">
+                                            {{ form.city }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {% if form.country.errors %}
+                    <div class="col-md-12">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.country.errors %}
+                                <span>Country | {{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.region.errors %}
+                    <div class="col-md-12">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.region.errors %}
+                                <span>Province/State | {{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.city.errors %}
+                    <div class="col-md-12">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.city.errors %}
+                                <span>City | {{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="col-md-12">
+                        <div class="input-checkbox">
+                            {{ form.agree }}
+                            <label for="checkbox"></label>
+                        </div>
+                        <span>I have read and agree to the
+                            <a href="#">terms and conditions</a>
+                        </span>
+                    </div>
+
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn--primary type--uppercase">Create House</button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endblock content %}
+
+
+
+
+
+
+
+

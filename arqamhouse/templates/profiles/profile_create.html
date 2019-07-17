@@ -1,7 +1,7 @@
 {% extends "frontend/base.html" %}
 
 {% block title %}
-Create Organization
+Create House
 {% endblock title %}
 
 {% load static %}
@@ -66,7 +66,7 @@ Create Organization
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-10 col-lg-8">
-                <img src="{% static 'images/Arqam.png' %}" style="max-height: 6em;">
+                <img src="{% static 'images/logo.png' %}" style="max-height: 6em;">
                 <p class="lead">
                     Make an account with us 
                 </p>
@@ -112,14 +112,18 @@ Create Organization
                     </div>
                     {% endif %}
 
-                    <div class="col-md-4">
+                    <div class="col-md-12">
                     	{{ form.name }}
                     </div>
+
                     <div class="col-md-4">
                         {{ form.email }}
                     </div>
                     <div class="col-md-4">
-                        {{ form.password }}
+                        {{ form.password1 }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.password2 }}
                     </div>
 
                     <hr>
@@ -186,7 +190,7 @@ Create Organization
                     </div>
 
                     <div class="col-md-12" style="padding-top: 30px;">
-                        <button type="submit" class="btn btn--primary type--uppercase">Create Profile</button>
+                        <button type="submit" class="btn btn--primary type--uppercase">Create Account</button>
                     </div>
 
                 </form>

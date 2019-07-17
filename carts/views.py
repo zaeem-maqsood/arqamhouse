@@ -5,8 +5,7 @@ from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.urls import reverse
 
 
-from events.models import Event
-from tickets.models import Ticket
+from events.models import Event, Ticket
 from .models import EventCart, EventCartItem
 from .forms import TicketsToCartForm
 

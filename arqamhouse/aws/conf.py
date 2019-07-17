@@ -8,7 +8,7 @@ AWS_QUERYSTRING_AUTH = False
 DEFAULT_FILE_STORAGE = 'arqamhouse.aws.utils.MediaRootS3BotoStorage'
 STATICFILES_STORAGE = 'arqamhouse.aws.utils.StaticRootS3BotoStorage'
 AWS_STORAGE_BUCKET_NAME = 'arqam'
-# AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_S3_SIGNATURE_VERSION = 's3v4'
 S3DIRECT_REGION = 'us-west-2'
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 S3_URL = '//%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
@@ -16,6 +16,7 @@ MEDIA_URL = '//%s.s3.amazonaws.com/media/' % AWS_STORAGE_BUCKET_NAME
 MEDIA_ROOT = MEDIA_URL
 STATIC_URL = S3_URL + 'static/'
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+AWS_DEFAULT_ACL = None
 
 two_months = datetime.timedelta(days=61)
 date_two_months_later = datetime.date.today() + two_months

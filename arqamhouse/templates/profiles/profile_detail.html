@@ -87,8 +87,8 @@
 				</div>
 
 				<div class="row row-padder">
-					{% for organization in organizations %}
-					<a href="{{ organization.get_absolute_url }}" class="btn btn-block btn-outline-info btn-lg">{{ organization.name }}</a>
+					{% for House in houses %}
+					<a href="{{ House.get_absolute_url }}" class="btn btn-block btn-outline-info btn-lg">{{ House.name }}</a>
 					{% endfor %}
 				</div>
 

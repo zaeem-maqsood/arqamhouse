@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from core.models import TimestampedModel
 from orders.models import Order, EventOrder
-from tickets.models import Ticket
+from events.models import Ticket
 from core.constants import genders
 from events.models import Checkin
 
@@ -13,7 +13,7 @@ from events.models import Checkin
 # Create your models here.
 
 def download_pdf_location(instance, filename):
-	return "%s/%s/%s/%s" % (slugify(instance.order.event.organization), slugify(instance.order.event), "tickets", filename)
+	return "%s/%s/%s/%s" % (slugify(instance.order.event.House), slugify(instance.order.event), "tickets", filename)
 
 
 class Attendee(TimestampedModel):

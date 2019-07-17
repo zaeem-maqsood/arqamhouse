@@ -8,7 +8,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.contrib import messages
 
-from organizations.mixins import OrganizationAccountMixin
+from houses.mixins import HouseAccountMixin
 
 from events.models import Event
 from orders.models import EventOrder
@@ -18,23 +18,23 @@ from .forms import EventPayoutForm
 
 # Create your views here.
 
-class PayoutDetailView(OrganizationAccountMixin, DetailView):
+class PayoutDetailView(HouseAccountMixin, DetailView):
 	template_name = "payouts/detail.html"
 	model = Payout
 
 	def get_context_data(self, *args, **kwargs):
 		context = {}
 		payout = kwargs['object']
-		organization = self.get_organization()
+		House = self.get_House()
 		events = self.get_events()
 		context["payout"] = payout
-		context["organization"] = organization
+		context["House"] = House
 		context["events"] = events
 		context["payout_history"] = True
 		return context
 
 
-class PayoutHistoryView(OrganizationAccountMixin, ListView):
+class PayoutHistoryView(HouseAccountMixin, ListView):
 	template_name = "payouts/history.html"
 	model = Payout
 
@@ -42,17 +42,17 @@ class PayoutHistoryView(OrganizationAccountMixin, ListView):
 		total = payouts.aggregate(Sum('amount'))
 		return total['amount__sum']
 
-	def get_payouts(self, organization):
-		payouts = Payout.objects.filter(organization=organization)
+	def get_payouts(self, House):
+		payouts = Payout.objects.filter(House=House)
 		return payouts
 
 	def get_context_data(self, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
-		payouts = self.get_payouts(organization)
+		House = self.get_House()
+		payouts = self.get_payouts(House)
 		payouts_total = self.payouts_total(payouts)
 		events = self.get_events()
-		context["organization"] = organization
+		context["House"] = House
 		context["events"] = events
 		context["payouts_total"] = payouts_total
 		context["payouts"] = payouts
@@ -62,7 +62,7 @@ class PayoutHistoryView(OrganizationAccountMixin, ListView):
 
 
 
-class EventPayoutView(OrganizationAccountMixin, FormView):
+class EventPayoutView(HouseAccountMixin, FormView):
 	template_name = "payouts/event_payouts.html"
 
 	def get_success_url(self):
@@ -123,7 +123,7 @@ class EventPayoutView(OrganizationAccountMixin, FormView):
 
 	def form_valid(self, form, orders, request, event):
 
-		event_payout = EventPayout.objects.create(event=event, organization=event.organization)
+		event_payout = EventPayout.objects.create(event=event, House=event.House)
 		event_payout.save()
 		amount = decimal.Decimal(0.00)
 

@@ -5,10 +5,12 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.urls import reverse
-from django.http import Http404, HttpResponseRedirect
+from django.template.loader import render_to_string
+from django.http import Http404, HttpResponseRedirect, HttpResponse, JsonResponse
 from django.contrib import messages
+from django.db.models import Q
 
-from organizations.mixins import OrganizationAccountMixin
+from houses.mixins import HouseAccountMixin
 from .models import EventOrder
 from events.models import Event
 from attendees.models import Attendee
@@ -18,7 +20,7 @@ from .forms import RefundForm
 
 # Create your views here.
 
-class OrderListView(OrganizationAccountMixin, ListView):
+class OrderListView(HouseAccountMixin, ListView):
 	model = EventOrder
 	template_name = "orders/event_orders.html"
 
@@ -33,23 +35,47 @@ class OrderListView(OrganizationAccountMixin, ListView):
 	def get(self, request, *args, **kwargs):
 		return render(request, self.template_name, self.get_context_data())
 
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+		print(data)
+		event = self.get_event(self.kwargs['slug'])
+		all_orders = EventOrder.objects.filter(event=event).order_by('created_at')
+		search_terms = data["search"].split()
+
+		if data["search"] == '':
+			orders = all_orders
+		else:
+			counter = 0
+			for search_term in search_terms:
+				if counter == 0:
+					orders = all_orders.filter(Q(name__icontains=search_term) | Q(amount__icontains=search_term) | Q(payment_id__icontains=search_term) | Q(brand__icontains=search_term))
+				else:
+					orders = orders.filter(Q(name__icontains=search_term) | Q(amount__icontains=search_term) | Q(payment_id__icontains=search_term) | Q(brand__icontains=search_term))
+				print(counter)
+				counter += 1
+		
+		orders = orders[:100]
+		print(orders)
+		html = render_to_string('orders/orders-dynamic-table-body.html', {'orders': orders, 'request':request})
+		return HttpResponse(html)
+
 	def get_context_data(self, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		House = self.get_House()
 		event = self.get_event(self.kwargs['slug'])
 		orders = EventOrder.objects.filter(event=event).order_by('created_at')
 		print(orders)
 		
-		context["organization"] = organization
+		context["House"] = House
 		context["orders"] = orders
 		context["event"] = event
 		context["events_tab"] = True
-		context["events"] = self.get_events()
+		context["dashboard_events"] = self.get_events()
 		return context
 
 
 
-class OrderDetailView(OrganizationAccountMixin, FormView):
+class OrderDetailView(HouseAccountMixin, FormView):
 	model = EventOrder
 	template_name = "orders/event_order_detail.html"
 
@@ -80,6 +106,7 @@ class OrderDetailView(OrganizationAccountMixin, FormView):
 		context["event_questions"] = EventQuestion.objects.filter(event=event, deleted=False, approved=True)
 		context["attendees"] = Attendee.objects.filter(order=order)
 		context["form"] = form
+		context["dashboard_events"] = self.get_events()
 		return context
 
 	def get(self, request, *args, **kwargs):

@@ -22,12 +22,15 @@ Profile Dashboard
 {% block content %}
 <section class="text-center">
     <div class="container" style="padding-bottom: 60px;">
-        <div class="row">
+        <div class="row" style="padding-bottom: 20px;padding-top: 30px;">
             <div class="col-md-12 col-lg-9">
-                <img src="{% static 'images/Arqam.png' %}" style="max-height: 6em;">
+                <img src="{% static 'images/logo.png' %}" style="max-height: 6em;">
                 <p style="margin-bottom: 5px;">Hello {{ profile.name }}. We are working very hard to make individual accounts on Arqam House powerful.</p>
-                <p>In the mean time please consider creating an organization account.</p>
-                <a href="{% url 'organizations:create' %}" class="btn btn--primary" style="color: white;">Create Organization</a>
+                <p>In the mean time please consider creating a House.</p>
+                <a href="#" style="color: #4399d5;">What is a house?</a>
+                <br>
+                <br>
+                <a href="{% url 'houses:create' %}" class="btn btn--primary" style="color: white;">Create House</a>
                 <a href="{% url 'profiles:logout' %}" class="btn btn--info" >Logout</a>
             </div>
         </div>

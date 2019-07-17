@@ -4,7 +4,7 @@ from django.db.models.signals import pre_save, post_save
 from django.conf import settings
 
 from events.models import Event
-from tickets.models import Ticket
+from events.models import Ticket
 
 
 # Create your models here.

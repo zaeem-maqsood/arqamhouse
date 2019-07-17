@@ -1,5 +1,5 @@
 from django.db import models
-from organizations.models import Organization
+from houses.models import House
 from events.models import Event
 from django.urls import reverse
 
@@ -8,7 +8,7 @@ from django.urls import reverse
 # Create your models here.
 class Payout(models.Model):
 
-	organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=False, null=False)
+	House = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
 	created_at = models.DateTimeField(auto_now_add=True, null=True)
 	amount = models.DecimalField(blank=True, null=True, max_digits=7, decimal_places=2)
 

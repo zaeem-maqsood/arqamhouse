@@ -5,10 +5,12 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.urls import reverse
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
+from django.db.models import Q
+from django.template.loader import render_to_string
 
-from organizations.mixins import OrganizationAccountMixin
+from houses.mixins import HouseAccountMixin
 from .models import Attendee
 from events.models import Event
 
@@ -31,21 +33,53 @@ def get_event(slug):
 
 
 # Create your views here.
-class AttendeeListView(OrganizationAccountMixin, ListView):
+class AttendeeListView(HouseAccountMixin, ListView):
 	model = Attendee
 	template_name = "attendees/event_attendees.html"
 
 	def get(self, request, *args, **kwargs):
 		return render(request, self.template_name, self.get_context_data())
 
+	def get_event(self, slug):
+		try:
+			event = Event.objects.get(slug=slug)
+			return event
+		except Exception as e:
+			print(e)
+			raise Http404
+
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+		print(data)
+		event = self.get_event(self.kwargs['slug'])
+		all_attendees = Attendee.objects.filter(order__event=event).order_by('order__created_at')
+		search_terms = data["search"].split()
+
+		if data["search"] == '':
+			attendees = all_attendees
+		else:
+			counter = 0
+			for search_term in search_terms:
+				if counter == 0:
+					attendees = all_attendees.filter(Q(name__icontains=search_term) | Q(ticket__title__icontains=search_term))
+				else:
+					attendees = attendees.filter(Q(name__icontains=search_term) | Q(ticket__title__icontains=search_term))
+				print(counter)
+				counter += 1
+		
+		attendees = attendees[:100]
+		print(attendees)
+		html = render_to_string('attendees/attendees-dynamic-table-body.html', {'attendees': attendees, 'request':request})
+		return HttpResponse(html)
+
 	def get_context_data(self, *args, **kwargs):
 		context = {}
-		organization = self.get_organization()
+		House = self.get_House()
 		event = get_event(self.kwargs['slug'])
 		attendees = Attendee.objects.filter(order__event=event)
 		print(attendees)
 		
-		context["organization"] = organization
+		context["House"] = House
 		context["attendees"] = attendees
 		context["event"] = event
 		context["events_tab"] = True
@@ -55,7 +89,7 @@ class AttendeeListView(OrganizationAccountMixin, ListView):
 
 
 
-class AttendeeDetailView(OrganizationAccountMixin, FormView):
+class AttendeeDetailView(HouseAccountMixin, FormView):
 	model = Attendee
 	template_name = "attendees/event_attendees_detail.html"
 
@@ -79,7 +113,7 @@ class AttendeeDetailView(OrganizationAccountMixin, FormView):
 		context["questions"] = TicketQuestion.objects.filter(event=event)
 		context["form"] = form
 		context["events_tab"] = True
-		context["events"] = self.get_events()
+		context["dashboard_events"] = self.get_events()
 		return context
 
 	def get(self, request, *args, **kwargs):

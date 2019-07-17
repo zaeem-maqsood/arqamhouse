@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-My Events | {{ organization.name }}
+My Events | {{ House.name }}
 {% endblock title %}
 
 {% block page_title %}
@@ -42,18 +42,18 @@ Tickets
 
 
 <div class="row">
-	<div class="col-12">
-		<div class="m-portlet m-portlet--bordered-semi m-portlet--space m-portlet--full-height ">
-			<div class="m-portlet__body">
-				<div class="row">
-					<div class="col-md-4">
-						<a href="{{ event.create_paid_ticket }}" class="btn btn-outline-info btn-lg btn-block">Add Paid Ticket</a>
+	<div class="col-9">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+				<div class="row text-center">
+					<div class="col-4">
+						<a href="{{ event.create_paid_ticket }}" class="btn btn-info btn-lg btn-block">Add Paid Ticket</a>
 					</div>
 					<div class="col-md-4">
-						<a href="{{ event.create_free_ticket }}" class="btn btn-outline-info btn-lg btn-block">Add Free Ticket</a>
+						<a href="{{ event.create_free_ticket }}" class="btn btn-info btn-lg btn-block">Add Free Ticket</a>
 					</div>
 					<div class="col-md-4">
-						<a href="{{ event.create_donation_ticket }}" class="btn btn-outline-info btn-lg btn-block">Add Donation Ticket</a>
+						<a href="{{ event.create_donation_ticket }}" class="btn btn-info btn-lg btn-block">Add Donation Ticket</a>
 					</div>
 				</div>
 			</div>
@@ -61,73 +61,27 @@ Tickets
 	</div>
 </div>
 
+{% for ticket in tickets %}
 <div class="row">
-
-	{% for ticket in tickets %}
-	<div class="col-lg-6">
-	<!--begin::Portlet-->
-		<div class="m-portlet m-portlet--brand m-portlet--head-solid-bg m-portlet--bordered" style="background-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};border-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};">
-			<div class="m-portlet__head" style="background-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};border-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};">
-				<div class="m-portlet__head-caption">
-					<div class="m-portlet__head-title">
-						<span class="m-portlet__head-icon">
-							<i class="fas fa-ticket-alt"></i>
-						</span>
-						<h3 class="m-portlet__head-text" style="font-weight: 400;">
-							{{ ticket.title }}
-						</h3>
-					</div>			
-				</div>
-				<div class="m-portlet__head-tools">
-					<ul class="m-portlet__nav">
-						<li class="m-portlet__nav-item" style="color: white;">
-							{% if ticket.paid %}Paid Ticket{% elif ticket.free %}Free Ticket{% elif ticket.donation %}Donation Ticket{% endif %}
-						</li>						
-					</ul>
-				</div>
-			</div>
-			<div class="m-portlet__body">
+	<div class="col-9">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+				
 				<div class="row">
-					<div class="col-md-4" style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">
-                        <h1 style="font-size: 4.5em;color: #7c96ad">{{ ticket.amount_sold }}</h1>
-                        <p style="font-size: 0.8em;color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">Tickets Sold</p>
-                    </div>
-                    <div class="col-md-8" style="padding-top: 10px;padding-bottom: 10px;">
-                        <p style="color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">{{ ticket.description }}</p>
-                    </div>
-				</div>
-				<br>
-				<div class="row text-center">
-					<div class="col-md-3">
-						<h2 style="color: #7c96ad">{% if ticket.sold_out == True %} Yes {% else %} No  {% endif %}</h2>
-						<p style="font-size: 0.8em;color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">Sold Out</p>
-					</div>
-					<div class="col-md-3">
-						<h2 style="color: #7c96ad">{{ ticket.amount_available }}</h2>
-						<p style="font-size: 0.8em;color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">Quantity Available</p>
-					</div>
-					<div class="col-md-3">
-						<h2 style="color: #7c96ad">{{ ticket.min_amount }}</h2>
-						<p style="font-size: 0.8em;color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">Min Amount Per Order</p>
-					</div>
-					<div class="col-md-3">
-						<h2 style="color: #7c96ad">{{ ticket.max_amount }}</h2>
-						<p style="font-size: 0.8em;color:{% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %}">Max Amount Per Order</p>
+					<div class="col-12">
+						<h5><a href="{{ ticket.update_ticket_view }}">{{ ticket.title }}</a></h5>
+						<br>
+						<div class="progress">
+							<div class="progress-bar progress-bar-striped progress-bar-animated {{ ticket.percentage_color }}" role="progressbar" aria-valuenow="{{ ticket.amount_sold }}" aria-valuemin="0" aria-valuemax="{{ ticket.amount_available }}" style="width: {{ ticket.percentage_sold }}"></div>
+						</div>
 					</div>
 				</div>
-				<br>
-                {% widthratio ticket.amount_sold ticket.amount_available 100 as width  %}
-                <div class="progress-bar progress-bar-striped progress-bar-animated bg-{% if width <= '50' %}success{% elif width <= '70' %}info{% elif width <= '90' %}warning{% elif width <= '99' %}danger{% endif %}" role="progressbar" aria-valuenow="{{ ticket.amount_sold }}" aria-valuemin="0" aria-valuemax="{{ ticket.amount_available }}" style="width: {% widthratio ticket.amount_sold ticket.amount_available 100 %}%">
-                </div>
-				<br>
-				<a href="{{ ticket.update_ticket_view }}" class="btn btn-primary btn-block" style="background-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};border-color: {% cycle '#716aca' '#ca6ac3' '#ca6a6a' '#6ac6ca' '#7dca6a' '#caa46a' '#ca6a6a' %};">Edit Ticket</a>
 			</div>
-		</div>	
-		<!--end::Portlet-->
+		</div>
 	</div>
-	{% endfor %}
-
 </div>
+{% endfor %}
+
 {% endblock content %}
 
 

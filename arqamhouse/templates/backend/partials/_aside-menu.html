@@ -3,7 +3,7 @@
     <div id="kt_aside_menu"class="kt-aside-menu "data-ktmenu-vertical="1" data-ktmenu-scroll="1" data-ktmenu-dropdown-timeout="500" >
         <ul class="kt-menu__nav ">
             <li class="kt-menu__item kt-menu__item--active" aria-haspopup="true" >
-                <a href="?page=index" class="kt-menu__link ">
+                <a href="{{ house.get_dashboard_url }}" class="kt-menu__link ">
                     <span class="kt-menu__link-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
                             <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -40,9 +40,9 @@
                             <li class="kt-menu__item kt-menu__item--parent" aria-haspopup="true" >
                                 <span class="kt-menu__link"><span class="kt-menu__link-text">Active Events</span></span>
                             </li>
-                            {% for dashbaord_event in dashboard_events %}
+                            {% for dashboard_event in dashboard_events %}
                             <li class="kt-menu__item " aria-haspopup="true" >
-                                <a href="?page=layout/subheader/toolbar" class="kt-menu__link ">
+                                <a href="{{ dashboard_event.get_event_dashboard }}" class="kt-menu__link ">
                                     <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
                                     <span class="kt-menu__link-text">{{ dashboard_event.title }}</span>
                                 </a>
@@ -52,7 +52,7 @@
                     </div>
                 </li>
                 <li class="kt-menu__item " aria-haspopup="true" >
-                    <a target="_blank" href="https://keenthemes.com/metronic/preview/default/builder.html" class="kt-menu__link ">
+                    <a href="{% url 'events:create' %}" class="kt-menu__link ">
                         <span class="kt-menu__link-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -65,7 +65,7 @@
                     </a>
                 </li>
                 <li class="kt-menu__item " aria-haspopup="true" >
-                    <a target="_blank" href="https://keenthemes.com/metronic/preview/default/builder.html" class="kt-menu__link ">
+                    <a href="{% url 'events:past' %}" class="kt-menu__link ">
                         <span class="kt-menu__link-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -85,7 +85,7 @@
                 <i class="kt-menu__section-icon flaticon-more-v2"></i> 
             </li>
                 <li class="kt-menu__item " aria-haspopup="true" >
-                    <a target="_blank" href="https://keenthemes.com/metronic/preview/default/builder.html" class="kt-menu__link ">
+                    <a href="{% url 'payouts:all_payouts' %}" class="kt-menu__link ">
                         <span class="kt-menu__link-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -106,7 +106,7 @@
                 <i class="kt-menu__section-icon flaticon-more-v2"></i> 
             </li>
                 <li class="kt-menu__item " aria-haspopup="true" >
-                    <a target="_blank" href="https://keenthemes.com/metronic/preview/default/builder.html" class="kt-menu__link ">
+                    <a href="{% url 'profiles:logout' %}" class="kt-menu__link ">
                         <span class="kt-menu__link-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

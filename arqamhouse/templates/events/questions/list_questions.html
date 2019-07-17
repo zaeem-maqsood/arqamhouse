@@ -42,104 +42,97 @@ Questions
 
 <form method="POST">{% csrf_token %}
 
-<div class="row" style="padding-top: 50px;">
-	<div class="col-md-12">
-		<div class="m-alert m-alert--icon m-alert--outline alert alert-info alert-dismissible fade show" role="alert">
-			<div class="m-alert__text">
-			  	<strong><h3>Frequently Asked Order Questions</h3></strong>
-		  		These questions will be asked once per order.
-			  	<br>	
-			</div>		  	
-		</div>
-	</div>
-</div>
 
+<div class="row">
+	<div class="col-md-10">
 
-<div class="row" style="padding-bottom: 30px;">
-	<div class="col-lg-12">
-		<div class="m-portlet m-portlet--full-height ">
-			<div class="m-portlet__body">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
 				<div class="row">
+					<div class="col-12">
+						<strong><h3>Common Order Questions</h3></strong>
+						These questions will be asked once per order.
+					</div>
+				</div>
+
+				<div class="row" style="padding-top:30px;">
 					<div class="col-md-6">
 						<div class="row">
-							<div class="col-md-5">
+							<div class="col-md-6">
 								<h5>Notes</h5>
-								<span class="m-switch m-switch--lg m-switch--icon">
+								<span class="kt-switch">
 									<label>
-			                        {{ event_general_questions_form.notes }}
-			                        <span></span>
-			                        </label>
-			                    </span>
+									{{ event_general_questions_form.notes }}
+									<span></span>
+									</label>
+								</span>
 							</div>
-							<div class="col-md-5">
+							<div class="col-md-6">
 								<h5>Required</h5>
-								<span class="m-switch m-switch--lg m-switch--icon">
+								<span class="kt-switch">
 									<label>
-			                        {{ event_general_questions_form.notes_required }}
-			                        <span></span>
-			                        </label>
-			                    </span>
-							</div>
-							<div class="col-md-2">
+									{{ event_general_questions_form.notes_required }}
+									<span></span>
+									</label>
+								</span>
 							</div>
 						</div>
-					</div>
-					<div class="col-md-6">
-						
 					</div>
 				</div>
 
 				<div class="row" style="padding-top: 30px;">
 					<div class="col-md-12">
-						<button type="submit" class="btn btn-primary btn-block">Save</button>
+						<button type="submit" class="btn btn-outline-brand btn-square btn-wide float-right">Save</button>
 					</div>
 				</div>
+
 			</div>
 		</div>
-
 	</div>
 </div>
 
 
 <div class="row">
-	<div class="col-md-12">
-		<div class="m-alert m-alert--icon m-alert--outline alert alert-info alert-dismissible fade show" role="alert">
-			<div class="m-alert__text">
-			  	<strong><h3>Custom Order Questions</h3></strong>
-		  		These questions will be asked once per order.
-			  	<br>	
-			</div>		  	
-		</div>
-	</div>
-</div>
+	<div class="col-md-10">
 
-
-<div class="row" style="padding-bottom: 30px;">
-	<div class="col-lg-12">
-    <!--begin:: Widgets/Support Tickets -->
-		<div class="m-portlet m-portlet--full-height ">
-			<div class="m-portlet__body">
-				{% for question in event_questions %}
-					<div class="row">
-						<div class="col-sm-1">
-							<h1>{{ question.order }}</h1>
-							<p>Order Number</p>
-						</div>
-						<div class="col-sm-4" style="padding-top: 20px;">
-							<a style="text-decoration: none;" href="{{ question.update_event_question_view }}"><h1 style="font-size: 1.5em;color: #7c96ad;">{{ question.title }}</h1></a>
-						</div>
-						<div class="col-sm-3" style="padding-top: 10px;">
-							<p class="lead" style="margin-top: 0px;margin-bottom: 0px;">Required: {% if required %}Yes{% else %}No{% endif %}</p>
-							<p class="lead">Type: {% if question.simple_question %} Standard {% elif question.paragraph_question %} Paragraph {% elif question.multiple_choice_question %} Multiple Choice {% endif %}</p>
-						</div>
-						<div class="col-sm-4" style="padding-top: 15px;">
-							<h5>Help Text</h5>
-							<p>{{ question.help_text }}</p>
-						</div>
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+				<div class="row">
+					<div class="col-12">
+						<strong><h3>Custom Questions</h3></strong>
+						These questions will be asked once per order.
 					</div>
-					<br>
-				{% endfor %}
-				
+				</div>
+
+				<div class="row" style="padding-top:20px;">
+					<div class="col-12">
+						<table class="table table-bordered table-hover">
+							<tbody>
+								{% for question in event_questions %}
+								<tr>
+									<td style="vertical-align:middle;text-align: center;">
+										<h1>{{ question.order }}</h1>
+										<p>Order Number</p>
+									</td>
+									<td style="vertical-align:middle;text-align: center;">
+										<a style="text-decoration: none;" href="{{ question.update_event_question_view }}"><h5 style="color: #7c96ad;">{{ question.title }}</h5></a>
+									</td>
+									<td style="vertical-align:middle;text-align: center;">
+										<p style="margin-top: 0px;margin-bottom: 0px;">Required | <span style="font-weight:600;">{% if required %}Yes{% else %}No{% endif %}</span></p>
+										<p>Type | <span style="font-weight:600;">{% if question.simple_question %} Standard {% elif question.paragraph_question %} Paragraph {% elif question.multiple_choice_question %} Multiple Choice {% endif %}</span></p>
+									</td>
+									<td style="vertical-align:middle;">
+										<h5>Help Text</h5>
+										<p>{{ question.help_text }}</p>
+									</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+
 				<div class="row" style="padding-top: 40px;">
 					<div class="col-md-4">
 						<a href="{{ event.create_simple_question }}" class="btn btn-info btn-block">Add Standard Question</a>
@@ -152,11 +145,14 @@ Questions
 					</div>
 				</div>
 
+
 			</div>
 		</div>
-	<!--end:: Widgets/Support Tickets -->  
 	</div>
 </div>
+
+
+
 
 
 <div class="row">

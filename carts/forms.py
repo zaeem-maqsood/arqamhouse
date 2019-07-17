@@ -1,6 +1,5 @@
 from django import forms
-from events.models import Event
-from tickets.models import Ticket
+from events.models import Event, Ticket
 
 
 

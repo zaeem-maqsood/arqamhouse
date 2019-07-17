@@ -1,4 +1,4 @@
-{% extends "backend/base.html" %}
+{% extends "backend/index.html" %}
 
 {% load static %}
 
@@ -21,7 +21,6 @@ Order #{{ order.id }} | {{ event.title }}
 
 
 {% block scripts %}
-<script src="{% static 'assets/demo/default/custom/components/datatables/base/html-table.js' %}" type="text/javascript"></script>
 <script type="text/javascript">
 
 $(document).ready(function(){
@@ -45,84 +44,61 @@ $(document).ready(function(){
 {% endblock page_crumbs %}
 
 {% block content %}
-<form method="POST">{% csrf_token %}
+
+
 <div class="row">
-	<div class="col-md-10">
-		<!--begin::Portlet-->
-		<div class="m-portlet m-portlet--tabs">
-		    <div class="m-portlet__head">
-		        <div class="m-portlet__head-tools">
-		            <ul class="nav nav-tabs m-tabs-line m-tabs-line--primary m-tabs-line--2x" role="tablist">
-		                <li class="nav-item m-tabs__item">
-		                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#m_tabs_6_1" role="tab">
-		                        <i class="fas fa-info"></i> Order Info
-		                    </a>
-		                </li>
-		                <li class="nav-item m-tabs__item">
-		                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_6_2" role="tab">
-		                        <i class="fas fa-users"></i> Attendees
-		                    </a>
-		                </li>
-		                <li class="nav-item m-tabs__item">
-		                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_6_3" role="tab">
-		                        <i class="fas fa-undo-alt"></i> Refund Order
-		                    </a>
-		                </li>
-		                <li class="nav-item m-tabs__item">
-		                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_6_4" role="tab">
-		                        <i class="fas fa-envelope"></i> Communicate 
-		                    </a>
-		                </li>
-		            </ul>
-		        </div>
-		    </div>
-		    <div class="m-portlet__body">                   
-		        <div class="tab-content">
-		            <div class="tab-pane active" id="m_tabs_6_1" role="tabpanel">
-		                <h2>{{ order.name }}</h2>
-		                <p class="m-badge m-badge--brand m-badge--wide m-badge--rounded">Order placed at {{ order.created_at }}</p>
-		                <p class="m-badge {% if order.failed %}m-badge--danger{% else %}m-badge--success{% endif %} m-badge--wide m-badge--rounded">{% if order.failed %}Order Failed{% else %}Successful Order{% endif %}</p>
-		                
-		                <hr>
-		                <div class="row">
-		                	<div class="col-12">
-		                		<p class="m-badge m-badge--metal m-badge--wide m-badge--rounded" style="display: inline;">Email</p><p class="lead" style="display: inline;">  {{ order.email }}</p>
-		                		<br>
-		                		<p class="m-badge m-badge--metal m-badge--wide m-badge--rounded" style="display: inline;">Charge ID</p><p class="lead" style="display: inline;">  {{ order.payment_id }}</p>
-		                	</div>
-		                	<div class="col-6">
-		                		
-		                	</div>
-		                </div>
+	<div class="col-12 col-lg-4">
+		<div class="kt-portlet kt-portlet--skin-solid kt-portlet-- kt-bg-brand">
+			<div class="kt-portlet__body">
+				<div class="row">
+					<div class="col-12">
+						<h1>{{ order.name }}</h1>
+						<p style="margin-bottom:2px;">Order placed on {{ order.created_at }}</p>
+						<p style="margin-bottom:2px;">{% if order.failed %}Order Failed{% else %}Successful Order{% endif %}</p>
+						<hr>
+					</div>
+				</div>
+				<div class="row" style="padding-top:20px;">
+					<div class="col-12">
+						<p style="margin-bottom:2px;"><span style="font-weight:900;">Email</span> | {{ order.email }}</p>
+						<p style="margin-bottom:2px;"><span style="font-weight:900;">Order ID</span> | {{ order.payment_id }}</p>
+						<hr>
+					</div>
+				</div>
+				<div class="row" style="padding-top:20px;">
+					<div class="col-12">
+						<p style="font-size: 1.5em;">{% include "orders/brands.html" with order=order %}</p>
+						<p style="margin: 0;"><span style="font-weight:900;">Payment Card</span> | {{ order.brand }}</p>
+						<p style="margin: 0;"><span style="font-weight:900;">Last Four Digits</span> | {{ order.last_four }}</p>
+						<p style="margin: 0;"><span style="font-weight:900;">Outcome</span> | {{ order.outcome_type|title }}</p>
+						<hr>
+					</div>
+				</div>
+				<div class="row" style="padding-top:20px;">
+					<div class="col-12">
+						<i class="fas fa-map-marker-alt" style="font-size: 2.0em;" style="padding:5px;"></i>
+						<p style="margin: 0;"><span style="font-weight:900;">Address</span> | {{ order.address_line_1 }}</p>
+						<p style="margin: 0;"><span style="font-weight:900;">Province/State</span> | {{ order.address_state }}</p>
+						<p style="margin: 0;"><span style="font-weight:900;">City</span> | {{ order.address_city }}</p>
+						<p style="margin: 0;"><span style="font-weight:900;">Country</span> | {{ order.address_country }}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-		                <hr>
-
-		                <div class="row">
-		                	<div class="col-md-12">
-		                		<p style="font-size: 2em;">{% include "orders/brands.html" with order=order %}</p>
-		                		<p class="lead" style="margin: 0;"><span class="m-badge m-badge--metal m-badge--wide m-badge--rounded" >Payment Card</span>  {{ order.brand }}</p>
-		                		<p class="lead" style="margin: 0;"><span class="m-badge m-badge--metal m-badge--wide m-badge--rounded">Last Four Digits</span>  {{ order.last_four }}</p>
-		                		<p class="lead" style="margin: 0;"><span class="m-badge m-badge--metal m-badge--wide m-badge--rounded">Outcome</span>  {{ order.outcome_type|title }}</p>
-		                	</div>
-		                </div>
-		                
-		                <hr>
-
-		                <div class="row">
-		                	<div class="col-md-12">
-		                		<p class=""><i class="fas fa-map-marker-alt" style="font-size: 4.0em;"></i></p>
-		                		<p class="lead" style="margin: 0;"><span class="m-badge m-badge--metal m-badge--wide m-badge--rounded" >Address</span> {{ order.address_line_1 }}</p>
-		                		<p class="lead" style="margin: 0;"><span class="m-badge m-badge--metal m-badge--wide m-badge--rounded" >Province/State</span> {{ order.address_state }}</p>
-		                		<p class="lead" style="margin: 0;"><span class="m-badge m-badge--metal m-badge--wide m-badge--rounded" >City</span> {{ order.address_city }}</p>
-		                		<p class="lead" style="margin: 0;"><span class="m-badge m-badge--metal m-badge--wide m-badge--rounded" >Country</span> {{ order.address_country }}</p>
-		                	</div>
-		                </div>
-		                
-		            </div>
-		            <div class="tab-pane" id="m_tabs_6_2" role="tabpanel">
-		                <!--begin: Datatable -->
-						<table class="m-datatable" id="html_table" width="100%">
-							<thead>
+	<div class="col-12 col-lg-6">
+		<div class="kt-portlet">
+			<div class="kt-portlet__body">
+					<div class="row" style="padding-bottom:20px;">
+						<div class="col-12">
+							<h3>Attendees In This Order</h3>
+						</div>
+					</div>
+				<div class="row">
+					<div class="col-12">
+						<table class="table table-bordered table-hover" width="100%">
+							<thead class="thead-light">
 							<tr>
 								<th class="text-center" title="Number">No.</th>
 								<th class="text-center" title="Number">Edit Attendee</th>
@@ -136,94 +112,95 @@ $(document).ready(function(){
 							<tbody>
 								{% for attendee in attendees %}
 								<tr>
-									<td><p class="lead text-center" style="color: #7069cb;margin:0 auto;">{{ forloop.counter }}</p></td>
+									<td><p class="text-center" style="color: #7069cb;margin:0 auto;">{{ forloop.counter }}</p></td>
 									<td><div class="text-center"><button class="btn btn-outline-brand btn-sm btn-block">Edit Attendee</button></div></td>
-									<td><p class="lead text-center" style="color: #7069cb;margin:0 auto;">{{ attendee.ticket }}</p></td>
-									<td><p class="lead text-center" style="margin:0 auto;">{{ attendee.name }}</p></td>
+									<td><p class="text-center" style="color: #7069cb;margin:0 auto;">{{ attendee.ticket }}</p></td>
+									<td><p class="text-center" style="margin:0 auto;">{{ attendee.name }}</p></td>
 									{% for answer in attendee.ticketanswer_set.all %}
-									<td><p class="lead text-center" style="margin:0 auto;">{{ answer.value }}</p></td>
+									<td><p class="text-center" style="margin:0 auto;">{{ answer.value }}</p></td>
 									{% endfor %}
 								</tr>
 								{% endfor %}
 							</tbody>
 						</table>
-						<!--end: Datatable -->
-		            </div>
-		            
-		            <div class="tab-pane" id="m_tabs_6_3" role="tabpanel">
-		               	                    
-		               	<div class="row row-padder">
-		               		<div class="col-12">
-		               			<h2 style="font-weight: 300;">Eligable refund amount: <span style="color: green;">${{ order.amount }}</span></h2>
-		               		</div>
-		               	</div>
-
-		               	{% if form.non_field_errors %}
-						<div class="row row-padder">
-							<div class="col-md-12">
-								<div class="form-group m-form__group">
-									{% for error in form.non_field_errors %}
-									<div class="alert alert-danger" role="alert">
-									  	<strong>Oh snap!</strong> {{ error }}
-									</div>
-									{% endfor %}
-								</div>
-							</div>
-						</div>
-						{% endif %}
-
-	                    <div class="row row-padder">
-							<div class="col-md-6">
-								<div class="form-group m-form__group">
-									<h5>Partial Refund</h5>
-									<span class="m-switch m-switch--lg m-switch--icon">
-										<label>
-				                        {{ form.partial_refund }}
-				                        <span></span>
-				                        </label>
-				                    </span>
-				                    <br>
-				                    <span class="m-form__help">Only refund a portion of the order or refund the entire eligable amount.</span>
-				                    <br>
-				                    <br>
-				                    {% for error in form.partial_refund.errors %}
-										<div class="alert m-alert--outline alert-danger" role="alert">
-										  	{{ error }}
-										</div>
-									{% endfor %}
-				                </div>
-				            </div>
-				            <div class="col-md-6">
-								<div class="form-group m-form__group">
-									<h5 {% if form.refund_amount.errors %}style="color:red;"{% endif %}>Partial Refund Amount</h5>
-									{{ form.refund_amount }}
-									<span class="m-form__help">Enter partial refund amount.</span>
-									<br>
-									{% for error in form.refund_amount.errors %}
-										<div class="alert m-alert--outline alert-danger" role="alert">
-										  	{{ error }}
-										</div>
-									{% endfor %}
-								</div>
-							</div>
-				        </div>
-	                     <div class="row row-padder">
-	                     	<div class="col-12">
-	                     		<button type="submit" name="Create" value="Create" class="btn btn-success btn-block publish">Issue Refund</button>
-	                     	</div>
-	                     </div>
-
-		            </div>
-
-
-		            <div class="tab-pane" id="m_tabs_6_4" role="tabpanel">
-		                Communicate with order person
-		            </div>
-		            
-		        </div>      
-		    </div>
+					</div>
+				</div>
+			</div>
 		</div>
-		<!--end::Portlet-->
+	</div>
+</div>
+
+
+<form method="POST">{% csrf_token %}
+<div class="row" style="padding-bottom:30px;">
+	<div class="col-12 col-lg-10">
+		<div class="kt-portlet kt-portlet--skin-solid kt-portlet-- kt-bg-success">
+			<div class="kt-portlet__body">
+				<div class="row">
+					<div class="col-12">
+						<h2 style="font-weight: 300;">The eligable refund amount is ${{ order.amount }}</h2>
+					</div>
+				</div>
+
+				{% if form.non_field_errors %}
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group m-form__group">
+							{% for error in form.non_field_errors %}
+							<div class="alert alert-danger" role="alert">
+								<strong>Oh snap!</strong> {{ error }}
+							</div>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+				{% endif %}
+
+				<div class="row" style="padding-top:30px;">
+					<div class="col-md-4">
+						<div class="form-group m-form__group">
+							<h5>Partial Refund</h5>
+							<span class="kt-switch kt-switch--outline kt-switch--icon kt-switch--success">
+								<label>
+								{{ form.partial_refund }}
+								<span></span>
+								</label>
+							</span>
+							<br>
+							<span class="m-form__help">Switch on to refund a portion of the order or switch off to refund the entire eligable amount.</span>
+							<br>
+							<br>
+							{% for error in form.partial_refund.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+										{{ error }}
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+					<div class="col-md-2"></div>
+					<div class="col-md-6">
+						<div class="form-group m-form__group">
+							<h5 {% if form.refund_amount.errors %}style="color:red;"{% endif %}>Partial Refund Amount</h5>
+							{{ form.refund_amount }}
+							<span class="m-form__help">Enter partial refund amount.</span>
+							<br>
+							{% for error in form.refund_amount.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+										{{ error }}
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-12">
+						<button type="submit" name="Create" value="Create" class="btn btn-warning btn-block publish">Issue Refund</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
 	</div>
 </div>
 </form>
