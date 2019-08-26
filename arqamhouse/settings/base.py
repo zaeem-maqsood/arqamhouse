@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 # import django_heroku
+import dj_database_url
+import dotenv
 import os
 from celery.schedules import crontab
 from arqamhouse.aws.conf import *
@@ -19,6 +21,11 @@ from arqamhouse.aws.conf import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# This is new:
+dotenv_file = os.path.join(BASE_DIR, ".env")
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
 
 
 # Quick-start development settings - unsuitable for production
@@ -91,6 +98,7 @@ WSGI_APPLICATION = 'arqamhouse.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {}
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 
 # DATABASES = {
@@ -241,6 +249,10 @@ STATICFILES_DIRS = [
      os.path.join(BASE_DIR, "static"),
  ]
 
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+del DATABASES['default']['OPTIONS']['sslmode']
 # STATIC_URL = '/static/'
 # MEDIA_URL = '/media/'
 
