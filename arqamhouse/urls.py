@@ -28,7 +28,7 @@ urlpatterns = [
     path('verification', ConnectVerificationView.as_view(), name='verification'),
     path('house/', include('houses.urls')),
     path('profile/', include('profiles.urls')),
-    # path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('events/', include('events.urls')),
     path('questions/', include('questions.urls')),
     path('payments/', include('payments.urls')),
