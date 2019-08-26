@@ -17,7 +17,6 @@ import os
 from celery.schedules import crontab
 from arqamhouse.aws.conf import *
 
-# django_heroku.settings(locals())
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -252,6 +251,7 @@ STATICFILES_DIRS = [
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+django_heroku.settings(locals())
 del DATABASES['default']['OPTIONS']['sslmode']
 # STATIC_URL = '/static/'
 # MEDIA_URL = '/media/'
