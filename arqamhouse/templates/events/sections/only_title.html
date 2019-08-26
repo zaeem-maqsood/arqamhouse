@@ -1,11 +1,41 @@
-<section class="text-center">
+{% load static %}
+
+<section class="switchable feature-large">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8">
-                <h2>{{ event.title }}</h2>
-                <p class="lead">
-                    {{ event.short_description }}
-                </p>
+        <div class="row justify-content-around">
+            <div class="col-md-9">
+                <div class="row text-center" style="padding-bottom:9em;padding-top:2em;">
+                    <div class="col-md-12 col-lg-12">
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 style="margin-bottom:0px;font-weight: 600;color: #595959;">{{ event.title }}</h2>
+                                <p class="">{{ event.short_description }}</p>
+                                <a class="btn btn--primary" href="{{ event.choose_tickets_view }}"><span class="btn__text">Get Tickets</span></a>
+                            </div> 
+                        </div>
+                            
+
+                        <div class="row" style="padding-top:50px;">
+                            <div class="col-md-12">
+                                <h3 style="margin-bottom: 5px;font-weight: 600;color: #595959;"><i class="far fa-clock"></i>  When</h3>
+                                <p style="margin-bottom: 0;">Starts <span style="font-weight:800;">| {{ event.start }}</span></p>
+                                <p style="margin-bottom: 0;">Ends <span style="font-weight:800;">| {{ event.end }}</span></p>
+                            </div>
+                        </div>
+                        
+
+                        <div class="row" style="padding-top:30px;">
+                            <div class="col-md-12">
+                                <h3 style="margin-bottom: 5px;font-weight: 600;color: #595959;"><i class="fas fa-map-marker-alt"></i>  Where</h3>
+                                <p style="margin-bottom: 0;"><span style="font-weight:800;">{{ event.venue_name }}</span></p>
+                                <p style="margin-bottom: 0;">{{ event.venue_address }}</p>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                </div>
             </div>
         </div>
         <!--end of row-->

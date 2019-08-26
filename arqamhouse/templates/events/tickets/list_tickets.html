@@ -42,18 +42,18 @@ Tickets
 
 
 <div class="row">
-	<div class="col-9">
+	<div class="col-8">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 				<div class="row text-center">
 					<div class="col-4">
-						<a href="{{ event.create_paid_ticket }}" class="btn btn-info btn-lg btn-block">Add Paid Ticket</a>
+						<a href="{{ event.create_paid_ticket }}" class="btn btn-primary btn-block">Add Paid Ticket</a>
 					</div>
 					<div class="col-md-4">
-						<a href="{{ event.create_free_ticket }}" class="btn btn-info btn-lg btn-block">Add Free Ticket</a>
+						<a href="{{ event.create_free_ticket }}" class="btn btn-primary btn-block">Add Free Ticket</a>
 					</div>
 					<div class="col-md-4">
-						<a href="{{ event.create_donation_ticket }}" class="btn btn-info btn-lg btn-block">Add Donation Ticket</a>
+						<a href="{{ event.create_donation_ticket }}" class="btn btn-primary btn-block">Add Donation Ticket</a>
 					</div>
 				</div>
 			</div>
@@ -63,7 +63,7 @@ Tickets
 
 {% for ticket in tickets %}
 <div class="row">
-	<div class="col-9">
+	<div class="col-8">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 				
@@ -74,6 +74,16 @@ Tickets
 						<div class="progress">
 							<div class="progress-bar progress-bar-striped progress-bar-animated {{ ticket.percentage_color }}" role="progressbar" aria-valuenow="{{ ticket.amount_sold }}" aria-valuemin="0" aria-valuemax="{{ ticket.amount_available }}" style="width: {{ ticket.percentage_sold }}"></div>
 						</div>
+						<br>
+						<div class="row">
+							<div class="col-md-6">
+								<p style="margin-bottom: 3px;"><span style="font-weight: 600;">{{ ticket.amount_sold }} / {{ ticket.amount_available }}</span></p>
+							</div>
+							<div class="col-md-6">
+								<p style="margin-bottom: 3px;" class="float-right"><span style="font-weight: 600;">{% if ticket.free %}Free{% elif ticket.paid %}Paid{% else %}Donation{% endif %}</span></p>
+							</div>
+						</div>
+						
 					</div>
 				</div>
 			</div>

@@ -9,1382 +9,355 @@ from django.http import Http404, HttpResponseRedirect
 from django.contrib import messages
 
 from houses.mixins import HouseAccountMixin
-from events.models import Event, EventGeneralQuestions, AttendeeGeneralQuestions, Ticket
-from .models import (EventQuestion, TicketQuestion, EventQuestionMultipleChoiceOption, AllTicketQuestionControl, 
-					TicketQuestionMultipleChoiceOption, AllTicketQuestionMultipleChoiceOption)
-from .forms import (EventQuestionBaseForm, EventGeneralQuestionsForm, AttendeeGeneralQuestionsForm, 
-					EventQuestionMutipleChoiceOptionForm, AllTicketQuestionForm, TicketQuestionForm,
-					AllTicketQuestionMutipleChoiceOptionForm, TicketQuestionMutipleChoiceOptionForm)
-
-# Create your views here.
+from events.models import Event, AttendeeCommonQuestions, Ticket, EventQuestion
+from questions.models import Question, MultipleChoice
+from questions.forms import QuestionForm, MutipleChoiceForm
 
 
 
 
+class MultipleChoiceCreateView(HouseAccountMixin, CreateView):
+	model = MultipleChoice
+	form_class = MutipleChoiceForm
+	template_name = "questions/multiple_choice_form.html"
 
-# Generic functions
+	def get_one_to_one_object(self, one_to_one_type, one_to_one_id):
+		one_to_one_object = None
+		if one_to_one_type == 'events':
+			one_to_one_object = Event.objects.get(id=one_to_one_id)
+		return one_to_one_object
 
-# Get Event Function
-def get_event(slug):
-	try:
-		event = Event.objects.get(slug=slug)
-	except Exception as e:
-		print(e)
-		raise Http404
-	return event
-
-# Get question type to display template properly
-def get_question_type(question_type, context):
-
-	if question_type == "simple":
-		context["simple"] = True
-	elif question_type == "paragraph":
-		context["paragraph"] = True
-	elif question_type == "multiple choice":
-		context["multiple_choice"] = True
-	else:
-		print(question_type)
-		print(context)
-		raise Http404
-
-	return context
-
-
-
-class QuestionsListView(HouseAccountMixin, View):
-
-	template_name = "events/questions/list_questions.html"
+	def get_success_url(self):
+		one_to_one_type = self.kwargs['one_to_one_type']
+		one_to_one_id = self.kwargs['one_to_one_id']
+		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
+		view_name = "questions:update_question"
+		return reverse(view_name, kwargs={"one_to_one_type": one_to_one_type, "one_to_one_id":one_to_one_id, "pk": self.object.question.id})
+		
 
 	def get(self, request, *args, **kwargs):
-		return render(request, self.template_name, self.get_context_data())
+		self.object = None
+		return self.render_to_response(self.get_context_data())
 
+	def get_question(self):
+		pk = self.kwargs["pk"]
+		question = Question.objects.get(id=pk)
+		return question
+
+	def get_context_data(self, *args, **kwargs):
+		context = {}
+		one_to_one_type = self.kwargs['one_to_one_type']
+		form = self.get_form()
+		context["form"] = form
+		context["dashboard_events"] = self.get_events()
+
+		return context
 
 	def post(self, request, *args, **kwargs):
-		
-		event = get_event(self.kwargs['slug'])
+		form = self.get_form()
 
-		event_general_questions_instance = EventGeneralQuestions.objects.get(event=event)
-		attendee_general_questions_instance = AttendeeGeneralQuestions.objects.get(event=event)
-
-		event_general_questions_form = EventGeneralQuestionsForm(instance=event_general_questions_instance, data=request.POST)
-		attendee_general_questions_form = AttendeeGeneralQuestionsForm(instance=attendee_general_questions_instance, data=request.POST)
-		if event_general_questions_form.is_valid() and attendee_general_questions_form.is_valid():
-
-			event_general_questions_instance = event_general_questions_form.save()
-			attendee_general_questions_instance = attendee_general_questions_form.save()
-
-			event_general_questions_instance.save()
-			attendee_general_questions_instance.save()
-
-			messages.success(request, 'Questions Updated Successfully!')
-			return render(request, self.template_name, self.get_context_data())
-
+		if form.is_valid():
+			return self.form_valid(form, request)
 		else:
-			return render(request, self.template_name, self.get_context_data())
+			return self.form_invalid(form)
+
+	
+	def form_valid(self, form, request):
+		data = request.POST
+		self.object = form.save(commit=False)
+		self.object.question = self.get_question()
+		self.object.save()
+		messages.success(request, 'Option added to question successfully!')
+		valid_data = super(MultipleChoiceCreateView, self).form_valid(form)
+		return valid_data
+
+	def form_invalid(self, form):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form))
+
+
+
+
+class MultipleChoiceUpdateView(HouseAccountMixin, UpdateView):
+	model = MultipleChoice
+	form_class = MutipleChoiceForm
+	template_name = "questions/multiple_choice_form.html"
+
+	def get_success_url(self):
+		one_to_one_type = self.kwargs['one_to_one_type']
+		one_to_one_id = self.kwargs['one_to_one_id']
+		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
+		view_name = "questions:update_question"
+		return reverse(view_name, kwargs={"one_to_one_type": one_to_one_type, "one_to_one_id":one_to_one_id, "pk": self.object.question.id})
+
+	def get_one_to_one_object(self, one_to_one_type, one_to_one_id):
+		one_to_one_object = None
+		if one_to_one_type == 'events':
+			one_to_one_object = Event.objects.get(id=one_to_one_id)
+		return one_to_one_object
+
+	def get_option(self):
+		pk = self.kwargs["option_id"]
+		multiple_choice = MultipleChoice.objects.get(id=pk)
+		return multiple_choice
+
+	def get_question(self):
+		pk = self.kwargs["pk"]
+		question = Question.objects.get(id=pk)
+		return question
+
+	def get(self, request, *args, **kwargs):
+		self.object = self.get_option()
+		return self.render_to_response(self.get_context_data())
+
+	def get_context_data(self, *args, **kwargs):
+		context = {}
+		form = self.get_form()
+		context["form"] = form
+		context["dashboard_events"] = self.get_events()
+		context["update"] = True
+		return context
+
+	def post(self, request, *args, **kwargs):
+		self.object = self.get_option()
+		form = self.get_form()
+		if form.is_valid():
+			return self.form_valid(form, request)
+		else:
+			return self.form_invalid(form)
+
+	
+	def form_valid(self, form, request):
+		data = request.POST
+		self.object = form.save()
+		messages.success(request, 'Option updated successfully!')
+		valid_data = super(MultipleChoiceUpdateView, self).form_valid(form)
+		return valid_data
+
+	def form_invalid(self, form):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form))
+
+
+
+class QuestionCreateView(HouseAccountMixin, CreateView):
+	model = Question
+	form_class = QuestionForm
+	template_name = "questions/question_form.html"
+
+	def get_success_url(self):
+		one_to_one_type = self.kwargs['one_to_one_type']
+		one_to_one_id = self.kwargs['one_to_one_id']
+		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
+		view_name = "%s:list_questions" % (one_to_one_type)
+		return reverse(view_name, kwargs={"slug": one_to_one_object.slug})
+
+
+	def get_one_to_one_object(self, one_to_one_type, one_to_one_id):
+		one_to_one_object = None
+		if one_to_one_type == 'events':
+			one_to_one_object = Event.objects.get(id=one_to_one_id)
+		return one_to_one_object
+
+
+	def get(self, request, *args, **kwargs):
+		self.object = None
+		return self.render_to_response(self.get_context_data())
 
 
 	def get_context_data(self, *args, **kwargs):
 		context = {}
-		house = self.get_House()
-		event = get_event(self.kwargs['slug'])
 
-		event_general_questions_instance = EventGeneralQuestions.objects.get(event=event)
-		attendee_general_questions_instance = AttendeeGeneralQuestions.objects.get(event=event)
-
-		event_general_questions_form = EventGeneralQuestionsForm(instance=event_general_questions_instance)
-		attendee_general_questions_form = AttendeeGeneralQuestionsForm(instance=attendee_general_questions_instance)
-
-		event_questions = EventQuestion.objects.filter(event=event, deleted=False).order_by('order')
-		all_ticket_questions = AllTicketQuestionControl.objects.filter(event=event, deleted=False).order_by('order')
-		ticket_questions = TicketQuestion.objects.filter(event=event, ticket__isnull=False, deleted=False).order_by('order')
-
-		context["tickets"] = Ticket.objects.filter(event=event, deleted=False)
-		context["event_general_questions_form"] = event_general_questions_form
-		context["attendee_general_questions_form"] = attendee_general_questions_form
-		context["event_questions"] = event_questions
-		context["all_ticket_questions"] = all_ticket_questions
-		context["ticket_questions"] = ticket_questions
-		context["event"] = event
-		context["house"] = house
-		context["events_tab"] = True
-		context["active_event_tab"] = True
-		return context
-
-
-
-
-
-
-# Functions for the following for Classes 
-def get_ticket(ticket_slug):
-	try:
-		ticket = Ticket.objects.get(slug=ticket_slug)
-	except:
-		raise Http404
-	return ticket
-
-
-# This view creates questions for specific tickets 
-class TicketQuestionCreateView(HouseAccountMixin, CreateView):
-	model = TicketQuestion
-	form_class = TicketQuestionForm
-	template_name = "events/questions/create_question.html"
-
-	# Check if multiple choice question then bring user back to question to add options 
-	# Else got back to list questions
-	def get_success_url(self):
-		if self.kwargs['type'] == "multiple choice":
-			view_name = "events:questions:update_ticket_question"
-			return reverse(view_name, kwargs={"slug": self.kwargs['slug'], "question_slug": self.object.slug, "ticket_slug": self.kwargs['ticket_slug']})
-		else:
-			view_name = "events:questions:list_questions"
-			return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
-
-
-	def get_context_data(self, form, question_type, event, ticket, *args, **kwargs):
-		context = {}
-		house = self.get_House()
-		context = get_question_type(question_type, context)
-		context["ticket"] = ticket
+		form = self.get_form()
 		context["form"] = form
-		context["question_type"] = question_type
-		context["house"] = house
-		context["event"] = event
-		context["events_tab"] = True
+
+		# Get the ticket type from the kwargs
+		one_to_one_type = self.kwargs['one_to_one_type']
+		one_to_one_id = self.kwargs['one_to_one_id']
+		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
+
+
+		if one_to_one_type == "events":
+			tickets = Ticket.objects.filter(event=one_to_one_object, deleted=False)
+			context["tickets"] = tickets
+
+		context["event_tab"] = True
+		context["dashboard_events"] = self.get_events()
+
 		return context
 
 
 	def post(self, request, *args, **kwargs):
 		
-		data = request.POST
+		one_to_one_type = self.kwargs['one_to_one_type']
+		one_to_one_id = self.kwargs['one_to_one_id']
+		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
 
-		# Check to make sure event slug is correct
-		event = get_event(kwargs['slug'])
-		ticket = get_ticket(kwargs['ticket_slug'])
-
-		# Get the ticket type from the kwargs
-		question_type = kwargs['type']
 		form = self.get_form()
 
-		
 		if form.is_valid():
-			return self.form_valid(form, request, event, question_type, ticket)
+			return self.form_valid(form, request, one_to_one_type, one_to_one_object)
 		else:
-			return self.form_invalid(form, question_type, event, ticket)
+			return self.form_invalid(form)
 
 
-	def form_valid(self, form, request, event, question_type, ticket):
+	def form_valid(self, form, request, one_to_one_type, one_to_one_object):
+
 		data = request.POST
 
-		form.instance.event = event
-		form.instance.ticket = ticket
-
-		title = form.cleaned_data.get("title")
-
-		if question_type == "simple":
-			form.instance.simple_question = True
-		elif question_type == "paragraph":
-			form.instance.paragraph_question = True
-		elif question_type == "multiple choice":
-			form.instance.multiple_choice_question = True
-		else:
-			pass
+		if form.cleaned_data['question_type'] == 'simple':
+			self.object.question_type = 'simple'
 
 		self.object = form.save()
 
-		messages.success(request, 'Question "%s" Created Successfully!' % (title))
+		if one_to_one_type == 'events':
+			event_question = EventQuestion.objects.create(event=one_to_one_object, question=self.object)
+			if 'order_question' in data:
+				event_question.order_question = True
+			tickets = Ticket.objects.filter(event=one_to_one_object)
+			for ticket in tickets:
+				if str(ticket.id) in data:
+					event_question.tickets.add(ticket)
+			event_question.save()
 
-		valid_data = super(TicketQuestionCreateView, self).form_valid(form)
+		messages.success(request, 'Question Created Successfully!')
+
+		valid_data = super(QuestionCreateView, self).form_valid(form)
 		return valid_data
 
-	def form_invalid(self, form, question_type, event, ticket):
+	def form_invalid(self, form):
 		print(form.errors)
-		return self.render_to_response(self.get_context_data(form=form, question_type=question_type, event=event, ticket=ticket))
-
-
-	def get(self, request, *args, **kwargs):
-		
-		# Check to make sure event slug is correct
-		event = get_event(kwargs['slug'])
-		ticket = get_ticket(kwargs['ticket_slug'])
-
-		self.object = None
-
-		# Get the ticket type from the kwargs
-		question_type = kwargs['type']
-		form = self.get_form()
-
-		return self.render_to_response(self.get_context_data(form=form, question_type=question_type, event=event, ticket=ticket))
-
-
-
-# Get Ticket Object Question
-# Used for the next three classes 
-def get_ticket_question(event, ticket, question_slug):
-	try:
-		question = TicketQuestion.objects.get(event=event, ticket=ticket, slug=question_slug)
-	except Exception as e:
-		print(e)
-	return question
-
-
-class TicketQuestionUpdateView(HouseAccountMixin, UpdateView):
-	model = TicketQuestion
-	form_class = TicketQuestionForm
-	template_name = "events/questions/create_question.html"
-
-	# Success url
-	def get_success_url(self):
-		view_name = "events:questions:list_questions"
-		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
-
-	# Context variables
-	def get_context_data(self, form, question, event, ticket, *args, **kwargs):
-		context = {}
-		house = self.get_house()
-
-		if question.simple_question:
-			context["simple"] = True
-		elif question.paragraph_question:
-			context["paragraph"] = True
-		elif question.multiple_choice_question:
-			context["multiple_choice"] = True
-			ticket_question_multiple_choice_options = TicketQuestionMultipleChoiceOption.objects.filter(ticket_question=question, deleted=False)
-			context["event_question_multiple_choice_options"] = ticket_question_multiple_choice_options
-		else:
-			pass
-
-		context["ticket"] = ticket
-		context["form"] = form
-		context["question"] = question
-		context["house"] = house
-		context["event"] = event
-		context["events_tab"] = True
-		context["update"] = True
-		context["single_ticket"] = True
-		return context
-
-
-	def post(self, request, *args, **kwargs):
-
-		# Check to make sure event slug is correct
-		event = get_event(kwargs['slug'])
-		ticket = get_ticket(kwargs['ticket_slug'])
-		question = get_ticket_question(event, ticket, kwargs['question_slug'])
-
-		# Set question to object
-		self.object = question
-
-		form = self.get_form()
-		if form.is_valid():
-			return self.form_valid(form, request, event, question, ticket)
-		else:
-			return self.form_invalid(form, question, event, ticket)
-
-
-	def form_valid(self, form, request, event, question, ticket):
-		# Get post data
-		data = request.POST
-
-		title = form.cleaned_data.get("title")
-
-		if "delete" in data:
-			self.object.deleted = True
-			self.object.save()
-			messages.success(request, 'Question %s Deleted Successfully!' % (title))
-
-		else:
-			form.instance.event = event
-			form.instance.ticket = ticket
-			form.instance.all_ticket_question_control = None
-			self.object = form.save()
-			messages.success(request, 'Question "%s" Updated Successfully!' % (title))
-		
-		valid_data = super(TicketQuestionUpdateView, self).form_valid(form)
-		return valid_data
-
-	def form_invalid(self, form, question, event, ticket):
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event, ticket=ticket))
-
-
-	def get(self, request, *args, **kwargs):
-		
-		# Get event ticket and question object
-		event = get_event(kwargs['slug'])
-		ticket = get_ticket(kwargs['ticket_slug'])
-		question = get_ticket_question(event, ticket, kwargs['question_slug'])
-
-		# Set object to question
-		self.object = question
-
-		form = self.get_form()
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event, ticket=ticket))
+		return self.render_to_response(self.get_context_data(form=form))
 
 
 
 
 
-class TicketQuestionMultipleChoiceOptionUpdateView(HouseAccountMixin, UpdateView):
-	model = TicketQuestionMultipleChoiceOption
-	form_class = TicketQuestionMutipleChoiceOptionForm
-	template_name = "events/questions/create_option.html"
 
-	def get_context_data(self, form, question, event, *args, **kwargs):
-		context = {}
-		house = self.get_House()
+class QuestionUpdateView(HouseAccountMixin, UpdateView):
+	model = Question
+	form_class = QuestionForm
+	template_name = "questions/question_form.html"
 
-		context["form"] = form
-		context["house"] = house
-		context["event"] = event
-		context["question"] = question
-		context["update"] = True
-		context["events_tab"] = True
-		context["single_ticket"] = True
-		return context
+
+	def create_option_url(self):
+		one_to_one_type = self.kwargs['one_to_one_type']
+		one_to_one_id = self.kwargs['one_to_one_id']
+		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
+		view_name = "questions:create_option"
+		return reverse(view_name, kwargs={"one_to_one_type": one_to_one_type, "one_to_one_id":one_to_one_id, "pk":self.object.id})
+
 
 	def get_success_url(self):
-		view_name = "events:questions:update_ticket_question"
-		return reverse(view_name, kwargs={"slug": self.kwargs['slug'], "question_slug": self.kwargs['question_slug'], "ticket_slug": self.object.ticket_question.ticket.slug})
+		one_to_one_type = self.kwargs['one_to_one_type']
+		one_to_one_id = self.kwargs['one_to_one_id']
+		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
+		view_name = "%s:list_questions" % (one_to_one_type)
+		return reverse(view_name, kwargs={"slug": one_to_one_object.slug})
 
 
-	def get_event(self, slug):
-		try:
-			event = Event.objects.get(slug=slug)
-		except Exception as e:
-			print(e)
-			raise Http404
-		return event
-
-	def get_question(self, event, ticket, question_slug):
-		try:
-			question = TicketQuestion.objects.get(event=event, ticket=ticket, slug=question_slug)
-		except Exception as e:
-			print(e)
-			raise Http404
-		return question
-
-	def get_ticket(self, ticket_slug):
-		try:
-			ticket = Ticket.objects.get(slug=ticket_slug)
-		except Exception as e:
-			print(e)
-			raise Http404
-		return ticket
-
-	def get_option(self, event, question, option_slug):
-		try:
-			option = TicketQuestionMultipleChoiceOption.objects.get(ticket_question__event=event, ticket_question=question, slug=option_slug)
-		except Exception as e:
-			print(e)
-			raise Http404
-		return option
+	def get_one_to_one_object(self, one_to_one_type, one_to_one_id):
+		one_to_one_object = None
+		if one_to_one_type == 'events':
+			one_to_one_object = Event.objects.get(id=one_to_one_id)
+		return one_to_one_object
 
 
-	def form_valid(self, form, request, event, question):
-		data = request.POST
-		title = form.cleaned_data.get("title")
-		if "delete" in data:
-			self.object.deleted = True
-			self.object.save()
-			messages.success(request, 'Option "%s" Deleted Successfully!' % (title))
-		else:
-			form.instance.event_question = question
-			self.object = form.save()
-			messages.success(request, 'Option "%s" Updated Successfully!' % (title))
-		valid_data = super(TicketQuestionMultipleChoiceOptionUpdateView, self).form_valid(form)
-		return valid_data
-
-	def form_invalid(self, form, question, event):
-		print(form.errors)
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-	def post(self, request, *args, **kwargs):
-		
-		data = request.POST
-
-		# Check to make sure event slug is correct
-		event = self.get_event(kwargs['slug'])
-		ticket = self.get_ticket(kwargs['ticket_slug'])
-		question = self.get_question(event, ticket, kwargs['question_slug'])
-		option = self.get_option(event, question, kwargs['option_slug'])
-		self.object = option
-
-		form = self.get_form()
-	
-		if form.is_valid():
-			return self.form_valid(form, request, event, question)
-		else:
-			return self.form_invalid(form, question, event)
-
-	def get(self, request, *args, **kwargs):
-		
-		# Check to make sure event slug is correct
-		event = self.get_event(kwargs['slug'])
-		ticket = self.get_ticket(kwargs['ticket_slug'])
-		question = self.get_question(event, ticket, kwargs['question_slug'])
-		option = self.get_option(event, question, kwargs['option_slug'])
-		self.object = option
-
-		# Get the ticket type from the kwargs
-		form = self.get_form()
-
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-
-
-
-class TicketQuestionMultipleChoiceOptionCreateView(HouseAccountMixin, CreateView):
-	model = TicketQuestionMultipleChoiceOption
-	form_class = TicketQuestionMutipleChoiceOptionForm
-	template_name = "events/questions/create_option.html"
-
-	def get_context_data(self, form, question, event, ticket, *args, **kwargs):
-		context = {}
-		house = self.get_House()
-
-		context["form"] = form
-		context["house"] = house
-		context["event"] = event
-		context["question"] = question
-		context["ticket"] = ticket
-		context["events_tab"] = True
-		context["single_ticket"] = True
-		return context
-
-	def get_success_url(self):
-		view_name = "events:questions:update_ticket_question"
-		return reverse(view_name, kwargs={"slug": self.kwargs['slug'], "question_slug": self.kwargs['question_slug'], "ticket_slug": self.kwargs['ticket_slug']})
-
-	def get_event(self, slug):
-		try:
-			event = Event.objects.get(slug=slug)
-		except Exception as e:
-			print(e)
-			raise Http404
-		return event
-
-	def get_question(self, event, ticket, question_slug):
-		try:
-			question = TicketQuestion.objects.get(event=event, ticket=ticket, slug=question_slug)
-		except Exception as e:
-			print(e)
-			raise Http404
+	def get_question(self, pk):
+		question = Question.objects.get(id=pk)
 		return question
 
 
-	def get_ticket(self, ticket_slug):
-		try:
-			ticket = Ticket.objects.get(slug=ticket_slug)
-		except Exception as e:
-			print(e)
-			raise Http404
-		return ticket
-
-
-	def form_valid(self, form, request, event, question, ticket):
-		data = request.POST
-
-		form.instance.ticket_question = question
-		form.instance.ticket_question.ticket = ticket
-		form.instance.ticket_question.all_ticket_question_control = None
-
-		title = form.cleaned_data.get("title")
-		self.object = form.save()
-
-		messages.success(request, 'Option "%s" Created Successfully!' % (title))
-
-		valid_data = super(TicketQuestionMultipleChoiceOptionCreateView, self).form_valid(form)
-		return valid_data
-
-	def form_invalid(self, form, question, event, ticket):
-		print(form.errors)
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event, ticket=ticket))
-
-	def post(self, request, *args, **kwargs):
-		
-		data = request.POST
-
-		# Check to make sure event slug is correct
-		event = self.get_event(kwargs['slug'])
-		ticket = self.get_ticket(kwargs['ticket_slug'])
-		question = self.get_question(event, ticket, kwargs['question_slug'])
-
-		form = self.get_form()
-	
-		if form.is_valid():
-			return self.form_valid(form, request, event, question, ticket)
-		else:
-			return self.form_invalid(form, question, event, ticket)
-
 	def get(self, request, *args, **kwargs):
-		
-		# Check to make sure event slug is correct
-		event = self.get_event(kwargs['slug'])
-		ticket = self.get_ticket(kwargs['ticket_slug'])
-		question = self.get_question(event, ticket, kwargs['question_slug'])
-		self.object = None
-
-		# Get the ticket type from the kwargs
-		form = self.get_form()
-
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event, ticket=ticket))
+		pk = self.kwargs['pk']
+		self.object = self.get_question(pk)
+		return self.render_to_response(self.get_context_data())
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# This view controls the creation of all ticket questions 
-class AllTicketQuestionCreateView(HouseAccountMixin, CreateView):
-	
-	model = AllTicketQuestionControl
-	form_class = AllTicketQuestionForm
-	template_name = "events/questions/create_question.html"
-
-	# success url takes user back to question list view or brings them back to add options if multiple 
-	# choice question
-	def get_success_url(self):
-
-		if self.kwargs['type'] == "multiple choice":
-			view_name = "events:questions:update_all_ticket_question"
-			return reverse(view_name, kwargs={"slug": self.kwargs['slug'], "question_slug": self.object.slug})
-
-		else:
-			view_name = "events:questions:list_questions"
-			return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
-
-	def get_context_data(self, form, question_type, event, *args, **kwargs):
+	def get_context_data(self, *args, **kwargs):
 		context = {}
-		house = self.get_House()
-		context = get_question_type(question_type, context)
-		context["all_ticket_question"] = True
+
+		form = self.get_form()
 		context["form"] = form
-		context["question_type"] = question_type
-		context["house"] = house
-		context["event"] = event
-		context["events_tab"] = True
-		context["all_ticket"] = True
-		return context
-
-	def post(self, request, *args, **kwargs):
-
-		# Check to make sure event slug is correct
-		event = get_event(kwargs['slug'])
 
 		# Get the ticket type from the kwargs
-		question_type = kwargs['type']
-		
-		form = self.get_form()
-		if form.is_valid():
-			return self.form_valid(form, request, event, question_type)
-		else:
-			return self.form_invalid(form, question_type, event)
+		one_to_one_type = self.kwargs['one_to_one_type']
+		one_to_one_id = self.kwargs['one_to_one_id']
+		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
+		context["one_to_one_type"] = one_to_one_type
+		context["one_to_one_id"] = one_to_one_id
+
+		if one_to_one_type == "events":
+			tickets = Ticket.objects.filter(event=one_to_one_object, deleted=False)
+			context["event_question"] = self.object.eventquestion
+			context["tickets"] = tickets
+			context["event"] = one_to_one_object
+			context["event_tab"] = True
+			context["dashboard_events"] = self.get_events()
 
 
-	def form_valid(self, form, request, event, question_type):
-		# add the event instance to the object 
-		form.instance.event = event
+		options = MultipleChoice.objects.filter(question=self.object)
 
-		# Get the title for the success message
-		title = form.cleaned_data.get("title")
-
-		# Set the question type on the object retrieved from the kwargs
-		if question_type == "simple":
-			form.instance.simple_question = True
-		elif question_type == "paragraph":
-			form.instance.paragraph_question = True
-		elif question_type == "multiple choice":
-			form.instance.multiple_choice_question = True
-		else:
-			pass
-
-		# Save Object
-		self.object = form.save()
-
-		# Success Message
-		messages.success(request, 'Question "%s" Created Successfully!' % (title))
-		valid_data = super(AllTicketQuestionCreateView, self).form_valid(form)
-		return valid_data
-
-	def form_invalid(self, form, question_type, event):
-		print(form.errors)
-		return self.render_to_response(self.get_context_data(form=form, question_type=question_type, event=event))
-
-
-	def get(self, request, *args, **kwargs):
-		
-		# Check to make sure event slug is correct
-		event = get_event(kwargs['slug'])
-
-		# Object set to none for creation
-		self.object = None
-
-		# Get the ticket type from the kwargs
-		question_type = kwargs['type']
-		
-		form = self.get_form()
-		return self.render_to_response(self.get_context_data(form=form, question_type=question_type, event=event))
-
-
-
-# Get All Ticket Question function reused for the following three classes 
-def get_all_ticket_question(event, question_slug):
-	try:
-		question = AllTicketQuestionControl.objects.get(event=event, slug=question_slug)
-	except:
-		raise Http404
-	return question
-
-
-
-# This view updates the all ticket question models 
-class AllTicketQuestionUpdateView(HouseAccountMixin, UpdateView):
-	
-	model = AllTicketQuestionControl
-	form_class = AllTicketQuestionForm
-	template_name = "events/questions/create_question.html"
-
-	# Success url take them back to questions list
-	def get_success_url(self):
-		view_name = "events:questions:list_questions"
-		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
-
-
-	# Get question type to display template properly
-	def get_question_type(self, question, context):
-
-		if question.simple_question:
-			context["simple"] = True
-		elif question.paragraph_question:
-			context["paragraph"] = True
-		elif question.multiple_choice_question:
-			# Get all options associated with this question
-			all_ticket_question_multiple_choice_options = AllTicketQuestionMultipleChoiceOption.objects.filter(all_ticket_question=question, deleted=False)
-			context["event_question_multiple_choice_options"] = all_ticket_question_multiple_choice_options
-			context["multiple_choice"] = True
-		else:
-			raise Http404
-
-		return context
-
-	# Context variables
-	def get_context_data(self, form, question, event, *args, **kwargs):
-		context = {}
-		house = self.get_House()
-		context = self.get_question_type(question, context)
-		context["all_ticket_question"] = True
-		context["form"] = form
-		context["question"] = question
-		context["house"] = house
-		context["event"] = event
-		context["events_tab"] = True
+		context["options"] = options
+		context["question"] = self.object
 		context["update"] = True
-		context["all_ticket"] = True
+		context["option_url"] = self.create_option_url()
+
 		return context
 
 
 	def post(self, request, *args, **kwargs):
+		pk = self.kwargs['pk']
+		self.object = self.get_question(pk)
 
-		# Get event and question objects
-		event = get_event(kwargs['slug'])
-		question = get_all_ticket_question(event, kwargs['question_slug'])
-
-		# Set the object to the question
-		self.object = question
-
-		form = self.get_form()
-		if form.is_valid():
-			return self.form_valid(form, request, event, question)
-		else:
-			return self.form_invalid(form, question, event)
-
-
-	def form_valid(self, form, request, event, question):
-		# Get POST data
-		data = request.POST
-
-		# Get title for success message
-		title = form.cleaned_data.get("title")
-
-		# Check if delete in post data, if so set object to deleted
-		if "delete" in data:
+		print(request.POST)
+		if "delete" in request.POST:
 			self.object.deleted = True
 			self.object.save()
-			messages.warning(request, 'Question %s Deleted Successfully!' % (title))
+			HttpResponseRedirect(self.get_success_url())
 
-		# If not deleted update object
-		else:
-			form.instance.event = event
-			self.object = form.save()
-			messages.success(request, 'Question "%s" Updated Successfully!' % (title))
-		
-		valid_data = super(AllTicketQuestionUpdateView, self).form_valid(form)
-		return valid_data
-
-
-	def form_invalid(self, form, question, event):
-		print(form.errors)
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-
-	def get(self, request, *args, **kwargs):
-		
-		# Get event and question object
-		event = get_event(kwargs['slug'])
-		question = get_all_ticket_question(event, kwargs['question_slug'])
-
-		# Set object to qquestion instance 
-		self.object = question
+		one_to_one_type = self.kwargs['one_to_one_type']
+		one_to_one_id = self.kwargs['one_to_one_id']
+		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
 
 		form = self.get_form()
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
+
+		if form.is_valid():
+			return self.form_valid(form, request, one_to_one_type, one_to_one_object)
+		else:
+			return self.form_invalid(form)
 
 
+	def form_valid(self, form, request, one_to_one_type, one_to_one_object):
 
-# This view creates options for the multiple choice question type
-class AllTicketQuestionMultipleChoiceOptionCreateView(HouseAccountMixin, CreateView):
-	model = AllTicketQuestionMultipleChoiceOption
-	form_class = AllTicketQuestionMutipleChoiceOptionForm
-	template_name = "events/questions/create_option.html"
+		data = request.POST
+		print(data)
 
-	# Context Variables
-	def get_context_data(self, form, question, event, *args, **kwargs):
-		context = {}
-		house = self.get_House()
-		context["all_ticket_question"] = True
-		context["form"] = form
-		context["house"] = house
-		context["event"] = event
-		context["question"] = question
-		context["events_tab"] = True
-		context["all_ticket"] = True
-		return context
+		if form.cleaned_data['question_type'] == 'simple':
+			self.object.question_type = 'simple'
 
-	# Get success url
-	def get_success_url(self):
-		view_name = "events:questions:update_all_ticket_question"
-		return reverse(view_name, kwargs={"slug": self.kwargs['slug'], "question_slug": self.kwargs['question_slug']})
-
-
-	def form_valid(self, form, request, event, question):
-
-		# Set all ticket question to the object instance 
-		form.instance.all_ticket_question = question
-
-		# Get the option title for the success message
-		title = form.cleaned_data.get("title")
-		
-		# Save object
 		self.object = form.save()
 
-		# Success message
-		messages.success(request, 'Option "%s" Created Successfully!' % (title))
-		valid_data = super(AllTicketQuestionMultipleChoiceOptionCreateView, self).form_valid(form)
+		if one_to_one_type == 'events':
+			event_question = EventQuestion.objects.get(event=one_to_one_object, question=self.object)
+			if 'order_question' in data:
+				event_question.order_question = True
+			tickets = Ticket.objects.filter(event=one_to_one_object)
+			event_question.tickets.clear()
+			for ticket in tickets:
+				if str(ticket.id) in data:
+					event_question.tickets.add(ticket)
+			event_question.save()
+			
+
+		messages.success(request, 'Question Updated Successfully!')
+
+		valid_data = super(QuestionUpdateView, self).form_valid(form)
 		return valid_data
 
-
-	def form_invalid(self, form, question, event):
+	def form_invalid(self, form):
 		print(form.errors)
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-
-	def post(self, request, *args, **kwargs):
-
-		# Get event and question 
-		event = get_event(kwargs['slug'])
-		question = get_all_ticket_question(event, kwargs['question_slug'])
-
-		form = self.get_form()
-		if form.is_valid():
-			return self.form_valid(form, request, event, question)
-		else:
-			return self.form_invalid(form, question, event)
-
-	def get(self, request, *args, **kwargs):
-		
-		# Get event and question
-		event = get_event(kwargs['slug'])
-		question = get_all_ticket_question(event, kwargs['question_slug'])
-		
-		# Set object to none
-		self.object = None
-
-		form = self.get_form()
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-
-# This view updates the options associated with multiple choice questions
-class AllTicketQuestionMultipleChoiceOptionUpdateView(HouseAccountMixin, UpdateView):
-	model = AllTicketQuestionMultipleChoiceOption
-	form_class = AllTicketQuestionMutipleChoiceOptionForm
-	template_name = "events/questions/create_option.html"
-
-	# Context variables
-	def get_context_data(self, form, question, event, *args, **kwargs):
-		context = {}
-		house = self.get_House()
-		context["all_ticket_question"] = True
-		context["form"] = form
-		context["house"] = house
-		context["event"] = event
-		context["question"] = question
-		context["update"] = True
-		context["events_tab"] = True
-		context["all_ticket"] = True
-		return context
-
-	# Take user back to question on success
-	def get_success_url(self):
-		view_name = "events:questions:update_all_ticket_question"
-		return reverse(view_name, kwargs={"slug": self.kwargs['slug'], "question_slug": self.kwargs['question_slug']})
-
-	# Get the option from the kwargs
-	def get_option(self, event, question, option_slug):
-		try:
-			option = AllTicketQuestionMultipleChoiceOption.objects.get(all_ticket_question__event=event, all_ticket_question=question, slug=option_slug)
-		except Exception as e:
-			print(e)
-			raise Http404
-		return option
-
-	def form_valid(self, form, request, event, question):
-		# Get the post data
-		data = request.POST
-
-		# Get the title from the form for the success message
-		title = form.cleaned_data.get("title")
-
-		# Check if delete in data, if so then set option to deleted
-		if "delete" in data:
-			self.object.deleted = True
-			self.object.save()
-			messages.warning(request, 'Option "%s" Deleted Successfully!' % (title))
-
-		# If not deleted then update option
-		else:
-			form.instance.event_question = question
-			self.object = form.save()
-			messages.success(request, 'Option "%s" Updated Successfully!' % (title))
-		valid_data = super(AllTicketQuestionMultipleChoiceOptionUpdateView, self).form_valid(form)
-		return valid_data
-
-	def form_invalid(self, form, question, event):
-		print(form.errors)
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-	def post(self, request, *args, **kwargs):
-
-		# Check to make sure event slug is correct
-		event = get_event(kwargs['slug'])
-		question = get_all_ticket_question(event, kwargs['question_slug'])
-		option = self.get_option(event, question, kwargs['option_slug'])
-		
-		# Set the object to the option
-		self.object = option
-
-		form = self.get_form()
-		if form.is_valid():
-			return self.form_valid(form, request, event, question)
-		else:
-			return self.form_invalid(form, question, event)
-
-	def get(self, request, *args, **kwargs):
-		
-		# Check to make sure event slug is correct
-		event = get_event(kwargs['slug'])
-		question = get_all_ticket_question(event, kwargs['question_slug'])
-		option = self.get_option(event, question, kwargs['option_slug'])
-		
-		# set the option object
-		self.object = option
-
-		form = self.get_form()
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Event Question Create View 
-# Takes in House mixin for authentication 
-class EventQuestionCreateView(HouseAccountMixin, CreateView):
-	model = EventQuestion
-	form_class = EventQuestionBaseForm
-	template_name = "events/questions/create_question.html"
-
-	# Success URL
-	def get_success_url(self):
-
-		# If the question being created is a multiple choice question bring them back to the question page because
-		# we want them to app options right away
-		if self.kwargs['type'] == "multiple choice":
-			view_name = "events:questions:update_event_question"
-			return reverse(view_name, kwargs={"slug": self.kwargs['slug'], "question_slug": self.object.slug})
-
-		# If not multiple choice question take user back to questions view
-		else:
-			view_name = "events:questions:list_questions"
-			return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
-
-
-	# Get context data for template
-	def get_context_data(self, form, question_type, event, *args, **kwargs):
-		context = {}
-		house = self.get_House()
-		context = get_question_type(question_type, context)
-		context["event_question"] = True 
-		context["form"] = form
-		context["question_type"] = question_type
-		context["house"] = house
-		context["event"] = event
-		context["events_tab"] = True
-		return context
-
-
-	def post(self, request, *args, **kwargs):
-
-		# Get event
-		event = get_event(kwargs['slug'])
-
-		# Get the ticket type from the kwargs
-		question_type = kwargs['type']
-		
-		# CreateView mixin handles form
-		form = self.get_form()
-		if form.is_valid():
-			return self.form_valid(form, request, event, question_type)
-		else:
-			return self.form_invalid(form, question_type, event)
-
-
-	def form_valid(self, form, request, event, question_type):
-
-		# set event to question instance
-		form.instance.event = event
-
-		# get title of question for display message
-		title = form.cleaned_data.get("title")
-
-		# Set question type boolen based off of question type
-		if question_type == "simple":
-			form.instance.simple_question = True
-		elif question_type == "paragraph":
-			form.instance.paragraph_question = True
-		elif question_type == "multiple choice":
-			form.instance.multiple_choice_question = True
-		else:
-			pass
-
-		# Save object
-		self.object = form.save()
-
-		# Success Message
-		messages.success(request, 'Question "%s" Created Successfully!' % (title))
-		valid_data = super(EventQuestionCreateView, self).form_valid(form)
-		return valid_data
-
-	def form_invalid(self, form, question_type, event):
-		print(form.errors)
-		return self.render_to_response(self.get_context_data(form=form, question_type=question_type, event=event))
-
-
-	def get(self, request, *args, **kwargs):
-		
-		# Get event
-		event = get_event(kwargs['slug'])
-
-
-		# set object to None
-		self.object = None
-
-		# Get the ticket type from the kwargs
-		question_type = kwargs['type']
-		form = self.get_form()
-
-		return self.render_to_response(self.get_context_data(form=form, question_type=question_type, event=event))
-
-
-
-
-# Event Question Update View 
-# Takes in House mixin for authentication 
-class EventQuestionUpdateView(HouseAccountMixin, UpdateView):
-	
-	model = EventQuestion
-	form_class = EventQuestionBaseForm
-	template_name = "events/questions/create_question.html"
-
-	# Success url, takes user back to question list view
-	def get_success_url(self):
-		view_name = "events:questions:list_questions"
-		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
-
-
-	# Get question from event instance and slug
-	def get_question(self, event, question_slug):
-		try:
-			question = EventQuestion.objects.get(event=event, slug=question_slug)
-		except:
-			raise Http404
-		return question
-
-
-	# Get question type to display template properly
-	def get_question_type(self, question, context):
-
-		if question.simple_question:
-			context["simple"] = True
-		elif question.paragraph_question:
-			context["paragraph"] = True
-		elif question.multiple_choice_question:
-			# Get all options associated with this question
-			event_question_multiple_choice_options = EventQuestionMultipleChoiceOption.objects.filter(event_question=question, deleted=False)
-			context["event_question_multiple_choice_options"] = event_question_multiple_choice_options
-			context["multiple_choice"] = True
-		else:
-			raise Http404
-
-		return context
-
-
-	# Context Data for template
-	def get_context_data(self, form, question, event, *args, **kwargs):
-		context = {}
-		house = self.get_House()
-
-		# Get the question type and send it to the template 
-		context = self.get_question_type(question, context)
-
-		context["event_question"] = True 
-		context["form"] = form
-		context["question"] = question
-		context["house"] = house
-		context["event"] = event
-		context["events_tab"] = True
-		context["update"] = True
-		return context
-
-
-	def post(self, request, *args, **kwargs):
-		
-		data = request.POST
-
-		# Retrieve Event and question from kwargs 
-		event = get_event(kwargs['slug'])
-		question = self.get_question(event, kwargs['question_slug'])
-
-		# Set current object to question instance
-		self.object = question
-
-		# UpdateView mixin handles form
-		form = self.get_form()	
-		if form.is_valid():
-			return self.form_valid(form, request, event, question)
-		else:
-			return self.form_invalid(form, question, event)
-
-
-	def form_valid(self, form, request, event, question):
-		data = request.POST
-
-		# Get the question title, only needs for the success message
-		title = form.cleaned_data.get("title")
-
-		# Check if delete value in post data, if so delete object
-		if "delete" in data:
-			self.object.deleted = True
-			self.object.save()
-			messages.warning(request, 'Question "%s" Deleted Successfully!' % (title))
-
-		# save event instance to question, save the form, present success message
-		else:
-			form.instance.event = event
-			self.object = form.save()
-			messages.success(request, 'Question "%s" Updated Successfully!' % (title))
-		
-		valid_data = super(EventQuestionUpdateView, self).form_valid(form)
-		return valid_data
-
-
-	def form_invalid(self, form, question, event):
-		print(form.errors)
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-
-	def get(self, request, *args, **kwargs):
-		
-		# Retrieve Event and question from kwargs 
-		event = get_event(kwargs['slug'])
-		question = self.get_question(event, kwargs['question_slug'])
-
-		# Set current object to question instance
-		self.object = question
-
-		# UpdateView mixin handles form
-		form = self.get_form()
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-
-
-# Get question function for Event Multiple Choice Create View and Update view 
-def get_event_question(question_slug):
-	try:
-		question = EventQuestion.objects.get(slug=question_slug)
-	except:
-		raise Http404
-	return question
-
-
-# Event Multiple Choice Option Create View
-class EventQuestionMultipleChoiceOptionCreateView(HouseAccountMixin, CreateView):
-	model = EventQuestionMultipleChoiceOption
-	form_class = EventQuestionMutipleChoiceOptionForm
-	template_name = "events/questions/create_option.html"
-
-	def get_success_url(self):
-		view_name = "events:questions:update_event_question"
-		return reverse(view_name, kwargs={"slug": self.kwargs['slug'], "question_slug": self.kwargs['question_slug']})
-
-	def form_valid(self, form, request, event, question):
-
-		# Add event question instance to option 
-		form.instance.event_question = question
-
-		# get the title of the option from the form
-		title = form.cleaned_data.get("title")
-
-		# Save the form
-		self.object = form.save()
-
-		# Success message
-		messages.success(request, 'Option "%s" Created Successfully!' % (title))
-
-		valid_data = super(EventQuestionMultipleChoiceOptionCreateView, self).form_valid(form)
-		return valid_data
-
-	def form_invalid(self, form, question, event):
-		print(form.errors)
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-	def post(self, request, *args, **kwargs):
-
-		# Check to make sure event slug is correct
-		event = get_event(kwargs['slug'])
-
-		# Get event question
-		question = get_event_question(kwargs['question_slug'])
-
-		# Create View handles the form
-		form = self.get_form()
-		if form.is_valid():
-			return self.form_valid(form, request, event, question)
-		else:
-			return self.form_invalid(form, question, event)
-
-	def get(self, request, *args, **kwargs):
-		
-		# Get event
-		event = get_event(kwargs['slug'])
-
-		# Get event question
-		question = get_event_question(kwargs['question_slug'])
-		
-		# Set object to none because we are creating a new one
-		self.object = None
-
-		# Form handled by create view
-		form = self.get_form()
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-
-
-# Event Question Multiple Choice Option Update View 
-class EventQuestionMultipleChoiceOptionUpdateView(HouseAccountMixin, CreateView):
-	model = EventQuestionMultipleChoiceOption
-	form_class = EventQuestionMutipleChoiceOptionForm
-	template_name = "events/questions/create_option.html"
-
-	# Context data
-	def get_context_data(self, form, question, event, *args, **kwargs):
-		context = {}
-		house = self.get_House()
-
-		context["event_question"] = True 
-		context["form"] = form
-		context["house"] = house
-		context["event"] = event
-		context["question"] = question
-		context["update"] = True
-		context["events_tab"] = True
-		return context
-
-	def get_success_url(self):
-		view_name = "events:questions:update_event_question"
-		return reverse(view_name, kwargs={"slug": self.kwargs['slug'], "question_slug": self.kwargs['question_slug']})
-
-	# Get the option object to update
-	def get_option(self, option_slug):
-		try:
-			option = EventQuestionMultipleChoiceOption.objects.get(slug=option_slug)
-		except:
-			raise Http404
-		return option
-
-	def form_valid(self, form, request, event, question):
-
-		# Get the POST data
-		data = request.POST
-
-		# Get title of option from form data for success message
-		title = form.cleaned_data.get("title")
-
-		# Check if delete in data and if so then delete the option
-		if "delete" in data:
-			self.object.deleted = True
-			self.object.save()
-			messages.warning(request, 'Option "%s" Deleted Successfully!' % (title))
-
-		# If not delete save updated option
-		else:
-			form.instance.event_question = question
-			self.object = form.save()
-			messages.success(request, 'Option "%s" Updated Successfully!' % (title))
-
-		valid_data = super(EventQuestionMultipleChoiceOptionUpdateView, self).form_valid(form)
-		return valid_data
-
-	def form_invalid(self, form, question, event):
-		print(form.errors)
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-	def post(self, request, *args, **kwargs):
-
-		# get event and question object
-		event = get_event(kwargs['slug'])
-		question = get_event_question(kwargs['question_slug'])
-
-		# Get option object
-		option = self.get_option(kwargs['option_slug'])
-
-		# Set the option object 
-		self.object = option
-
-		# Form handled by update view 
-		form = self.get_form()
-		if form.is_valid():
-			return self.form_valid(form, request, event, question)
-		else:
-			return self.form_invalid(form, question, event)
-
-	def get(self, request, *args, **kwargs):
-
-		event = get_event(kwargs['slug'])
-		question = get_event_question(kwargs['question_slug'])
-
-		# Get option object
-		option = self.get_option(kwargs['option_slug'])
-		self.object = option
-
-		# Get the ticket type from the kwargs
-		form = self.get_form()
-
-		return self.render_to_response(self.get_context_data(form=form, question=question, event=event))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		return self.render_to_response(self.get_context_data(form=form))
 
 
 

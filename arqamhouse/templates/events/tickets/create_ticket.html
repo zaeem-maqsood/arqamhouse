@@ -31,96 +31,43 @@
 
 <script type="text/javascript">
 
-function updateCountdown() {
-    // 140 is the max message length
-    var remaining = 100 - jQuery('.message').val().length;
-    jQuery('.countdown').text(remaining + ' characters remaining.');
-}
 
 jQuery(document).ready(function($) {
-    updateCountdown();
-
-    $('.message').change(updateCountdown);
-    $('.message').keyup(updateCountdown);
     calculateBuyerTicketCostAndOrganizerTicketValue()
-
-
 });
 
 
-$('#id_sale_start').datetimepicker({
-    format: 'mm/dd/yyyy HH:ii P',
-    todayBtn: true,
-    
-    pickerPosition: 'bottom-right',
-    showMeridian: true
-});
 
-
-$('#id_sale_end').datetimepicker({
-    format: 'mm/dd/yyyy HH:ii P',
-    todayBtn: true,
-    
-    pickerPosition: 'bottom-right',
-    showMeridian: true
-});
-
-
-$('#id_sale_price').keyup(function() {
-  
-  // If value is not empty
-  if ($(this).val().length == 0) {
-    // Hide the element
-    $('.show_hide').hide();
-  } else {
-    // Otherwise show it
-    $('.show_hide').show();
-  }
-}).keyup();
 
 
 function calculateBuyerTicketCostAndOrganizerTicketValue() {
 	var price = 0.00;
-	var sale_price = 0.00;
 	var new_price = 0.00;
 	var buyer_ticket_cost = 0.00;
 	var organizer_ticket_value = 0.00;
 
-	// Get the price and sale price elements
-	sale_price = document.getElementById("id_sale_price");
+	// Get the price elements
 	price = document.getElementById("id_price");
 
-
-	// Check and see if sale price elements value is not null 
-	if (sale_price != null) {
-		sale_price = sale_price.value;
-	}
 
 	// Check and see if price element value is not null
 	if (price != null) {
 		price = price.value;
 	}
 
-
-	// Check and see if there is a sale price or if it is null
-	// use the regular price 
-	if (sale_price) {
-		new_price = parseFloat(sale_price);
-		document.getElementById("id_sale_start").required = true; // $('#id_sale_start')
-		document.getElementById("id_sale_end").required = true;
-	} else {
+	if (price) {
 		new_price = parseFloat(price);
-		document.getElementById("id_sale_start").required = false;
-		document.getElementById("id_sale_end").required = false;
 	}
+
+	// use the regular price 
 
 	// Check the value of the "pass fee" checkbox
 	if (document.getElementById('id_pass_fee').checked) {
-        buyer_ticket_cost = (new_price + (new_price * 0.05) + 0.30);
+        buyer_ticket_cost = (new_price + (new_price * 0.04) + 0.30);
         organizer_ticket_value = new_price;
     } else {
         buyer_ticket_cost = new_price;
-        organizer_ticket_value = (new_price - (new_price * 0.05) - 0.30);
+        organizer_ticket_value = (new_price - (new_price * 0.04) - 0.30);
     }
 
     // Convert to 2 decimal places
@@ -157,10 +104,6 @@ $('#id_price').bind('input', function() {
 	calculateBuyerTicketCostAndOrganizerTicketValue()
 });
 
-$('#id_sale_price').bind('input', function() {
-	calculateBuyerTicketCostAndOrganizerTicketValue()
-});
-
 
 
 </script>
@@ -179,12 +122,16 @@ $('#id_sale_price').bind('input', function() {
 {% endblock page_crumbs %}
 
 {% block content %}
-
+<style>
+.dashboard-links {
+	color: #7396b0;
+}
+</style>
 
 
 <form method="POST" enctype="multipart/form-data">{% csrf_token %}
 	<div class="row">
-		<div class="col-8">
+		<div class="col-6">
 			<div class="kt-portlet kt-portlet--mobile">
 				<div class="kt-portlet__body">
 
@@ -202,9 +149,9 @@ $('#id_sale_price').bind('input', function() {
 					</div>
 					{% endif %}
 
-					<div class="row" style="padding-bottom: 30px;">
+					<div class="row" {% if not donation_ticket %}style="padding-bottom: 20px;"{% endif %}>
 						<div class="col-md-12">
-							<h5 {% if form.title.errors %}style="color:red;"{% endif %}>Ticket Title <i class="fas fa-asterisk" style="color: red;"></i></h5>
+							<p style="font-weight: 600;margin-bottom:0px;{% if form.title.errors %}color:red;{% endif %}">Title</p>
 							{{ form.title }}
 							<br>
 							{% for error in form.title.errors %}
@@ -215,10 +162,35 @@ $('#id_sale_price').bind('input', function() {
 						</div>
 					</div>
 
+					<div class="row" {% if not donation_ticket %}style="padding-bottom: 40px;"{% endif %}>
+						<div class="col-md-12">
+							<p style="font-weight: 600;margin-bottom:0px;{% if form.description.errors %}color:red;{% endif %}">Description</p>
+							{{ form.description }}
+							<br>
+							{% for error in form.description.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+									{{ error }}
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+
+
 					{% if paid_ticket %}
-					<div class="row" style="padding-bottom: 30px;">
+					<div class="row" style="padding-bottom: 10px;">
 						<div class="col-md-6">
-							<h5 {% if form.price.errors %}style="color:red;"{% endif %}>Price <i class="fas fa-asterisk" style="color: red;"></i></h5>
+							<h3 class="m--font-info" id="new_price_div">$0.00</h3>
+							<p>Buyer Price</p>
+						</div>
+						<div class="col-md-6">
+							<h3 class="m--font-success" id="amount_received_div">$0.00</h3>
+							<p>Your Payout</p>
+						</div>
+					</div>
+
+					<div class="row" style="padding-bottom: 10px;">
+						<div class="col-md-12">
+							<p style="font-weight: 600;margin-bottom:0px;{% if form.price.errors %}color:red;{% endif %}">Price</p>
 							{{ form.price }}
 							<br>
 							{% for error in form.price.errors %}
@@ -227,76 +199,28 @@ $('#id_sale_price').bind('input', function() {
 								</div>
 							{% endfor %}
 						</div>
-						<div class="col-md-6">
-							<h5 {% if form.sale_price.errors %}style="color:red;"{% endif %}>Sale Price</h5>
-							{{ form.sale_price }}
-							<br>
-							{% for error in form.sale_price.errors %}
-								<div class="alert m-alert--outline alert-danger" role="alert">
-									{{ error }}
-								</div>
-							{% endfor %}
-						</div>
 					</div>
 
-					<div class="row show_hide" style="padding-bottom: 30px;">
-						<div class="col-md-6">
-							<h5 {% if form.sale_start.errors %}style="color:red;"{% endif %}>Sale Start <i class="fas fa-asterisk" style="color: red;"></i></h5>
-							{{ form.sale_start }}
-							<br>
-							{% for error in form.sale_start.errors %}
-								<div class="alert m-alert--outline alert-danger" role="alert">
-										{{ error }}
-								</div>
-							{% endfor %}
-						</div>
-						<div class="col-md-6">
-							<h5 {% if form.sale_end.errors %}style="color:red;"{% endif %}>Sale End <i class="fas fa-asterisk" style="color: red;"></i></h5>
-							{{ form.sale_end }}
-							<br>
-							{% for error in form.sale_end.errors %}
-								<div class="alert m-alert--outline alert-danger" role="alert">
-										{{ error }}
-								</div>
-							{% endfor %}
-						</div>
-					</div>
-
-					<div class="row text-center" style="padding-bottom: 50px;">
-						<div class="col-md-6">
-							<h1 class="m--font-info" id="new_price_div" style="font-size: 4.5em;">$0.00</h1>
-							<p>Ticket Price Shown To Buyer</p>
-						</div>
-						<div class="col-md-6">
-							<h1 class="m--font-success" id="amount_received_div" style="font-size: 4.5em;">$0.00</h1>
-							<p>Amount You Will Receive</p>
-						</div>
-					</div>
-
-					<div class="row text-center justify-content-center" style="padding-bottom: 50px;">
+					<div class="row" style="padding-bottom: 50px;">
 						<div class="col-md-12">
-							<h5>Platform Fee</h5>
-							<div class="row">
-								<div class="col-md-3 mx-auto">
-									<span class="kt-switch kt-switch--icon mx-auto" style="user-select: auto;">
-										<label style="user-select: auto;">
-											{{ form.pass_fee }}
-											<span style="user-select: auto;"></span>
-										</label>
-									</span>
-								</div>
-							</div>
-							<br>
-							<p>Pass Fee onto buyer (on) absorb fee (off). <br>The Arqam Platform fee + Credit Card Processing Fee is %{{ platform_fee }} of the ticket price plus a ${{ platform_base_fee }} base fee for each ticket sold.</p>
+							<span class="kt-switch kt-switch--icon mx-auto" style="user-select: auto;">
+								<p style="font-weight: 600;margin-bottom:0px;">Pass Fee</p>
+								<label style="user-select: auto;">
+									{{ form.pass_fee }}
+									<span style="user-select: auto;"></span>
+								</label>
+							</span>
 						</div>
 					</div>
+
+					
 					{% endif %}
 
 
 					{% if not donation_ticket %}
-			        <div class="row" style="padding-bottom: 30px;">
-						<div class="col-md-4">
-							<h5>Min Amount</h5>
+			        <div class="row" style="padding-bottom: 10px;">
+						<div class="col-md-6">
+							<p style="font-weight: 600;margin-bottom:0px;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="The minimum amount of tickets the buyer must purchase per order. Leave blank for default.">Min Amount</p>
 							{{ form.min_amount }}
 							<br>
 							{% for error in form.min_amount.errors %}
@@ -305,8 +229,8 @@ $('#id_sale_price').bind('input', function() {
 								</div>
 							{% endfor %}
 						</div>
-						<div class="col-md-4">
-							<h5>Max Amount</h5>
+						<div class="col-md-6">
+							<p style="font-weight: 600;margin-bottom:0px;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="The maximum amount of tickets the buyer is able to purchase per order. Leave blank for default.">Max Amount</p>
 							{{ form.max_amount }}
 							<br>
 							{% for error in form.max_amount.errors %}
@@ -315,34 +239,22 @@ $('#id_sale_price').bind('input', function() {
 								</div>
 							{% endfor %}
 						</div>
-						<div class="col-md-4">
-							<h5>Amount Available</h5>
+					</div>
+
+					<div class="row" style="padding-bottom: 50px;">
+						<div class="col-md-6">
+							<p style="font-weight: 600;margin-bottom:0px;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Total number of tickets available for this ticket. Leave blank if unlimited.">Amount Available</p>
 							{{ form.amount_available }}
-							<br>
 							{% for error in form.amount_available.errors %}
 								<div class="alert m-alert--outline alert-danger" role="alert">
 									{{ error }}
 								</div>
 							{% endfor %}
-							{% if button_text == "Update Ticket" %}
-								<p>You have sold {{ form.instance.amount_sold }} ticket so far.</p>
-							{% endif %}
 						</div>
 					</div>
 					{% endif %}
 
-					<div class="row">
-						<div class="col-md-12">
-							<h5 {% if form.description.errors %}style="color:red;"{% endif %}>Description</h5>
-							{{ form.description }}
-							<br>
-							{% for error in form.description.errors %}
-								<div class="alert m-alert--outline alert-danger" role="alert">
-										{{ error }}
-								</div>
-							{% endfor %}
-						</div>
-					</div>
+					
 
 
 					<div class="row">
@@ -362,6 +274,33 @@ $('#id_sale_price').bind('input', function() {
 
 
 
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-2 col-md-4 col-6">
+			<div class="kt-portlet kt-portlet--mobile">
+				<div class="kt-portlet__body">
+					<div class="row text-center">
+						<div class="col-12">
+							<a class="dashboard-links" href="{{ event.list_attendees_view }}">
+								<h1>{{ form.instance.amount_sold }}</h1>
+								<p>Ticket{% if form.instance.amount_sold > 1 %}s{% endif %} Sold</p>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+	
+			<div class="kt-portlet kt-portlet--mobile">
+				<div class="kt-portlet__body">
+					<div class="row text-center">
+						<div class="col-12">
+							<a class="dashboard-links" href="{{ event.list_tickets_view }}">
+								<i class="la la-ticket" style="font-size:3em;"></i>
+								<p style="padding-top: 10px;">Tickets</p>
+							</a>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

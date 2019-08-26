@@ -1,0 +1,120 @@
+{% extends "backend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Orders | {{ event.title }}
+{% endblock title %}
+
+{% block page_title %}
+Orders
+{% endblock page_title %}
+
+{% block styles %}
+
+{% endblock styles %}
+
+
+{% block scripts %}
+<script>
+
+function ChangeText(object) {
+    text = object.value
+    // text = text.replace(/\s/g, '&nbsp;');
+    var stripped = text.replace(/<\/?[^>]+(>|$)/g, "");
+    $('#message').html(stripped);
+}
+
+</script>
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item">
+		<a href="{{ profile.get_update_url }}" class="m-nav__link">
+			<span class="m-nav__link-text">{{ orders.count }} Order{% if orders.count > 1 %}s{% endif %} for "{{ event.title }}"</span>
+		</a>
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+<style>
+.dashboard-links {
+	color: #7396b0;
+}
+</style>
+<div class="row">
+	<div class="col-lg-4 col-md-4">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+				<div class="row" style="padding-bottom:30px;">
+					<div class="col-12">
+                        <p class="lead">Email Message</p>
+                        {{ form.message }}
+					</div>
+				</div>
+				
+			</div>
+					
+		</div>
+	</div>
+
+	<div class="col-lg-6 col-md-6 col-6">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+                
+                <div class="row text-center" style="padding-bottom: 30px;">
+					<div class="col-12">
+                        <img src="{% static 'images/logo.png' %}" style="max-height: 5em;">
+					</div>
+                </div>
+                
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-12">
+                        <p>Congratulations! You've got your tickets and are all ready for <span style="font-weight: 400;">{{ event.title }}</span>.</p>
+                        <p>Your tickets are attached to this email.</p>
+                    </div>
+                </div>
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-12">
+                        <h4 style="font-weight: 200;">When</h4>
+                        <p><span style="font-weight: 400;">{{ event.start }}</span> to <span style="font-weight: 400;">{{ event.end }}</span></p>
+                        <br>
+                        <h4 style="font-weight: 200;">Where</h4>
+                        <p style="margin-bottom:5px;"><span style="font-weight: 400;">{{ event.venue_name }}</span></p>
+                        <p>Located at <span style="font-weight: 400;">{{ event.venue_address }}</span></p>
+                    </div>
+                </div>
+
+                <div class="row text-center" style="padding-bottom: 30px;">
+                    <div class="col-12">
+                        <p style="font-weight: 400;">Message from the organizer</p>
+                        <hr>
+                        <p style="white-space: pre-wrap;" id="message"></p>
+                    </div>
+                </div>
+
+			</div>
+		</div>
+	</div>
+
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

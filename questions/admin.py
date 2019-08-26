@@ -1,11 +1,8 @@
 from django.contrib import admin
 
-
-from .models import EventQuestion, AllTicketQuestionControl, TicketQuestion, EventQuestionMultipleChoiceOption
+from questions.models import Question, MultipleChoice
 
 # Register your models here.
-admin.site.register(EventQuestion)
-admin.site.register(EventQuestionMultipleChoiceOption)
-admin.site.register(AllTicketQuestionControl)
-admin.site.register(TicketQuestion)
+admin.site.register(Question)
+admin.site.register(MultipleChoice)
 

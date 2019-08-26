@@ -42,13 +42,9 @@ INSTALLED_APPS = [
     'cities_light',
     'houses',
     'profiles',
-    'payouts',
+    'payments',
     'events',
     'questions',
-    'carts',
-    'orders',
-    'attendees',
-    'answers',
     'descriptions',
 ]
 
@@ -202,7 +198,7 @@ AUTHENTICATION_BACKENDS = (
 
 STRIPE_FEE = 2.9
 STRIPE_BASE_FEE = 0.30
-PLATFORM_FEE = 5
+PLATFORM_FEE = 4.0
 PLATFORM_BASE_FEE = 0.30
 
 

@@ -117,9 +117,9 @@ $('#id_end').datetimepicker({
 							</div>
 							{% endif %}
 
-							<div class="row" style="padding-bottom: 30px;">
+							<div class="row" style="padding-bottom: 40px;">
 								<div class="col-md-12">
-									<h5 {% if form.title.errors %}style="color:red;"{% endif %}>Event Title <i class="fas fa-asterisk" style="color: red;font-size: 0.6em;vertical-align: top;"></i></h5>
+									<p style="font-weight: 600;margin-bottom:0px;{% if form.title.errors %}color:red;{% endif %}">Event Title</p>
 									{{ form.title }}
 									{% for error in form.title.errors %}
 										<div class="alert m-alert--outline alert-danger" role="alert">
@@ -129,9 +129,9 @@ $('#id_end').datetimepicker({
 								</div>
 							</div>
 
-							<div class="row" style="padding-bottom: 30px;">
+							<div class="row" style="padding-bottom: 40px;">
 								<div class="col-md-12">
-									<h5 {% if form.url.errors %}style="color:red;"{% endif %}>Event URL <span class="m-nav__link-text" style="font-weight: 200;font-size: 0.7em;vertical-align: middle;">| arqamhouse.com/events/<span id="output">{% if update_event_tab %}{{ event.slug }}{% else %}new-event{% endif %}</span></span></h5>
+									<p style="font-weight: 600;margin-bottom:0px;{% if form.url.errors %}color:red;{% endif %}">Event URL <span class="m-nav__link-text" style="font-weight: 200;font-size: 0.7em;vertical-align: middle;">| arqamhouse.com/events/<span id="output">{% if update_event_tab %}{{ event.slug }}{% else %}new-event{% endif %}</span></span></p>
 									{{ form.url }}
 									{% for error in form.url.errors %}
 										<div class="alert m-alert--outline alert-danger" role="alert">
@@ -141,9 +141,9 @@ $('#id_end').datetimepicker({
 								</div>
 							</div>
 
-							<div class="row" style="padding-bottom: 30px;">
+							<div class="row" style="padding-bottom: 40px;">
 								<div class="col-md-6">
-									<h5 {% if form.start.errors %}style="color:red;"{% endif %}>Start <i class="fas fa-asterisk" style="color: red;font-size: 0.6em;vertical-align: top;"></i></h5>
+									<p style="font-weight: 600;margin-bottom:0px;{% if form.start.errors %}color:red;{% endif %}">Start</p>
 									{{ form.start }}
 									<br>
 									{% for error in form.start.errors %}
@@ -153,7 +153,7 @@ $('#id_end').datetimepicker({
 									{% endfor %}
 								</div>
 								<div class="col-md-6">
-									<h5 {% if form.end.errors %}style="color:red;"{% endif %}>End <i class="fas fa-asterisk" style="color: red;font-size: 0.6em;vertical-align: top;"></i></h5>
+									<p style="font-weight: 600;margin-bottom:0px;{% if form.end.errors %}color:red;{% endif %}">End</p>
 									{{ form.end }}
 									<br>
 									{% for error in form.end.errors %}
@@ -166,7 +166,7 @@ $('#id_end').datetimepicker({
 
 							<div class="row" style="padding-bottom: 50px;">
 								<div class="col-md-6">
-									<h5 {% if form.venue_name.errors %}style="color:red;"{% endif %}>Venue Name</h5>
+									<p style="font-weight: 600;margin-bottom:0px;{% if form.venue_name.errors %}color:red;{% endif %}">Venue Name</p>
 									{{ form.venue_name }}
 									{% for error in form.venue_name.errors %}
 										<div class="alert m-alert--outline alert-danger" role="alert">
@@ -175,7 +175,7 @@ $('#id_end').datetimepicker({
 									{% endfor %}
 								</div>
 								<div class="col-md-6">
-									<h5 {% if form.venue_address.errors %}style="color:red;"{% endif %}>Venue Address</h5>
+									<p style="font-weight: 600;margin-bottom:0px;{% if form.venue_address.errors %}color:red;{% endif %}">Venue Address</p>
 									{{ form.venue_address }}
 									{% for error in form.venue_address.errors %}
 										<div class="alert m-alert--outline alert-danger" role="alert">
@@ -187,7 +187,7 @@ $('#id_end').datetimepicker({
 
 							<div class="row" style="padding-bottom: 30px;">
 								<div class="col-md-12">
-									<h5 {% if form.short_description.errors %}style="color:red;"{% endif %}>Short Description</h5>
+									<p style="font-weight: 600;margin-bottom:0px;{% if form.short_description.errors %}color:red;{% endif %}">Short Description</p>
 									{{ form.short_description }}
 									<br>
 									{% for error in form.short_description.errors %}
@@ -200,7 +200,7 @@ $('#id_end').datetimepicker({
 
 							<div class="row" style="padding-bottom: 50px;">
 								<div class="col-md-6">
-									<h5 {% if form.image.errors %}style="color:red;"{% endif %}>Event Image</h5>
+									<p style="font-weight: 600;margin-bottom:0px;{% if form.image.errors %}color:red;{% endif %}">Event Image</p>
 									{{ form.image }}
 									<br>
 									{% for error in form.image.errors %}

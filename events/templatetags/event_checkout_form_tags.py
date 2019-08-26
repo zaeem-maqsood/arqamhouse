@@ -1,6 +1,5 @@
 from django import template
-from carts.models import EventCart, EventCartItem
-from questions.models import EventQuestion, AllTicketQuestionControl, TicketQuestion
+from events.models import EventQuestion, EventCart, EventCartItem
 from django.http import HttpResponse
 from django.utils.html import escape, mark_safe
 
@@ -29,7 +28,7 @@ def create_errors_string(field):
 	for error in field.errors:
 		sub_error_string = """
 							<div class="col-md-12">
-						        <div class="alert bg--error">
+								<div class="alert bg--error">
 									<div class="alert__body">
 										Oh snap! The field "%s" has errors. %s
 									</div>

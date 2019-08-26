@@ -1,8 +1,0 @@
-{% for attendee in attendees %}
-<tr>
-    <td><a href="{{ attendee.order.get_order_view }}" class="btn btn-primary btn-wide">Order</a></td>
-    <td><a href="{{ attendee.get_attendee_view }}" class="btn btn-primary btn-wide">Details</a></td>
-    <td>{{ attendee.name }}</td>
-    <td>{{ attendee.ticket.title }}</td>
-</tr>
-{% endfor %}

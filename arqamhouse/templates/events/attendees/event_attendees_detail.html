@@ -1,0 +1,250 @@
+{% extends "backend/base.html" %}
+{% load attendee_form_tags %}
+{% load static %}
+
+{% block title %}
+Attendee | {{ attendee.name }}
+{% endblock title %}
+
+{% block page_title %}
+<a style="text-decoration: none;font-size: 0.7em;color: #4499d5;" href="{{ event.list_attendees_view }}"><i style="font-size: 1em;" class="fas fa-long-arrow-alt-left"></i> Back To Attendees</a>
+{% endblock page_title %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+<!--begin::Page Resources --> 
+
+<!--end::Page Resources -->
+{% endblock scripts %}
+
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item">
+		
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+<style>
+.dashboard-links {
+	color: #7396b0;
+}
+</style>
+<div class="row">
+	<div class="col-md-8">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+				<div class="row" style="padding-bottom:40px;">
+					<div class="col-md-12">
+						<h4>Attendee Details</h4>
+						<p><a href="{{ attendee.order.get_order_view }}">Order ID |<span style="font-weight: 600"> {{ attendee.order.transaction.payment_id }}</span></a></p>
+						<p>Name | <span style="font-weight: 600">{{ attendee.name }}</span></p>
+						<p>Ticket | <span style="font-weight: 600">{{ attendee.ticket.title }}</span></p>
+						{% if attendee.email %}
+						<p>Email | <span style="font-weight: 600">{{ attendee.email }}</span></p>
+						{% endif %}
+						{% if attendee.gender %}
+						<p>Gender | <span style="font-weight: 600">{{ attendee.gender }}</span></p>
+						{% endif %}
+						{% if attendee.age %}
+						<p>Age | <span style="font-weight: 600">{{ attendee.age }}</span></p>
+						{% endif %}
+						{% if attendee.note %}
+						<p>Note | <span style="font-weight: 600">{{ attendee.note }}</span></p>
+						{% endif %}
+
+						{% if answers %}
+							{% for answer in answers %}
+							<p style="margin-bottom: 0px;font-weight: 600;">Q | {{ answer.question }}</p>
+							<p>A | {{ answer.value }}</p>
+							{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+
+
+
+				<form method="POST">{% csrf_token %}
+				<div class="row">
+					<div class="col-md-12">
+						<h4>Edit Attendee</h4>
+					</div>
+				</div>
+
+				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
+					<div class="col-md-12">
+						<p style="margin-bottom: 4px;">Name</p>
+						<input pattern="[a-zA-Z ]*" title="No numbers please" maxlength="100" class="form-control" type="text" name="name" id="name" size="30" required placeholder="Full Name" value="{{ attendee.name }}">
+					</div>
+				</div>
+
+				{% if attendee_common_questions.email %}
+				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
+					<div class="col-md-12">
+						<p style="margin-bottom: 4px;">Email</p>
+						<input class="form-control" maxlength="150" type="email" name="email" id="email" size="30" required placeholder="email@address.com" value="{{ attendee.email }}">
+					</div>
+				</div>
+				{% endif %}
+
+				{% if attendee_common_questions.gender %}
+				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
+					<div class="col-md-12">
+						<p style="margin-bottom: 4px;">Gender</p>
+						<select id="gender" name="gender" class="form-control m-input">
+							{% if not attendee_common_questions.gender_required %}
+							<option value="None">------</option>
+							{% endif %}
+							<option {% if attendee.gender == 'female' %}selected{% endif %} value="female">Female</option>
+							<option {% if attendee.gender == 'male' %}selected{% endif %} value="male">Male</option>
+						</select>
+					</div>
+				</div>
+				{% endif %}
+
+				{% if attendee_common_questions.age %}
+				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
+					<div class="col-md-12">
+						<p style="margin-bottom: 4px;">Age</p>
+						<input class="form-control m-input" name="age" value="{{ attendee.age }}" id="age" type="number" min="0" max="100" {% if attendee_common_questions.age_required %}required{% endif %}>
+					</div>
+				</div>
+				{% endif %}
+
+				{% if attendee_common_questions.note %}
+				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
+					<div class="col-md-12">
+						<p style="margin-bottom: 4px;">Note</p>
+						<textarea name="note" id="note" placeholder="You can write additional notes or concerns about this attendee here." class="form-control m-input" rows="3" style="user-select: auto;" {% if attendee_common_questions.notes_required %}required{% endif %}>{{ attendee.note }}</textarea>
+					</div>
+				</div>
+				{% endif %}
+
+				{% if answers %}
+				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
+					<div class="col-md-12">
+						<hr>
+						{% for answer in answers %}
+							<div class="row" style="padding-top:10px;padding-bottom: 10px;">
+								<div class="col-md-12">
+									<p style="margin-bottom: 4px;">{{ answer.question.question.title }}</p>
+									{% if answer.question.question.question_type == 'Long' %}
+									<textarea maxlength="300" name="{{ answer.question.pk }}_{{ answer.attendee.id }}" id="{{ answer.question.pk }}_{{ answer.attendee.id }}" class="form-control m-input" rows="3" style="user-select: auto;" {% if answer.question.question.required %}required{% endif %}>{{ answer.value }}</textarea>
+									{% elif answer.question.question.question_type == 'Multiple Choice' %}
+									<select name="{{ answer.question.pk }}_{{ answer.attendee.id }}" id="{{ answer.question.pk }}_{{ answer.attendee.id }}" class="form-control m-input">
+										{% if not answer.question.question.required %}
+										<option value="None">------</option>
+										{% endif %}
+										{% for option in answer.question.question.multiplechoice_set.all %}
+										<option {% if option.title == answer.value %}selected{% endif %} value="{{ option.title }}">{{ option.title }}</option>
+										{% endfor %}
+									</select>
+									{% else %}
+									<input maxlength="300" name="{{ answer.question.pk }}_{{ answer.attendee.id }}" value="{{ answer.value}}" class="form-control m-input" type="text" id="{{ answer.question }}_{{ answer.attendee }}" size="30" {% if answer.question.question.required %}required{% endif %} placeholder="{{ answer.question.question.help_text }}">
+									{% endif %}
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+				{% endif %}
+
+				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
+					<div class="col-md-12">
+						<button type="submit" class="btn btn-block btn-primary">Save</button>
+					</div>
+				</div>
+				</form>
+
+
+			</div>
+		</div>
+	</div>	
+
+
+	<div class="col-12 col-lg-2">
+
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+				<div class="row text-center" style="padding-bottom: 40px;padding-top:40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_attendees_view }}">
+							<i class="la la-users" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Attendees</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_orders_view }}">
+							<i class="la la-list" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Orders</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
+							<i class="la la-check-square" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Answers</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_questions_view }}">
+							<i class="la la-question-circle" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Questions</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.get_email_confirmation_view }}">
+							<i class="la la-envelope" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Email</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
+							<i class="la la-ticket" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Tickets</p>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

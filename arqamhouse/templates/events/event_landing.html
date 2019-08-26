@@ -1,18 +1,12 @@
 {% extends "frontend/base.html" %}
+{% load static %}
 
 {% block title %}
 Create House
 {% endblock title %}
 
-{% block navigation %}
-	{% include "frontend/navigation.html" %}
-{% endblock navigation %}
-
-{% block footer %}
-	{% include "frontend/footer.html" %}
-{% endblock footer %}
-
 {% block styles %}
+
 {% endblock styles %}
 
 {% block top_page_scripts %}
@@ -31,7 +25,7 @@ Create House
             	{% for message in messages %}
                 <div class="alert bg--{{ message.tags }}">
 					<div class="alert__body">
-						<span>{{ message.tags|upper }}: {{ message }}</span>
+						<span>{{ message.tags|upper }}! {{ message }}</span>
 					</div>
 					<div class="alert__close"> × </div>
 				</div>
@@ -44,45 +38,18 @@ Create House
 </section>
 {% endif %}
 
+<style>
+.btn--primary, .btn--primary:visited {
+    background: #4498d4;
+    border-color: #4498d4;
+}
+</style>
+
 {% if event.image %}
     {% include "events/sections/title_and_image.html" with event=event %}
 {% else %}
     {% include "events/sections/only_title.html" with event=event %}
 {% endif %}
-
-
-{% include "events/sections/external_links.html" with event=event %}
-
-
-<section>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-
-            {% for description_element in description_elements %}
-                
-                {% if description_element.h1title %}
-                     <h1>{{ description_element.h1title.title }}</h1>
-                {% endif %}
-
-                {% if description_element.h2title %}
-                    <h2>{{ description_element.h2title.title }}</h2>
-                {% endif %}
-
-                {% if description_element.h3title %}
-                    <h3>{{ description_element.h3title.title }}</h3>
-                {% endif %}
-
-                {% if description_element.paragraph %}
-                    <p>{{ description_element.paragraph.text }}</p>
-                {% endif %}
-
-            {% endfor %}
-
-        </div>
-    </div>
-</section>
-
 
 {% endblock content %}
 

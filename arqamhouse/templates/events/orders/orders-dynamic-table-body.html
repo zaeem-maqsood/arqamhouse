@@ -1,0 +1,8 @@
+{% for order in orders %}
+<tr>
+    <td><a href="{{ order.get_order_view }}">{{ order.name }}</a></td>
+    <td>$ {% if order.transaction.amount %}{{ order.transaction.amount }}{% else %}0.00{% endif %}</td>
+    <td>{{ order.attendee_set.all.count }}</td>
+    <td>{% if order.failed %}<i style="font-size:1.5em;color:#e37f7f;" class="far fa-times-circle"></i>{% else %}<i style="font-size:1.5em;color:#62c262;" class="far fa-check-circle"></i>{% endif %}</td>
+</tr>
+{% endfor %}

@@ -1,0 +1,6 @@
+{% for attendee in attendees %}
+<tr>
+    <td>{{ attendee.name }}</td>
+    <td>{{ attendee.ticket.title }}</td>
+</tr>
+{% endfor %}

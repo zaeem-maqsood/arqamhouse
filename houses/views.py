@@ -30,10 +30,7 @@ from profiles.models import Profile
 from .models import House, HouseUser
 from .forms import HouseForm, ConnectIndividualVerificationForm, ConnectCompanyVerificationForm
 
-from events.models import Event, Ticket
-from orders.models import Order
-from attendees.models import Attendee
-from carts.models import EventCart, EventCartItem
+from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
 from profiles.models import Profile
 
 
@@ -49,15 +46,16 @@ class DashboardView(HouseAccountMixin, DetailView):
 
 	def get_attendees(self, house):
 		now = datetime.today()
-		fifteen_days_earlier = now - timedelta(days=15)
-		attendees = Attendee.objects.filter(order__event__house=house, order__created_at__range=(fifteen_days_earlier, now)).select_related("order", "ticket", "order__event").prefetch_related("order", "ticket", "order__event")
+		ten_days_earlier = now - timedelta(days=10)
+		attendees = Attendee.objects.filter(order__event__house=house, order__created_at__range=(ten_days_earlier, now)).select_related("order", "ticket", "order__event").prefetch_related("order", "ticket", "order__event")
 		return attendees
 
 	def get_10_day_orders(self, house):
 		data = {}
 		today = datetime.today()
 		ten_days_earlier = today - timedelta(days=10)
-		all_orders = Order.objects.filter(house=house ,created_at__lte=today, created_at__gte=ten_days_earlier)
+
+		all_orders = EventOrder.objects.filter(event__house=house ,created_at__lte=today, created_at__gte=ten_days_earlier)
 		data_sales = []
 		data_days = []
 		use_large_scale = False
@@ -91,14 +89,14 @@ class DashboardView(HouseAccountMixin, DetailView):
 		house = self.get_house()
 		events = self.get_events()
 		profile = self.get_profile()
-		context["House"] = House
+		context["house"] = house
 		context["dashboard_events"] = events
 		context["profile"] = profile
 		# ------------- House Mixin Context Variables 
 
 		attendees = self.get_attendees(house)
 		context["attendees"] = attendees[:5]
-		context["data"] = self.get_10_day_orders(house)
+		# context["data"] = self.get_10_day_orders(house)
 		context["dashboard_tab"] = True
 		return render(request, self.template_name, context)
 

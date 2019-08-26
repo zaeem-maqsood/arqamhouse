@@ -1,0 +1,17 @@
+{% if order.brand == "MasterCard" %}
+	<i style="font-size: 1.5em;" class="fab fa-cc-mastercard"></i>
+{% elif order.brand == "Visa" %}
+	<i style="font-size: 1.5em;" class="fab fa-cc-visa"></i>
+{% elif order.brand == "American Express" %}
+	<i class="fab fa-cc-amex"></i>
+{% elif order.brand == "Discover" %}
+	<i class="fab fa-cc-discover"></i>
+{% elif order.brand == "Diners Club" %}
+	<i class="fab fa-cc-diners-club"></i>
+{% elif order.brand == "JCB" %}
+	<i class="fab fa-cc-jcb"></i>
+{% elif order.brand %}
+	<i class="far fa-credit-card"></i>
+{% else %}
+	<i class="flaticon-more-v2"></i>
+{% endif %}

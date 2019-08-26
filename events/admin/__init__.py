@@ -1,4 +1,10 @@
-from .base_admin import *
-from .event_admin import *
-from .ticket_admin import *
-
+from .base import *
+from .events import *
+from .tickets import *
+from .carts import *
+from .questions import *
+from .orders import *
+from .attendees import *
+from .answers import *
+from .descriptions import *
+from .emails import *

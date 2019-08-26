@@ -19,52 +19,16 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import (EventQuestionCreateView, QuestionsListView, EventQuestionUpdateView, 
-                    EventQuestionMultipleChoiceOptionCreateView, EventQuestionMultipleChoiceOptionUpdateView,
-                    AllTicketQuestionCreateView, AllTicketQuestionUpdateView, TicketQuestionCreateView,
-                    TicketQuestionUpdateView, AllTicketQuestionMultipleChoiceOptionCreateView,
-                    AllTicketQuestionMultipleChoiceOptionUpdateView, TicketQuestionMultipleChoiceOptionCreateView,
-                    TicketQuestionMultipleChoiceOptionUpdateView)
+from questions.views import QuestionCreateView, QuestionUpdateView, MultipleChoiceCreateView, MultipleChoiceUpdateView
 
 app_name="questions"
 
 urlpatterns = [
 
-    path('', QuestionsListView.as_view(), name='list_questions'),
-
-    # Event Questions
-    path('event-create/simple', EventQuestionCreateView.as_view(), name='create_simple', kwargs={"type":"simple"}),
-    path('event-create/paragraph', EventQuestionCreateView.as_view(), name='create_paragraph', kwargs={"type":"paragraph"}),
-    path('event-create/multiple-choice', EventQuestionCreateView.as_view(), name='create_multiple_choice', kwargs={"type":"multiple choice"}),
-    
-    path('update/<slug:question_slug>', EventQuestionUpdateView.as_view(), name='update_event_question'),
-
-    path('event-create/multiple-choice/<slug:question_slug>/add-option', EventQuestionMultipleChoiceOptionCreateView.as_view(), name='create_multiple_choice_option'),
-    path('event-create/multiple-choice/<slug:question_slug>/update-option/<slug:option_slug>', EventQuestionMultipleChoiceOptionUpdateView.as_view(), name='update_multiple_choice_option'),
-    
-
-    # All Ticket Question
-    path('all-ticket-create/simple', AllTicketQuestionCreateView.as_view(), name='all_ticket_create_simple', kwargs={"type":"simple"}),
-    path('all-ticket-create/paragraph', AllTicketQuestionCreateView.as_view(), name='all_ticket_create_paragraph', kwargs={"type":"paragraph"}),
-    path('all-ticket-create/multiple-choice', AllTicketQuestionCreateView.as_view(), name='all_ticket_create_multiple_choice', kwargs={"type":"multiple choice"}),
-
-    path('update-all-ticket/<slug:question_slug>', AllTicketQuestionUpdateView.as_view(), name='update_all_ticket_question'),
-
-    path('all-ticket-create/multiple-choice/<slug:question_slug>/add-option', AllTicketQuestionMultipleChoiceOptionCreateView.as_view(), name='create_all_ticket_multiple_choice_option'),
-    path('all-ticket-create/multiple-choice/<slug:question_slug>/update-option/<slug:option_slug>', AllTicketQuestionMultipleChoiceOptionUpdateView.as_view(), name='update_all_ticket_multiple_choice_option'),
-
-
-
-    # Single Ticket Questions
-    path('ticket-create/simple/<slug:ticket_slug>', TicketQuestionCreateView.as_view(), name='ticket_create_simple', kwargs={"type":"simple"}),
-    path('ticket-create/paragraph/<slug:ticket_slug>', TicketQuestionCreateView.as_view(), name='ticket_create_paragraph', kwargs={"type":"paragraph"}),
-    path('ticket-create/multiple-choice/<slug:ticket_slug>', TicketQuestionCreateView.as_view(), name='ticket_create_multiple_choice', kwargs={"type":"multiple choice"}),
-
-    path('update-ticket/<slug:ticket_slug>/<slug:question_slug>', TicketQuestionUpdateView.as_view(), name='update_ticket_question'),
-
-    path('ticket-create/multiple-choice/<slug:question_slug>/add-option/<slug:ticket_slug>', TicketQuestionMultipleChoiceOptionCreateView.as_view(), name='create_ticket_multiple_choice_option'),
-    path('ticket-create/multiple-choice/<slug:question_slug>/update-option/<slug:ticket_slug>/<slug:option_slug>', TicketQuestionMultipleChoiceOptionUpdateView.as_view(), name='update_ticket_multiple_choice_option'),
-
+    path('<one_to_one_type>/<int:one_to_one_id>/create/', QuestionCreateView.as_view(), name='create_question'),
+    path('<one_to_one_type>/<int:one_to_one_id>/update/<int:pk>', QuestionUpdateView.as_view(), name='update_question'),
+    path('<one_to_one_type>/<int:one_to_one_id>/update/<int:pk>/option/create', MultipleChoiceCreateView.as_view(), name='create_option'),
+    path('<one_to_one_type>/<int:one_to_one_id>/update/<int:pk>/option/update/<int:option_id>', MultipleChoiceUpdateView.as_view(), name='update_option')
 ]
 
 

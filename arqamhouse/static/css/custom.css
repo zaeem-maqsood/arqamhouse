@@ -1,1 +1,21 @@
 /*! Place your custom styles here */
+
+html, body {
+    font-size: 15px;
+}
+
+@media (max-width: 1024px) {
+.kt-header-mobile .kt-header-mobile__toolbar .kt-header-mobile__toggler span {
+    background: rgb(69, 153, 213);
+}}
+
+@media (max-width: 1024px){
+.kt-header-mobile .kt-header-mobile__toolbar .kt-header-mobile__toggler span::before, .kt-header-mobile .kt-header-mobile__toolbar .kt-header-mobile__toggler span::after {
+    background: rgb(69, 153, 213);
+}
+}
+
+
+.kt-portlet {
+    border-radius: 15px;
+}

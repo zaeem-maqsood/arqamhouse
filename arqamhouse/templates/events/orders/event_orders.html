@@ -1,0 +1,192 @@
+{% extends "backend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Orders | {{ event.title }}
+{% endblock title %}
+
+{% block page_title %}
+Orders
+{% endblock page_title %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+<script>
+
+function FocusOnInput()
+{
+    document.getElementById("product-search").focus();
+    
+}
+
+function GetProducts(object)
+{
+
+    console.log(object.value)
+    var search = object.value;
+    var token = '{{csrf_token}}';
+
+    $.ajax({
+        type:"POST",
+        headers: { "X-CSRFToken": token },
+        url: '{{ request.path }}',
+        data: {
+          'search': search,
+        },
+        
+        success: function (data) {
+            console.log("HELLOO")
+            document.getElementById("dynamic").innerHTML = data;
+            
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown)
+                {
+                    alert(errorThrown);
+                  //some stuff on failure
+                },
+    });
+    
+}
+
+jQuery(document).ready(function() {
+    // DataTableAjax();
+    FocusOnInput();
+
+});
+</script>
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+	<li class="m-nav__item">
+		<a href="{{ profile.get_update_url }}" class="m-nav__link">
+			<span class="m-nav__link-text">{{ orders.count }} Order{% if orders.count > 1 %}s{% endif %} for "{{ event.title }}"</span>
+		</a>
+	</li>
+</ul>
+{% endblock page_crumbs %}
+
+{% block content %}
+<style>
+.dashboard-links {
+	color: #7396b0;
+}
+</style>
+<div class="row">
+	<div class="col-lg-8 col-md-8">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+				<div class="row" style="padding-bottom:30px;">
+					<div class="col-12">
+						<h3>Orders <span style="font-size: 0.8em;font-weight: 200;">| {{ orders.count }}</span></h3>
+					</div>
+				</div>
+
+				<div class="row" style="padding-bottom:30px;">
+					<div class="col-12">
+						<input type="search" placeholder="Search for an order" id="product-search" class="form-control m-input" onkeyup="GetProducts(this)">
+						<br>
+					</div>
+				</div>
+					
+				<table class="table table-bordered table-hover">
+					<thead>
+						<tr>
+							<th>Buyer</th>
+							<th>Amount</th>
+							<th>Tickets</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody id="dynamic">
+						{% for order in orders %}
+						<tr>
+							<td><a href="{{ order.get_order_view }}">{{ order.name }}</a></td>
+							<td>$ {% if order.transaction.amount %}{{ order.transaction.amount }}{% else %}0.00{% endif %}</td>
+							<td>{{ order.attendee_set.all.count }}</td>
+							<td>{% if order.failed %}<i style="font-size:1.5em;color:#e37f7f;" class="far fa-times-circle"></i>{% else %}<i style="font-size:1.5em;color:#62c262;" class="far fa-check-circle"></i>{% endif %}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>	
+				
+			</div>
+					
+		</div>
+	</div>
+
+	<div class="col-lg-2 col-md-4 col-6">
+
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+				<div class="row text-center" style="padding-top:40px;padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_attendees_view }}">
+							<i class="la la-users" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Attendees</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
+							<i class="la la-check-square" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Answers</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_questions_view }}">
+							<i class="la la-question-circle" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Questions</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.get_email_confirmation_view }}">
+							<i class="la la-envelope" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Email</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
+							<i class="la la-ticket" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Tickets</p>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
