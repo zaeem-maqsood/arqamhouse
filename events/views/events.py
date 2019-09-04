@@ -10,6 +10,7 @@ from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
+from django.utils import timezone
 from django.utils.timezone import datetime, timedelta
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -41,81 +42,9 @@ class EventDashboardView(HouseAccountMixin, DetailView):
 		except Exception as e:
 			raise Http404
 
-
-
 	def get_tickets(self, event):
 		tickets = Ticket.objects.filter(event=event)
 		return tickets
-
-	def get_all_ticket_and_sales_data(self, attendees):
-		order_ids = set()
-		tickets_sum = 0
-		sales_sum = decimal.Decimal(0.00)
-		order_sum = 0
-		for attendee in attendees:
-			tickets_sum = None
-			# if not int(attendee.order.id) in order_ids:
-			# 	order_ids.add(attendee.order.id)
-			# 	order_sum += 1
-			# 	sales_sum += attendee.order.amount
-
-		data = {"tickets_sum": tickets_sum, "sales_sum": sales_sum, "order_sum": order_sum}
-		return data
-
-
-	def get_ten_day_ticket_and_sales_data(self, attendees):
-
-		# Get Todays Date
-		now = datetime.today()
-
-		# Get 15 days earlier date
-		fifteen_days_earlier = now - timedelta(days=10)
-
-		# Filter all attendees to only 15 days
-		attendees = attendees.filter(order__created_at__range=(fifteen_days_earlier, now))
-
-		# Day label for both graphs
-		day_label = []
-
-		# 10 days sales label
-		sales_label = []
-
-		# 10 days tickets label
-		tickets_label = []
-
-		# Booleans to use a large scale or not
-		use_large_scale_tickets = False
-		use_large_scale = False
-
-		# Calculate sales and ticket labels 
-		today = datetime.today()
-		for x in range(10):
-			one_day_earlier = today - timedelta(days=x)
-			attendees_for_day = attendees.filter(order__created_at__day=one_day_earlier.day)
-			order_ids = set()
-			sales_sum = decimal.Decimal(0.00)
-			tickets_sum = 0
-			for attendee in attendees_for_day:
-				tickets_sum += 1
-				if tickets_sum > 20:
-					use_large_scale_tickets = True
-
-				if not int(attendee.order.id) in order_ids:
-					order_ids.add(attendee.order.id)
-					sales_sum = None
-					# if sales_sum > 20:
-					# 	use_large_scale = True
-
-			sales_label.append(sales_sum)
-			tickets_label.append("%s" % (tickets_sum))	
-			day_label.append("%s %s" % (one_day_earlier.strftime('%b'), one_day_earlier.day))
-
-		sales_label = list(reversed(sales_label))
-		day_label = list(reversed(day_label))
-		tickets_label = list(reversed(tickets_label))
-
-		data = {"tickets_label":tickets_label, "sales_label": sales_label, "day_label": day_label, "use_large_scale": use_large_scale, "use_large_scale_tickets":use_large_scale_tickets}
-		return data
 
 
 	def get_total_sales(self, event):
@@ -129,7 +58,8 @@ class EventDashboardView(HouseAccountMixin, DetailView):
 
 	def graph_data(self, event):
 		
-		today = datetime.today()
+		today = timezone.now()
+		print(today)
 		days_earlier = today - timedelta(days=10)
 		attendees = Attendee.objects.filter(order__event=event, order__created_at__range=(days_earlier, today))
 
@@ -145,8 +75,6 @@ class EventDashboardView(HouseAccountMixin, DetailView):
 				tickets_sum += 1
 
 			tickets_label.append("%s" % (tickets_sum))
-
-			tickets_label = list(reversed(tickets_label))
 			day_label.append("%s %s" % (one_day_earlier.strftime('%b'), one_day_earlier.day))
 
 		
@@ -168,8 +96,6 @@ class EventDashboardView(HouseAccountMixin, DetailView):
 		
 		dashboard_events = self.get_events()
 		tickets = self.get_tickets(event)
-		# all_ticket_and_sales_data = self.get_all_ticket_and_sales_data(attendees)
-		# get_ten_day_ticket_and_sales_data = self.get_ten_day_ticket_and_sales_data(attendees)
 
 		if event.active == False:
 			context["inactive_event_tab"] = True
@@ -181,8 +107,6 @@ class EventDashboardView(HouseAccountMixin, DetailView):
 		context["dashboard_events"] = dashboard_events
 		context["total_sales"] = self.get_total_sales(event)
 		context["graph_data"] = self.graph_data(event)
-		# context["all_ticket_and_sales_data"] = all_ticket_and_sales_data
-		# context["get_ten_day_ticket_and_sales_data"] = get_ten_day_ticket_and_sales_data
 		context["house"] = house
 		context["event"] = event
 		context["request"] = request
@@ -485,8 +409,11 @@ class EventLandingView(DetailView):
 		context["event_description"] = event_description
 		context["description_elements"] = description_elements
 		context["event"] = event
+		context["tickets"] = event.ticket_set.exists()
 		context["request"] = request
 		return render(request, self.template_name, context)
+
+
 
 
 class PastEventsView(HouseAccountMixin, EventMixin, ListView):
@@ -502,7 +429,8 @@ class PastEventsView(HouseAccountMixin, EventMixin, ListView):
 		context["events"] = inactive_events
 		context["deleted_events"] = deleted_events
 		context["house"] = house
-		context["inactive_event_tab"] = True
+		context["dashboard_events"] = self.get_events()
+		context["past_event_tab"] = True
 		return context
 
 
@@ -595,7 +523,11 @@ class EventUpdateView(HouseAccountMixin, UpdateView):
 			context["events_tab"] = True
 
 		context["update_event"] = True
+
+		if self.object.active:
+			context["event_tab"] = True
 		context["dashboard_events"] = self.get_events()
+		print(self.get_events())
 		return context
 
 	def get(self, request, *args, **kwargs):
@@ -625,15 +557,22 @@ class EventUpdateView(HouseAccountMixin, UpdateView):
 		data = request.POST
 		self.object = form.save()
 
-		if "Archive Event" in data:
+		if "Archive" in data:
 			self.object.active = False
 			self.object.save()
+			messages.warning(request, 'Archived Event')
 
-		if "Re-Open Event" in data:
+		if "Remove" in data:
+			self.object.image = None
+			self.object.save()
+			messages.warning(request, 'Event Image Removed')
+
+		if "Re-Open" in data:
 			self.object.active = True
 			self.object.save()
+			messages.info(request, 'Event Re-Opened')
 
-		if "Delete Event" in data:
+		if "Delete" in data:
 			self.object.active = False
 			self.object.deleted = True
 			self.object.save()

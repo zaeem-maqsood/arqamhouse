@@ -1,9 +1,10 @@
 from .base import *
 
 from core.models import TimestampedModel
-from events.models import Ticket, EventOrder
+from events.models import Ticket, EventOrder, EventCartItem
 from core.constants import genders
 from cities_light.models import City, Region, Country
+from payments.models import Refund
 
 
 class Attendee(TimestampedModel):
@@ -18,6 +19,7 @@ class Attendee(TimestampedModel):
 	country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=True, null=True)
 	region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True)
 	city = models.ForeignKey(City, on_delete=models.CASCADE, blank=True, null=True)
+	active = models.BooleanField(default=True)
 
 	def __str__(self):
 		return self.name
@@ -26,5 +28,16 @@ class Attendee(TimestampedModel):
 	def get_attendee_view(self):
 		view_name = "events:attendee_detail"
 		return reverse(view_name, kwargs={"slug": self.order.event.slug, "attendee_id": self.id})
+
+
+
+class EventOrderRefund(models.Model):
+
+	order = models.ForeignKey(EventOrder, on_delete=models.CASCADE, blank=False, null=False)
+	refund = models.ForeignKey(Refund, on_delete=models.CASCADE, blank=True, null=True)
+	attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE, blank=True, null=True)
+
+	def __str__(self):
+		return (self.order.name)
 
 

@@ -154,8 +154,9 @@ class EventForm(forms.ModelForm):
 
 				"venue_address": forms.TextInput(
 						attrs={
+							"autocomplete": "off",
 							"class":"form-control m-input",
-							"placeholder":"",
+							"placeholder":"123 Main Street",
 							"id":"autocomplete",
 						}
 					),

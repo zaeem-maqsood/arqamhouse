@@ -18,8 +18,8 @@ class EventQuerySet(models.QuerySet):
 class EventManager(models.Manager):
 
 	def active_events(self, **kwargs):
-		# return self.filter(Q(active=True, deleted=False))
-		return EventQuerySet(self.model, using=self._db)
+		return self.filter(Q(active=True, deleted=False))
+		# return EventQuerySet(self.model, using=self._db)
 
 	def inactive_events(self, **kwargs):
 		return self.filter(Q(active=False, deleted=False))
@@ -33,7 +33,7 @@ class Event(TimestampedModel):
 	title = models.CharField(max_length=120, null=True, blank=False)
 	url = models.CharField(max_length=120, null=True, blank=True)
 	slug = models.SlugField(max_length = 175, unique = False, blank=True)
-	start = models.DateTimeField(blank=False, null=True)
+	start = models.DateTimeField(blank=False, null=True, default=timezone.now)
 	end = models.DateTimeField(blank=False, null=True)
 	short_description = models.TextField(null=True, blank=True)
 	venue_address = models.CharField(max_length=200, null=True, blank=True)

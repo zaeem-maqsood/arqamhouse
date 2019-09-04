@@ -157,10 +157,16 @@ $('#id_gender_required').change(function() {
 
 
 <div class="row">
-	<div class="col-md-10">
+	<div class="col-md-8">
 
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
+
+				<div class="row">
+					<div class="col-12">
+						<h3>Questions</h3>
+					</div>
+				</div>
 
 				<div class="row" style="padding-top:30px;">
 					<div class="col-md-4">
@@ -307,49 +313,37 @@ $('#id_gender_required').change(function() {
 					</div>
 				</div> -->
 
-				<div class="row" style="padding-top:30px;">
+				<div class="row" style="padding-top:10px;">
 					<div class="col-12">
-						<p>These questions are asked once per ticket.<br>
+						<p style="font-size: 0.8em;">These questions are asked once per ticket.<br>
 						Asking your attendees for their age and gender will enable analytics.</p>
 					</div>
 				</div>
 
-			</div>
-		</div>
-	</div>
-</div>
 
-
-{% if event_questions %}
-<div class="row">
-	<div class="col-md-10">
-
-		<div class="kt-portlet kt-portlet--mobile">
-			<div class="kt-portlet__body">
-
+				{% if event_questions %}
 				{% for event_question in event_questions %}
-				<div class="row">
+				<div class="row" style="padding-top:30px;">
 					<div class="col-md-12">
-						<a href="{{ event_question.update_question }}"><h2>{{ event_question.question.order }}. <span style="font-weight: 200;">{{ event_question.question.title }}</span></h2></a>
+						<a href="{{ event_question.update_question }}"><h4>{{ event_question.question.order }}. <span style="font-weight: 200;">{{ event_question.question.title }}</span></h4></a>
 						<p><i>{{ event_question.question.question_type }} question</i></p>
 					</div>
 				</div>
 				{% endfor %}
+				{% endif %}
 
-				<br>
-				<p>Questions are asked in this order. You can change the order by editing the question.</p>
-
-				<div class="row">
+				<div class="row" style="padding-top:30px;">
 					<div class="col-md-12">
-						<a href="{{ event.create_question }}" class="btn btn-primary">Create A Question</a>
+						<a href="{{ event.create_question }}" class="btn btn-primary">Create Question</a>
 					</div>
 				</div>
+
 
 			</div>
 		</div>
 	</div>
 </div>
-{% endif %}
+
 
 
 

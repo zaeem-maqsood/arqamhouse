@@ -1,12 +1,13 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 class TimestampedModel(models.Model):
 	# A timestamp representing when this object was created.
-	created_at = models.DateTimeField(auto_now_add=True)
+	created_at = models.DateTimeField(default=timezone.now)
 
 	# A timestamp reprensenting when this object was last updated.
-	updated_at = models.DateTimeField(auto_now=True)
+	updated_at = models.DateTimeField(default=timezone.now)
 
 	class Meta:
 		abstract = True

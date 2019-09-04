@@ -16,15 +16,18 @@ def pdf_location(instance, filename):
 def qrcode_location(instance, filename):
 	return "order_qrcodes/%s/%s/%s" % (instance.event.house.slug, instance.transaction.payment_id, filename)
 
+
+
 class EventOrder(models.Model):
 
 	name = models.CharField(max_length=150, null=True, blank=True)
-	created_at = models.DateTimeField(auto_now_add=True, null=True)
+	created_at = models.DateTimeField(default=timezone.now)
 	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=False, null=False)
 	event_cart = models.ForeignKey(EventCart, on_delete=models.CASCADE, blank=False, null=False)
 	email = models.EmailField(max_length=300, blank=False, null=False)
 	transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, blank=False, null=False)
 	failed = models.BooleanField(default=False)
+	partial_refund = models.BooleanField(default=False)
 	refunded = models.BooleanField(default=False)
 	note = models.TextField(blank=True, null=True)
 	pdf = models.FileField(upload_to=pdf_location, blank=True, null=True)

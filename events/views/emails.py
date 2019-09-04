@@ -36,6 +36,7 @@ class EventConfirmationEmailView(HouseAccountMixin, UpdateView):
         context["event"] = event
 
         context["update_event"] = True
+        context["event_tab"] = True
         context["dashboard_events"] = self.get_events()
         return context
 

@@ -1,48 +1,52 @@
-<section class="switchable feature-large" style="padding-bottom:10px;padding-top: 4em;">
+<section class="switchable feature-large" style="padding-bottom:10px;padding-top: 4.5em;">
     <div class="container">
         <div class="row justify-content-around">
-            <div class="col-md-9">
-                <div class="row text-center" style="padding-bottom:50px;">
+            <div class="col-lg-9 col-md-12 col-12">
+
+                <div class="row text-center" style="padding-bottom:60px;">
                     <div class="col-md-12">
-                        <h2 style="margin-bottom:0px;font-weight: 600;color: #595959;">{{ event.title }}</h2>
+                        <h2 style="margin-bottom:0px;font-weight: 400;color: #7c8a93;">{{ event.title }}</h2>
                         <p class="">{{ event.short_description }}</p>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6 col-lg-6">
-                        <img alt="Image" class="border--round box-shadow-wide" src="{{ event.image.url }}" />
-                    </div>
-                    <div class="col-md-1 col-lg-1">
 
+                <div class="row" style="padding-bottom:20px;">
+
+                    <div class="col-md-6 col-lg-6 col-9" style="padding: 0px 0px 30px 100px;">
+                        <img alt="Image" class="border--round box-shadow-wide" style="box-shadow: -10px 5px 20px rgba(0, 0, 0, 0.4);" src="{{ event.image.url }}" />
                     </div>
-                    <div class="col-md-5 col-lg-5">
+
+                    <div class="col-md-6 col-lg-6 col-11" style="padding: 0px 0px 30px 30px;">
                         
-                        <div class="row" style="padding-top:50px;">
+                        <div class="row text-center text-centering">
                             <div class="col-md-12">
-                                <h3 style="margin-bottom: 5px;font-weight: 600;color: #595959;"><i class="far fa-clock"></i>  When</h3>
-                                <p style="margin-bottom: 0;">Starts <span style="font-weight:800;">| {{ event.start }}</span></p>
-                                <p style="margin-bottom: 0;">Ends <span style="font-weight:800;">| {{ event.end }}</span></p>
+                                <h3 style="margin-bottom: 5px;font-weight: 400;color: #7c8a93;"><i class="far fa-clock"></i>  When</h3>
+                                <p style="margin-bottom: 0;">Starts <span style="font-weight:700;"> {{ event.start }}</span></p>
+                                <p style="margin-bottom: 0;">Ends <span style="font-weight:700;"> {{ event.end }}</span></p>
                             </div>
                         </div>
                         
 
-                        <div class="row" style="padding-top:50px;">
+                        <div class="row text-center text-centering" style="padding-top:30px;">
                             <div class="col-md-12">
-                                <h3 style="margin-bottom: 5px;font-weight: 600;color: #595959;"><i class="fas fa-map-marker-alt"></i>  Where</h3>
+                                <h3 style="margin-bottom: 5px;font-weight: 400;color: #7c8a93;"><i class="fas fa-map-marker-alt"></i>  Where</h3>
                                 <p style="margin-bottom: 0;"><span style="font-weight:800;">{{ event.venue_name }}</span></p>
                                 <p style="margin-bottom: 0;">{{ event.venue_address }}</p>
                             </div>
                         </div>
-
-                        <div class="row" style="padding-top:50px;">
-                            <div class="col-md-12">
-                                <a class="btn btn--primary" href="{{ event.choose_tickets_view }}"><span class="btn__text">Get Tickets</span></a>
-                            </div> 
-                        </div>
                         
                     </div>
 
                 </div>
+
+                {% if tickets %}
+                <div class="row text-center">
+                    <div class="col-lg-12" style="padding: 0px 80px 60px 80px;">
+                        <a class="btn btn--primary btn-block" href="{{ event.choose_tickets_view }}"><span class="btn__text">Get Tickets</span></a>
+                    </div> 
+                </div>
+                {% endif %}
+
             </div>
         </div>
         <!--end of row-->

@@ -1,13 +1,13 @@
 from django.db import models
 from houses.models import House
-
+from django.utils import timezone
 
 # Create your models here.
 
 class Payout(models.Model):
 
 	house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
-	created_at = models.DateTimeField(auto_now_add=True, null=True)
+	created_at = models.DateTimeField(default=timezone.now, null=True)
 	amount = models.DecimalField(blank=True, null=True, max_digits=7, decimal_places=2)
 
 
@@ -19,12 +19,10 @@ class Payout(models.Model):
 class Transaction(models.Model):
 	house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=False)
 	payout = models.ForeignKey(Payout, on_delete=models.CASCADE, blank=True, null=True)
-	created_at = models.DateTimeField(auto_now_add=True, null=True)
+	created_at = models.DateTimeField(default=timezone.now, null=True)
 	amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	payment_id = models.CharField(max_length=150, null=True, blank=True)
 	failed = models.BooleanField(default=False)
-	partial_refunded = models.BooleanField(default=False)
-	refunded = models.BooleanField(default=False)
 	code_fail_reason = models.CharField(max_length=250, null=True, blank=True)
 	failure_code = models.CharField(max_length=150, null=True, blank=True)
 	failure_message = models.CharField(max_length=150, null=True, blank=True)
@@ -53,6 +51,7 @@ class Refund(models.Model):
 
 	transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, blank=False, null=False)
 	amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	partial_refund = models.BooleanField(default=False)
 
 	def __str__(self):
-		return (self.house.name)
+		return (self.transaction.house.name)

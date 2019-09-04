@@ -3,8 +3,10 @@ from .base import *
 import qrcode
 import decimal
 import stripe
+from django.db.models import Sum
 from houses.mixins import HouseAccountMixin
-from events.models import Event, EventOrder, Attendee, EventQuestion
+from events.models import Event, EventOrder, Attendee, EventOrderRefund, EventQuestion, EventCart, EventCartItem
+from payments.models import Refund
 from questions.models import Question
 
 from django.core.mail import send_mail
@@ -103,6 +105,17 @@ class OrderDetailView(HouseAccountMixin, FormView):
 		order = self.get_order(order_id)
 		house = self.get_house()
 		attendees = Attendee.objects.filter(order=order)
+		active_attendees = attendees.filter(active=True)
+		context["active_attendees"] = active_attendees
+		event_order_refunds = EventOrderRefund.objects.filter(order=order)
+		if event_order_refunds:
+			total_payout = event_order_refunds.aggregate(Sum('refund__amount'))
+			print(total_payout)
+			total_payout = order.event_cart.total_no_fee - total_payout["refund__amount__sum"]
+			print(total_payout)
+			total_payout = '{0:.2f}'.format(total_payout)
+			print(total_payout)
+			context["total_payout"] = total_payout
 
 
 		# Testing ------------------------------------------------------------------------------------------------
@@ -124,15 +137,13 @@ class OrderDetailView(HouseAccountMixin, FormView):
 		context["house"] = house
 		context["event"] = event
 		context["order"] = order
+		context["event_order_refunds"] = event_order_refunds
 		context["attendees"] = attendees
 		context["event_tab"] = True
 		context["dashboard_events"] = self.get_events()
 		return context
 
 	def get(self, request, *args, **kwargs):
-
-		
-
 		return self.render_to_response(self.get_context_data())
 
 	def post(self, request, *args, **kwargs):
@@ -141,31 +152,61 @@ class OrderDetailView(HouseAccountMixin, FormView):
 		order_id = kwargs['pk']
 		event = self.get_event(slug)
 		order = self.get_order(order_id)
+		attendees = Attendee.objects.filter(order=order)
 
-		if 'Partial Refund' in data:
-			print(data)
 
-			amount = int(data['partial']) * 100
-			print(amount)
-			stripe.api_key = settings.STRIPE_SECRET_KEY
-			
-			try:
+		print(data)
 
-				refund = stripe.Refund.create(
-					charge=order.transaction.payment_id,
-					amount=amount,
-				)
+		if 'Refund' in data:
 
-				order.refunded = True
-				order.transaction.refunded = True
-				order.transaction.save()
+			attendee_to_be_refunded_id = data['Refund']
+			attendee_to_be_refunded = attendees.get(id=attendee_to_be_refunded_id)
+			ticket = attendee_to_be_refunded.ticket
+			amount = int(ticket.price * 100)
+			partial_refund = True
+
+			if attendee_to_be_refunded.active:
+				print("Did it come here")
+				event_order_refund = EventOrderRefund.objects.create(order=order, attendee=attendee_to_be_refunded)
+				print("Yes it is created Partial Refund")
+				print(amount)
+				refund = Refund.objects.create(transaction=order.transaction, amount=(amount/100), partial_refund=partial_refund)
+				event_order_refund.refund = refund
+				event_order_refund.save()
+				attendee_to_be_refunded.active = False
+				attendee_to_be_refunded.save()
+				order.partial_refund = True
 				order.save()
 
-			except Exception as e:
-				print(e)
+				stripe.api_key = settings.STRIPE_SECRET_KEY
+				response = stripe.Refund.create(charge=order.transaction.payment_id, amount=amount)
+				print(response)
 
 
-			# return HttpResponseRedirect(self.get_success_url())
+		# User wants a full refund on the order
+		if 'Full Refund' in data:
+
+			for attendee in attendees:
+				if attendee.active:
+					amount = int(attendee.ticket.price * 100)
+					event_order_refund = EventOrderRefund.objects.create(order=order, attendee=attendee)
+					print("Yes it is created Full Refund")
+					refund = Refund.objects.create(transaction=order.transaction, amount=(amount/100))
+					event_order_refund.refund = refund
+					event_order_refund.save()
+					attendee.active = False
+					attendee.save()
+
+					stripe.api_key = settings.STRIPE_SECRET_KEY
+					response = stripe.Refund.create(charge=order.transaction.payment_id, amount=amount)
+					print(response)
+
+				order.refunded = True
+				order.save()
+
+				
+			
+
 
 		return render(request, self.template_name, self.get_context_data(data))
 

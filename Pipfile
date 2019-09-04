@@ -26,6 +26,7 @@ weasyprint = "*"
 qrcode = "*"
 django-heroku = "*"
 python-dotenv = "*"
+django-cleanup = "*"
 
 [requires]
 python_version = "3.7"

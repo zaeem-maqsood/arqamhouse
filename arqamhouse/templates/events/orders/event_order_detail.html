@@ -21,15 +21,6 @@ Order #{{ order.id }} | {{ event.title }}
 
 
 {% block scripts %}
-<script type="text/javascript">
-
-$(document).ready(function(){
-		document.getElementById('id_partial_refund').onchange = function() {
-	    document.getElementById('id_refund_amount').disabled = !this.checked;
-	};
-
-});
-</script>
 {% endblock scripts %}
 
 
@@ -58,13 +49,23 @@ $(document).ready(function(){
 					<div class="col-12">
 						<h4>Order Details</h4>
 						<p>Order placed on {{ order.created_at }}</p>
-						<p>{% if order.failed %}<i style="font-size:1.2em;color:#e37f7f;" class="far fa-times-circle"></i> Order Failed{% else %}<i style="font-size:1.2em;color:#62c262;" class="far fa-check-circle"></i> Successful Order{% endif %}</p>
-						<p><span style="font-weight:900;">Name</span> | {{ order.name }}</p>
-						<p><span style="font-weight:900;">Email</span> | {{ order.email }}</p>
-						<p><span style="font-weight:900;">Order ID</span> | {{ order.transaction.payment_id }}</p>
-						<p><span style="font-weight:900;">Payment Card</span> | {% include "events/orders/brands.html" with order=order.transaction %}</p>
-						<p><span style="font-weight:900;">Last Four Digits</span> | {{ order.transaction.last_four }}</p>
-						<p><span style="font-weight:900;">Outcome</span> | {{ order.transaction.outcome_type|title }}</p>
+						<p style="font-weight:500;">
+							{% if order.failed %}
+								<span style="color:#e37f7f;"> Order Failed</span>
+							{% elif order.partial_refund %}
+								<span style="color:#e37f7f;"> This order has been partially refunded</span>
+							{% elif order.refunded %}
+								<span style="color:#e37f7f;"> This order has been refunded</span>
+							{% else %}
+								<span style="color:#62c262;">Successful Order</span>
+							{% endif %}
+						</p>
+						<p><span style="font-weight:500;">Name</span> | {{ order.name }}</p>
+						<p><span style="font-weight:500;">Email</span> | {{ order.email }}</p>
+						<p><span style="font-weight:500;">Order ID</span> | {{ order.transaction.payment_id }}</p>
+						<p><span style="font-weight:500;">Payment Card</span> | {% include "events/orders/brands.html" with order=order.transaction %}</p>
+						<p><span style="font-weight:500;">Last Four Digits</span> | {{ order.transaction.last_four }}</p>
+						<p><span style="font-weight:500;">Outcome</span> | {{ order.transaction.outcome_type|title }}</p>
 					</div>
 				</div>
 
@@ -73,24 +74,39 @@ $(document).ready(function(){
 						<h4>Attendees</h4>
 					</div>
 				</div>
-				<div class="row">
+
+				<form method="POST">{% csrf_token %}
+				<div class="row text-center">
 					<div class="col-12">
 						<table class="table table-bordered table-hover" width="100%">
 							<tbody>
 								{% for attendee in attendees %}
 								<tr>
-									<td><p style="margin:0 auto;">{{ forloop.counter }}</p></td>
-									<td><p style="margin:0 auto;">{{ attendee.ticket }}</p></td>
-									<td><a href="{{ attendee.get_attendee_view }}"><p style="margin:0 auto;">{{ attendee.name }}</p></a></td>
+									<td style="vertical-align: inherit;"><p style="margin:0 auto;">{{ forloop.counter }}</p></td>
+									<td style="vertical-align: inherit;"><p style="margin:0 auto;">{{ attendee.ticket }}</p></td>
+									<td style="vertical-align: inherit;"><a href="{{ attendee.get_attendee_view }}"><p style="margin:0 auto;">{{ attendee.name }}</p></a></td>
+									{% if attendee.active %}
+									<td><button type="submit" name="Refund" value="{{ attendee.id }}" class="btn btn-warning btn-block">Refund</button></td>
+									{% else %}
+									<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#e37f7f;">Refunded</p></td>
+									{% endif %}
 								</tr>
 								{% endfor %}
 							</tbody>
 						</table>
 					</div>
 				</div>
+				
+				{% if active_attendees.count > 1 %}
+				<div class="row">
+					<div class="col-12">
+						<button type="submit" name="Full Refund" value="Full Refund" class="btn btn-outline-danger btn-block">Refund Entire Order</button>
+					</div>
+				</div>
+				{% endif %}
+				</form>
 
-
-				<div class="row" style="padding-top: 40px;">
+				<div class="row" style="padding-top: 50px;">
 					<div class="col-12">
 						<h4>Order Breakdown</h4>
 					</div>
@@ -110,12 +126,37 @@ $(document).ready(function(){
 							<tbody>
 								{% for cart_item in event_cart_items %}
 								<tr>
-									<td>{{ cart_item.ticket.title }}</td>
-									<td>${{ cart_item.ticket.price }}</td>
-									<td>{{ cart_item.quantity }}</td>
-									<td>${{ cart_item.cart_item_total_no_fee }}</td>
+									<td style="color: grey;">{{ cart_item.ticket.title }}</td>
+									<td style="color: grey;">${{ cart_item.ticket.price }}</td>
+									<td style="color: grey;">{{ cart_item.quantity }}</td>
+									<td style="color: #62c262;">+ ${{ cart_item.cart_item_total_no_fee }}</td>
 								</tr>
 								{% endfor %}
+								
+								{% if event_order_refunds %}
+								<tr>
+									<td style="font-weight: 600;">Refunds</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								{% endif %}
+								{% for event_order_refund in event_order_refunds %}
+								<tr>
+									<td>{{ event_order_refund.attendee.ticket.title }} ({{ event_order_refund.attendee.name }})</td>
+									<td>${{ event_order_refund.attendee.ticket.price }}</td>
+									<td>1</td>
+									<td style="color: #e37f7f;">- ${{ event_order_refund.refund.amount }}</td>
+								</tr>
+								{% endfor %}
+								{% if event_order_refunds %}
+								<tr>
+									<td></td>
+									<td></td>
+									<td><p style="color: grey;">Total payout to you</p></td>
+									<td><p style="color: #62c262;">${{ total_payout }}</p></td>
+								</tr>
+								{% else %}
 								<tr>
 									<td></td>
 									<td></td>
@@ -132,103 +173,15 @@ $(document).ready(function(){
 									<td></td>
 									<td></td>
 									<td><p style="color: grey;">Total payout to you</p></td>
-									<td><p style="color: grey;">${{ order.event_cart.total_no_fee }}</p></td>
+									<td><p style="color: #62c262;">${{ order.event_cart.total_no_fee }}</p></td>
 								</tr>
+								{% endif %}
 							</tbody>
 						</table>
 					</div>
-					
 				</div>
-
-
-				<form method="POST">{% csrf_token %}
-				<div class="row" style="padding-top: 40px;">
-					<div class="col-12">
-						<h4>Refund</h4>
-						<p>Eligable refund amount <span style="font-weight: 600;">| ${{ order.transaction.amount }}</span></p>
-					</div>
-				</div>
-		
-				<div class="row" style="padding-top:10px;">
-					<div class="col-md-12">
-						<div class="row" style="padding-bottom: 30px;">
-							<div class="col-6">
-								<p>Partial Refund Amount</p>
-								<input class="form-control m-input" name="partial" value="" id="partial" type="number" min="0.00" max="{{ order.transaction.amount }}" step="0.01">
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-6">
-								<button type="submit" name="Partial Refund" value="Partial Refund" class="btn btn-warning btn-block">Partial Refund</button>
-							</div>
-							<div class="col-6">
-								<button type="submit" name="Full Refund" value="Full Refund" class="btn btn-danger btn-block">Full Refund</button>
-							</div>
-						</div>
-					</div>
-				</div>
-				</form>
-
-
 			</div>
 		</div>		
-	</div>
-
-	<div class="col-12 col-lg-2">
-
-		<div class="kt-portlet kt-portlet--mobile">
-			<div class="kt-portlet__body">
-				<div class="row text-center" style="padding-bottom: 30px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_orders_view }}">
-							<i class="la la-list" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Orders</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_attendees_view }}">
-							<i class="la la-users" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Attendees</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
-							<i class="la la-check-square" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Answers</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_questions_view }}">
-							<i class="la la-question-circle" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Questions</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.get_email_confirmation_view }}">
-							<i class="la la-envelope" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Email</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
-							<i class="la la-ticket" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Tickets</p>
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-
 	</div>
 </div>
 {% endblock content %}

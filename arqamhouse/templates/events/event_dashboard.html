@@ -1,5 +1,6 @@
 {% extends "backend/base.html" %}
 {% load static %}
+{% load tz %}
 {% block title %}
 Dashboard | {{ event.title }}
 {% endblock title %}
@@ -25,7 +26,9 @@ Dashboard | {{ event.title }}
 
 
 {% block scripts %}
-<script src="{% static 'assets/demo/default/custom/components/datatables/base/html-table.js' %}" type="text/javascript"></script>
+<script>
+	console.log(Intl.DateTimeFormat().resolvedOptions().timeZone)
+</script>
 
 <script type="text/javascript">
 	var ctx2 = document.getElementById("myChart2");
@@ -58,6 +61,15 @@ Dashboard | {{ event.title }}
 	    	legend: {
 	            display: false,
 	        },
+
+			layout: {
+				padding: {
+					left: 0,
+					right: 0,
+					top: 10,
+					bottom: 0
+				}
+			},
 
 	        animation: {
 	            duration: 4000,

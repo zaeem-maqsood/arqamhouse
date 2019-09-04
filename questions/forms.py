@@ -30,7 +30,7 @@ class MutipleChoiceForm(forms.ModelForm):
 
 class QuestionForm(forms.ModelForm):
 
-	order = forms.IntegerField(min_value=0, widget=forms.NumberInput(attrs={"class":"form-control m-input", "placeholder":"Which question first?"}))
+	order = forms.IntegerField(min_value=0, widget=forms.NumberInput(attrs={"class":"form-control m-input", "placeholder":"1"}))
 
 	class Meta:
 		model = Question

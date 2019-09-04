@@ -46,23 +46,8 @@ function ChangeText(object) {
 }
 </style>
 <div class="row">
-	<div class="col-lg-4 col-md-4">
-		<div class="kt-portlet kt-portlet--mobile">
-			<div class="kt-portlet__body">
-
-				<div class="row" style="padding-bottom:30px;">
-					<div class="col-12">
-                        <p class="lead">Email Message</p>
-                        {{ form.message }}
-					</div>
-				</div>
-				
-			</div>
-					
-		</div>
-	</div>
-
-	<div class="col-lg-6 col-md-6 col-6">
+	
+	<div class="col-lg-8 col-md-8 col-8">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
                 
@@ -94,7 +79,7 @@ function ChangeText(object) {
                     <div class="col-12">
                         <p style="font-weight: 400;">Message from the organizer</p>
                         <hr>
-                        <p style="white-space: pre-wrap;" id="message"></p>
+                        {{ form.message }}
                     </div>
                 </div>
 

@@ -231,6 +231,60 @@ Attendee | {{ attendee.name }}
 			</div>
 		</div>
 
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+				<div class="row text-center" style="padding-bottom: 40px;padding-top:40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_attendees_view }}">
+							<i class="la la-users" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Attendees</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_orders_view }}">
+							<i class="la la-list" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Orders</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
+							<i class="la la-check-square" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Answers</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_questions_view }}">
+							<i class="la la-question-circle" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Questions</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.get_email_confirmation_view }}">
+							<i class="la la-envelope" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Email</p>
+						</a>
+					</div>
+				</div>
+				<div class="row text-center" style="padding-bottom: 40px;">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
+							<i class="la la-ticket" style="font-size:3em;"></i>
+							<p style="padding-top: 10px;">Tickets</p>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
 	</div>
 </div>
 {% endblock content %}

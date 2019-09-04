@@ -17,7 +17,7 @@ Create House
 }
 
 .bg--secondary {
-    background: #fcfeff;
+    background: #ffffff;
 }
 </style>
 {% endblock styles %}
@@ -107,19 +107,19 @@ $('#id_{{ ticket.id }}').change(function() {
 
 {% block content %}
 
-<section class="text-center" style="padding-bottom:10px;">
-    <div class="container">
+<section class="text-center" style="padding-bottom:0px;padding-top: 50px;">
+    <div class="container hidden-xs">
         <div class="row justify-content-center">
             <div class="col-md-10 col-lg-8">
 				<img src="{% static 'images/logo.png' %}" style="max-height: 5em;">
-                <h4 style="color: #666666;">Choose Tickets For {{ event.title }}</h4>
+                <h4 style="color: #666666;font-weight: 300;">Choose tickets for '{{ event.title }}'</h4>
             </div>
         </div>
     </div>
 </section>
 
 
-<section class="switchable feature-large">
+<section class="switchable feature-large" style="">
     <div class="container">
     	
     	<form method="POST">{% csrf_token %}
@@ -128,10 +128,10 @@ $('#id_{{ ticket.id }}').change(function() {
             <div class="col-md-12 col-lg-8 col-sm-12">
 
             	{% for ticket in tickets %}
-            	<div class="boxed boxed--border bg--secondary boxed--lg box-shadow">
+            	<div class="boxed boxed--border bg--secondary boxed--lg box-shadow" style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px; margin: 20px;">
             		<div class="row" style="padding: 10px;">
             			<div class="col-md-8">
-							<p style="font-size: 1.3em;">{{ ticket }} <span style="color:#4399d5;"> - </span> <span style="color:#4399d5;"> 
+							<p style="font-size: 1.3em;margin-bottom: 5px;">{{ ticket }} <span style="color:#4399d5;"> - </span> <span style="color:#4399d5;"> 
 								
 								{% if ticket.paid %} 
 									{% if ticket.pass_fee %} 
@@ -169,8 +169,8 @@ $('#id_{{ ticket.id }}').change(function() {
         </div>
 
         <div class="row justify-content-center text-center" style="padding-top: 30px;">
-            <div class="col-md-10 col-lg-8">
-                <h2 style="color: #666666;" class="m--font-info color--info" id="new_price_div">Order Total $0.00</h2>
+            <div class="col-md-10 col-lg-4">
+                <h3 style="color: #666666;" class="m--font-info color--info" id="new_price_div">Order Total $0.00</h3>
                 <button type="submit" name="checkout" value="checkout" class="btn btn--primary">Checkout</button>
             </div>
         </div>
