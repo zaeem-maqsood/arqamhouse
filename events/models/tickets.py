@@ -97,6 +97,9 @@ def ticket_pre_save_reciever(sender, instance, *args, **kwargs):
 
 	instance.slug = create_slug(instance)
 
+	if instance.amount_sold == instance.amount_available:
+		instance.sold_out = True
+
 	# Check if the ticket is a paid ticket type
 	if instance.paid:
 
@@ -121,8 +124,6 @@ def ticket_pre_save_reciever(sender, instance, *args, **kwargs):
 			instance.buyer_price = (price_to_calculate + fee)
 		else:
 			instance.buyer_price = (price_to_calculate)
-
-		
 
 	else:
 		instance.buyer_price = 0.00

@@ -60,7 +60,7 @@ class OrderListView(HouseAccountMixin, ListView):
 		context = {}
 		house = self.get_house()
 		event = self.get_event(self.kwargs['slug'])
-		orders = EventOrder.objects.filter(event=event).order_by('created_at')
+		orders = EventOrder.objects.filter(event=event).order_by('-created_at')
 		print(orders)
 		
 		context["house"] = house
@@ -163,19 +163,29 @@ class OrderDetailView(HouseAccountMixin, FormView):
 			attendee_to_be_refunded = attendees.get(id=attendee_to_be_refunded_id)
 			ticket = attendee_to_be_refunded.ticket
 			amount = int(ticket.price * 100)
-			partial_refund = True
+
+			if attendees.filter(active=True).count() == 1:
+				partial_refund = False
+				full_refund = True
+			else:
+				partial_refund = True
+				full_refund = False
 
 			if attendee_to_be_refunded.active:
-				print("Did it come here")
 				event_order_refund = EventOrderRefund.objects.create(order=order, attendee=attendee_to_be_refunded)
-				print("Yes it is created Partial Refund")
-				print(amount)
 				refund = Refund.objects.create(transaction=order.transaction, amount=(amount/100), partial_refund=partial_refund)
+				
 				event_order_refund.refund = refund
 				event_order_refund.save()
+				
 				attendee_to_be_refunded.active = False
 				attendee_to_be_refunded.save()
-				order.partial_refund = True
+				attendee_to_be_refunded.ticket.amount_sold -= 1
+				attendee_to_be_refunded.ticket.sold_out = False
+				attendee_to_be_refunded.ticket.save()
+				
+				order.partial_refund = partial_refund
+				order.refunded = full_refund
 				order.save()
 
 				stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -196,7 +206,9 @@ class OrderDetailView(HouseAccountMixin, FormView):
 					event_order_refund.save()
 					attendee.active = False
 					attendee.save()
-
+					attendee.ticket.amount_sold -= 1
+					attendee.ticket.sold_out = False
+					attendee.ticket.save()
 					stripe.api_key = settings.STRIPE_SECRET_KEY
 					response = stripe.Refund.create(charge=order.transaction.payment_id, amount=amount)
 					print(response)

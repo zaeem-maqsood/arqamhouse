@@ -47,11 +47,13 @@ class EventCart(models.Model):
 
 		# calculate totals
 		for item in event_cart_items:
+
 			total_no_fee += item.cart_item_total_no_fee
 			total += item.cart_item_total
 
-		# Calculate total fee
-		total_fee = total - total_no_fee
+			# Calculate total fee
+			total_fee += item.cart_item_fee
+
 
 		# Calculate Stripe charge to us
 		stripe_charge = (total * stripe_fee) + stripe_base_fee
@@ -81,6 +83,8 @@ class EventCartItem(models.Model):
 	ticket_price = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	cart_item_total_no_fee = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	cart_item_total = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	cart_item_fee = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+
 	
 
 	def __str__(self):
@@ -106,8 +110,12 @@ def event_cart_item_pre_save_reciever(sender, instance, *args, **kwargs):
 		instance.paid_ticket = True
 		instance.ticket_price = instance.ticket.buyer_price
 		quantity = instance.quantity
-		instance.cart_item_total_no_fee = (instance.ticket.price * quantity)
+		if instance.ticket.pass_fee:
+			instance.cart_item_total_no_fee = (instance.ticket.price * quantity)
+		else:
+			instance.cart_item_total_no_fee = ((instance.ticket.price - instance.ticket.fee) * quantity)
 		instance.cart_item_total = (instance.ticket.buyer_price * quantity)
+		instance.cart_item_fee = (instance.ticket.fee * quantity)
 
 		# Check if the fee is passed on, if so set the 'pass_fee' boolean indicator
 		if instance.ticket.pass_fee:

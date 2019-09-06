@@ -1,0 +1,75 @@
+{% extends "backend/base.html" %}
+{% load static %}
+{% load payment_tags %}
+{% block title %}
+Payout History | {{ House }}
+{% endblock title %}
+
+
+{% block styles %}
+
+{% endblock styles %}
+
+
+{% block scripts %}
+{% endblock scripts %}
+
+
+{% block content %}
+
+<style>
+.table {
+    color: #4d4d4d;
+}
+</style>
+
+<div class="row">
+	<div class="col-8">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+				<div class="row" style="padding-bottom:30px;">
+					<div class="col-12">
+						<h3>Payments</h3>
+					</div>
+				</div>
+
+				<table class="table table-bordered table-hover">
+					<thead class="thead-light">
+						<tr>
+							<th>Amount</th>
+							<th>Description</th>
+							<th>Date</th>
+						</tr>
+					</thead>
+					<tbody id="dynamic">
+						{% for payment in payments %}
+						<tr>
+							<td style="font-weight: {% get_type_font_weight payment %};font-size: 1.2em;">${% get_type_amount payment %}</td>
+							<td style="color: {% get_type_color payment %};font-weight: 400;">{% get_type payment %} {% autoescape off %}{% get_type_icon payment %}{% endautoescape %}</td>
+							<td style="font-size: 0.9em;">{{ payment.created_at }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

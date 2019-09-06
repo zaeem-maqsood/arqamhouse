@@ -1,0 +1,97 @@
+{% extends "backend/base.html" %}
+{% load static %}
+{% load payment_tags %}
+{% block title %}
+Payout History | {{ House }}
+{% endblock title %}
+
+
+{% block styles %}
+
+{% endblock styles %}
+
+
+{% block scripts %}
+<script>
+function updateFeeAndTotal() {
+
+    amount = document.getElementById("id_amount").value;
+    console.log(amount)
+
+    total = {{ total }} - amount
+    total = total.toFixed(2);
+    document.getElementById("total").innerHTML = "$" + total;
+    console.log(total)
+}
+
+jQuery(document).ready(function($) {
+    updateFeeAndTotal()
+});
+</script>
+{% endblock scripts %}
+
+
+{% block content %}
+<form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
+<div class="row">
+	<div class="col-lg-8 col-12">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+                
+				<div class="row" style="padding-bottom:30px;">
+					<div class="col-12">
+                        <h3>Payout</h3>
+					</div>
+                </div>
+
+                <div class="row text-center" style="padding-bottom:30px;">
+                    <div class="col-lg-2 col-12">
+                        <p style="font-size: 3em;margin-bottom: 0rem;color: #65a365;">${{ total }}</p>
+                        <p>Balance</p>
+                    </div>
+                    <div class="col-2" style="padding-top: 10px;">
+                        <p style="font-size: 2em;">-</p>
+                    </div>
+                    <div class="col-lg-3 col-12" style="padding-top: 10px;">
+                        {{ form.amount }}
+                        <p style="margin-top:0.9rem;">Enter payout amount</p>
+                    </div>
+                    <div class="col-2" style="padding-top: 10px;">
+                        <p style="font-size: 2em;">=</p>
+                    </div>
+                    <div class="col-lg-2 col-12">
+                        <p style="font-size: 3em;margin-bottom: 0rem;color: #65a365;" id="total">$0.00</p>
+                        <p>New Balance</p>
+                    </div>
+                </div>
+
+    
+                <div class="row">
+                    <div class="col-md-12">
+                        <button id="customButton" type="submit" class="btn btn-primary">Request Payout</button>
+                    </div>
+                </div>
+
+
+
+			</div>
+		</div>
+	</div>
+</div>
+</form>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -12,7 +12,7 @@ class Payout(models.Model):
 
 
 	def __str__(self):
-		return (self.house)
+		return (self.house.name)
 
 
 
@@ -20,7 +20,12 @@ class Transaction(models.Model):
 	house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=False)
 	payout = models.ForeignKey(Payout, on_delete=models.CASCADE, blank=True, null=True)
 	created_at = models.DateTimeField(default=timezone.now, null=True)
+
 	amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	house_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	stripe_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	arqam_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+
 	payment_id = models.CharField(max_length=150, null=True, blank=True)
 	failed = models.BooleanField(default=False)
 	code_fail_reason = models.CharField(max_length=250, null=True, blank=True)
@@ -52,6 +57,17 @@ class Refund(models.Model):
 	transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, blank=False, null=False)
 	amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	partial_refund = models.BooleanField(default=False)
+	created_at = models.DateTimeField(default=timezone.now, null=True)
 
 	def __str__(self):
 		return (self.transaction.house.name)
+
+
+
+class HousePayment(models.Model):
+	transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, blank=False, null=False)
+	created_at = models.DateTimeField(default=timezone.now, null=True)
+
+	def __str__(self):
+		return (self.transaction.house.name)
+

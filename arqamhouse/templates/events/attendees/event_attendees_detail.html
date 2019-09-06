@@ -85,7 +85,7 @@ Attendee | {{ attendee.name }}
 				</div>
 
 				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
-					<div class="col-md-12">
+					<div class="col-md-6">
 						<p style="margin-bottom: 4px;">Name</p>
 						<input pattern="[a-zA-Z ]*" title="No numbers please" maxlength="100" class="form-control" type="text" name="name" id="name" size="30" required placeholder="Full Name" value="{{ attendee.name }}">
 					</div>
@@ -93,7 +93,7 @@ Attendee | {{ attendee.name }}
 
 				{% if attendee_common_questions.email %}
 				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
-					<div class="col-md-12">
+					<div class="col-md-6">
 						<p style="margin-bottom: 4px;">Email</p>
 						<input class="form-control" maxlength="150" type="email" name="email" id="email" size="30" required placeholder="email@address.com" value="{{ attendee.email }}">
 					</div>
@@ -102,7 +102,7 @@ Attendee | {{ attendee.name }}
 
 				{% if attendee_common_questions.gender %}
 				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
-					<div class="col-md-12">
+					<div class="col-md-6">
 						<p style="margin-bottom: 4px;">Gender</p>
 						<select id="gender" name="gender" class="form-control m-input">
 							{% if not attendee_common_questions.gender_required %}
@@ -117,7 +117,7 @@ Attendee | {{ attendee.name }}
 
 				{% if attendee_common_questions.age %}
 				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
-					<div class="col-md-12">
+					<div class="col-md-4">
 						<p style="margin-bottom: 4px;">Age</p>
 						<input class="form-control m-input" name="age" value="{{ attendee.age }}" id="age" type="number" min="0" max="100" {% if attendee_common_questions.age_required %}required{% endif %}>
 					</div>
@@ -173,119 +173,6 @@ Attendee | {{ attendee.name }}
 			</div>
 		</div>
 	</div>	
-
-
-	<div class="col-12 col-lg-2">
-
-		<div class="kt-portlet kt-portlet--mobile">
-			<div class="kt-portlet__body">
-
-				<div class="row text-center" style="padding-bottom: 40px;padding-top:40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_attendees_view }}">
-							<i class="la la-users" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Attendees</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_orders_view }}">
-							<i class="la la-list" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Orders</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
-							<i class="la la-check-square" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Answers</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_questions_view }}">
-							<i class="la la-question-circle" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Questions</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.get_email_confirmation_view }}">
-							<i class="la la-envelope" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Email</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
-							<i class="la la-ticket" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Tickets</p>
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="kt-portlet kt-portlet--mobile">
-			<div class="kt-portlet__body">
-
-				<div class="row text-center" style="padding-bottom: 40px;padding-top:40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_attendees_view }}">
-							<i class="la la-users" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Attendees</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_orders_view }}">
-							<i class="la la-list" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Orders</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
-							<i class="la la-check-square" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Answers</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_questions_view }}">
-							<i class="la la-question-circle" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Questions</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.get_email_confirmation_view }}">
-							<i class="la la-envelope" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Email</p>
-						</a>
-					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
-							<i class="la la-ticket" style="font-size:3em;"></i>
-							<p style="padding-top: 10px;">Tickets</p>
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-
-	</div>
 </div>
 {% endblock content %}
 

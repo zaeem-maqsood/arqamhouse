@@ -20,6 +20,7 @@ Create House
     background: #ffffff;
 }
 </style>
+
 {% endblock styles %}
 
 {% block top_page_scripts %}
@@ -114,13 +115,29 @@ $('#id_{{ ticket.id }}').change(function() {
 				<img src="{% static 'images/logo.png' %}" style="max-height: 5em;">
                 <h4 style="color: #666666;font-weight: 300;">Choose tickets for '{{ event.title }}'</h4>
             </div>
-        </div>
+		</div>
+
     </div>
 </section>
 
 
 <section class="switchable feature-large" style="">
     <div class="container">
+
+		{% if messages %}
+		<div class="row justify-content-center" style="padding:30px;">
+			<div class="col-md-12 col-lg-8 col-sm-12">
+				{% for message in messages %}
+				<div class="alert bg--{{ message.tags }}">
+					<div class="alert__body">
+						<span>{{ message }}</span>
+					</div>
+					<div class="alert__close">&times;</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+		{% endif %}
     	
     	<form method="POST">{% csrf_token %}
 
@@ -153,13 +170,17 @@ $('#id_{{ ticket.id }}').change(function() {
 							<p>{{ ticket.description }}</p>
             			</div>
             			<div class="col-md-4">
-            				{% if ticket.donation %}
-            					<p style="margin-bottom: 0px;">Donation Amount</p>
-            					{% get_ticket_related_form_field_donation form ticket %}
-            				{% endif %}
-            				<div class="input-select">
-            					{% get_ticket_related_form_field form ticket %}
-            				</div>
+							{% if not ticket.sold_out  %}
+								{% if ticket.donation %}
+									<p style="margin-bottom: 0px;">Donation Amount</p>
+									{% get_ticket_related_form_field_donation form ticket %}
+								{% endif %}
+								<div class="input-select">
+									{% get_ticket_related_form_field form ticket %}
+								</div>
+							{% else %}
+							<h3 style="color: #e15656;font-weight: 500;">Sold out</h3>
+							{% endif %}
             			</div>
             		</div>
 				</div>

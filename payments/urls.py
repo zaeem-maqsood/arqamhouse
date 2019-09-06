@@ -3,12 +3,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import PayoutHistoryView, PayoutDetailView
+from .views import PaymentListView, AddFundsView, PayoutView
 
 app_name="payments"
 
 urlpatterns = [
 
-    path('', PayoutHistoryView.as_view(), name='all_payouts'),
-    path('<int:pk>', PayoutDetailView.as_view(), name='detail'),
+    path('', PaymentListView.as_view(), name='list'),
+    path('add-funds/', AddFundsView.as_view(), name='add_funds'),
+    path('payout/', PayoutView.as_view(), name='payout'),
 ]

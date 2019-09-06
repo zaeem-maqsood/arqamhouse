@@ -48,7 +48,7 @@ class EventDashboardView(HouseAccountMixin, DetailView):
 
 
 	def get_total_sales(self, event):
-		orders = EventOrder.objects.filter(event=event).select_related("transaction")
+		orders = EventOrder.objects.filter(event=event, refunded=False).select_related("transaction")
 		total_sales = decimal.Decimal(0.00)
 		for order in orders:
 			if order.transaction.amount:
@@ -61,7 +61,7 @@ class EventDashboardView(HouseAccountMixin, DetailView):
 		today = timezone.now()
 		print(today)
 		days_earlier = today - timedelta(days=10)
-		attendees = Attendee.objects.filter(order__event=event, order__created_at__range=(days_earlier, today))
+		attendees = Attendee.objects.filter(order__event=event, order__created_at__range=(days_earlier, today), active=True)
 
 		day_label = []
 		tickets_label = []
@@ -159,7 +159,6 @@ class EventCheckoutView(FormView):
 		view_name = "events:landing"
 		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
 
-
 	def get_event(self, slug):
 		try:
 			event = Event.objects.get(slug=slug)
@@ -201,6 +200,13 @@ class EventCheckoutView(FormView):
 
 
 	def get(self, request, *args, **kwargs):
+		# Check if the user should be here in the first place
+		cart = self.get_cart()
+		cart_items = EventCartItem.objects.filter(event_cart=cart)
+		print(cart_items)
+		if not cart_items.exists():
+			return HttpResponseRedirect(self.get_success_url())
+
 		return render(request, self.template_name, self.get_context_data())
 
 
@@ -313,7 +319,11 @@ class EventCheckoutView(FormView):
 					)
 			print(charge)
 
-			transaction.amount = (int(charge['amount']) / 100)
+			transaction.amount = cart.total
+			transaction.arqam_amount = cart.arqam_charge
+			transaction.stripe_amount = cart.stripe_charge
+			transaction.house_amount = cart.total_no_fee
+
 			transaction.payment_id = charge['id']
 			transaction.failure_code = charge['failure_code']
 			transaction.failure_message = charge['failure_message']
@@ -409,7 +419,7 @@ class EventLandingView(DetailView):
 		context["event_description"] = event_description
 		context["description_elements"] = description_elements
 		context["event"] = event
-		context["tickets"] = event.ticket_set.exists()
+		context["tickets"] = event.ticket_set.filter(sold_out=False).exists()
 		context["request"] = request
 		return render(request, self.template_name, context)
 
