@@ -39,15 +39,17 @@ Payout History | {{ House }}
 						<tr>
 							<th>Amount</th>
 							<th>Description</th>
+							<th>Balance</th>
 							<th>Date</th>
 						</tr>
 					</thead>
 					<tbody id="dynamic">
-						{% for payment in payments %}
+						{% for house_balance_log in house_balance_logs %}
 						<tr>
-							<td style="font-weight: {% get_type_font_weight payment %};font-size: 1.2em;">${% get_type_amount payment %}</td>
-							<td style="color: {% get_type_color payment %};font-weight: 400;">{% get_type payment %} {% autoescape off %}{% get_type_icon payment %}{% endautoescape %}</td>
-							<td style="font-size: 0.9em;">{{ payment.created_at }}</td>
+							<td style="font-weight: {% get_type_font_weight house_balance_log %};font-size: 1.2em;">${% get_amount house_balance_log %}</td>
+							<td style="color: {% get_type_color house_balance_log %};font-weight: 400;">{% autoescape off %}{% get_type_icon house_balance_log %} {% get_type house_balance_log %}{% endautoescape %}</td>
+							<td style="font-weight: {% get_type_font_weight house_balance_log %};font-size: 1.2em;">${{ house_balance_log.balance }}</td>
+							<td style="font-size: 0.9em;">{{ house_balance_log.created_at }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>

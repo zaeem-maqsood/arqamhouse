@@ -32,13 +32,11 @@ from .forms import HouseForm, ConnectIndividualVerificationForm, ConnectCompanyV
 
 from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
 from profiles.models import Profile
+from payments.models import HouseBalance, HouseBalanceLog
 
 
 
 # Create your views here.
-
-
-
 class DashboardView(HouseAccountMixin, DetailView):
 	model = House
 	template_name = "houses/new_dashboard.html"
@@ -171,6 +169,12 @@ class HouseCreateView(CreateView):
 		# Create House User
 		house_user = HouseUser.objects.create(house=self.object, profile=profile, role="admin")
 		house_user.save()
+
+		# Create House Balance and initial House Balance Log with $0.00 opening balance
+		house_balance = HouseBalance.objects.create(house=self.object, balance=0.00)
+		house_balance.save()
+		house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, balance=0.00, opening_balance=True)
+		house_balance_log.save()
 
 		valid_data = super(HouseCreateView, self).form_valid(form)
 		return valid_data

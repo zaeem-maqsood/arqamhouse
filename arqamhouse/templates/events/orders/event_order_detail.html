@@ -51,13 +51,13 @@ Order #{{ order.id }} | {{ event.title }}
 						<p>Order placed on {{ order.created_at }}</p>
 						<p style="font-weight:500;">
 							{% if order.failed %}
-								<span style="color:#e37f7f;"> Order Failed</span>
+								<span style="color:#FF4500;"> Order Failed</span>
 							{% elif order.partial_refund %}
-								<span style="color:#9e7fe3;"> This order has been partially refunded</span>
+								<span style="color:#FFBE00;"> This order has been partially refunded</span>
 							{% elif order.refunded %}
-								<span style="color:#e37f7f;"> This order has been refunded</span>
+								<span style="color:#FF4500;"> This order has been refunded</span>
 							{% else %}
-								<span style="color:#62c262;">Successful Order</span>
+								<span style="color:#2584C7;">Successful Order</span>
 							{% endif %}
 						</p>
 						<p><span style="font-weight:500;">Name</span> | {{ order.name }}</p>
@@ -86,9 +86,13 @@ Order #{{ order.id }} | {{ event.title }}
 									<td style="vertical-align: inherit;"><p style="margin:0 auto;">{{ attendee.ticket }}</p></td>
 									<td style="vertical-align: inherit;"><a href="{{ attendee.get_attendee_view }}"><p style="margin:0 auto;">{{ attendee.name }}</p></a></td>
 									{% if attendee.active %}
-									<td><button type="submit" name="Refund" value="{{ attendee.id }}" class="btn btn-warning btn-block">Refund</button></td>
+										{% if attendee.ticket.price <= house_balance.balance %}
+											<td><button type="submit" name="Refund" value="{{ attendee.id }}" class="btn btn-warning btn-block">Refund</button></td>
+										{% else %}
+											<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#FFBE00;">Refund Not Available</p></td>
+										{% endif %}
 									{% else %}
-									<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#e37f7f;">Refunded</p></td>
+									<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#FF4500;">Refunded</p></td>
 									{% endif %}
 								</tr>
 								{% endfor %}
@@ -97,7 +101,7 @@ Order #{{ order.id }} | {{ event.title }}
 					</div>
 				</div>
 				
-				{% if active_attendees.count > 1 %}
+				{% if active_attendees.count > 1  and order.event_cart.total <= house_balance.balance %}
 				<div class="row">
 					<div class="col-12">
 						<button type="submit" name="Full Refund" value="Full Refund" class="btn btn-outline-danger btn-block">Refund Entire Order</button>
@@ -129,7 +133,7 @@ Order #{{ order.id }} | {{ event.title }}
 									<td style="color: grey;">{{ cart_item.ticket.title }}</td>
 									<td style="color: grey;">${{ cart_item.ticket.price }}</td>
 									<td style="color: grey;">{{ cart_item.quantity }}</td>
-									<td style="color: #62c262;">+ ${{ cart_item.cart_item_total_no_fee }}</td>
+									<td style="color: #2584C7;">+ ${{ cart_item.cart_item_total_no_fee }}</td>
 								</tr>
 								{% endfor %}
 								
@@ -146,7 +150,7 @@ Order #{{ order.id }} | {{ event.title }}
 									<td>{{ event_order_refund.attendee.ticket.title }} ({{ event_order_refund.attendee.name }})</td>
 									<td>${{ event_order_refund.attendee.ticket.price }}</td>
 									<td>1</td>
-									<td style="color: #e37f7f;">- ${{ event_order_refund.refund.amount }}</td>
+									<td style="color: #FF4500;">- ${{ event_order_refund.refund.amount }}</td>
 								</tr>
 								{% endfor %}
 								{% if event_order_refunds %}
@@ -154,7 +158,7 @@ Order #{{ order.id }} | {{ event.title }}
 									<td></td>
 									<td></td>
 									<td><p style="color: grey;">Total payout to you</p></td>
-									<td><p style="color: #62c262;">${{ total_payout }}</p></td>
+									<td><p style="color: #2584C7;">${{ total_payout }}</p></td>
 								</tr>
 								{% else %}
 								<tr>
@@ -173,7 +177,7 @@ Order #{{ order.id }} | {{ event.title }}
 									<td></td>
 									<td></td>
 									<td><p style="color: grey;">Total payout to you</p></td>
-									<td><p style="color: #62c262;">${{ order.event_cart.total_no_fee }}</p></td>
+									<td><p style="color: #2584C7;">${{ order.event_cart.total_no_fee }}</p></td>
 								</tr>
 								{% endif %}
 							</tbody>

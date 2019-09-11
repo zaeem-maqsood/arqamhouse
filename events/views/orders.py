@@ -6,7 +6,7 @@ import stripe
 from django.db.models import Sum
 from houses.mixins import HouseAccountMixin
 from events.models import Event, EventOrder, Attendee, EventOrderRefund, EventQuestion, EventCart, EventCartItem
-from payments.models import Refund
+from payments.models import Refund, HouseBalance
 from questions.models import Question
 
 from django.core.mail import send_mail
@@ -31,6 +31,8 @@ class OrderListView(HouseAccountMixin, ListView):
 
 	def get(self, request, *args, **kwargs):
 		return render(request, self.template_name, self.get_context_data())
+
+
 
 	def post(self, request, *args, **kwargs):
 		data = request.POST
@@ -104,35 +106,18 @@ class OrderDetailView(HouseAccountMixin, FormView):
 		event = self.get_event(slug)
 		order = self.get_order(order_id)
 		house = self.get_house()
+		house_balance = HouseBalance.objects.get(house=house)
 		attendees = Attendee.objects.filter(order=order)
 		active_attendees = attendees.filter(active=True)
 		context["active_attendees"] = active_attendees
 		event_order_refunds = EventOrderRefund.objects.filter(order=order)
 		if event_order_refunds:
 			total_payout = event_order_refunds.aggregate(Sum('refund__amount'))
-			print(total_payout)
 			total_payout = order.event_cart.total_no_fee - total_payout["refund__amount__sum"]
-			print(total_payout)
 			total_payout = '{0:.2f}'.format(total_payout)
-			print(total_payout)
 			context["total_payout"] = total_payout
 
-
-		# Testing ------------------------------------------------------------------------------------------------
-		# send_mail('subject', 'body of the message', 'info@arqamhouse.com', ['zaeem@arqamhouse.com'])
-
-		# order.qrcode()
-		# context_dict = {}
-		# context_dict["order"] = order
-		# html_string = render_to_string('pdfs/ticket.html', context_dict)
-		# css_string = render_to_string('pdfs/ticket.css')
-		# html = HTML(string=html_string)
-		# css_styles = CSS(string=css_string)
-		# css_bootstrap = CSS(url="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css")
-		# order.pdf = SimpleUploadedFile(order.name +'.pdf', html.write_pdf(stylesheets=[css_bootstrap, css_styles]), content_type='application/pdf')
-		# order.save()
-		# Testing ------------------------------------------------------------------------------------------------
-
+		context["house_balance"] = house_balance
 		context["event_cart_items"] = order.event_cart.eventcartitem_set.all
 		context["house"] = house
 		context["event"] = event

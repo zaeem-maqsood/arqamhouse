@@ -30,8 +30,14 @@ Profile Dashboard
                 <a href="#" style="color: #4399d5;">What is a house?</a>
                 <br>
                 <br>
-                <a href="{% url 'houses:create' %}" class="btn btn--primary" style="color: white;">Create House</a>
-                <a href="{% url 'profiles:logout' %}" class="btn btn--info" >Logout</a>
+                <div class="row" style="padding-bottom: 20px;padding-top: 30px;">
+                    <div class="col-6">
+                        <a href="{% url 'houses:create' %}" class="btn btn--primary" style="color: white;">Create House</a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{% url 'profiles:logout' %}" class="btn btn--info" >Logout</a>
+                    </div>
+                </div>
             </div>
         </div>
         <!--end of row-->

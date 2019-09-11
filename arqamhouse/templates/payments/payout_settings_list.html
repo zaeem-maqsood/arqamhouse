@@ -1,0 +1,88 @@
+{% extends "backend/base.html" %}
+{% load static %}
+{% load payout_settings_tags %}
+{% block title %}
+Payout History | {{ House }}
+{% endblock title %}
+
+
+{% block styles %}
+
+{% endblock styles %}
+
+
+{% block scripts %}
+{% endblock scripts %}
+
+
+{% block content %}
+
+<style>
+.table {
+    color: #4d4d4d;
+}
+</style>
+
+<div class="row">
+	<div class="col-lg-8 col-md-8 col-12">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+				<div class="row" style="padding-bottom:30px;">
+					<div class="col-12">
+						<h3>Payout Methods</h3>
+					</div>
+                </div>
+
+                {% if payout_settings %}
+                
+                {% for payout_setting in payout_settings %}
+                <div class="row" style="padding-top: 20px;">
+                    <div class="col-md-12">
+                        <p style="font-size:1em;"><span style="font-weight: 600;font-size: 1.3em;">{{ payout_setting.name }} |</span> Electronic Mail Transfer</p>
+                    </div>
+                </div>
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-md-5">
+                        <p style="margin-bottom: 0px;font-weight: 600;">Email Address</p>
+                        <p>{{ payout_setting.etransfer.email }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p style="margin-bottom: 0px;font-weight: 600;">Password</p>
+                        <p>{{ payout_setting.etransfer.password }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ payout_setting.etransfer.get_edit_url }}" class="btn btn-primary">Edit</a>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% else %}
+                {% endif %}
+
+                <div class="row" style="padding-top: 20px;">
+                    <div class="col-lg-4 col-md-12">
+                        <a href="{% url 'payments:add_e_transfer' %}" class="btn btn-primary btn-block">Add E-Transfer Payout</a>
+                    </div>
+                </div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

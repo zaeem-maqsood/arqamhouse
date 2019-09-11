@@ -46,10 +46,11 @@ jQuery(document).ready(function($) {
                 </div>
 
                 <div class="row text-center" style="padding-bottom:30px;">
-                    <div class="col-lg-2 col-12">
-                        <p style="font-size: 3em;margin-bottom: 0rem;color: #65a365;">${{ total }}</p>
+                    <div class="{% if house_balance.balance > 0 %}col-lg-2{% else %}col-lg-12{% endif %} col-12">
+                        <p style="font-size: 2.5em;margin-bottom: 0rem;color: #FF7947;">${{ total }}</p>
                         <p>Balance</p>
                     </div>
+                    {% if house_balance.balance > 0 and payout_settings %}
                     <div class="col-2" style="padding-top: 10px;">
                         <p style="font-size: 2em;">-</p>
                     </div>
@@ -61,18 +62,33 @@ jQuery(document).ready(function($) {
                         <p style="font-size: 2em;">=</p>
                     </div>
                     <div class="col-lg-2 col-12">
-                        <p style="font-size: 3em;margin-bottom: 0rem;color: #65a365;" id="total">$0.00</p>
+                        <p style="font-size: 2.5em;margin-bottom: 0rem;color: #FF7947;" id="total">$0.00</p>
                         <p>New Balance</p>
                     </div>
+                    {% endif %}
                 </div>
 
-    
-                <div class="row">
+                {% if house_balance.balance > 0 and payout_settings %}
+                <div class="row" style="padding-bottom:30px;">
                     <div class="col-md-12">
-                        <button id="customButton" type="submit" class="btn btn-primary">Request Payout</button>
+                        {{ form.payout_setting }}
                     </div>
                 </div>
+                {% endif %}
 
+                {% if house_balance.balance > 0 and payout_settings %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <button id="customButton" type="submit" class="btn btn-primary" >Request Payout</button>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="#" class="btn btn-primary">Add Payout Method</button>
+                    </div>
+                </div>
+                {% endif %}
 
 
 			</div>

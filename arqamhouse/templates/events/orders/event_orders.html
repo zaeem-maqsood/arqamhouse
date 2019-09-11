@@ -119,13 +119,13 @@ jQuery(document).ready(function() {
 							<td>
 								<p style="font-weight:500;">
 									{% if order.failed %}
-										<span style="color:#e37f7f;">Failed Order</span>
+										<span style="color:#FF4500;">Failed Order</span>
 									{% elif order.partial_refund %}
-										<span style="color:#9e7fe3;">Partially Refunded</span>
+										<span style="color:#FFBE00;">Partially Refunded</span>
 									{% elif order.refunded %}
-										<span style="color:#e37f7f;">Refunded</span>
+										<span style="color:#FF4500;">Refunded</span>
 									{% else %}
-										<span style="color:#62c262;">Successful Order</span>
+										<span style="color:#2584C7;">Successful Order</span>
 									{% endif %}
 								</p>
 							</td>

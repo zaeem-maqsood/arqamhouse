@@ -5,7 +5,7 @@ from django.db.models import Sum
 from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
-from django.views.generic.edit import FormView
+from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.contrib import messages
@@ -14,16 +14,143 @@ from operator import attrgetter
 from django.conf import settings
 from django.http import Http404, HttpResponseRedirect
 
+from django.core import mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
 from houses.mixins import HouseAccountMixin
-from .models import Payout, Transaction, Refund, HousePayment
-from .forms import AddFundsForm, PayoutForm
+from .models import Payout, Transaction, Refund, HousePayment, HouseBalance, HouseBalanceLog, PayoutSetting, Etransfer
+from .forms import AddFundsForm, PayoutForm, AddEtransferForm
 
 
 # Create your views here.
+class UpdateETransferView(HouseAccountMixin, CreateView):
+	template_name = "payments/add_etransfer.html"
+	form_class = AddEtransferForm
+	model = PayoutSetting
+
+	def get_success_url(self):
+		view_name = "payments:payout_settings_list"
+		return reverse(view_name)
+
+	def get(self, request, *args, **kwargs):
+		etransfer_id = kwargs['etransfer_id']
+		self.object = Etransfer.objects.get(id=etransfer_id)
+		return render(request, self.template_name, self.get_context_data())
+
+	
+	def post(self, request, *args, **kwargs):
+		etransfer_id = kwargs['etransfer_id']
+		self.object = Etransfer.objects.get(id=etransfer_id)
+		data = request.POST
+		house = self.get_house()
+		form = self.get_form()
+		if form.is_valid():
+			return self.form_valid(form, request, data)
+		else:
+			return self.form_invalid(form)
+	
+	def form_valid(self, form, request, data):
+		house = self.get_house()
+		self.object = form.save()
+		payout_method_name = data["payout_method_name"]
+		payout_setting = PayoutSetting.objects.get(house=house, etransfer=self.object)
+		payout_setting.name = payout_method_name
+		payout_setting.save()
+		messages.success(request, 'Payout Method Created!')
+		valid_data = super(UpdateETransferView, self).form_valid(form)
+		return valid_data
+
+	def get_context_data(self, *args, **kwargs):
+		context = {}
+		house = self.get_house()
+		form = self.get_form()
+		payout_setting = PayoutSetting.objects.get(house=house, etransfer=self.object)
+		context["form"] = form
+		context["payout_setting"] = payout_setting
+		context["dashboard_events"] = self.get_events()
+		context["house"] = self.get_house()
+		return context
+
+
+	def form_invalid(self, form):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form))
+
+
+
+class AddETransferView(HouseAccountMixin, CreateView):
+	template_name = "payments/add_etransfer.html"
+	form_class = AddEtransferForm
+	model = PayoutSetting
+
+	def get_success_url(self):
+		view_name = "payments:payout_settings_list"
+		return reverse(view_name)
+
+	def get(self, request, *args, **kwargs):
+		self.object = None
+		return render(request, self.template_name, self.get_context_data())
+
+	
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+		house = self.get_house()
+		form = self.get_form()
+		if form.is_valid():
+			return self.form_valid(form, request)
+		else:
+			return self.form_invalid(form)
+	
+	def form_valid(self, form, request):
+		house = self.get_house()
+		self.object = form.save()
+		payout_method_name = form.cleaned_data["payout_method_name"]
+		payout_setting = PayoutSetting.objects.create(house=house, etransfer=self.object, name=payout_method_name)
+		messages.success(request, 'Payout Method Created!')
+		valid_data = super(AddETransferView, self).form_valid(form)
+		return valid_data
+
+	def get_context_data(self, *args, **kwargs):
+		context = {}
+		house = self.get_house()
+		form = self.get_form()
+		context["form"] = form
+		context["dashboard_events"] = self.get_events()
+		context["house"] = self.get_house()
+		return context
+
+
+	def form_invalid(self, form):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form))
+
+
+
+class PayoutSettingsListView(HouseAccountMixin, View):
+	template_name = "payments/payout_settings_list.html"
+
+	def get_payout_settings(self, house):
+		payout_settings = PayoutSetting.objects.filter(house=house)
+		return payout_settings
+
+	def get(self, request, *args, **kwargs):
+		return render(request, self.template_name, self.get_context_data())
+
+	def get_context_data(self, data=None, *args, **kwargs):
+		context = {}
+		house = self.get_house()
+		payout_settings = self.get_payout_settings(house)
+		context["payout_settings"] = payout_settings
+		context["dashboard_events"] = self.get_events()
+		context["house"] = self.get_house()
+		return context
+
+
+
 
 class PayoutView(HouseAccountMixin, FormView):
 	template_name = "payments/payout.html"
-	form_class = PayoutForm
 	model = Payout
 
 	def get_success_url(self):
@@ -33,53 +160,77 @@ class PayoutView(HouseAccountMixin, FormView):
 	def get(self, request, *args, **kwargs):
 		return render(request, self.template_name, self.get_context_data())
 
+	
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+		house = self.get_house()
+		house_balance = HouseBalance.objects.get(house=house)
+		form = PayoutForm(data=data, total=house_balance.balance, house=house)
+		if form.is_valid():
+			return self.form_valid(form, request, house_balance)
+		else:
+			return self.form_invalid(form)
+
+
+	def send_payout_email(self, payout):
+		subject = 'New payout for %s' % (payout.house.name)
+		context = {}
+		context["payout"] = payout
+		context["house"] = payout.house
+		context["payout_amount"] = '{0:.2f}'.format(payout.amount)
+		html_message = render_to_string('emails/payout_notify_us.html', context)
+		plain_message = strip_tags(html_message)
+		from_email = 'Arqam House Payout <admin@arqamhouse.com>'
+		to = ['info@arqamhouse.com', 'admin@arqamhouse.com']
+		mail.send_mail(subject, plain_message, from_email, to, html_message=html_message)
+		return "Done"
+
+	
+	def form_valid(self, form, request, house_balance):
+		house = self.get_house()
+		amount = decimal.Decimal(form.cleaned_data["amount"])
+		payout_setting = form.cleaned_data["payout_setting"]
+		payout = Payout.objects.create(house=house, amount=amount, payout_setting=payout_setting)
+		self.send_payout_email(payout)
+		messages.success(request, 'Payout Requested!')
+		valid_data = super(PayoutView, self).form_valid(form)
+		return valid_data
+
+
 
 	def get_context_data(self, *args, **kwargs):
 		context = {}
 		house = self.get_house()
-		transactions = Transaction.objects.filter(house=house)
-		refunds = Refund.objects.filter(transaction__in=transactions)
+		house_balance = HouseBalance.objects.get(house=house)
+		payout_settings = PayoutSetting.objects.filter(house=house)
 
-		transactions_amount = transactions.aggregate(Sum('house_amount'))
-		refunds_amount = refunds.aggregate(Sum('amount'))
-		print(transactions_amount)
-		print(refunds_amount)
+		total = '{0:.2f}'.format(house_balance.balance)
 
-		total = transactions_amount["house_amount__sum"] - refunds_amount["amount__sum"]
-		total = '{0:.2f}'.format(total)
-		print(total)
-		form = self.get_form()
+		form = PayoutForm(house_balance.balance, house)
+		print(form)
 		context["form"] = form
+		context["payout_settings"] = payout_settings
+		context["house_balance"] = house_balance
 		context["total"] = total
 		context["dashboard_events"] = self.get_events()
+		context["house"] = self.get_house()
 		return context
+
+
+	def form_invalid(self, form):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form))
 
 
 
 
 class PaymentListView(HouseAccountMixin, View):
-	
 	template_name = "payments/list.html"
 
-	def get_transactions(self, house):
-		transactions = Transaction.objects.filter(house=house).order_by("-created_at")
-		return transactions
-
-	def get_refunds(self, house):
-		refunds = Refund.objects.filter(transaction__house=house).order_by("-created_at")
-		return refunds
-
-	def get_payouts(self, house):
-		payouts = Payout.objects.filter(house=house).order_by("-created_at")
-		return payouts
-
-	def get_payments(self, house):
-		transactions = self.get_transactions(house)
-		refunds = self.get_refunds(house)
-		payouts = self.get_payouts(house)
-		payments = sorted(chain(transactions, refunds, payouts), key=attrgetter('created_at'), reverse=True)
-		return payments
-
+	def get_house_balance_logs(self, house):
+		house_balance = HouseBalance.objects.get(house=house)
+		house_balance_logs = HouseBalanceLog.objects.filter(house_balance=house_balance).order_by("-created_at")
+		return house_balance_logs
 
 	def get(self, request, *args, **kwargs):
 		return render(request, self.template_name, self.get_context_data())
@@ -87,9 +238,10 @@ class PaymentListView(HouseAccountMixin, View):
 	def get_context_data(self, data=None, *args, **kwargs):
 		context = {}
 		house = self.get_house()
-		payments = self.get_payments(house)
-		context["payments"] = payments
+		house_balance_logs = self.get_house_balance_logs(house)
+		context["house_balance_logs"] = house_balance_logs
 		context["dashboard_events"] = self.get_events()
+		context["house"] = self.get_house()
 		return context
 
 
@@ -112,6 +264,8 @@ class AddFundsView(HouseAccountMixin, FormView):
 		form = self.get_form()
 		context["public_key"] = settings.STRIPE_PUBLIC_KEY
 		context["form"] = form
+		context["house"] = self.get_house()
+		context["dashboard_events"] = self.get_events()
 		return context
 
 	
@@ -142,7 +296,7 @@ class AddFundsView(HouseAccountMixin, FormView):
 		
 		try:
 			stripe.api_key = settings.STRIPE_SECRET_KEY
-			transaction = Transaction.objects.create(house=house)
+			
 			charge = stripe.Charge.create(
 							amount = stripe_charge_amount,
 							currency = 'cad',
@@ -152,31 +306,31 @@ class AddFundsView(HouseAccountMixin, FormView):
 						)
 			print(charge)
 
-			transaction.amount = amount
-			transaction.house_amount = house_total
-			transaction.stripe_amount = stripe_amount
-			transaction.arqam_amount = arqam_amount
-
-			transaction.payment_id = charge['id']
-			transaction.failure_code = charge['failure_code']
-			transaction.failure_message = charge['failure_message']
-			transaction.last_four = charge.source['last4']
-			transaction.brand = charge.source['brand']
-			transaction.network_status = charge.outcome['network_status']
-			transaction.reason = charge.outcome['reason']
-			transaction.risk_level = charge.outcome['risk_level']
-			transaction.seller_message = charge.outcome['seller_message']
-			transaction.outcome_type = charge.outcome['type']
-			transaction.email = user.email
-			transaction.name = charge.source['name']
-			transaction.address_line_1 = charge.source['address_line1']
-			transaction.address_state = charge.source['address_state']
-			transaction.address_postal_code = charge.source['address_zip']
-			transaction.address_city = charge.source['address_city']
-			transaction.address_country = charge.source['address_country']
-			transaction.save()
+			transaction = Transaction.objects.create(house=house,
+			amount = amount,
+			house_amount = house_total,
+			stripe_amount = stripe_amount,
+			arqam_amount = arqam_amount,
+			house_payment = True,
+			payment_id = charge['id'],
+			failure_code = charge['failure_code'],
+			failure_message = charge['failure_message'],
+			last_four = charge.source['last4'],
+			brand = charge.source['brand'],
+			network_status = charge.outcome['network_status'],
+			reason = charge.outcome['reason'],
+			risk_level = charge.outcome['risk_level'],
+			seller_message = charge.outcome['seller_message'],
+			outcome_type = charge.outcome['type'],
+			email = user.email,
+			name = charge.source['name'],
+			address_line_1 = charge.source['address_line1'],
+			address_state = charge.source['address_state'],
+			address_postal_code = charge.source['address_zip'],
+			address_city = charge.source['address_city'],
+			address_country = charge.source['address_country'],
+			)
 			house_payment = HousePayment.objects.create(transaction=transaction)
-			house_payment.save()
 		except Exception as e:
 			print(e)
 			messages.success(request, 'An Error Occured. Please contact support.')
