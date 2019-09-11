@@ -4,15 +4,6 @@ pip-selfcheck.json
 
 arqamhouse/settings/local.py
 
-# Remove all the migration files 
-events/migrations
-core/migrations
-descriptions/migrations
-houses/migrations
-payments/migrations
-profiles/migrations
-questions/migrations
-
 celerybeat.pid
 
 
