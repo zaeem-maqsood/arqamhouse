@@ -16,7 +16,7 @@ class HouseAccountMixin(LoginRequiredMixin, object):
 
 	def test_func(self):
 		# house_users = HouseUser.objects.filter(profile=self.request.user)
-		pass
+		return True
 		# try:
 		# 	event = Event.objects.get(slug=self.kwargs['slug'])
 		# 	print(event)
