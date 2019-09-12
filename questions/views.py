@@ -8,7 +8,10 @@ from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.contrib import messages
 
+from django.contrib.auth.mixins import UserPassesTestMixin
+
 from houses.mixins import HouseAccountMixin
+from houses.models import HouseUser
 from events.models import Event, AttendeeCommonQuestions, Ticket, EventQuestion
 from questions.models import Question, MultipleChoice
 from questions.forms import QuestionForm, MutipleChoiceForm
@@ -16,7 +19,7 @@ from questions.forms import QuestionForm, MutipleChoiceForm
 
 
 
-class MultipleChoiceCreateView(HouseAccountMixin, CreateView):
+class MultipleChoiceCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
 	model = MultipleChoice
 	form_class = MutipleChoiceForm
 	template_name = "questions/multiple_choice_form.html"
@@ -78,7 +81,7 @@ class MultipleChoiceCreateView(HouseAccountMixin, CreateView):
 
 
 
-class MultipleChoiceUpdateView(HouseAccountMixin, UpdateView):
+class MultipleChoiceUpdateView(HouseAccountMixin, UserPassesTestMixin, UpdateView):
 	model = MultipleChoice
 	form_class = MutipleChoiceForm
 	template_name = "questions/multiple_choice_form.html"
@@ -140,7 +143,7 @@ class MultipleChoiceUpdateView(HouseAccountMixin, UpdateView):
 
 
 
-class QuestionCreateView(HouseAccountMixin, CreateView):
+class QuestionCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
 	model = Question
 	form_class = QuestionForm
 	template_name = "questions/question_form.html"
@@ -234,7 +237,7 @@ class QuestionCreateView(HouseAccountMixin, CreateView):
 
 
 
-class QuestionUpdateView(HouseAccountMixin, UpdateView):
+class QuestionUpdateView(HouseAccountMixin, UserPassesTestMixin, UpdateView):
 	model = Question
 	form_class = QuestionForm
 	template_name = "questions/question_form.html"
@@ -257,9 +260,13 @@ class QuestionUpdateView(HouseAccountMixin, UpdateView):
 
 
 	def get_one_to_one_object(self, one_to_one_type, one_to_one_id):
+		house_users = HouseUser.objects.filter(profile=self.request.user)
 		one_to_one_object = None
 		if one_to_one_type == 'events':
 			one_to_one_object = Event.objects.get(id=one_to_one_id)
+			for house_user in house_users:
+				if one_to_one_object.house != house_user.house:
+					raise Http404
 		return one_to_one_object
 
 

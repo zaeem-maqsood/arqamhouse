@@ -17,7 +17,7 @@ from events.models import Event, Ticket
 
 # Create your views here.
 
-class TicketListView(HouseAccountMixin, ListView):
+class TicketListView(HouseAccountMixin, UserPassesTestMixin, ListView):
 	model = Ticket
 	template_name = "events/tickets/list_tickets.html"
 
@@ -44,7 +44,7 @@ class TicketListView(HouseAccountMixin, ListView):
 
 
 
-class TicketCreateView(HouseAccountMixin, CreateView):
+class TicketCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
 	model = Ticket
 	form_class = None
 	template_name = "events/tickets/create_ticket.html"
@@ -174,7 +174,7 @@ class TicketCreateView(HouseAccountMixin, CreateView):
 
 
 
-class TicketUpdateView(HouseAccountMixin, UpdateView):
+class TicketUpdateView(HouseAccountMixin, UserPassesTestMixin, UpdateView):
 	model = Ticket
 	form_class = None
 	template_name = "events/tickets/create_ticket.html"

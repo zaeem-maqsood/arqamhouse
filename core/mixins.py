@@ -4,6 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.utils.decorators import method_decorator
 from django.shortcuts import redirect
+from django.core.exceptions import PermissionDenied
+
+from houses.models import House, HouseUser
+from events.models import Event
+
 
 
 class LoginRequiredMixin(object):

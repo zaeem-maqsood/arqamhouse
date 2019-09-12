@@ -1,0 +1,215 @@
+{% extends "backend/base.html" %}
+{% load static %}
+{% block title %}
+Dashboard | {{ House.name }}
+{% endblock title %}
+
+{% block page_title %}
+{{ House.name }}
+{% endblock page_title %}
+
+{% block css_vendors %}
+
+{% endblock css_vendors %}
+
+{% block vendors %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js" type="text/javascript" />
+{% endblock vendors %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+	var ctx2 = document.getElementById("myChart2");
+	var myChart2 = new Chart(ctx2, {
+	    type: 'line',
+	    aspectRatio: 2,
+	    data: {
+	        labels: {{ graph_data.day_label|safe }},
+	        datasets: [{
+	            label: 'Sales ($)',
+	            data: {{ graph_data.sales_label|safe }},
+	            backgroundColor: 'rgba(68, 153, 216, 0.2)',
+	            borderColor:'rgba(68, 153, 216, 1)',
+	            borderWidth: 4,
+	            lineTension: 0.1,
+	            borderCapStyle: 'butt',
+	            borderDashOffset: 3.0,
+            	borderJoinStyle: 'miter',
+            	pointBorderWidth: 6,
+            	pointHoverRadius: 5,
+            	pointHoverBorderWidth: 2,
+            	pointRadius: 0.5,
+            	pointHitRadius: 7,
+            	xPadding: 25,
+
+	        }]
+	    },
+	    options: {
+
+	    	legend: {
+	            display: false,
+			},
+
+			tooltips:{
+                enabled: true,
+				mode: 'label',
+
+				callbacks: {
+					label: function(item) {
+						label = (Math.round(item.yLabel * 100) / 100).toFixed(2);
+						label = label.toString();
+						label = " $ " + label
+						return label
+					},
+				},
+            },
+
+			layout: {
+				padding: {
+					left: 0,
+					right: 0,
+					top: 10,
+					bottom: 0
+				}
+			},
+
+	        animation: {
+	            duration: 4000,
+	        },
+
+	        maintainAspectRatio: false,
+
+	        scales: {
+	            yAxes: [{
+
+	            	gridLines: {
+						drawBorder: false,
+	                    display: false,
+	                },
+
+	                ticks: {
+						display: false,
+	                    beginAtZero: true,
+	                    suggestedMin: 0,
+                    	fontSize: 30,
+	                },
+
+	            }],
+
+	            xAxes: [{
+
+	                gridLines: {
+	                    display:false,
+	                },
+
+	                ticks: {
+                    	fontSize: 13,
+	                },
+
+	                stepSize: 5,
+	                position: 'bottom',
+
+	            }],
+
+	        },
+
+
+	        responsive: true,
+	    }
+	});
+</script>
+
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+
+{% endblock page_crumbs %}
+
+{% block content %}
+<style>
+.dashboard-links {
+	color: #7396b0;
+}
+</style>
+<div class="row">
+	<div class="col-12 col-lg-10">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+				<div class="row" style="padding-bottom:30px;">
+					<div class="col-9">
+						<h3><a class="dashboard-links" href="{{ event.get_update_view }}">{{ house.name }}</a></h3>
+					</div>
+					<div class="col-3">
+						<h3 class="float-right" style="color: #91baa2;">${{ house_balance.balance }}</h3>
+					</div>
+				</div>
+						
+				<div class="row">
+					<div class="col-12">
+						<canvas id="myChart2" width="400" height="200"></canvas>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<div class="row text-center">
+	<div class="col-12 col-lg-12">
+
+		<div class="row">
+
+			<div class="col-3">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" href="{% url 'events:create' %}">
+									<i class="la la-edit" style="font-size:3em;"></i>
+									<p style="padding-top: 10px;">Create Event</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{% if not payout_set %}
+			<div class="col-3">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" href="{% url 'payments:payout_settings_list' %}">
+									<i class="la la-cog" style="font-size:3em;"></i>
+									<p style="padding-top: 10px;">Set-up Payouts</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

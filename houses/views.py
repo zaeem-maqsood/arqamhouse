@@ -12,6 +12,7 @@ from django.core.files.base import ContentFile
 
 from django.db.models import Sum
 from django.utils.timezone import datetime, timedelta
+from django.utils import timezone
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect
@@ -32,70 +33,61 @@ from .forms import HouseForm, ConnectIndividualVerificationForm, ConnectCompanyV
 
 from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
 from profiles.models import Profile
-from payments.models import HouseBalance, HouseBalanceLog
+from payments.models import HouseBalance, HouseBalanceLog, Transaction, PayoutSetting
 
 
 
 # Create your views here.
 class DashboardView(HouseAccountMixin, DetailView):
 	model = House
-	template_name = "houses/new_dashboard.html"
+	template_name = "houses/house_dashboard.html"
 
+	def graph_data(self, house):
+		
+		transactions = Transaction.objects.filter(house=house, failed=False)
+		today = timezone.now()
+		days_earlier = today - timedelta(days=10)
+		day_label = []
+		sales_label = []
 
-	def get_attendees(self, house):
-		now = datetime.today()
-		ten_days_earlier = now - timedelta(days=10)
-		attendees = Attendee.objects.filter(order__event__house=house, order__created_at__range=(ten_days_earlier, now)).select_related("order", "ticket", "order__event").prefetch_related("order", "ticket", "order__event")
-		return attendees
-
-	def get_10_day_orders(self, house):
-		data = {}
-		today = datetime.today()
-		ten_days_earlier = today - timedelta(days=10)
-
-		all_orders = EventOrder.objects.filter(event__house=house ,created_at__lte=today, created_at__gte=ten_days_earlier)
-		data_sales = []
-		data_days = []
-		use_large_scale = False
-		for x in range(11):
+		for x in range(10):
 			one_day_earlier = today - timedelta(days=x)
-			data_days.append("%s %s" % (one_day_earlier.strftime('%b'), one_day_earlier.day))
-			orders = all_orders.filter(created_at__day=one_day_earlier.day)
-			today_sum = orders.aggregate(Sum('amount'))
-			if today_sum["amount__sum"] == None:
-				data_sales.append(0.00)
-			else:
-				data_sales.append(float(today_sum['amount__sum']))
-				if today_sum["amount__sum"] > 20:
-					use_large_scale = True
-		data_total_orders = all_orders.count()
-		data_total_sales = sum(data_sales)
-		data["data_sales"] = list(reversed(data_sales))
-		data["data_days"] = list(reversed(data_days))
-		data["data_total_orders"] = data_total_orders
-		data["data_total_sales"] = data_total_sales
-		data["use_large_scale"] = use_large_scale
-		return data
+			transactions_for_day = transactions.filter(created_at__day=one_day_earlier.day)
 
+			sales_sum = 0
+			for transaction in transactions_for_day:
+				sales_sum += transaction.house_amount
+
+			sales_label.append('{0:.2f}'.format(sales_sum))
+			day_label.append("%s %s" % (one_day_earlier.strftime('%b'), one_day_earlier.day))
+
+		
+		sales_label = list(reversed(sales_label))
+		day_label = list(reversed(day_label))
+
+		graph_data = {'sales_label':sales_label, 'day_label':day_label}
+		return graph_data
 
 
 	def get(self, request, *args, **kwargs):
 
 		context = {}
-
-		# ------------- House Mixin Context Variables 
 		house = self.get_house()
+		house_balance = HouseBalance.objects.get(house=house)
 		events = self.get_events()
 		profile = self.get_profile()
+
+		graph_data = self.graph_data(house)
+		print(graph_data)
+
+		context["payout_set"] = PayoutSetting.objects.filter(house=house).exists()
+		context["house_balance"] = house_balance
+		context["graph_data"] = graph_data
 		context["house"] = house
 		context["dashboard_events"] = events
 		context["profile"] = profile
-		# ------------- House Mixin Context Variables 
-
-		attendees = self.get_attendees(house)
-		context["attendees"] = attendees[:5]
-		# context["data"] = self.get_10_day_orders(house)
 		context["dashboard_tab"] = True
+
 		return render(request, self.template_name, context)
 
 

@@ -31,7 +31,8 @@ def get_event(slug):
 
 
 # Create your views here.
-class AttendeeListView(HouseAccountMixin, ListView):
+
+class AttendeeListView(HouseAccountMixin, UserPassesTestMixin, ListView):
 	model = Attendee
 	template_name = "events/attendees/event_attendees.html"
 
@@ -185,7 +186,7 @@ class AttendeeListView(HouseAccountMixin, ListView):
 
 
 
-class AttendeeDetailView(HouseAccountMixin, FormView):
+class AttendeeDetailView(HouseAccountMixin, UserPassesTestMixin, FormView):
 	model = Attendee
 	template_name = "events/attendees/event_attendees_detail.html"
 

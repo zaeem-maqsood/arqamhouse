@@ -11,5 +11,7 @@ from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils import timezone
 
+from django.contrib.auth.mixins import UserPassesTestMixin
+
 from houses.mixins import HouseAccountMixin
 from events.models import Event
