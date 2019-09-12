@@ -28,7 +28,7 @@ class DonationTicketForm(forms.ModelForm):
 				"description": forms.Textarea(
 						attrs={
 							"class":"form-control m-input",
-							"placeholder":"Give you event a short and sweet description to hook in potential ticket buyers. Totally optional.",
+							"placeholder":"Give your ticket a description here. Totally optional.",
 							"rows": '3'
 						}
 					),
@@ -49,8 +49,8 @@ class DonationTicketForm(forms.ModelForm):
 
 class FreeTicketForm(DonationTicketForm):
 
-	min_amount = forms.IntegerField(min_value=0, max_value=10, widget=forms.NumberInput(attrs={"class":"form-control m-input", "placeholder": '0'}))
-	max_amount = forms.IntegerField(min_value=0, max_value=10, widget=forms.NumberInput(attrs={"class":"form-control m-input", "placeholder": '10'}))
+	min_amount = forms.IntegerField(min_value=0, max_value=10, required=False, widget=forms.NumberInput(attrs={"class":"form-control m-input", "placeholder": '0'}))
+	max_amount = forms.IntegerField(min_value=0, max_value=10, required=False, widget=forms.NumberInput(attrs={"class":"form-control m-input", "placeholder": '10'}))
 
 	class Meta:
 		model = Ticket
@@ -72,7 +72,7 @@ class FreeTicketForm(DonationTicketForm):
 				"description": forms.Textarea(
 						attrs={
 							"class":"form-control m-input",
-							"placeholder":"Give you event a short and sweet description to hook in potential ticket buyers. Totally optional.",
+							"placeholder":"Give your ticket a description here. Totally optional..",
 							"rows": '3'
 						}
 					),
@@ -104,7 +104,7 @@ class PaidTicketForm(FreeTicketForm):
 				"description": forms.Textarea(
 						attrs={
 							"class":"form-control m-input",
-							"placeholder":"Give you event a short and sweet description to hook in potential ticket buyers. Totally optional.",
+							"placeholder":"Give your ticket a description here. Totally optional.",
 							"rows": '3'
 						}
 					),
@@ -117,13 +117,6 @@ class PaidTicketForm(FreeTicketForm):
 							"step": "0.01",
 							"value": "5.00",
 							"required": True,
-						}
-					),
-
-				"sale_price": forms.NumberInput(
-						attrs={
-							"class":"form-control m-input",
-							"id": "id_sale_price",
 						}
 					),
 

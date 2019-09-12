@@ -110,32 +110,26 @@ $('#id_price').bind('input', function() {
 {% endblock scripts %}
 
 
-{% block page_crumbs %}
-<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
-	<li class="m-nav__item">
-		<a href="{{ profile.get_update_url }}" class="m-nav__link">
-			<span class="m-nav__link-text">{{ event.title }}</span>
-		</a>
-	</li>
-</ul>
-{% endblock page_crumbs %}
 
 {% block content %}
 <style>
 .dashboard-links {
 	color: #7396b0;
 }
+.card-header {
+    background-color: #e7f5ff;
+}
 </style>
 
 
 <form method="POST" enctype="multipart/form-data">{% csrf_token %}
-	<div class="row">
-		<div class="col-8">
+	<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+		<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
 			<div class="kt-portlet kt-portlet--mobile">
-				<div class="kt-portlet__body">
+				<div class="kt-portlet__body" style="margin: 30px;">
 
 					<input type="hidden" name="token" id="token">
-					
+
 					{% if form.non_field_errors %}
 					<div class="row">
 						<div class="col-md-10">
@@ -149,8 +143,8 @@ $('#id_price').bind('input', function() {
 					{% endif %}
 
 					<div class="row" {% if not donation_ticket %}style="padding-bottom: 20px;"{% endif %}>
-						<div class="col-md-10">
-							<p style="font-weight: 600;margin-bottom:0px;{% if form.title.errors %}color:red;{% endif %}">Title</p>
+						<div class="col-md-10 offset-md-1">
+							<p style="font-size:1.1rem;font-weight: 500;margin-bottom:0px;{% if form.title.errors %}color:red;{% endif %}">Ticket Name <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
 							{{ form.title }}
 							<br>
 							{% for error in form.title.errors %}
@@ -161,8 +155,63 @@ $('#id_price').bind('input', function() {
 						</div>
 					</div>
 
-					<div class="row" {% if not donation_ticket %}style="padding-bottom: 40px;"{% endif %}>
-						<div class="col-md-10">
+					{% if paid_ticket %}
+					<div class="row" {% if not donation_ticket %}style="padding-bottom: 20px;"{% endif %}>
+						<div class="col-md-10 offset-md-1">
+							<p style="font-weight: 600;margin-bottom:0px;{% if form.price.errors %}color:red;{% endif %}">Price <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
+							{{ form.price }}
+							<br>
+							{% for error in form.price.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+									{{ error }}
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+
+					<div class="row" {% if not donation_ticket %}style="padding-bottom: 10px;"{% endif %}>
+						<div class="col-md-10 offset-md-1">
+							<div style="padding-bottom: 30px;" class="accordion" id="accordionExample4">
+								<div class="card">
+									<div class="card-header" id="headingTwo1">
+										<div class="card-title collapsed" data-toggle="collapse" data-target="#collapseTwo4" aria-expanded="false" aria-controls="collapseTwo4">
+											<i class="la la-plus"></i>Pricing Options
+										</div>
+									</div>
+									<div id="collapseTwo4" class="collapse" aria-labelledby="headingTwo1" data-parent="#accordionExample4">
+										<div class="card-body">
+
+											
+											<div class="row" style="padding-bottom: 10px;">
+												<div class="col-lg-4 col-md-4 col-4">
+													<span class="kt-switch kt-switch--icon mx-auto" style="user-select: auto;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="You can choose to pass on the processing fee to buyers.">
+														<p style="margin-bottom:0px;">Pass Fee</p>
+														<label style="user-select: auto;">
+															{{ form.pass_fee }}
+															<span style="user-select: auto;"></span>
+														</label>
+													</span>
+												</div>
+												<div class="col-md-4 col-4">
+													<h3 class="m--font-info" id="new_price_div" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="This is the amount the buyer will have to pay for this ticket.">$0.00</h3>
+													<p>Buyer Price</p>
+												</div>
+												<div class="col-md-4 col-4">
+													<h3 class="m--font-success" id="amount_received_div" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="This is the amount you will recieve for each one of these tickets sold.">$0.00</h3>
+													<p>Your Payout</p>
+												</div>
+											</div>
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					{% endif %}
+
+					<div class="row" {% if not donation_ticket %}style="padding-bottom: 30px;"{% endif %}>
+						<div class="col-md-10 offset-md-1">
 							<p style="font-weight: 600;margin-bottom:0px;{% if form.description.errors %}color:red;{% endif %}">Description</p>
 							{{ form.description }}
 							<br>
@@ -175,118 +224,79 @@ $('#id_price').bind('input', function() {
 					</div>
 
 
-					{% if paid_ticket %}
-					<div class="row" style="padding-bottom: 10px;">
-						<div class="col-md-10">
-							<div class="row">
-								<div class="col-md-4">
-									<p style="font-weight: 600;margin-bottom:0px;{% if form.price.errors %}color:red;{% endif %}">Price</p>
-									{{ form.price }}
-									<br>
-									{% for error in form.price.errors %}
-										<div class="alert m-alert--outline alert-danger" role="alert">
-											{{ error }}
-										</div>
-									{% endfor %}
-								</div>
-								<div class="col-md-4">
-									<h3 class="m--font-info" id="new_price_div">$0.00</h3>
-									<p>Buyer Price</p>
-								</div>
-								<div class="col-md-4">
-									<h3 class="m--font-success" id="amount_received_div">$0.00</h3>
-									<p>Your Payout</p>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="row" style="padding-bottom: 50px;">
-						<div class="col-md-4">
-							<span class="kt-switch kt-switch--icon mx-auto" style="user-select: auto;">
-								<p style="font-weight: 600;margin-bottom:0px;">Pass Fee</p>
-								<label style="user-select: auto;">
-									{{ form.pass_fee }}
-									<span style="user-select: auto;"></span>
-								</label>
-							</span>
-						</div>
-					</div>
-					
-					{% endif %}
-
-
 					{% if not donation_ticket %}
-			        <div class="row" style="padding-bottom: 10px;padding-top:30px;">
-						<div class="col-md-6">
-							<p style="font-weight: 600;margin-bottom:0px;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="The minimum amount of tickets the buyer must purchase per order. Leave blank for default.">Min Amount</p>
-							{{ form.min_amount }}
-							<br>
-							{% for error in form.min_amount.errors %}
-								<div class="alert m-alert--outline alert-danger" role="alert">
-									{{ error }}
-								</div>
-							{% endfor %}
-						</div>
-						<div class="col-md-6">
-							<p style="font-weight: 600;margin-bottom:0px;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="The maximum amount of tickets the buyer is able to purchase per order. Leave blank for default.">Max Amount</p>
-							{{ form.max_amount }}
-							<br>
-							{% for error in form.max_amount.errors %}
-								<div class="alert m-alert--outline alert-danger" role="alert">
-									{{ error }}
-								</div>
-							{% endfor %}
-						</div>
-					</div>
+					<div class="row" style="padding-bottom: 10px;">
+						<div class="col-md-10 offset-md-1">
+							<div style="padding-bottom: 30px;" class="accordion" id="accordionExample4">
+								<div class="card">
+									<div class="card-header" id="headingTwo4">
+										<div class="card-title collapsed" data-toggle="collapse" data-target="#collapseThree4" aria-expanded="false" aria-controls="collapseThree4">
+											<i class="la la-plus"></i> Additional Settings
+										</div>
+									</div>
+									<div id="collapseThree4" class="collapse" aria-labelledby="headingThree1" data-parent="#accordionExample4">
+										<div class="card-body">
 
-					<div class="row" style="padding-bottom: 50px;">
-						<div class="col-md-6">
-							<p style="font-weight: 600;margin-bottom:0px;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Total number of tickets available for this ticket. Leave blank if unlimited.">Amount Available</p>
-							{{ form.amount_available }}
-							{% for error in form.amount_available.errors %}
-								<div class="alert m-alert--outline alert-danger" role="alert">
-									{{ error }}
+
+											<div class="row" style="padding-bottom: 10px;padding-top:30px;">
+												<div class="col-lg-4 col-md-12">
+													<p style="margin-bottom:0px;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="The minimum amount of tickets the buyer must purchase per order. Leave blank for default.">Min Amount</p>
+													{{ form.min_amount }}
+													<br>
+													{% for error in form.min_amount.errors %}
+														<div class="alert m-alert--outline alert-danger" role="alert">
+															{{ error }}
+														</div>
+													{% endfor %}
+												</div>
+												<div class="col-lg-4 col-md-12">
+													<p style="margin-bottom:0px;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="The maximum amount of tickets the buyer is able to purchase per order. Leave blank for default.">Max Amount</p>
+													{{ form.max_amount }}
+													<br>
+													{% for error in form.max_amount.errors %}
+														<div class="alert m-alert--outline alert-danger" role="alert">
+															{{ error }}
+														</div>
+													{% endfor %}
+												</div>
+												<div class="col-lg-4 col-md-12">
+													<p style="margin-bottom:0px;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Total number of tickets available for this ticket. Leave blank if unlimited.">Total</p>
+													{{ form.amount_available }}
+													{% for error in form.amount_available.errors %}
+														<div class="alert m-alert--outline alert-danger" role="alert">
+															{{ error }}
+														</div>
+													{% endfor %}
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
-							{% endfor %}
+							</div>
 						</div>
 					</div>
 					{% endif %}
-
 					
-
-
-					<div class="row">
-					{% if button_text == "Update Ticket" %}
-							<div class="col-md-6">
-								<button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">{{ button_text }}</button>
+					<div class="row" style="padding-bottom: 10px;">
+						<div class="col-md-10 offset-md-1">
+							<div class="row">
+							{% if button_text == "Update Ticket" %}
+									<div class="col-md-6" style="padding-top: 20px;">
+										<button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">{{ button_text }}</button>
+									</div>
+									<div class="col-md-6" style="padding-top: 20px;">
+										<button type="submit" name="delete" value="delete" class="btn btn-danger btn-block">Delete Ticket</button>
+									</div>
+							{% else %}
+								<div class="col-md-12">
+									<button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">{{ button_text }}</button>
+								</div>
+							{% endif %}
 							</div>
-							<div class="col-md-6">
-								<button type="submit" name="delete" value="delete" class="btn btn-danger btn-block">Delete Ticket</button>
-							</div>
-					{% else %}
-						<div class="col-md-12">
-							<button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">{{ button_text }}</button>
-						</div>
-					{% endif %}
-					</div>
-
-
-
-				</div>
-			</div>
-		</div>
-		<div class="col-lg-2 col-md-4 col-6">
-			<div class="kt-portlet kt-portlet--mobile">
-				<div class="kt-portlet__body">
-					<div class="row text-center">
-						<div class="col-12">
-							<a class="dashboard-links" href="{{ event.list_attendees_view }}">
-								<h1>{{ form.instance.amount_sold }}</h1>
-								<p>Ticket{% if form.instance.amount_sold > 1 %}s{% endif %} Sold</p>
-							</a>
 						</div>
 					</div>
+
+
 				</div>
 			</div>
 		</div>

@@ -67,107 +67,118 @@ Create House
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-10 col-lg-8">
-                <img src="{% static 'images/logo.png' %}" style="max-height: 6em;">
-                <p class="lead">
-                    Give your House a name
-                </p>
 
-                <form class="row justify-content-center" action="" method="POST" id="profileForm" data-regions-url="{% url 'profiles:ajax_load_regions' %}" data-cities-url="{% url 'profiles:ajax_load_cities' %}">{% csrf_token %}
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-md-12">
+                        <img src="{% static 'images/logo.png' %}" style="max-height: 6em;">
+                        <p class="lead">
+                            Give your House a name
+                        </p>
+                    </div>
+                </div>
+
+                <form action="" method="POST" id="profileForm" data-regions-url="{% url 'profiles:ajax_load_regions' %}" data-cities-url="{% url 'profiles:ajax_load_cities' %}">{% csrf_token %}
                 	
                 	{% if form.non_field_errors %}
-                	<div class="col-md-12">
-                        <div class="alert bg--error">
-							<div class="alert__body">
-								{% for error in form.non_field_errors %}
-                                <span>{{ error|escape }}</span>
-                            	{% endfor %}
-							</div>
-							<div class="alert__close">×</div>
-						</div>
-                	</div>
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.non_field_errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
+                            </div>
+                        </div>
+                    </div>
                 	{% endif %}
 
-                    <div class="col-md-12">
-                    	{{ form.name }}
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-8">
+                            {{ form.name }}
+                        </div>
                     </div>
-                    <hr>
 
-                    <div class="col-md-12">
-                        <ul class="accordion accordion-2">
-                            <li>
-                                <div class="accordion__title">
-                                    <span class="h5">Change Location of House</span>
-                                </div>
-                                <div class="accordion__content">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            {{ form.country }}
-                                        </div>
-                                        <br>
-                                        <div class="col-md-12">
-                                            {{ form.region }}
-                                        </div>
-                                        <br>
-                                        <div class="col-md-12">
-                                            {{ form.city }}
-                                        </div>
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-8">
+                            <ul class="accordion accordion-2">
+                                <li>
+                                    <div class="accordion__title">
+                                        <span class="h5">Change Location of House</span>
                                     </div>
-                                </div>
-                            </li>
-                        </ul>
+                                    <div class="accordion__content">
+                                        {{ form.region }}
+                                        <br>
+                                        <br>
+                                        {{ form.city }}
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
                     {% if form.country.errors %}
-                    <div class="col-md-12">
-                        <div class="alert bg--error">
-                            <div class="alert__body">
-                                {% for error in form.country.errors %}
-                                <span>Country | {{ error|escape }}</span>
-                                {% endfor %}
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.country.errors %}
+                                    <span>Country | {{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
                             </div>
-                            <div class="alert__close">×</div>
                         </div>
                     </div>
                     {% endif %}
 
                     {% if form.region.errors %}
-                    <div class="col-md-12">
-                        <div class="alert bg--error">
-                            <div class="alert__body">
-                                {% for error in form.region.errors %}
-                                <span>Province/State | {{ error|escape }}</span>
-                                {% endfor %}
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.region.errors %}
+                                    <span>Province/State | {{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
                             </div>
-                            <div class="alert__close">×</div>
                         </div>
                     </div>
                     {% endif %}
 
                     {% if form.city.errors %}
-                    <div class="col-md-12">
-                        <div class="alert bg--error">
-                            <div class="alert__body">
-                                {% for error in form.city.errors %}
-                                <span>City | {{ error|escape }}</span>
-                                {% endfor %}
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.city.errors %}
+                                    <span>City | {{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
                             </div>
-                            <div class="alert__close">×</div>
                         </div>
                     </div>
                     {% endif %}
 
-                    <div class="col-md-12">
-                        <div class="input-checkbox">
-                            {{ form.agree }}
-                            <label for="checkbox"></label>
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12">
+                            <div class="input-checkbox">
+                                {{ form.agree }}
+                                <label for="checkbox"></label>
+                            </div>
+                            <span>I have read and agree to the
+                                <a href="#">terms and conditions</a>
+                            </span>
                         </div>
-                        <span>I have read and agree to the
-                            <a href="#">terms and conditions</a>
-                        </span>
                     </div>
 
-                    <div class="col-md-12">
-                        <button type="submit" class="btn btn--primary type--uppercase">Create House</button>
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-8">
+                            <button type="submit" class="btn btn--primary type--uppercase">Create House</button>
+                        </div>
                     </div>
                     
                 </form>

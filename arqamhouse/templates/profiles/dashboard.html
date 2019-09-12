@@ -24,13 +24,35 @@ Profile Dashboard
     <div class="container" style="padding-bottom: 60px;">
         <div class="row" style="padding-bottom: 20px;padding-top: 30px;">
             <div class="col-md-12 col-lg-9">
-                <img src="{% static 'images/logo.png' %}" style="max-height: 6em;">
-                <p style="margin-bottom: 5px;">Hello {{ profile.name }}. We are working very hard to make individual accounts on Arqam House powerful.</p>
-                <p>In the mean time please consider creating a House.</p>
-                <a href="#" style="color: #4399d5;">What is a house?</a>
-                <br>
-                <br>
-                <div class="row" style="padding-bottom: 20px;padding-top: 30px;">
+                
+
+                {% if profile.is_active %}
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <img src="{% static 'images/logo.png' %}" style="max-height: 6em;">
+                        <p style="margin-bottom: 5px;">Hello {{ profile.name }}. We are working very hard to make individual accounts on Arqam
+                            House powerful.</p>
+                        <p>In the mean time please consider creating a House.</p>
+                    </div>
+                </div>
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-8">
+                        <ul class="accordion accordion-1 accordion--oneopen">
+                            <li>
+                                <div class="accordion__title">
+                                    <span class="h5">What is a house?</span>
+                                </div>
+                                <div class="accordion__content">
+                                    <p style="margin-bottom:0px;">A house can be considered your company/organization/group etc.</p>
+                                    <p>Your house is what identifies you to the rest of the world.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="row" style="padding-bottom: 20px;">
                     <div class="col-6">
                         <a href="{% url 'houses:create' %}" class="btn btn--primary" style="color: white;">Create House</a>
                     </div>
@@ -38,6 +60,16 @@ Profile Dashboard
                         <a href="{% url 'profiles:logout' %}" class="btn btn--info" >Logout</a>
                     </div>
                 </div>
+
+                {% else %}
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <img src="{% static 'images/logo.png' %}" style="max-height: 6em;">
+                        <p style="margin-bottom: 5px;">Hello {{ profile.name }}. Please finish activating your account through the email we just sent you.</p>
+                    </div>
+                </div>
+                {% endif %}
+
             </div>
         </div>
         <!--end of row-->

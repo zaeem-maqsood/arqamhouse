@@ -152,6 +152,7 @@ CELERY_BEAT_SCHEDULE = {
 
 
 # Sendgrid Email Backend
+DEFAULT_FROM_EMAIL = 'info@arqamhouse.com'
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 # SENDGRID_API_KEY = os.environ["SENDGRID_API_KEY"]
 SENDGRID_API_KEY = "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"

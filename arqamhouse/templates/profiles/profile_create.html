@@ -62,124 +62,125 @@ Create House
 {% endblock scripts %}
 
 {% block content %}
-<section class="text-center">
+<section class="text-center" style="padding-top:5rem;">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8">
-                <img src="{% static 'images/logo.png' %}" style="max-height: 6em;">
-                <p class="lead">
-                    Make an account with us 
-                </p>
+            <div class="col-md-6 offset-md-3">
 
-                <form class="row justify-content-center" action="" method="POST" id="profileForm" data-regions-url="{% url 'profiles:ajax_load_regions' %}" data-cities-url="{% url 'profiles:ajax_load_cities' %}">{% csrf_token %}
-                	
-                	{% if form.non_field_errors %}
-                	<div class="col-md-12">
-                        <div class="alert bg--error">
-							<div class="alert__body">
-								{% for error in form.non_field_errors %}
-                                <span>{{ error|escape }}</span>
-                            	{% endfor %}
-							</div>
-							<div class="alert__close">×</div>
-						</div>
-                	</div>
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <img src="{% static 'images/logo.png' %}" style="max-height: 5em;">
+                        <p class="lead">
+                            Make an account with us 
+                        </p>
+                    </div>
+                </div>
+                
+
+                <form action="" method="POST" id="profileForm" data-regions-url="{% url 'profiles:ajax_load_regions' %}" data-cities-url="{% url 'profiles:ajax_load_cities' %}">{% csrf_token %}
+                    
+                    
+                    {% if form.non_field_errors %}
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.non_field_errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
+                            </div>
+                        </div>
+                    </div>
                 	{% endif %}
 
-                	{% if form.email.errors %}
-                	<div class="col-md-12">
-                        <div class="alert bg--error">
-							<div class="alert__body">
-								{% for error in form.email.errors %}
-                                <span>{{ error|escape }}</span>
-                            	{% endfor %}
-							</div>
-							<div class="alert__close">×</div>
-						</div>
-					</div>
+                    {% if form.email.errors %}
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.email.errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
+                            </div>
+                        </div>
+                    </div>
                 	{% endif %}
 
                     {% if form.password.errors %}
-                    <div class="col-md-12">
-                        <div class="alert bg--error">
-                            <div class="alert__body">
-                                {% for error in form.password.errors %}
-                                <span>{{ error|escape }}</span>
-                                {% endfor %}
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.password.errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
                             </div>
-                            <div class="alert__close">×</div>
                         </div>
                     </div>
                     {% endif %}
 
-                    <div class="col-md-12">
-                    	{{ form.name }}
+                    {% if form.password2.errors %}
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.password2.errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            {{ form.name }}
+                        </div>
                     </div>
 
-                    <div class="col-md-4">
-                        {{ form.email }}
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            {{ form.email }}
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        {{ form.password1 }}
+
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            {{ form.password1 }}
+                        </div>
                     </div>
-                    <div class="col-md-4">
+
+
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-md-12">
                         {{ form.password2 }}
+                        </div>
                     </div>
 
                     <hr>
 
-
-                    {% if form.country.errors %}
-                    <div class="col-md-12">
-                        <div class="alert bg--error">
-                            <div class="alert__body">
-                                {% for error in form.country.errors %}
-                                <span>Country | {{ error|escape }}</span>
-                                {% endfor %}
-                            </div>
-                            <div class="alert__close">×</div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if form.region.errors %}
-                    <div class="col-md-12">
-                        <div class="alert bg--error">
-                            <div class="alert__body">
-                                {% for error in form.region.errors %}
-                                <span>Province/State | {{ error|escape }}</span>
-                                {% endfor %}
-                            </div>
-                            <div class="alert__close">×</div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if form.city.errors %}
-                    <div class="col-md-12">
-                        <div class="alert bg--error">
-                            <div class="alert__body">
-                                {% for error in form.city.errors %}
-                                <span>City | {{ error|escape }}</span>
-                                {% endfor %}
-                            </div>
-                            <div class="alert__close">×</div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <div class="col-md-4">
-                        {{ form.country }}
-                    </div>
-                    <div class="col-md-4">
+                    <div class="row" style="padding-bottom: 20px;padding-top: 10px;">
+                        <div class="col-md-12">
                         {{ form.region }}
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        {{ form.city }}
+
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            {{ form.city }}
+                        </div>
                     </div>
 
 
-                    <div class="col-md-12" style="padding-top: 30px;">
+                    <div class="col-md-12" style="padding-top: 10px;">
                     	<div class="input-checkbox">
                 			{{ form.agree }}
                 			<label for="checkbox"></label>

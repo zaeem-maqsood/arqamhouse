@@ -15,11 +15,12 @@ from houses.models import HouseUser
 from events.models import Event, AttendeeCommonQuestions, Ticket, EventQuestion
 from questions.models import Question, MultipleChoice
 from questions.forms import QuestionForm, MutipleChoiceForm
+from questions.mixins import QuestionSecurityMixin
 
 
 
 
-class MultipleChoiceCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
+class MultipleChoiceCreateView(HouseAccountMixin, QuestionSecurityMixin, UserPassesTestMixin, CreateView):
 	model = MultipleChoice
 	form_class = MutipleChoiceForm
 	template_name = "questions/multiple_choice_form.html"
@@ -81,7 +82,7 @@ class MultipleChoiceCreateView(HouseAccountMixin, UserPassesTestMixin, CreateVie
 
 
 
-class MultipleChoiceUpdateView(HouseAccountMixin, UserPassesTestMixin, UpdateView):
+class MultipleChoiceUpdateView(HouseAccountMixin, QuestionSecurityMixin, UserPassesTestMixin, UpdateView):
 	model = MultipleChoice
 	form_class = MutipleChoiceForm
 	template_name = "questions/multiple_choice_form.html"
@@ -148,6 +149,24 @@ class QuestionCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
 	form_class = QuestionForm
 	template_name = "questions/question_form.html"
 
+	def test_func(self):
+		house_users = HouseUser.objects.filter(profile=self.request.user)
+		one_to_one_type = self.kwargs['one_to_one_type']
+		one_to_one_id = self.kwargs['one_to_one_id']
+
+		if one_to_one_type == 'events':
+			try:
+				event = Event.objects.get(id=self.kwargs['one_to_one_id'])
+				for house_user in house_users:
+					if event.house == house_user.house:
+						return True
+				return False
+			except:
+				raise Http404
+		else:
+			# Change this when new objects are introduced
+			return False
+
 	def get_success_url(self):
 		one_to_one_type = self.kwargs['one_to_one_type']
 		one_to_one_id = self.kwargs['one_to_one_id']
@@ -160,6 +179,8 @@ class QuestionCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
 		one_to_one_object = None
 		if one_to_one_type == 'events':
 			one_to_one_object = Event.objects.get(id=one_to_one_id)
+		else:
+			raise Http404
 		return one_to_one_object
 
 
@@ -207,11 +228,13 @@ class QuestionCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
 	def form_valid(self, form, request, one_to_one_type, one_to_one_object):
 
 		data = request.POST
+		house = self.get_house()
+		self.object = form.save()
+
+		self.object.house = house
 
 		if form.cleaned_data['question_type'] == 'simple':
 			self.object.question_type = 'simple'
-
-		self.object = form.save()
 
 		if one_to_one_type == 'events':
 			event_question = EventQuestion.objects.create(event=one_to_one_object, question=self.object)
@@ -237,7 +260,7 @@ class QuestionCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
 
 
 
-class QuestionUpdateView(HouseAccountMixin, UserPassesTestMixin, UpdateView):
+class QuestionUpdateView(HouseAccountMixin, QuestionSecurityMixin, UserPassesTestMixin, UpdateView):
 	model = Question
 	form_class = QuestionForm
 	template_name = "questions/question_form.html"

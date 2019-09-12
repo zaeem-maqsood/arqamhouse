@@ -26,17 +26,17 @@
 
 {% block content %}
 <form method="POST">{% csrf_token %}
-<div class="row">
-    <div class="col-md-8">
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+    <div class="col-lg-10 offset-lg-1 col-md-12 col-12">
 
         <div class="kt-portlet kt-portlet--mobile">
-            <div class="kt-portlet__body">
+            <div class="kt-portlet__body" style="margin: 30px;">
 
-                <div class="row" style="padding-top:30px;">
+                <div class="row">
                     <div class="col-md-12">
                         <div class="row">
-                            <div class="col-md-12">
-                                <p style="font-weight: 500;">Questions Title</p>
+                            <div class="col-md-10 offset-md-1">
+                                <p style="font-weight: 500;">Title <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
                                 {{ form.title }}
                             </div>
                         </div>
@@ -44,12 +44,14 @@
                 </div>
 
                 <div class="row" style="padding-top:30px;">
-                    <div class="col-md-6">
-                        <p style="font-weight: 500;">Questions Type</p>
+                    <div class="col-md-10 offset-md-1">
+                        <p style="font-weight: 500;">Type <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
                         {{ form.question_type }}
                     </div>
-                    <div class="col-md-2">
-                        <p style="font-weight: 500;">Required</p>
+                </div>
+                <div class="row" style="padding-top:30px;">
+                    <div class="col-md-10 offset-md-1">
+                        <p style="font-weight: 500;">Required <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Make this question required to answer."></i></p>
                         <span class="kt-switch kt-switch--lg">
                             <label>
                                 {{ form.required }}
@@ -57,17 +59,19 @@
                             </label>
                         </span>
                     </div>
-                    <div class="col-md-4">
-                        <p style="font-weight: 500;">Order</p>
+                </div>
+                <div class="row" style="padding-top:30px;">
+                    <div class="col-md-10 offset-md-1">
+                        <p style="font-weight: 500;">Order <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Choose the order in which you would like to ask this question."></i> <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
                         {{ form.order }}
                     </div>
                 </div>
                 
                 <div class="row" style="padding-top:30px;">
-                    <div class="col-md-12">
+                    <div class="col-md-10 offset-md-1">
                         <div class="row">
                             <div class="col-md-12">
-                                <p style="font-weight: 500;">Question Help Text</p>
+                                <p style="font-weight: 500;">Help Text <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="You can provide buyers help text to assist them in answering this question."></i></p>
                                 {{ form.help_text }}
                             </div>
                         </div>
@@ -76,8 +80,8 @@
 
                 {% if question.question_type == "Multiple Choice" %}
                 <div class="row" style="padding-top:30px;">
-                    <div class="col-md-12">
-                        <p style="font-weight: 500;">Options</p>
+                    <div class="col-md-10 offset-md-1">
+                        <p style="font-weight: 500;">Options <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Add options for your question."></i></p></p>
                         
                             {% for option in options %}
                                 <a href="{% url 'questions:update_option' one_to_one_type one_to_one_id question.id option.id %}"><p>{{ option.title }}</p></a>
@@ -87,16 +91,10 @@
                 </div>
                 {% endif %}
 
-                <div class="row" style="padding-top: 30px;">
-                    <div class="col-md-12">
-                        <br>
-                    </div>
-                </div>
 
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <p style="font-weight: 500;">Ask this question to the buyer?</p>
+                <div class="row" style="padding-top: 50px;">
+                    <div class="col-md-10 offset-md-1">
+                        <p style="font-weight: 500;">Ask question to buyer? <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Would you like this question to be asked by the buyer (individual buying the tickets) ?"></i></p>
                         <span class="kt-switch">
                             <label>
                                 <input type="checkbox" {% if event_question.order_question %}checked{% endif %} name="order_question" style="user-select: auto;" id="order_question">
@@ -108,15 +106,15 @@
 
 
                 <div class="row" style="padding-top: 40px;">
-                    <div class="col-md-12">
-                        <p style="font-weight: 500;">Choose the tickets you'd like this question to be asked in.</p>
+                    <div class="col-md-10 offset-md-1">
+                        <p style="font-weight: 500;">Choose the tickets you'd like this question to be asked in. <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Select the tickets that will trigger this question to be asked."></i></p>
                     </div>
                 </div>
 
 
                 {% for ticket in tickets %}
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-10 offset-md-1">
                         <p>{{ forloop.counter }}. {{ ticket.title }}</p>
                         <span class="kt-switch">
                             <label>
@@ -129,19 +127,23 @@
                 {% endfor %}
 
 
-                <div class="row" style="padding-top:30px;">
-                {% if update %}
-                        <div class="col-md-6">
-                            <button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">Update Question</button>
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-md-10 offset-md-1">
+                        <div class="row" style="padding-top:30px;">
+                        {% if update %}
+                                <div class="col-md-6">
+                                    <button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">Update Question</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="submit" name="delete" value="delete" class="btn btn-danger btn-block">Delete Question</button>
+                                </div>
+                        {% else %}
+                            <div class="col-md-12">
+                                <button type="submit" name="create" value="create" class="btn btn-primary btn-block">Create Question</button>
+                            </div>
+                        {% endif %}
                         </div>
-                        <div class="col-md-6">
-                            <button type="submit" name="delete" value="delete" class="btn btn-danger btn-block">Delete Question</button>
-                        </div>
-                {% else %}
-                    <div class="col-md-12">
-                        <button type="submit" name="create" value="create" class="btn btn-primary btn-block">Create Question</button>
                     </div>
-                {% endif %}
                 </div>
 
             </div>

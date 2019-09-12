@@ -9,6 +9,15 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from houses.mixins import HouseAccountMixin
 
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from .token_generator import account_activation_token
+from django.utils.html import strip_tags
+from django.core import mail
+
+
 from .models import Profile
 from .forms import ProfileForm, LoginForm
 from .mixins import ProfileMixin
@@ -18,15 +27,15 @@ from cities_light.models import City, Region, Country
 
 
 def load_cities(request):
-    region_id = request.GET.get('region')
-    cities = City.objects.filter(region__id=region_id).order_by('name')
-    return render(request, 'components/city_dropdown_list_options.html', {'cities': cities})
+	region_id = request.GET.get('region')
+	cities = City.objects.filter(region__id=region_id).order_by('name')
+	return render(request, 'components/city_dropdown_list_options.html', {'cities': cities})
 
 
 def load_regions(request):
-    country_id = request.GET.get('country')
-    regions = Region.objects.filter(country__id=country_id).order_by('name')
-    return render(request, 'components/region_dropdown_list_options.html', {'regions': regions})
+	country_id = request.GET.get('country')
+	regions = Region.objects.filter(country__id=country_id).order_by('name')
+	return render(request, 'components/region_dropdown_list_options.html', {'regions': regions})
 
 
 
@@ -57,6 +66,22 @@ class UserDashboardView(ProfileMixin, View):
 		context["profile"] = profile
 		return render(request, self.template_name, context)
 
+
+def activate_account(request, uidb64, token):
+	try:
+		uid = force_bytes(urlsafe_base64_decode(uidb64))
+		user = Profile.objects.get(pk=uid)
+	except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+		user = None
+	if user is not None and account_activation_token.check_token(user, token):
+		user.is_active = True
+		user.save()
+		login(request, user)
+		messages.success(request, 'Account Activated! Please login to continue.')
+		return HttpResponseRedirect(reverse('profiles:login'))
+	else:
+		messages.error(request, 'Account Not Activated. Please try again.')
+		return HttpResponseRedirect(reverse('profiles:login'))
 
 
 class ProfileCreateView(CreateView):
@@ -110,7 +135,25 @@ class ProfileCreateView(CreateView):
 			print("errors")
 
 		# Save form
-		self.object = form.save()
+		self.object = form.save(commit=False)
+		self.object.is_active = False
+		self.object.save()
+
+		current_site = get_current_site(request)
+		subject = 'Finish Activating Your Account'
+		context = {}
+		context["name"] = name
+		context["user"] = self.object
+		context["domain"] = current_site.domain
+		context["uid"] = urlsafe_base64_encode(force_bytes(self.object.pk))
+		context["token"] = account_activation_token.make_token(self.object)
+		html_message = render_to_string('emails/account_activation.html', context)
+		plain_message = strip_tags(html_message)
+		from_email = 'Arqam House Account Activation <info@arqamhouse.com>'
+		to = ['admin@arqamhouse.com']
+		mail.send_mail(subject, plain_message, from_email, to, html_message=html_message)
+
+		messages.success(request, 'Account Created! Please check your email to finish activation.')
 
 		valid_data = super(ProfileCreateView, self).form_valid(form)
 		return valid_data

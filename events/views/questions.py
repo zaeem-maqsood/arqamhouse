@@ -4,7 +4,7 @@ from events.models import Event, EventQuestion, AttendeeCommonQuestions
 from houses.mixins import HouseAccountMixin
 
 
-class QuestionsListView(HouseAccountMixin, UserPassesTestMixin, View):
+class QuestionsListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, View):
 
 	template_name = "events/questions/list_questions.html"
 

@@ -6,7 +6,7 @@ from events.forms import EventEmailConfirmationForm
 
 
 
-class EventConfirmationEmailView(HouseAccountMixin, UserPassesTestMixin, UpdateView):
+class EventConfirmationEmailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, UpdateView):
     model = EventEmailConfirmation
     form_class = EventEmailConfirmationForm
     template_name = "events/emails/confirmation_email.html"

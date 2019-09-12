@@ -97,7 +97,6 @@ class HouseForm(forms.ModelForm):
 		model = House
 		fields = [
 			"name",
-			"country",
 			"region",
 			"city"
 		]
@@ -107,14 +106,8 @@ class HouseForm(forms.ModelForm):
 			"name": forms.TextInput(
 					attrs={
 						"class":"validate-required",
-						"placeholder":"House Name",
+						"placeholder":"i.e. Arqam House",
 						"required": True
-					}
-				),
-			"country": forms.Select(
-					attrs={
-						"required" : True,
-						"class":"validate-required",
 					}
 				),
 			"region": forms.Select(
@@ -135,14 +128,13 @@ class HouseForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
-		self.fields['country'].empty_label = "Country"
-		self.fields['city'].empty_label = "City"
-		self.fields['region'].empty_label = "Region"
+		self.fields['city'].empty_label = None
+		self.fields['region'].empty_label = None
 
 		self.fields['city'].queryset = City.objects.all()
 		self.fields['region'].queryset = Region.objects.all()
 
-		if 'country' in self.data:
+		if 'region' in self.data:
 			try:
 				country_id = int(self.data.get('country'))
 				region_id = int(self.data.get('region'))

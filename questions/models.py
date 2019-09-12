@@ -5,8 +5,8 @@ from django.utils.text import slugify
 from django.db.models.signals import pre_save, post_save
 from django.urls import reverse
 
-from events.models import Event
-from events.models import Ticket
+from events.models import Event, Ticket
+from houses.models import House
 
 
 QUESTION_CHOICES = (
@@ -18,6 +18,7 @@ QUESTION_CHOICES = (
 # Create your models here.
 class Question(models.Model):
 
+	house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=True)
 	title = models.CharField(max_length=100, null=True, blank=True)
 	order = models.PositiveSmallIntegerField(blank=True, null=False, default=1)
 	help_text = models.CharField(max_length=150, null=True, blank=True)

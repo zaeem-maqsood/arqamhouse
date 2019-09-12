@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from .views import (ProfileUpdateView, ProfileCreateView, ProfileDetailView, LoginView, LogoutView,
-					load_cities, load_regions, UserDashboardView)
+                    load_cities, load_regions, UserDashboardView, activate_account)
 
 
 app_name="profiles"
@@ -23,5 +23,7 @@ urlpatterns = [
 
 	path('ajax/load-region/', load_regions, name='ajax_load_regions'),
 	path('ajax/load-cities/', load_cities, name='ajax_load_cities'),  
+
+	path('activate/<slug:uidb64>/<slug:token>/', activate_account, name='activate')
 
 ]

@@ -17,7 +17,7 @@ from weasyprint import HTML, CSS
 
 
 
-class OrderListView(HouseAccountMixin, UserPassesTestMixin, ListView):
+class OrderListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, ListView):
 	model = EventOrder
 	template_name = "events/orders/event_orders.html"
 
@@ -74,7 +74,7 @@ class OrderListView(HouseAccountMixin, UserPassesTestMixin, ListView):
 
 
 
-class OrderDetailView(HouseAccountMixin, UserPassesTestMixin, FormView):
+class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, FormView):
 	model = EventOrder
 	template_name = "events/orders/event_order_detail.html"
 

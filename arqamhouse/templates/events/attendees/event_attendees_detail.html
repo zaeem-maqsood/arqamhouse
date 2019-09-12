@@ -42,30 +42,64 @@ Attendee | {{ attendee.name }}
 	color: #7396b0;
 }
 </style>
-<div class="row">
-	<div class="col-md-8">
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
-				<div class="row" style="padding-bottom:40px;">
+				<div class="row" style="padding-bottom:20px;">
 					<div class="col-md-12">
 						<h4>Attendee Details</h4>
-						<p><a href="{{ attendee.order.get_order_view }}">Order ID |<span style="font-weight: 600"> {{ attendee.order.transaction.payment_id }}</span></a></p>
-						<p>Name | <span style="font-weight: 600">{{ attendee.name }}</span></p>
-						<p>Ticket | <span style="font-weight: 600">{{ attendee.ticket.title }}</span></p>
-						{% if attendee.email %}
-						<p>Email | <span style="font-weight: 600">{{ attendee.email }}</span></p>
-						{% endif %}
-						{% if attendee.gender %}
-						<p>Gender | <span style="font-weight: 600">{{ attendee.gender }}</span></p>
-						{% endif %}
-						{% if attendee.age %}
-						<p>Age | <span style="font-weight: 600">{{ attendee.age }}</span></p>
-						{% endif %}
-						{% if attendee.note %}
-						<p>Note | <span style="font-weight: 600">{{ attendee.note }}</span></p>
-						{% endif %}
+					</div>
+				</div>
 
+				<div class="row" style="padding-bottom:10px;">
+					<div class="col-md-4">
+						<p style="font-weight: 600;margin-bottom: 0px;">Name</p>
+						<p>{{ attendee.name }}</p>
+					</div>
+					<div class="col-md-5">
+						<p style="font-weight: 600;margin-bottom: 0px;"><a href="{{ attendee.order.get_order_view }}">Order ID</a></p>
+						<p>{{ attendee.order.transaction.payment_id }}</p>
+					</div>
+				</div>
+
+				<div class="row" style="padding-bottom:10px;">
+					<div class="col-md-4">
+						<p style="font-weight: 600;margin-bottom: 0px;">Ticket</p>
+						<p>{{ attendee.ticket.title }}</p>
+					</div>
+					{% if attendee.email %}
+					<div class="col-md-2">
+						<p style="font-weight: 600;margin-bottom: 0px;">Email</p>
+						<p>{{ attendee.email }}</p>
+					</div>
+					{% endif %}
+					{% if attendee.gender %}
+					<div class="col-md-2">
+						<p style="font-weight: 600;margin-bottom: 0px;">Gender</p>
+						<p>{{ attendee.gender|title }}</p>
+					</div>
+					{% endif %}
+					{% if attendee.age %}
+					<div class="col-md-2">	
+						<p style="font-weight: 600;margin-bottom: 0px;">Age</p>
+						<p>{{ attendee.age }}</p>
+					</div>
+					{% endif %}
+				</div>
+
+				<div class="row" style="padding-bottom: 30px;">
+					<div class="col-md-12">
+						{% if attendee.note %}
+						<p style="font-weight: 600;margin-bottom: 5px;">Note</p>
+						<p>{{ attendee.note }}</p>
+						{% endif %}
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-12">
 						{% if answers %}
 							{% for answer in answers %}
 							<p style="margin-bottom: 0px;font-weight: 600;">Q | {{ answer.question }}</p>
@@ -76,11 +110,10 @@ Attendee | {{ attendee.name }}
 				</div>
 
 
-
 				<form method="POST">{% csrf_token %}
 				<div class="row">
 					<div class="col-md-12">
-						<h4>Edit Attendee</h4>
+						<h4>Edit Details</h4>
 					</div>
 				</div>
 

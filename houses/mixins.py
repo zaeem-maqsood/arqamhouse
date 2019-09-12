@@ -14,36 +14,6 @@ class HouseAccountMixin(LoginRequiredMixin, object):
 	house = None
 	profile = None
 
-	def test_func(self):
-		# house_users = HouseUser.objects.filter(profile=self.request.user)
-		return True
-		# try:
-		# 	event = Event.objects.get(slug=self.kwargs['slug'])
-		# 	print(event)
-		# 	for house_user in house_users:
-		# 		if event.house == house_user.house:
-		# 			return True
-		# 	return False
-		# except:
-		# 	pass
-			# print("It came her to test")
-			# one_to_one_type = self.kwargs['one_to_one_type']
-			# one_to_one_id = self.kwargs['one_to_one_id']
-
-			# if one_to_one_type == 'events':
-			# 	print("And here")
-			# 	event = Event.objects.get(id=one_to_one_id)
-			# 	print(event)
-			# 	for house_user in house_users:
-			# 		if event.house == house_user.house:
-			# 			return True
-			# 	return False
-
-			# return False
-
-
-
-
 	def get_house(self):
 		profile = self.request.user
 		house = profile.house

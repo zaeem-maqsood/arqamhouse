@@ -15,9 +15,9 @@ class LoginForm(forms.Form):
 
 class ProfileForm(UserCreationForm):
 
-	email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={"required" : True, "class":"validate-required", "placeholder": "Email"}))
-	password1 = forms.CharField(max_length=100, required=True, widget=forms.PasswordInput(attrs={'class': 'validate-required', 'placeholder': 'Enter Password'}))
-	password2 = forms.CharField(max_length=100, required=True, widget=forms.PasswordInput(attrs={'class': 'validate-required', 'placeholder': 'Enter Password Again'}))
+	email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={"required" : True, "class":"validate-required", "placeholder": "Email", "autocomplete": "off"}))
+	password1 = forms.CharField(max_length=100, required=True, widget=forms.PasswordInput(attrs={'class': 'validate-required', 'placeholder': 'Enter Password', "autocomplete": "off"}))
+	password2 = forms.CharField(max_length=100, required=True, widget=forms.PasswordInput(attrs={'class': 'validate-required', 'placeholder': 'Enter Password Again', "autocomplete": "off"}))
 	agree = forms.BooleanField(widget=forms.CheckboxInput)
 
 	class Meta(UserCreationForm):
@@ -25,7 +25,6 @@ class ProfileForm(UserCreationForm):
 		fields = [
 			"name",
 			"email",
-			"country",
 			"region",
 			"city"
 		]
@@ -39,12 +38,6 @@ class ProfileForm(UserCreationForm):
 						"required": True
 					}
 				),
-				"country": forms.Select(
-						attrs={
-							"required" : True,
-							"class":"validate-required",
-						}
-					),
 				"region": forms.Select(
 						attrs={
 							"required" : True,
@@ -63,18 +56,18 @@ class ProfileForm(UserCreationForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
-		self.fields['country'].empty_label = "Country"
 		self.fields['city'].empty_label = "City"
 		self.fields['region'].empty_label = "Region"
 
 		self.fields['city'].queryset = City.objects.all()
 		self.fields['region'].queryset = Region.objects.all()
 
-		if 'country' in self.data:
+		
+		if 'region' in self.data:
 			try:
-				country_id = int(self.data.get('country'))
+				canada = Country.objects.get(name="Canada")
 				region_id = int(self.data.get('region'))
-				self.fields['region'].queryset = Region.objects.filter(country_id=country_id).order_by('name')
+				self.fields['region'].queryset = Region.objects.filter(country=canada).order_by('name')
 				self.fields['city'].queryset = City.objects.filter(region_id=region_id).order_by('name')
 			except (ValueError, TypeError):
 				pass  # invalid input from the client; ignore and fallback to empty City queryset

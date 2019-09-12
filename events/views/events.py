@@ -31,7 +31,7 @@ from payments.models import Transaction
 
 
 
-class EventDashboardView(HouseAccountMixin, UserPassesTestMixin, DetailView):
+class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, DetailView):
 	model = Event
 	template_name = "events/event_dashboard.html"
 
@@ -114,7 +114,7 @@ class EventDashboardView(HouseAccountMixin, UserPassesTestMixin, DetailView):
 
 
 
-class EventDescriptionView(HouseAccountMixin, UserPassesTestMixin, EventMixin, ListView):
+class EventDescriptionView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, EventMixin, ListView):
 	model = Event
 	template_name = "events/event_description.html"
 
@@ -426,7 +426,7 @@ class EventLandingView(DetailView):
 
 
 
-class PastEventsView(HouseAccountMixin, UserPassesTestMixin, EventMixin, ListView):
+class PastEventsView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, EventMixin, ListView):
 	model = Event
 	template_name = "events/past_events.html"
 
@@ -445,7 +445,7 @@ class PastEventsView(HouseAccountMixin, UserPassesTestMixin, EventMixin, ListVie
 
 
 
-class EventCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
+class EventCreateView(HouseAccountMixin, CreateView):
 	model = Event
 	form_class = EventForm
 	template_name = "events/event_form.html"
@@ -499,7 +499,7 @@ class EventCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
 
 
 
-class EventUpdateView(HouseAccountMixin, UserPassesTestMixin, UpdateView):
+class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, UpdateView):
 	model = Event
 	form_class = EventForm
 	template_name = "events/event_form.html"

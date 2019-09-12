@@ -35,7 +35,7 @@ class Ticket(models.Model):
 	free = models.BooleanField(default=False)
 	donation = models.BooleanField(default=False)
 	sold_out = models.BooleanField(default=False)
-	amount_available = models.PositiveSmallIntegerField(blank=True, null=True, default=3000)
+	amount_available = models.PositiveSmallIntegerField(blank=True, null=True, default=500)
 	amount_sold = models.PositiveSmallIntegerField(blank=True, null=False, default=0)
 	deleted = models.BooleanField(default=False)
 
@@ -95,8 +95,18 @@ def create_slug(instance, new_slug=None):
 
 def ticket_pre_save_reciever(sender, instance, *args, **kwargs):
 
+	# Create ticket slug
 	instance.slug = create_slug(instance)
 
+	# Set the min amount, max amount, and amount available 
+	if not instance.min_amount:
+		instance.min_amount = 0
+	if not instance.max_amount:
+		instance.max_amount = 10
+	if not instance.amount_available:
+		instance.amount_available = 500
+
+	# Set the ticket to sold out 
 	if instance.amount_sold == instance.amount_available:
 		instance.sold_out = True
 

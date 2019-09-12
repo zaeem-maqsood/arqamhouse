@@ -19,3 +19,10 @@ html, body {
 .kt-portlet {
     border-radius: 15px;
 }
+
+
+.btn-danger {
+    color: #fff;
+    background-color: #ff8a5f;
+    border-color: #ff8a5f;
+}

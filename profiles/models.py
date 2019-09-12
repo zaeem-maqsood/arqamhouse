@@ -89,7 +89,16 @@ def create_slug(instance, new_slug=None):
 
 
 def profile_pre_save_reciever(sender, instance, *args, **kwargs):
+
+	# Create Slug
 	instance.slug = create_slug(instance)
+
+	# Assign country as Canada
+	try:
+		canada = Country.objects.get(name="Canada")
+		instance.country = canada
+	except:
+		pass
 
 pre_save.connect(profile_pre_save_reciever, sender=Profile)
 

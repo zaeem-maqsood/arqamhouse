@@ -132,8 +132,8 @@ Dashboard | {{ House.name }}
 	color: #7396b0;
 }
 </style>
-<div class="row">
-	<div class="col-12 col-lg-12">
+<div class="row align-items-center h-100">
+	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
@@ -156,48 +156,6 @@ Dashboard | {{ House.name }}
 		</div>
 	</div>
 </div>
-
-
-
-<!-- <div class="row text-center">
-	<div class="col-12 col-lg-12">
-
-		<div class="row">
-
-			<div class="col-3">
-				<div class="kt-portlet kt-portlet--mobile">
-					<div class="kt-portlet__body">
-						<div class="row text-center">
-							<div class="col-12">
-								<a class="dashboard-links" href="{% url 'events:create' %}">
-									<i class="la la-edit" style="font-size:3em;"></i>
-									<p style="padding-top: 10px;">Create Event</p>
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			{% if not payout_set %}
-			<div class="col-3">
-				<div class="kt-portlet kt-portlet--mobile">
-					<div class="kt-portlet__body">
-						<div class="row text-center">
-							<div class="col-12">
-								<a class="dashboard-links" href="{% url 'payments:payout_settings_list' %}">
-									<i class="la la-cog" style="font-size:3em;"></i>
-									<p style="padding-top: 10px;">Set-up Payouts</p>
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			{% endif %}
-		</div>
-	</div>
-</div> -->
 {% endblock content %}
 
 
