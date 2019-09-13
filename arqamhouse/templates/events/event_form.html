@@ -129,8 +129,8 @@ $('#id_end').datetimepicker({
 {% endif %}
 
 <form method="POST" enctype="multipart/form-data" autocomplete="off">{% csrf_token %}
-<div class="row {% if event.active %}align-items-center h-100{% endif %}" {% if event.active %}style="padding: 3rem 0px 3rem 0px;"{% endif %}>
-    <div class="{% if event.active %}col-lg-8 offset-lg-2 col-md-12 col-12{% else %}col-lg-8{% endif %}">
+<div class="row {% if event.active %}align-items-center h-100{% endif %}{% if not event %} align-items-center h-100{% endif %}" {% if event.active %}style="padding: 3rem 0px 3rem 0px;"{% endif %}  {% if not event %}style="padding: 3rem 0px 3rem 0px;"{% endif %}>
+    <div class="{% if event.active %}col-lg-8 offset-lg-2 col-md-12 col-12{% else %}col-lg-8{% endif %}{% if not event %} offset-lg-2{% endif %}">
         <div class="kt-portlet kt-portlet--mobile" style="padding:20px;">
             <div class="kt-portlet__body">
 				
