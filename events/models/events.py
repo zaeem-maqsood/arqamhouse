@@ -1,5 +1,5 @@
 from .base import *
-
+import itertools
 from core.models import TimestampedModel
 from houses.models import House
 
@@ -47,6 +47,28 @@ class Event(TimestampedModel):
 
 	def __str__(self):
 		return self.title
+
+	def _generate_slug(self):
+		max_length = self._meta.get_field('slug').max_length
+		if self.url:
+			value = self.url
+		else:
+			value = self.title
+		slug_candidate = slug_original = slugify(value, allow_unicode=True)
+		for i in itertools.count(1):
+			if not Event.objects.filter(slug=slug_candidate).exists():
+				break
+			slug_candidate = '{}-{}'.format(slug_original, i)
+
+		self.slug = slug_candidate
+
+	def save(self, *args, **kwargs):
+		if not self.pk:
+			self._generate_slug()
+
+		super().save(*args, **kwargs)
+
+	
 
 	def get_email_confirmation_view(self):
 		view_name = "events:email_confirmation"
@@ -110,33 +132,34 @@ class Event(TimestampedModel):
 
 
 
-def create_slug(instance, new_slug=None):
+# def create_slug(instance, new_slug=None):
 
-	if instance.url:
-		slug = slugify(instance.url)
-	else:
-		slug = slugify(instance.title)
+# 	if instance.url:
+# 		slug = slugify(instance.url)
+# 	else:
+# 		slug = slugify(instance.title)
 		
-	if new_slug is not None:
-		slug = new_slug
-	qs = Event.objects.filter(slug=slug)
-	exists = qs.count() > 1
+# 	if new_slug is not None:
+# 		slug = new_slug
 
-	if exists:
-		new_slug = "%s-%s" %(slug, qs.first().id)
-		return create_slug(instance, new_slug=new_slug)
+# 	qs = Event.objects.filter(slug=slug)
+# 	exists = qs.count() > 1
 
-	return slug
+# 	if exists:
+# 		new_slug = "%s-%s" %(slug, qs.first().id)
+# 		return create_slug(instance, new_slug=new_slug)
 
-
-
-def event_pre_save_reciever(sender, instance, *args, **kwargs):
-	instance.slug = create_slug(instance)
+# 	return slug
 
 
 
+# def event_pre_save_reciever(sender, instance, *args, **kwargs):
+# 	instance.slug = create_slug(instance)
 
-pre_save.connect(event_pre_save_reciever, sender=Event)
+
+
+
+# pre_save.connect(event_pre_save_reciever, sender=Event)
 
 
 

@@ -18,6 +18,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.storage import FileSystemStorage
 
 from houses.mixins import HouseAccountMixin
+from houses.models import HouseUser
 from questions.models import Question
 from descriptions.models import EventDescription, DescriptionElement
 from events.mixins import EventMixin
@@ -426,9 +427,18 @@ class EventLandingView(DetailView):
 
 
 
-class PastEventsView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, EventMixin, ListView):
+class PastEventsView(HouseAccountMixin, UserPassesTestMixin, EventMixin, ListView):
 	model = Event
 	template_name = "events/past_events.html"
+
+	def test_func(self):
+		house_users = HouseUser.objects.filter(profile=self.request.user)
+		house = self.get_house()
+		print(house)
+		for house_user in house_users:
+			if house == house_user.house:
+				return True
+		return False
 
 
 	def get_context_data(self, *args, **kwargs):
@@ -451,9 +461,9 @@ class EventCreateView(HouseAccountMixin, CreateView):
 	template_name = "events/event_form.html"
 
 	def get_success_url(self):
-		house = self.get_house()
-		view_name = "houses:dashboard"
-		return reverse(view_name, kwargs={'slug': house.slug})
+		event = self.object
+		view_name = "events:dashboard"
+		return reverse(view_name, kwargs={'slug': event.slug})
 
 	def get_context_data(self, form, *args, **kwargs):
 		context = {}

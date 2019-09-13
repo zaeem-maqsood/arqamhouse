@@ -26,21 +26,28 @@ New Event
 
 {% block scripts %}
 <!--begin::Page Resources --> 
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVgFLTnIgdwTPmWhaisvDoi6uHKow9j88&libraries=places"></script>
+
 <!-- <script src="{% static 'assets/demo/default/custom/components/forms/widgets/bootstrap-datetimepicker.js' %}" type="text/javascript"></script> -->
 
 <script type="text/javascript">
 
 
-function initialize() {
+function initMap() {
   var input = document.getElementById('autocomplete');
-  new google.maps.places.Autocomplete(input);
+  var autocomplete = new google.maps.places.Autocomplete(input);
+
 }
-google.maps.event.addDomListener(window, 'load', initialize);
+
+
 
 $('#id_url').bind('input propertychange', function() {
     value = $(this).val();
-    new_value = value.replace(/\s/g, '-');
+	// Step 1
+	new_value = value.toLowerCase()
+	// Step 2
+	new_value = new_value.replace(/[^\w ]+/g, '')
+	// Step 3
+	new_value = new_value.replace(/ +/g, '-')
     $('#output').html(new_value);
 });
 
@@ -77,6 +84,9 @@ $('#id_end').datetimepicker({
 
 
 </script>
+
+<script type="text/javascript"
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnTiJMXoPzVLoo-ztKaRyCrjAocA0K3pQ&libraries=places&callback=initMap"></script>
 <!--end::Page Resources -->
 {% endblock scripts %}
 
@@ -119,12 +129,12 @@ $('#id_end').datetimepicker({
 {% endif %}
 
 <form method="POST" enctype="multipart/form-data" autocomplete="off">{% csrf_token %}
-<div class="row">
-    <div class="col-12 col-lg-8">
-        <div class="kt-portlet kt-portlet--mobile">
+<div class="row {% if event.active %}align-items-center h-100{% endif %}" {% if event.active %}style="padding: 3rem 0px 3rem 0px;"{% endif %}>
+    <div class="{% if event.active %}col-lg-8 offset-lg-2 col-md-12 col-12{% else %}col-lg-8{% endif %}">
+        <div class="kt-portlet kt-portlet--mobile" style="padding:20px;">
             <div class="kt-portlet__body">
 				
-				<div class="row" style="margin-left:20px;">
+				<div class="row">
 					<div class="col-12">
 
 						<input type="hidden" name="token" id="token">
@@ -143,7 +153,7 @@ $('#id_end').datetimepicker({
 
 						<div class="row" style="padding-bottom: 40px;">
 							<div class="col-md-8">
-								<p style="font-weight: 600;margin-bottom:0px;{% if form.title.errors %}color:red;{% endif %}">Title</p>
+								<p style="font-weight: 600;margin-bottom:0px;{% if form.title.errors %}color:red;{% endif %}">Title <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
 								{{ form.title }}
 								{% for error in form.title.errors %}
 									<div class="alert m-alert--outline alert-danger" role="alert">
@@ -155,19 +165,22 @@ $('#id_end').datetimepicker({
 
 						<div class="row" style="padding-bottom: 40px;">
 							<div class="col-md-8">
-								<p style="font-weight: 600;margin-bottom:0px;{% if form.url.errors %}color:red;{% endif %}">URL <span class="m-nav__link-text" style="font-weight: 200;font-size: 0.7em;vertical-align: middle;">| arqamhouse.com/events/<span id="output">{% if update_event_tab %}{{ event.slug }}{% else %}new-event{% endif %}</span></span></p>
+								<p style="font-weight: 600;margin-bottom:0px;{% if form.url.errors %}color:red;{% endif %}">Custom URL</p>
 								{{ form.url }}
 								{% for error in form.url.errors %}
 									<div class="alert m-alert--outline alert-danger" role="alert">
 										{{ error }}
 									</div>
 								{% endfor %}
+								<span class="m-nav__link-text" style="font-weight: 200;font-size: 0.7em;vertical-align: middle;">
+									arqamhouse.com/events/<span
+										id="output" style="font-weight: 600">{% if update_event_tab %}{{ event.slug }}{% else %}new-event{% endif %}</span></span>
 							</div>
 						</div>
 
-						<div class="row" style="padding-bottom: 40px;">
-							<div class="col-md-4">
-								<p style="font-weight: 600;margin-bottom:0px;{% if form.start.errors %}color:red;{% endif %}">Start</p>
+						<div class="row" style="padding-bottom: 30px;">
+							<div class="col-md-6">
+								<p style="font-weight: 600;margin-bottom:0px;{% if form.start.errors %}color:red;{% endif %}">Start <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
 								{{ form.start }}
 								<br>
 								{% for error in form.start.errors %}
@@ -176,8 +189,8 @@ $('#id_end').datetimepicker({
 									</div>
 								{% endfor %}
 							</div>
-							<div class="col-md-4">
-								<p style="font-weight: 600;margin-bottom:0px;{% if form.end.errors %}color:red;{% endif %}">End</p>
+							<div class="col-md-6">
+								<p style="font-weight: 600;margin-bottom:0px;{% if form.end.errors %}color:red;{% endif %}">End <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
 								{{ form.end }}
 								<br>
 								{% for error in form.end.errors %}
@@ -189,7 +202,7 @@ $('#id_end').datetimepicker({
 						</div>
 
 						<div class="row" style="padding-bottom: 50px;">
-							<div class="col-md-4">
+							<div class="col-md-5" style="padding-bottom:20px;">
 								<p style="font-weight: 600;margin-bottom:0px;{% if form.venue_name.errors %}color:red;{% endif %}">Venue Name</p>
 								{{ form.venue_name }}
 								{% for error in form.venue_name.errors %}
@@ -209,7 +222,7 @@ $('#id_end').datetimepicker({
 							</div>
 						</div>
 
-						<div class="row" style="padding-bottom: 50px;">
+						<div class="row" style="padding-bottom: 20px;">
 							<div class="col-md-12">
 								<p style="font-weight: 600;margin-bottom:0px;{% if form.short_description.errors %}color:red;{% endif %}">Short Description</p>
 								{{ form.short_description }}
@@ -222,7 +235,7 @@ $('#id_end').datetimepicker({
 							</div>
 						</div>
 
-						<div class="row" style="padding-bottom: 50px;">
+						<div class="row" style="padding-bottom: 20px;">
 							<div class="col-md-6" style="padding: 30px;">
 								<p style="font-weight: 600;margin-bottom:0px;{% if form.image.errors %}color:red;{% endif %}">Image</p>
 								{{ form.image }}
@@ -259,27 +272,25 @@ $('#id_end').datetimepicker({
 	</div>
 	
 	{% if update_event %}
-	<div class="col-12 col-lg-3">
+	<div class="{% if event.active %}col-lg-8 offset-lg-2 col-md-12 col-12{% else %}col-lg-4{% endif %}">
 
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
-
-				{% if event.active %}
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
+				
+				<div class="row text-center" style="padding-bottom: 10px;">
+					{% if event.active %}
+					<div class="{% if event.active %}col-6{% else %}col-md-6 col-6{% endif %}" style="padding-bottom: 10px;">
 						<button type="submit" name="Archive" value="Archive" class="btn btn-brand btn-elevate btn-block btn-warning"><i class="la la-archive"></i>Archive</button>
 					</div>
-				</div>
-				{% else %}
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
-						<button type="submit" name="Re-Open" value="Re-Open" class="btn btn-brand btn-elevate btn-block btn-warning"><i class="la la-archive"></i>Recover</button>
+					{% else %}
+					<div class="col-lg-12 col-md-6 col-12" style="padding-bottom: 10px;">
+						<button type="submit" name="Re-Open" value="Re-Open" class="btn btn-brand btn-elevate btn-block btn-warning"><i
+								class="la la-archive"></i>Recover</button>
 					</div>
-				</div>
-				{% endif %}
-				<div class="row text-center">
-					<div class="col-12">
-						<button type="submit" name="Delete" value="Delete" class="btn btn-brand btn-elevate btn-block btn-danger"><i class="la la-trash"></i>Delete</button>
+					{% endif %}
+					<div class="{% if event.active %}col-6{% else %}col-lg-12 col-md-6 col-12{% endif %}">
+						<button type="submit" name="Delete" value="Delete" class="btn btn-brand btn-elevate btn-block btn-danger"><i
+								class="la la-trash"></i>Delete</button>
 					</div>
 				</div>
 			</div>
@@ -289,54 +300,45 @@ $('#id_end').datetimepicker({
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
-				<div class="row text-center" style="padding-bottom: 40px;padding-top:40px;">
-					<div class="col-12">
+				<div class="row text-center" style="padding-top:40px;">
+					<div class="col-md-6 col-md-4 col-4" style="padding-bottom:10px;">
 						<a class="dashboard-links" href="{{ event.list_orders_view }}">
 							<i class="la la-list" style="font-size:3em;"></i>
 							<p style="padding-top: 10px;">Orders</p>
 						</a>
 					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
+					<div class="col-md-6 col-md-4 col-4" style="padding-bottom:10px;">
 						<a class="dashboard-links" href="{{ event.list_attendees_view }}">
 							<i class="la la-users" style="font-size:3em;"></i>
 							<p style="padding-top: 10px;">Attendees</p>
 						</a>
 					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
+					<div class="col-md-6 col-md-4 col-4" style="padding-bottom:10px;">
 						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
 							<i class="la la-check-square" style="font-size:3em;"></i>
 							<p style="padding-top: 10px;">Answers</p>
 						</a>
 					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
+					<div class="col-md-6 col-md-4 col-4" style="padding-bottom:10px;">
 						<a class="dashboard-links" href="{{ event.list_questions_view }}">
 							<i class="la la-question-circle" style="font-size:3em;"></i>
 							<p style="padding-top: 10px;">Questions</p>
 						</a>
 					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
+					<div class="col-md-6 col-md-4 col-4" style="padding-bottom:10px;">
 						<a class="dashboard-links" href="{{ event.get_email_confirmation_view }}">
 							<i class="la la-envelope" style="font-size:3em;"></i>
 							<p style="padding-top: 10px;">Email</p>
 						</a>
 					</div>
-				</div>
-				<div class="row text-center" style="padding-bottom: 40px;">
-					<div class="col-12">
+					<div class="col-md-6 col-md-4 col-4" style="padding-bottom:10px;">
 						<a class="dashboard-links" href="{{ event.list_tickets_view }}">
 							<i class="la la-ticket" style="font-size:3em;"></i>
 							<p style="padding-top: 10px;">Tickets</p>
 						</a>
 					</div>
 				</div>
+				
 			</div>
 		</div>
 		{% endif %}

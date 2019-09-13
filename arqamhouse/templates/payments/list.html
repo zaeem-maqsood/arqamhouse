@@ -23,8 +23,8 @@ Payout History | {{ House }}
 }
 </style>
 
-<div class="row">
-	<div class="col-lg-8 col-md-12 col-12">
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
@@ -39,8 +39,8 @@ Payout History | {{ House }}
 						<tr>
 							<th>Amount</th>
 							<th>Description</th>
-							<th>Balance</th>
-							<th>Date</th>
+							<th class="d-none d-sm-none d-md-table-cell">Balance</th>
+							<th class="d-none d-sm-none d-md-table-cell">Date</th>
 						</tr>
 					</thead>
 					<tbody id="dynamic">
@@ -48,8 +48,8 @@ Payout History | {{ House }}
 						<tr>
 							<td style="font-weight: {% get_type_font_weight house_balance_log %};font-size: 1.2em;">${% get_amount house_balance_log %}</td>
 							<td style="color: {% get_type_color house_balance_log %};font-weight: 400;">{% autoescape off %}{% get_type_icon house_balance_log %} {% get_type house_balance_log %}{% endautoescape %}</td>
-							<td style="font-weight: {% get_type_font_weight house_balance_log %};font-size: 1.2em;">${{ house_balance_log.balance }}</td>
-							<td style="font-size: 0.9em;">{{ house_balance_log.created_at }}</td>
+							<td class="d-none d-sm-none d-md-table-cell" style="font-weight: {% get_type_font_weight house_balance_log %};font-size: 1.2em;">${{ house_balance_log.balance }}</td>
+							<td class="d-none d-sm-none d-md-table-cell" style="font-size: 0.9em;">{{ house_balance_log.created_at }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>

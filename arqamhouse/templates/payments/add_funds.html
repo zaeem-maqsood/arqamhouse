@@ -128,7 +128,7 @@ jQuery(document).ready(function($) {
 <form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
 <div class="row">
 	<div class="col-lg-8 col-12">
-		<div class="kt-portlet kt-portlet--mobile">
+		<div class="kt-portlet kt-portlet--mobile" style="padding: 10px;">
 			<div class="kt-portlet__body">
 
                 
@@ -138,24 +138,30 @@ jQuery(document).ready(function($) {
 					</div>
                 </div>
                 
-                <div class="row text-center" style="padding-bottom:30px;">
-                    <div class="col-3">
+                <div class="row" style="padding-bottom:30px;">
+                    <div class="col-lg-3 col-md-3">
                         {{ form.amount }}
                         <p style="margin-top: 10px;">Charge amount</p>
                     </div>
-                    <div class="col-1">
+                    <div class="col-lg-1 col-md-1 d-none d-sm-none d-md-block">
                         <p style="font-size: 2em;">-</p>
                     </div>
-                    <div class="col-3">
+                    <div class="col-lg-3 col-md-3 col-6">
                         <span id="fee" style="font-size: 2em;">$0.00</span>
                         <p style="margin-top: 10px;">Processing Fee</p>
                     </div>
-                    <div class="col-1">
+                    <div class="col-lg-1 col-md-1 d-none d-sm-none d-md-block">
                         <p style="font-size: 2em;">=</p>
                     </div>
-                    <div class="col-4">
+                    <div class="col-lg-4 col-md-4 col-6">
                         <span id="total" style="font-size: 2em;">$0.00</span>
                         <p style="margin-top: 10px;">Total funds to add</p>
+                    </div>
+                </div>
+
+                <div class="row" style="padding-bottom:30px;">
+                    <div class="col-12">
+                        <h5>Payment Card</h5>
                     </div>
                 </div>
 
@@ -171,7 +177,7 @@ jQuery(document).ready(function($) {
                     </div>
                 </div>
     
-                <div class="row" style="padding-top: 30px;"">
+                <div class="row" style="padding-top: 10px;">
                     <div class="col-md-12">
                         <button id="customButton" type="submit" class="btn btn-primary">Accept Charges</button>
                     </div>

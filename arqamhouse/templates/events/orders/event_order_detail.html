@@ -60,22 +60,22 @@ Order #{{ order.id }} | {{ event.title }}
 				</div>
 
 				<div class="row">
-					<div class="col-4">
+					<div class="col-md-4">
 						<p><span style="font-weight:500;">Name</span> | {{ order.name }}</p>
 					</div>
-					<div class="col-8">
+					<div class="col-md-8">
 						<p><span style="font-weight:500;">Email</span> | {{ order.email }}</p>
 					</div>
 				</div>
 
 				<div class="row">
-					<div class="col-4">
+					<div class="col-md-4">
 						<p><span style="font-weight:500;">Payment Card</span> | {% include "events/orders/brands.html" with order=order.transaction %}</p>
 					</div>
-					<div class="col-4">
+					<div class="col-md-4">
 						<p><span style="font-weight:500;">Last Four Digits</span> | {{ order.transaction.last_four }}</p>
 					</div>
-					<div class="col-4">
+					<div class="col-md-4">
 						<p><span style="font-weight:500;">Outcome</span> | {{ order.transaction.outcome_type|title }}</p>
 					</div>
 				</div>
@@ -144,7 +144,7 @@ Order #{{ order.id }} | {{ event.title }}
 									<td style="color: grey;">{{ cart_item.ticket.title }}</td>
 									<td style="color: grey;">${{ cart_item.ticket.price }}</td>
 									<td style="color: grey;">{{ cart_item.quantity }}</td>
-									<td style="color: #2584C7;">+ ${{ cart_item.cart_item_total_no_fee }}</td>
+									<td style="color: #2584C7;">+${{ cart_item.cart_item_total_no_fee }}</td>
 								</tr>
 								{% endfor %}
 								
@@ -161,7 +161,7 @@ Order #{{ order.id }} | {{ event.title }}
 									<td>{{ event_order_refund.attendee.ticket.title }} ({{ event_order_refund.attendee.name }})</td>
 									<td>${{ event_order_refund.attendee.ticket.price }}</td>
 									<td>1</td>
-									<td style="color: #FF4500;">- ${{ event_order_refund.refund.amount }}</td>
+									<td style="color: #FF4500;">-${{ event_order_refund.refund.amount }}</td>
 								</tr>
 								{% endfor %}
 								{% if event_order_refunds %}
