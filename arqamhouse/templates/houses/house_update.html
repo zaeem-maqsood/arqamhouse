@@ -1,0 +1,137 @@
+{% extends "backend/base.html" %}
+{% load static %}
+{% block title %}
+Dashboard | {{ House.name }}
+{% endblock title %}
+
+{% block page_title %}
+{{ House.name }}
+{% endblock page_title %}
+
+{% block css_vendors %}
+
+{% endblock css_vendors %}
+
+{% block vendors %}
+{% endblock vendors %}
+
+{% block scripts %}
+
+<script>
+function changeHouse(object) {
+
+    console.log(object.value)
+    var house_user = object.value;
+    var token = '{{csrf_token}}';
+
+    $.ajax({
+        type: "POST",
+        headers: { "X-CSRFToken": token },
+        url: '{{ request.path }}',
+        data: {
+            'house_user': house_user,
+        },
+
+        success: function (data) {
+            console.log("HELLOO");
+            window.location = data;
+            
+
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert(errorThrown);
+            //some stuff on failure
+        },
+    });  
+
+}
+</script>
+
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+
+{% endblock page_crumbs %}
+
+{% block content %}
+<style>
+    .dashboard-links {
+        color: #7396b0;
+    }
+</style>
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+    <div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+        <div class="kt-portlet kt-portlet--mobile" style="padding:30px;">
+            <div class="kt-portlet__body">
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-10 offset-1">
+
+                            <form method="POST" action="">{% csrf_token %}
+
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-12">
+                                    <h4>Hello {{ profile.name }},</h4>
+                                    <p>You're currently in your '{{ house.name }}' house</p>
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-12">
+                                    <p>You can change houses by selecting a house from the drop down menu</p>
+                                    {{ house_change_form.house_select }}
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-6">
+                                    <a href="{% url 'houses:create' %}" class="btn btn-primary btn-block">Create a new house</a>
+                                </div>
+                                <div class="col-6">
+                                    <a href="{% url 'houses:manage' %}" class="btn btn-primary btn-block">Manage House Owners</a>
+                                </div>
+                            </div>
+
+                            
+                            <div class="row" style="padding-bottom:10px;padding-top:30px;">
+                                <div class="col-12">
+                                    <h5>Update house settings</h5>
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-12">
+                                    <p style="margin-bottom:0px;">Name</p>
+                                    {{ form.name }}
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-12">
+                                    <p style="margin-bottom:0px;">Region</p>
+                                    {{ form.region }}
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-12">
+                                    <p style="margin-bottom:0px;">City</p>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-block">Update House</button>
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

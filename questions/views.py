@@ -283,13 +283,9 @@ class QuestionUpdateView(HouseAccountMixin, QuestionSecurityMixin, UserPassesTes
 
 
 	def get_one_to_one_object(self, one_to_one_type, one_to_one_id):
-		house_users = HouseUser.objects.filter(profile=self.request.user)
 		one_to_one_object = None
 		if one_to_one_type == 'events':
 			one_to_one_object = Event.objects.get(id=one_to_one_id)
-			for house_user in house_users:
-				if one_to_one_object.house != house_user.house:
-					raise Http404
 		return one_to_one_object
 
 

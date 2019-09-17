@@ -148,7 +148,7 @@ class EventForm(forms.ModelForm):
 				"venue_name": forms.TextInput(
 						attrs={
 							"class":"form-control m-input",
-							"placeholder":"My Awesome Venue",
+							"placeholder":"Venue",
 						}
 					),
 

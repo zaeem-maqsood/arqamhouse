@@ -163,6 +163,7 @@ $('#id_end').datetimepicker({
 							</div>
 						</div>
 
+						{% if event.active %}
 						<div class="row" style="padding-bottom: 40px;">
 							<div class="col-md-8">
 								<p style="font-weight: 600;margin-bottom:0px;{% if form.url.errors %}color:red;{% endif %}">Custom URL</p>
@@ -177,6 +178,7 @@ $('#id_end').datetimepicker({
 										id="output" style="font-weight: 600">{% if update_event_tab %}{{ event.slug }}{% else %}new-event{% endif %}</span></span>
 							</div>
 						</div>
+						{% endif %}
 
 						<div class="row" style="padding-bottom: 30px;">
 							<div class="col-md-6">

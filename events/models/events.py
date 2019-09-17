@@ -132,37 +132,6 @@ class Event(TimestampedModel):
 
 
 
-# def create_slug(instance, new_slug=None):
-
-# 	if instance.url:
-# 		slug = slugify(instance.url)
-# 	else:
-# 		slug = slugify(instance.title)
-		
-# 	if new_slug is not None:
-# 		slug = new_slug
-
-# 	qs = Event.objects.filter(slug=slug)
-# 	exists = qs.count() > 1
-
-# 	if exists:
-# 		new_slug = "%s-%s" %(slug, qs.first().id)
-# 		return create_slug(instance, new_slug=new_slug)
-
-# 	return slug
-
-
-
-# def event_pre_save_reciever(sender, instance, *args, **kwargs):
-# 	instance.slug = create_slug(instance)
-
-
-
-
-# pre_save.connect(event_pre_save_reciever, sender=Event)
-
-
-
 
 
 

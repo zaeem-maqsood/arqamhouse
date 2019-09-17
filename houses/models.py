@@ -1,3 +1,4 @@
+import itertools
 from django.db import models
 from django.utils.text import slugify
 from django.db.models.signals import pre_save, post_save
@@ -38,7 +39,6 @@ class House(TimestampedModel):
 	region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=False, null=True)
 	city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=True)
 
-
 	entity = models.CharField(max_length=150, choices=entity_types, default = 'individual', null=True, blank=True)
 	connect_account_created = models.BooleanField(default=False)
 	connected_stripe_account_id = models.CharField(max_length=200, null=True, blank=False)
@@ -50,33 +50,42 @@ class House(TimestampedModel):
 	def __str__(self):
 		return str(self.name)
 
+	def _generate_slug(self):
+		max_length = self._meta.get_field('slug').max_length
+		# if self.url:
+		# 	value = self.url
+		# else:
+		value = self.name
+		slug_candidate = slug_original = slugify(value, allow_unicode=True)
+		for i in itertools.count(1):
+			if not House.objects.filter(slug=slug_candidate).exists():
+				break
+			slug_candidate = '{}-{}'.format(slug_original, i)
+
+		self.slug = slug_candidate
+
+	def save(self, *args, **kwargs):
+		if not self.pk:
+			self._generate_slug()
+		super().save(*args, **kwargs)
+
+
 	def get_dashboard_url(self):
 		view_name = "houses:dashboard"
-		return reverse(view_name, kwargs={"slug": self.slug})
+		return reverse(view_name)
 
 	def get_absolute_url(self):
 		view_name = "houses:detail"
 		return reverse(view_name, kwargs={"slug": self.slug})
 
 
-def create_slug(instance, new_slug=None):
-
-	slug = slugify(instance.name)
-		
-	if new_slug is not None:
-		slug = new_slug
-	qs = House.objects.filter(slug=slug)
-	exists = qs.count() > 1
-
-	if exists:
-		new_slug = "%s-%s" %(slug, qs.first().id)
-		return create_slug(instance, new_slug=new_slug)
-
-	return slug
-
-
 def house_pre_save_reciever(sender, instance, *args, **kwargs):
-	instance.slug = create_slug(instance)
+	# Assign country as Canada
+	try:
+		canada = Country.objects.get(name="Canada")
+		instance.country = canada
+	except:
+		pass
 
 pre_save.connect(house_pre_save_reciever, sender=House)
 
@@ -87,7 +96,7 @@ pre_save.connect(house_pre_save_reciever, sender=House)
 # the houses that they are associated with. 
 
 class HouseUser(TimestampedModel):
-	profile = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+	profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=False, null=False)
 	house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
 	role = models.CharField(max_length=150, choices=roles, default = 'admin')
 

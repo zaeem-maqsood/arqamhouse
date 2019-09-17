@@ -19,6 +19,21 @@ Create House
 {% block scripts %}
 
 <script>
+
+jQuery(document).ready(function ($) {
+    updateCountdown();
+    $('.message').change(updateCountdown);
+    $('.message').keyup(updateCountdown);
+});
+
+$('#id_name').bind('input propertychange', function () {
+        value = $(this).val();
+        $('#output').html(value);
+});
+
+</script>
+
+<script>
     $("#id_country").change(function () {
       
       var url = $("#profileForm").attr("data-regions-url");  // get the url of the `load_cities` view
@@ -71,8 +86,8 @@ Create House
                 <div class="row" style="padding-bottom: 30px;">
                     <div class="col-md-12">
                         <img src="{% static 'images/logo.png' %}" style="max-height: 6em;">
-                        <p class="lead">
-                            Give your House a name
+                        <p class="lead" style="font-weight: 300;">
+                            House Name| <span style="font-weight: 600;" id="output">Arqam House</span>
                         </p>
                     </div>
                 </div>
@@ -117,21 +132,6 @@ Create House
                             </ul>
                         </div>
                     </div>
-
-                    {% if form.country.errors %}
-                    <div class="row" style="padding-bottom: 30px;">
-                        <div class="col-md-12">
-                            <div class="alert bg--error">
-                                <div class="alert__body">
-                                    {% for error in form.country.errors %}
-                                    <span>Country | {{ error|escape }}</span>
-                                    {% endfor %}
-                                </div>
-                                <div class="alert__close">×</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
 
                     {% if form.region.errors %}
                     <div class="row" style="padding-bottom: 30px;">

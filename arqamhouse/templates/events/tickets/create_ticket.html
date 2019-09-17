@@ -184,8 +184,8 @@ $('#id_price').bind('input', function() {
 											
 											<div class="row" style="padding-bottom: 10px;">
 												<div class="col-lg-4 col-md-4 col-4">
-													<span class="kt-switch kt-switch--icon mx-auto" style="user-select: auto;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="You can choose to pass on the processing fee to buyers.">
-														<p style="margin-bottom:0px;">Pass Fee</p>
+													<span class="kt-switch kt-switch--icon mx-auto" style="user-select: auto;">
+														<p style="margin-bottom:0px;"><i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle"  data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="You can choose to pass on the processing fee to the ticket buyer."></i> Pass Fee</p>
 														<label style="user-select: auto;">
 															{{ form.pass_fee }}
 															<span style="user-select: auto;"></span>
@@ -193,12 +193,16 @@ $('#id_price').bind('input', function() {
 													</span>
 												</div>
 												<div class="col-md-4 col-4">
-													<h3 class="m--font-info" id="new_price_div" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="This is the amount the buyer will have to pay for this ticket.">$0.00</h3>
-													<p>Buyer Price</p>
+													<h3 class="m--font-info" id="new_price_div">$0.00</h3>
+													<p><i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip"
+														data-placement="top" title=""
+														data-original-title="This is how much this ticket will cost buyers"></i>Buyer Price</p>
 												</div>
 												<div class="col-md-4 col-4">
-													<h3 class="m--font-success" id="amount_received_div" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="This is the amount you will recieve for each one of these tickets sold.">$0.00</h3>
-													<p>Your Payout</p>
+													<h3 class="m--font-success" id="amount_received_div">$0.00</h3>
+													<p><i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip"
+														data-placement="top" title=""
+														data-original-title="This is how much you will recieve every time this ticket is sold"></i>Your Payout</p>
 												</div>
 											</div>
 
@@ -240,7 +244,9 @@ $('#id_price').bind('input', function() {
 
 											<div class="row" style="padding-bottom: 10px;padding-top:30px;">
 												<div class="col-lg-4 col-md-12">
-													<p style="margin-bottom:0px;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="The minimum amount of tickets the buyer must purchase per order. Leave blank for default.">Min Amount</p>
+													<p style="margin-bottom:0px;"><i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip"
+														data-placement="top" title=""
+														data-original-title="The minimum amount of tickets the buyer must purchase per order. Leave blank for default."></i> Min Amount</p>
 													{{ form.min_amount }}
 													<br>
 													{% for error in form.min_amount.errors %}
@@ -250,7 +256,9 @@ $('#id_price').bind('input', function() {
 													{% endfor %}
 												</div>
 												<div class="col-lg-4 col-md-12">
-													<p style="margin-bottom:0px;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="The maximum amount of tickets the buyer is able to purchase per order. Leave blank for default.">Max Amount</p>
+													<p style="margin-bottom:0px;"><i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip"
+														data-placement="top" title=""
+														data-original-title="The maximum amount of tickets the buyer is able to purchase per order. Leave blank for default."></i> Max Amount</p>
 													{{ form.max_amount }}
 													<br>
 													{% for error in form.max_amount.errors %}
@@ -260,7 +268,9 @@ $('#id_price').bind('input', function() {
 													{% endfor %}
 												</div>
 												<div class="col-lg-4 col-md-12">
-													<p style="margin-bottom:0px;" data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Total number of tickets available for this ticket. Leave blank if unlimited.">Total</p>
+													<p style="margin-bottom:0px;"><i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip"
+														data-placement="top" title=""
+														data-original-title="Total number of tickets available for this ticket. Leave blank if unlimited."></i> Total</p>
 													{{ form.amount_available }}
 													{% for error in form.amount_available.errors %}
 														<div class="alert m-alert--outline alert-danger" role="alert">

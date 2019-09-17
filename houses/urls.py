@@ -19,7 +19,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import (HouseCreateView, HouseLandingView, DashboardView)
+from .views import (HouseCreateView, HouseLandingView,
+                    DashboardView, HouseUpdateView, AddUserToHouseView)
 
 
 app_name="houses"
@@ -31,13 +32,12 @@ urlpatterns = [
 	path('new', HouseCreateView.as_view(), name='create'),
 
 	# Langing Page For house
-	path('<slug:slug>/dashboard', DashboardView.as_view(), name='dashboard'),
+	path('dashboard', DashboardView.as_view(), name='dashboard'),
 
 	# Update House
-	# path('<slug:slug>/update', EventDetailView.as_view(), name='update'),
+	path('update', HouseUpdateView.as_view(), name='update'),
 
-
-	# Deactivate House
-	# path('<slug:slug>/deactivate', EventDetailView.as_view(), name='deactivate'),
+	# Manage Users
+	path('manage', AddUserToHouseView.as_view(), name='manage'),
 
 ]

@@ -6,6 +6,7 @@ from django.utils.text import slugify
 from django.db.models.signals import pre_save, post_save
 from django.conf import settings
 from django.urls import reverse
+import itertools
 
 from cities_light.models import City, Region, Country
 from django.contrib.auth.models import User
@@ -63,6 +64,25 @@ class Profile(AbstractUser):
 	def __str__(self):
 		return str(self.email)
 
+	def _generate_slug(self):
+		max_length = self._meta.get_field('slug').max_length
+		# if self.url:
+		# 	value = self.url
+		# else:
+		value = self.name
+		slug_candidate = slug_original = slugify(value, allow_unicode=True)
+		for i in itertools.count(1):
+			if not House.objects.filter(slug=slug_candidate).exists():
+				break
+			slug_candidate = '{}-{}'.format(slug_original, i)
+
+		self.slug = slug_candidate
+
+	def save(self, *args, **kwargs):
+		if not self.pk:
+			self._generate_slug()
+		super().save(*args, **kwargs)
+
 	def get_update_url(self):
 		view_name = "profiles:update"
 		return reverse(view_name, kwargs={"slug": self.slug})
@@ -72,26 +92,8 @@ class Profile(AbstractUser):
 		return reverse(view_name, kwargs={"slug": self.slug})
 
 
-def create_slug(instance, new_slug=None):
-
-	slug = slugify(instance.name)
-		
-	if new_slug is not None:
-		slug = new_slug
-	qs = Profile.objects.filter(slug=slug)
-	exists = qs.count() > 1
-
-	if exists:
-		new_slug = "%s-%s" %(slug, qs.first().id)
-		return create_slug(instance, new_slug=new_slug)
-
-	return slug
-
 
 def profile_pre_save_reciever(sender, instance, *args, **kwargs):
-
-	# Create Slug
-	instance.slug = create_slug(instance)
 
 	# Assign country as Canada
 	try:

@@ -44,7 +44,7 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 			raise Http404
 
 	def get_tickets(self, event):
-		tickets = Ticket.objects.filter(event=event)
+		tickets = Ticket.objects.filter(event=event, deleted=False)
 		return tickets
 
 
@@ -97,6 +97,7 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 		
 		dashboard_events = self.get_events()
 		tickets = self.get_tickets(event)
+		questions = EventQuestion.objects.filter(event=event, question__deleted=False)
 
 		if event.active == False:
 			context["inactive_event_tab"] = True
@@ -104,6 +105,7 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 		else:
 			context["event_tab"] = True
 
+		context["questions"] = questions
 		context["tickets"] = tickets
 		context["dashboard_events"] = dashboard_events
 		context["total_sales"] = self.get_total_sales(event)

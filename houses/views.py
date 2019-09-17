@@ -22,14 +22,14 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponsePermanentRedirect
 
 from .mixins import HouseAccountMixin, HouseLandingMixin
 
 from django.contrib.auth.models import User
 from profiles.models import Profile
 from .models import House, HouseUser
-from .forms import HouseForm, ConnectIndividualVerificationForm, ConnectCompanyVerificationForm
+from .forms import AddUserToHouse, HouseUpdateForm, HouseChangeForm, HouseForm, ConnectIndividualVerificationForm, ConnectCompanyVerificationForm
 
 from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
 from profiles.models import Profile
@@ -112,6 +112,150 @@ class HouseLandingView(HouseLandingMixin, DetailView):
 		return render(request, self.template_name, context)
 
 
+class AddUserToHouseView(HouseAccountMixin, FormView):
+
+	template_name = "houses/manage_users.html"
+
+	def get_success_url(self):
+		view_name = "houses:manage"
+		return reverse(view_name)
+
+	def get(self, request, *args, **kwargs):
+		return self.render_to_response(self.get_context_data())
+
+	def get_context_data(self, *args, **kwargs):
+		context = {}
+		house = self.get_house()
+		profile = self.request.user
+		current_house_user = HouseUser.objects.get(profile=profile, house=house)
+		house_users = HouseUser.objects.filter(house=house).exclude(profile=profile)
+		context["current_house_user"] = current_house_user
+		context["house_users"] = house_users
+		context["form"] = AddUserToHouse()
+		context["profile"] = profile
+		context["house"] = house
+		context["dashboard_events"] = self.get_events()
+		return context
+
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+
+		print(data)
+		if 'Remove' in data:
+			house_user_id = data["Remove"]
+			house_user_to_remove = HouseUser.objects.get(id=house_user_id).delete()
+			messages.info(request, 'User removed from house.')
+			return HttpResponseRedirect(self.get_success_url())
+
+		form = AddUserToHouse(data=data)
+
+		if form.is_valid():
+			return self.form_valid(form, request)
+		else:
+			return self.form_invalid(form)
+
+	def form_valid(self, form, request):
+		print(form.cleaned_data)
+		email = form.cleaned_data["email"]
+		profile = self.request.user
+		house = self.get_house()
+
+
+		# Step 1 - See if user exists
+		try:
+			profile_to_add = Profile.objects.get(email=email)
+
+			# Step 2 - If user exists make sure the user isnt already added
+			try:
+				house_user = HouseUser.objects.get(profile=profile_to_add, house=house)
+				messages.warning(request, 'This user is already a member of your house.')
+			except Exception as e:
+				print(e)
+				house_user = HouseUser.objects.create(profile=profile_to_add, house=house, role='admin')
+				if not profile_to_add.house:
+					profile_to_add.house = house
+					profile_to_add.save()
+				messages.success(request, 'New user successfully added!')
+		except Exception as e:
+			print(e)
+			messages.warning(request, 'No such user with that email address.')
+
+
+
+
+		valid_data = super(AddUserToHouseView, self).form_valid(form)
+		return valid_data
+
+	def form_invalid(self, form):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form))
+
+
+
+
+
+
+class HouseUpdateView(HouseAccountMixin, FormView):
+	template_name = "houses/house_update.html"
+
+	def get_success_url(self):
+		view_name = "houses:update"
+		return reverse(view_name)
+
+	def get_context_data(self, *args, **kwargs):
+		context = {}
+		house = self.get_house()
+		profile = self.request.user
+		house_users = HouseUser.objects.filter(profile=profile)
+
+		current_house_user = HouseUser.objects.get(profile=profile, house=house)
+		print(house_users)
+		house_change_form = HouseChangeForm(house_users=house_users, initial={"house_select": current_house_user})
+		form = HouseUpdateForm(instance=house)
+
+		context["dashboard_events"] = self.get_events()
+		context["house_change_form"] = house_change_form
+		context["form"] = form
+		context["profile"] = profile
+		context["house"] = house
+
+		return context
+
+	def get(self, request, *args, **kwargs):
+		return self.render_to_response(self.get_context_data())
+
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+
+		print(data)
+		if 'house_user' in data:
+			house_user = HouseUser.objects.get(id=data["house_user"])
+			profile = self.request.user
+			profile.house = house_user.house
+			profile.save()
+			messages.success(request, 'You have changed your house to  %s!' % (house_user.house))
+			return HttpResponse("/house/update")
+
+		else:
+			profile = self.request.user
+			house_users = HouseUser.objects.filter(profile=profile)
+			form = HouseUpdateForm(data=data, instance=self.get_house())
+
+			if form.is_valid():
+				messages.success(request, 'House Updated!')
+				return self.form_valid(form, request, house)
+			else:
+				return self.form_invalid(form)
+
+	def form_valid(self, form, request, house):
+
+		valid_data = super(HouseUpdateView, self).form_valid(form)
+		return valid_data
+
+	def form_invalid(self, form):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form))
+
 
 
 
@@ -122,7 +266,7 @@ class HouseCreateView(CreateView):
 
 	def get_success_url(self):
 		view_name = "houses:dashboard"
-		return reverse(view_name, kwargs={'slug': self.object.slug})
+		return reverse(view_name)
 
 	def get_context_data(self, form, *args, **kwargs):
 		context = {}
@@ -159,7 +303,7 @@ class HouseCreateView(CreateView):
 		profile.save()
 		
 		# Create House User
-		house_user = HouseUser.objects.create(house=self.object, profile=profile, role="admin")
+		house_user = HouseUser.objects.create(house=self.object, profile=profile, role="admin",)
 		house_user.save()
 
 		# Create House Balance and initial House Balance Log with $0.00 opening balance

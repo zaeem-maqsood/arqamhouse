@@ -32,11 +32,12 @@ jQuery(document).ready(function($) {
 
 
 {% block content %}
-<form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
-<div class="row">
-	<div class="col-lg-8 col-12">
+
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
+                <form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
 
                 
 				<div class="row" style="padding-bottom:30px;">
@@ -76,26 +77,28 @@ jQuery(document).ready(function($) {
                 </div>
                 {% endif %}
 
-                {% if house_balance.balance > 0 and payout_settings %}
-                <div class="row">
-                    <div class="col-md-12">
-                        <button id="customButton" type="submit" class="btn btn-primary" >Request Payout</button>
+                {% if payout_settings %}   
+                    {% if house_balance.balance > 0 %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button id="customButton" type="submit" class="btn btn-primary" >Request Payout</button>
+                        </div>
                     </div>
-                </div>
+                    {% endif %}
                 {% else %}
-                <div class="row">
-                    <div class="col-md-12">
-                        <a href="#" class="btn btn-primary">Add Payout Method</button>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a href="#" class="btn btn-primary">Add Payout Method</a>
+                        </div>
                     </div>
-                </div>
                 {% endif %}
 
-
+            </form>
 			</div>
 		</div>
 	</div>
 </div>
-</form>
+
 {% endblock content %}
 
 
