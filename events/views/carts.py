@@ -22,7 +22,7 @@ class AddTicketsToCartView(FormView):
 		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
 
 	def get_tickets(self, event):
-		return Ticket.objects.filter(event=event)
+		return Ticket.objects.filter(event=event, deleted=False)
 
 	def get_event(self, slug):
 		try:
