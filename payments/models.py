@@ -21,6 +21,19 @@ class Etransfer(models.Model):
 		return reverse(view_name, kwargs={"etransfer_id": self.pk})
 
 
+class BankTransfer(models.Model):
+	transit = models.PositiveIntegerField(blank=False, null=False)
+	institution = models.PositiveIntegerField(null=False, blank=False)
+	account = models.PositiveIntegerField(null=False, blank=False)
+
+	def __str__(self):
+		return (self.institution)
+
+	def get_edit_url(self):
+		view_name = "payments:update_e_transfer"
+		return reverse(view_name, kwargs={"etransfer_id": self.pk})
+
+
 class PayoutSetting(models.Model):
 	name = models.CharField(max_length=150, null=False, blank=False)
 	house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)

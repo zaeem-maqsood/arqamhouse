@@ -7,8 +7,8 @@ from events.models import Event, Ticket
 # Frequently Asked Attendee Questions --------------------------------------
 class AttendeeCommonQuestions(models.Model):
 	event = models.OneToOneField(Event, on_delete=models.CASCADE, blank=False, null=False)
-	notes = models.BooleanField(default=False)
-	notes_required = models.BooleanField(default=False)
+	address = models.BooleanField(default=False)
+	address_required = models.BooleanField(default=False)
 	age = models.BooleanField(default=False)
 	age_required = models.BooleanField(default=False)
 	gender = models.BooleanField(default=False)
@@ -55,3 +55,7 @@ class EventQuestion(models.Model):
 	def update_question(self):
 		view_name = "questions:update_question"
 		return reverse(view_name, kwargs={"one_to_one_type": "events", "one_to_one_id": self.event.pk, "pk": self.pk})
+
+	def view_answers(self):
+		view_name = "events:answer_detail"
+		return reverse(view_name, kwargs={"slug": self.event.slug, "event_question_id": self.pk})

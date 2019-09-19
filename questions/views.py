@@ -367,7 +367,10 @@ class QuestionUpdateView(HouseAccountMixin, QuestionSecurityMixin, UserPassesTes
 		if one_to_one_type == 'events':
 			event_question = EventQuestion.objects.get(event=one_to_one_object, question=self.object)
 			if 'order_question' in data:
+				print("Ye sboss it is coming here")
 				event_question.order_question = True
+			else:
+				event_question.order_question = False
 			tickets = Ticket.objects.filter(event=one_to_one_object)
 			event_question.tickets.clear()
 			for ticket in tickets:

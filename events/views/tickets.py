@@ -32,7 +32,7 @@ class TicketListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin,
 		context = {}
 		house = self.get_house()
 		event = self.get_event(self.kwargs['slug'])
-		tickets = Ticket.objects.filter(event=event, deleted=False)
+		tickets = Ticket.objects.filter(event=event).order_by("deleted")
 		print(tickets)
 		context["tickets"] = tickets
 		context["event"] = event

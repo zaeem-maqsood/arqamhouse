@@ -23,45 +23,67 @@ Create House
 
 {% block content %}
 
-{% if messages %}
-<section class="elements-title space--xxs text-center">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-            	{% for message in messages %}
-                <div class="alert bg--{{ message.tags }}">
-					<div class="alert__body">
-						<span>{{ message.tags|upper }}! {{ message }}</span>
-					</div>
-					<div class="alert__close"> × </div>
-				</div>
-				{% endfor %}
-			</div>
-        </div>
-        <!--end of row-->
-    </div>
-    <!--end of container-->
-</section>
-{% endif %}
-
 <style>
 .btn--primary, .btn--primary:visited {
     background: #4498d4;
     border-color: #4498d4;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 765px) {
     .text-centering {
         text-align: left;
     }
 }
 </style>
 
-{% if event.image %}
-    {% include "events/sections/title_and_image.html" with event=event %}
-{% else %}
-    {% include "events/sections/only_title.html" with event=event %}
-{% endif %}
+
+<section class="switchable feature-large" style="padding-bottom:3.5em; padding-top: 3.5em;">
+    <div class="container">
+
+        {% if is_owner %}
+        <div class="row justify-content-around" style="padding:20px;">
+            <div class="col-lg-9 col-md-12 col-12"
+                style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 40px;border-radius: 15px;">
+                <p style="margin-bottom:0px;">Hello {{ request.user.name }},</p>
+                <p style="margin-bottom:0px;">If you'd like to edit something on this page <a href="{{ event.get_update_view  }}">here</a>.</p>
+                <p>Or you can click <a href="{{ event.get_event_dashboard}}">here</a> to go to your event's dashboard.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if messages %}
+        <div class="row justify-content-around">
+            <div class="col-lg-9 col-md-12 col-12">
+                {% for message in messages %}
+                <div class="alert bg--{{ message.tags }}">
+                    <div class="alert__body">
+                        <span>{{ message }}</span>
+                    </div>
+                    <div class="alert__close"> × </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row justify-content-around" style="padding:20px;">
+            <div class="col-lg-9 col-md-12 col-12"
+                style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 40px;border-radius: 15px;">
+
+
+                {% if event.image %}
+                    {% include "events/sections/title_and_image.html" with event=event %}
+                {% else %}
+                    {% include "events/sections/only_title.html" with event=event %}
+                {% endif %}
+
+
+            </div>
+        </div>
+
+
+    </div>
+</section>
 
 {% endblock content %}
 

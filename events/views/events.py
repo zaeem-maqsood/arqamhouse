@@ -242,7 +242,7 @@ class EventCheckoutView(FormView):
 		print(email)
 
 		# Step 2 Get Buyer questions and make answers
-		order_questions = EventQuestion.objects.filter(event=event, order_question=True).order_by("question__order")
+		order_questions = EventQuestion.objects.filter(event=event, order_question=True, question__deleted=False).order_by("question__order")
 		for order_question in order_questions:
 			value = data["%s_order_question" % (order_question.question.id)] 
 
@@ -268,7 +268,7 @@ class EventCheckoutView(FormView):
 				email = None
 				age = None
 				gender = None
-				note = None
+				address = None
 				
 				print("\n")
 				print("---------------------------- Attendee Common Questions")
@@ -289,12 +289,12 @@ class EventCheckoutView(FormView):
 					gender = data["%s_%s_gender" % (quantity, cart_item.ticket.id)]
 					print(gender) 
 
-				if attendee_common_questions.notes:
-					note = data["%s_%s_note" % (quantity, cart_item.ticket.id)]
-					print(note)
+				if attendee_common_questions.address:
+					address = data["%s_%s_address" % (quantity, cart_item.ticket.id)]
+					print(address)
 
-				
-				attendee = Attendee.objects.create(order=order, ticket=cart_item.ticket, name=name, email=email, age=age, gender=gender, note=note)
+				attendee = Attendee.objects.create(
+					order=order, ticket=cart_item.ticket, name=name, email=email, age=age, gender=gender, address=address)
 				attendee.save()
 
 				# Step 3c answers to custom questions
@@ -411,6 +411,16 @@ class EventLandingView(DetailView):
 		description_elements = DescriptionElement.objects.filter(description=event_description)
 		return description_elements
 
+	def is_owner(self, event):
+		profile = self.request.user
+		house = event.house
+		try:
+			house_user = HouseUser.objects.get(house=house, profile=profile)
+			return True
+		except Exception as e:
+			print(e)	
+			return False	
+
 	def get(self, request, *args, **kwargs):
 		context = {}
 		slug = kwargs['slug']
@@ -419,6 +429,7 @@ class EventLandingView(DetailView):
 		event_description = self.get_event_description(event)
 		description_elements = self.get_description_elements(event_description)
 
+		context["is_owner"] = self.is_owner(event)
 		context["event_description"] = event_description
 		context["description_elements"] = description_elements
 		context["event"] = event
@@ -464,7 +475,7 @@ class EventCreateView(HouseAccountMixin, CreateView):
 
 	def get_success_url(self):
 		event = self.object
-		view_name = "events:dashboard"
+		view_name = "events:landing"
 		return reverse(view_name, kwargs={'slug': event.slug})
 
 	def get_context_data(self, form, *args, **kwargs):
@@ -517,7 +528,7 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 	template_name = "events/event_form.html"
 
 	def get_success_url(self):
-		view_name = "events:update"
+		view_name = "events:landing"
 		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
 
 	def get_success_delete_url(self):
@@ -555,7 +566,13 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 	def get(self, request, *args, **kwargs):
 		slug = kwargs['slug']
 		self.object = self.get_event(slug)
-		form = EventForm(instance=self.object, initial={"start": self.object.start.strftime("%m/%d/%Y %I:%M %p"), "end": self.object.end.strftime("%m/%d/%Y %I:%M %p")})
+		initial = {}
+		if self.object.start:
+			initial["start"] = self.object.start.strftime("%m/%d/%Y %I:%M %p")
+		if self.object.end:
+			initial["end"] = self.object.end.strftime("%m/%d/%Y %I:%M %p")
+		form = EventForm(instance=self.object, initial=initial)
+		
 		return self.render_to_response(self.get_context_data(form=form))
 
 	def post(self, request, *args, **kwargs):
@@ -584,24 +601,26 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 			self.object.save()
 			messages.warning(request, 'Archived Event')
 
-		if "Remove" in data:
+		elif "Remove" in data:
 			self.object.image = None
 			self.object.save()
 			messages.warning(request, 'Event Image Removed')
 
-		if "Re-Open" in data:
+		elif "Re-Open" in data:
 			self.object.active = True
 			self.object.save()
 			messages.info(request, 'Event Re-Opened')
 
-		if "Delete" in data:
+		elif "Delete" in data:
 			self.object.active = False
 			self.object.deleted = True
 			self.object.save()
 			messages.warning(request, 'Event Deleted Successfully')
 			return HttpResponseRedirect(self.get_success_delete_url())
 
-		messages.success(request, 'Event Updated')
+		else:
+			messages.success(request, 'Event Updated Successfully!')
+			
 		valid_data = super(EventUpdateView, self).form_valid(form)
 		return valid_data
 

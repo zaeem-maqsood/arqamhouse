@@ -67,15 +67,6 @@ jQuery(document).ready(function() {
 {% endblock scripts %}
 
 
-{% block page_crumbs %}
-<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
-	<li class="m-nav__item">
-		<a href="{{ profile.get_update_url }}" class="m-nav__link">
-			<span class="m-nav__link-text">{{ orders.count }} Order{% if orders.count > 1 %}s{% endif %} for "{{ event.title }}"</span>
-		</a>
-	</li>
-</ul>
-{% endblock page_crumbs %}
 
 {% block content %}
 <style>

@@ -20,6 +20,7 @@ iframe {
 
 {% block top_page_scripts %}
 <script src="https://js.stripe.com/v3/"></script>
+
 {% endblock top_page_scripts %}
 
 
@@ -32,7 +33,6 @@ var elements = stripe.elements();
 var style = {
   base: {
     color: '#303238',
-    fontSize: '26px',
     color: "#32325d",
     fontSmoothing: 'antialiased',
     '::placeholder': {
@@ -93,215 +93,231 @@ function stripeTokenHandler(token) {
   form.submit();
 }
 
+
+function initMap() {
+    {% for cart_item in cart_items %}
+        {% for quantity in cart_item.quantity|quantity %}
+
+            {% if attendee_common_questions.address %}
+            
+                var input = document.getElementById('{{ quantity }}_{{ cart_item.ticket.id }}_address');
+                var autocomplete = new google.maps.places.Autocomplete(input);
+
+            
+            {% endif %}
+
+        {% endfor %}
+    {% endfor %}
+}
+
 </script>
+<script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnTiJMXoPzVLoo-ztKaRyCrjAocA0K3pQ&libraries=places&callback=initMap"></script>
 {% endblock scripts %}
 
 
 
 {% block content %}
-<section class="text-center hidden-xs" style="padding-bottom: 40px;">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8">
-                <img src="{% static 'images/logo.png' %}" style="max-height: 5em;">
-            </div>
-        </div>
-    </div>
-</section>
-
-
-<section>
+<section style="padding-top: 5rem;padding-bottom:0px;">
     <div class="container">
 
         <form id="checkoutForm" method="POST">{% csrf_token %}
 
-
-            <div class="row justify-content-center" style="padding-bottom: 50px;padding-top: 30px;">
-                <div class="col-md-6">
-
-                    <div class="row" style="padding-bottom: 20px;">
-                        <div class="col-md-12 col-lg-12">
-                            <p class="lead" style="font-weight: 800;">Overview </p>
-                        </div>
-                    </div>
-
-                    {% for cart_item in cart_items %}
-                    <div class="row" style="padding-top: 20px;">
-                        <div class="col-md-9">
-                            <p style="font-size: 1.1em;"> {{ cart_item.ticket.title }} <span style="font-weight:800;">| {{ cart_item.quantity }}</span></p>
-                        </div>
-                        <div class="col-md-3">
-                            <p style="font-size: 1.1em;" class="float-right">${{ cart_item.cart_item_total }}</p>
-                        </div>
-                    </div>
-                    {% endfor %}
-
-                    <div class="row" style="padding-top: 20px;">
-                        <div class="col-md-9">
-                            <p style="font-size: 1.1em;font-weight: 800;">Total</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p style="font-size: 1.1em;font-weight: 800;" class="float-right">${{ cart.total }}</p>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-
-
             <div class="row justify-content-center" style="padding-bottom: 50px;">
-                <div class="col-md-6">
-                    <div class="row" style="padding-bottom: 20px;">
-                        <div class="col-md-12 col-lg-12">
-                            <p class="lead" style="font-weight: 800;">Buyer Details</p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 col-lg-6">
-                            <p style="margin-bottom: 0;">Name</p>
-                            <input pattern="[a-zA-Z ]*" title="No numbers please" maxlength="100" class="validate-required" type="text" name="name" id="name" size="30" required placeholder="Full Name" value="{{ data.name }}">
-                        </div>
-                        <div class="col-md-6 col-lg-6">
-                            <p style="margin-bottom: 0;">Email</p>
-                            <input class="validate-required" maxlength="150" type="email" name="email" id="email" size="30" required placeholder="email@address.com" value="{{ data.email }}">
-                        </div>
-                    </div>
-                    {% for order_question in event|order_question %}
-                    <div class="row" style="padding-top: 20px;">
-                        <div class="col-md-12 col-lg-12">
-                            <p style="margin-bottom: 0;">{{ order_question.question.title }}</p>
-                            {% if order_question.question.question_type == "Long" %}
-                            <textarea maxlength="300" name="{{ order_question.question.id }}_order_question" id="{{ order_question.question.id }}_order_question" placeholder="{{ order_question.question.help_text }}" class="validate-required" rows="3" style="user-select: auto;" {% if order_question.question.required %}required{% endif %}>{% get_order_question_initial_value data order_question.question.id %}</textarea>
-                            {% elif order_question.question.question_type == "Multiple Choice" %}
-                            <select name="{{ order_question.question.id }}_order_question" value="{% get_order_question_initial_value data order_question.question.id %}" id="{{ order_question.question.id }}_order_question" class="form-control">
-                                {% if not order_question.question.required %}
-                                <option value="None">------</option>
-                                {% endif %}
-                                {% for option in order_question.question.multiplechoice_set.all %}
-                                <option {% get_order_question_initial_value_multiplechoice data order_question.question.id option %} value="{{ option.title }}">{{ option.title }}</option>
-                                {% endfor %}
-                            </select>
-                            {% else %}
-                            <input maxlength="300"  name="{{ order_question.question.id }}_order_question" value="{% get_order_question_initial_value data order_question.question.id %}" class="validate-required" type="text" id="{{ order_question.question.id }}_order_question" {% if order_question.question.required %}required{% endif %} placeholder="{{ order_question.question.help_text }}">
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
+                <div class="col-md-8 col-10" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 50px;border-radius: 15px;">
 
+                    <div class="row justify-content-center" style="padding-bottom: 50px;">
+                        <div class="col-md-12">
 
-        
-
-            {% for cart_item in cart_items %}
-                {% for quantity in cart_item.quantity|quantity %}
-                <div class="row justify-content-center" style="padding-bottom: 30px;">
-                    <div class="col-md-6 col-lg-6">
-                        <div class="row" style="padding-bottom: 20px;">
-                            <div class="col-md-12 col-lg-12">
-                                <p class="lead" style="font-weight: 800;">{{ cart_item.ticket }}</p>
-                            </div>
-                        </div>
-
-                        <div class="row" style="padding-bottom: 20px;">
-                            <div class="col-md-6 col-lg-6">
-                                <p style="margin-bottom: 0;">Full Name</p>
-                                <input pattern="[a-zA-Z ]*" title="No numbers please" class="validate-required" type="text" name="{{ quantity }}_{{ cart_item.ticket.id }}_name" value="{% get_attendee_name_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_name" size="30" required placeholder="Full Name">
-                            </div>
-                            {% if attendee_common_questions.email %}
-                            <div class="col-md-6 col-lg-6">
-                                <p style="margin-bottom: 0;">Email</p>
-                                <input class="validate-required" type="email" name="{{ quantity }}_{{ cart_item.ticket.id }}_email" id="{{ quantity }}_{{ cart_item.ticket.id }}_email" size="30" required placeholder="email@address.com" value="{% get_attendee_email_initial_value data quantity cart_item.ticket.id %}">
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        
-                        {% if attendee_common_questions.age or attendee_common_questions.gender %}
-                        <div class="row" style="padding-bottom: 20px;">
-                            {% if attendee_common_questions.age %}
-                            <div class="col-md-6 col-lg-6">
-                                <p style="margin-bottom: 0;">Age</p>
-                                <input class="validate-required" name="{{ quantity }}_{{ cart_item.ticket.id }}_age" value="{% get_attendee_age_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_age" type="number" min="0" max="100" {% if attendee_common_questions.age_required %}required{% endif %}>
-                            </div>
-                            {% endif %}
-                            {% if attendee_common_questions.gender %}
-                            <div class="col-md-6 col-lg-6">
-                                <p style="margin-bottom: 0;">Gender</p>
-                                <select id="{{ quantity }}_{{ cart_item.ticket.id }}_gender" name="{{ quantity }}_{{ cart_item.ticket.id }}_gender" class="form-control m-input">
-                                    {% if not attendee_common_questions.gender_required %}
-                                    <option value="None">------</option>
-                                    {% endif %}
-                                    <option {% get_attendee_gender_initial_value data quantity cart_item.ticket.id "female" %} value="female">Female</option>
-                                    <option {% get_attendee_gender_initial_value data quantity cart_item.ticket.id "male" %} value="male">Male</option>
-                                </select>
-                            </div>
-                            {% endif %}
-                        </div>
-                        {% endif %}
-
-
-                        {% for event_question in cart_item|ticket_question %}
                             <div class="row" style="padding-bottom: 20px;">
                                 <div class="col-md-12 col-lg-12">
-                                    <p style="margin-bottom: 0;">{{ event_question.question.title }}</p>
-                                    {% if event_question.question.question_type == "Long" %}
-                                    <textarea maxlength="300" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" value="{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" placeholder="{{ event_question.question.help_text }}" class="validate-required" rows="3" style="user-select: auto;" {% if event_question.question.required %}required{% endif %}>{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}</textarea>
-                                    {% elif event_question.question.question_type == "Multiple Choice" %}
-                                    <select name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" class="form-control m-input">
-                                        {% if not event_question.question.required %}
+                                    <p style="font-weight: 600;font-size: 1.4em;color: #4a90e2;">Order Overview </p>
+                                </div>
+                            </div>
+
+                            {% for cart_item in cart_items %}
+                            <div class="row" style="padding-top: 20px;">
+                                <div class="col-md-6">
+                                    <p style="font-size: 1.1em;"> {{ cart_item.ticket.title }}</p>
+                                </div>
+                                <div class="col-md-2">
+                                    <p style="font-size: 1.1em;">${{ cart_item.ticket.buyer_price }}</p>
+                                </div>
+                                <div class="col-md-2">
+                                    <p style="font-size: 1.1em;font-weight:800;">x {{ cart_item.quantity }}</p>
+                                </div>
+                                <div class="col-md-2">
+                                    <p style="font-size: 1.1em;" class="float-right">${{ cart_item.cart_item_total }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                            <div class="row" style="padding-top: 20px;">
+                                <div class="col-md-9">
+                                    <p style="font-size: 1.1em;font-weight: 800;">Total</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <p style="font-size: 1.1em;font-weight: 800;" class="float-right">${{ cart.total }}</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="row justify-content-center" style="padding-bottom: 50px;">
+                        <div class="col-md-12">
+                            <div class="row" style="padding-bottom: 20px;">
+                                <div class="col-md-12 col-lg-12">
+                                    <p style="font-weight: 600;font-size: 1.4em;color: #4a90e2;">Buyer Details</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-lg-6">
+                                    <p style="margin-bottom: 0;">Name</p>
+                                    <input pattern="[a-zA-Z ]*" title="No numbers please" maxlength="100" class="validate-required" type="text" name="name" id="name" size="30" required placeholder="Full Name" value="{{ data.name }}">
+                                </div>
+                                <div class="col-md-6 col-lg-6">
+                                    <p style="margin-bottom: 0;">Email</p>
+                                    <input class="validate-required" maxlength="150" type="email" name="email" id="email" size="30" required placeholder="email@address.com" value="{{ data.email }}">
+                                </div>
+                            </div>
+                            {% for order_question in event|order_question %}
+                            <div class="row" style="padding-top: 20px;">
+                                <div class="col-md-12 col-lg-12">
+                                    <p style="margin-bottom: 0;">{{ order_question.question.title }}</p>
+                                    {% if order_question.question.question_type == "Long" %}
+                                    <textarea maxlength="300" name="{{ order_question.question.id }}_order_question" id="{{ order_question.question.id }}_order_question" placeholder="{{ order_question.question.help_text }}" class="validate-required" rows="3" style="user-select: auto;" {% if order_question.question.required %}required{% endif %}>{% get_order_question_initial_value data order_question.question.id %}</textarea>
+                                    {% elif order_question.question.question_type == "Multiple Choice" %}
+                                    <select name="{{ order_question.question.id }}_order_question" value="{% get_order_question_initial_value data order_question.question.id %}" id="{{ order_question.question.id }}_order_question" class="form-control">
+                                        {% if not order_question.question.required %}
                                         <option value="None">------</option>
                                         {% endif %}
-                                        {% for option in event_question.question.multiplechoice_set.all %}
-                                        <option {% get_attendee_question_initial_value_multiplechoice data quantity event_question.question.id cart_item.ticket.id option %} value="{{ option.title }}">{{ option.title }}</option>
+                                        {% for option in order_question.question.multiplechoice_set.all %}
+                                        <option {% get_order_question_initial_value_multiplechoice data order_question.question.id option %} value="{{ option.title }}">{{ option.title }}</option>
                                         {% endfor %}
                                     </select>
                                     {% else %}
-                                    <input maxlength="300" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" value="{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}" class="validate-required" type="text" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" size="30" {% if event_question.question.required %}required{% endif %} placeholder="{{ event_question.question.help_text }}">
+                                    <input maxlength="300"  name="{{ order_question.question.id }}_order_question" value="{% get_order_question_initial_value data order_question.question.id %}" class="validate-required" type="text" id="{{ order_question.question.id }}_order_question" {% if order_question.question.required %}required{% endif %} placeholder="{{ order_question.question.help_text }}">
                                     {% endif %}
                                 </div>
                             </div>
-                        {% endfor %}
+                            {% endfor %}
+                        </div>
+                    </div>
 
 
-                        {% if attendee_common_questions.notes %}
-                        <div class="row" style="padding-bottom: 20px;">
+                
+
+                    {% for cart_item in cart_items %}
+                        {% for quantity in cart_item.quantity|quantity %}
+                        <div class="row justify-content-center" style="padding-bottom: 30px;">
                             <div class="col-md-12 col-lg-12">
-                                <p style="margin-bottom: 0;">Additional Notes</p>
-                                <textarea name="{{ quantity }}_{{ cart_item.ticket.id }}_note" value="{% get_attendee_note_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_note" placeholder="You can write additional notes or concerns about this attendee here." class="validate-required" rows="3" style="user-select: auto;" {% if attendee_common_questions.notes_required %}required{% endif %}>{% get_attendee_note_initial_value data quantity cart_item.ticket.id %}</textarea>
+                                <div class="row" style="padding-bottom: 20px;">
+                                    <div class="col-md-12 col-lg-12">
+                                        <p style="font-weight: 600;font-size: 1.4em;color: #265a97;">Ticket | <span style="color: #4a90e2;">{{ cart_item.ticket }}</span></p>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="padding-bottom: 20px;">
+                                    <div class="col-md-6 col-lg-6">
+                                        <p style="margin-bottom: 0;">Full Name</p>
+                                        <input pattern="[a-zA-Z ]*" title="No numbers please" class="validate-required" type="text" name="{{ quantity }}_{{ cart_item.ticket.id }}_name" value="{% get_attendee_name_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_name" size="30" required placeholder="Full Name">
+                                    </div>
+                                    {% if attendee_common_questions.email %}
+                                    <div class="col-md-6 col-lg-6">
+                                        <p style="margin-bottom: 0;">Email</p>
+                                        <input class="validate-required" type="email" name="{{ quantity }}_{{ cart_item.ticket.id }}_email" id="{{ quantity }}_{{ cart_item.ticket.id }}_email" size="30" required placeholder="email@address.com" value="{% get_attendee_email_initial_value data quantity cart_item.ticket.id %}">
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                
+                                {% if attendee_common_questions.age or attendee_common_questions.gender %}
+                                <div class="row" style="padding-bottom: 20px;">
+                                    {% if attendee_common_questions.age %}
+                                    <div class="col-md-6 col-lg-6">
+                                        <p style="margin-bottom: 0;">Age</p>
+                                        <input class="validate-required" name="{{ quantity }}_{{ cart_item.ticket.id }}_age" value="{% get_attendee_age_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_age" type="number" min="0" max="100" {% if attendee_common_questions.age_required %}required{% endif %}>
+                                    </div>
+                                    {% endif %}
+                                    {% if attendee_common_questions.gender %}
+                                    <div class="col-md-6 col-lg-6">
+                                        <p style="margin-bottom: 0;">Gender</p>
+                                        <select id="{{ quantity }}_{{ cart_item.ticket.id }}_gender" name="{{ quantity }}_{{ cart_item.ticket.id }}_gender" class="validate-required">
+                                            {% if not attendee_common_questions.gender_required %}
+                                            <option value="None">------</option>
+                                            {% endif %}
+                                            <option {% get_attendee_gender_initial_value data quantity cart_item.ticket.id "female" %} value="female">Female</option>
+                                            <option {% get_attendee_gender_initial_value data quantity cart_item.ticket.id "male" %} value="male">Male</option>
+                                        </select>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+
+                                {% if attendee_common_questions.address %}
+                                <div class="row" style="padding-bottom: 20px;">
+                                    <div class="col-md-12 col-lg-12">
+                                        <p style="margin-bottom: 0;">Address</p>
+                                        <input name="{{ quantity }}_{{ cart_item.ticket.id }}_address" value="{% get_attendee_address_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_address" placeholder="123 Main Street" autocomplete="off" {% if attendee_common_questions.address_required %}required{% endif %}>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+
+                                {% for event_question in cart_item|ticket_question %}
+                                    <div class="row" style="padding-bottom: 20px;">
+                                        <div class="col-md-12 col-lg-12">
+                                            <p style="margin-bottom: 0;">{{ event_question.question.title }}</p>
+                                            {% if event_question.question.question_type == "Long" %}
+                                            <textarea maxlength="300" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" value="{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" placeholder="{{ event_question.question.help_text }}" class="validate-required" rows="3" style="user-select: auto;" {% if event_question.question.required %}required{% endif %}>{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}</textarea>
+                                            {% elif event_question.question.question_type == "Multiple Choice" %}
+                                            <select name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" class="form-control m-input">
+                                                {% if not event_question.question.required %}
+                                                <option value="None">------</option>
+                                                {% endif %}
+                                                {% for option in event_question.question.multiplechoice_set.all %}
+                                                <option {% get_attendee_question_initial_value_multiplechoice data quantity event_question.question.id cart_item.ticket.id option %} value="{{ option.title }}">{{ option.title }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            {% else %}
+                                            <input maxlength="300" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" value="{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}" class="validate-required" type="text" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" size="30" {% if event_question.question.required %}required{% endif %} placeholder="{{ event_question.question.help_text }}">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
+
                             </div>
                         </div>
-                        {% endif %}
+                        {% endfor %}
+                    {% endfor %}
 
 
-                    </div>
-                </div>
-                {% endfor %}
-            {% endfor %}
-
-
-            <div class="row justify-content-center" style="padding-bottom:50px;">
-                <div class="col-md-6">
-                    <div>
-                        <label for="card-element" class="lead" style="font-weight: 800;">Payment</label>
-                        <div id="card-element">
-                            <!-- A Stripe Element will be inserted here. -->
+                    <div class="row justify-content-center" style="padding-bottom:50px;">
+                        <div class="col-md-12">
+                            <div>
+                                <label for="card-element" style="font-weight: 600;font-size: 1.4em;color: #4a90e2;margin-bottom: 15px;">Payment</label>
+                                <div id="card-element">
+                                    <!-- A Stripe Element will be inserted here. -->
+                                </div>
+                            
+                                <!-- Used to display Element errors. -->
+                                <div id="card-errors" role="alert" style="color: #e5424d;"></div>
+                            </div>
                         </div>
-                    
-                        <!-- Used to display Element errors. -->
-                        <div id="card-errors" role="alert" style="color: #e5424d;"></div>
                     </div>
-                </div>
-            </div>
 
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <button id="customButton" type="submit" class="btn btn--primary">Checkout</button>
+                    <div class="row justify-content-center">
+                        <div class="col-md-12">
+                            <button id="customButton" type="submit" class="btn btn--primary">Checkout</button>
+                        </div>
+                    </div>
+            
                 </div>
             </div>
-            
-                
             
 
         </form>
@@ -309,6 +325,16 @@ function stripeTokenHandler(token) {
     </div>
 </section>
 
+<section class="text-center hidden-xs" style="padding-bottom: 40px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <img src="{% static 'images/logo.png' %}" style="max-height: 5em;margin-bottom:0px;">
+                <p>Arqam House Inc.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
 
 {% endblock content %}

@@ -27,6 +27,7 @@ qrcode = "*"
 django-heroku = "*"
 python-dotenv = "*"
 django-cleanup = "*"
+googlemaps = "*"
 
 [requires]
 python_version = "3.7"

@@ -228,6 +228,7 @@ class AttendeeDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 
 	def post(self, request, *args, **kwargs):
 		data = request.POST
+		print(data)
 		slug = kwargs['slug']
 		attendee_id = kwargs['attendee_id']
 		event = get_event(slug)
@@ -250,8 +251,8 @@ class AttendeeDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 			attendee.age = data['age']
 			attendee.save()
 
-		if 'note' in data:
-			attendee.note = data['note']
+		if 'address' in data:
+			attendee.address = data['address']
 			attendee.save()
 
 		for answer in answers:

@@ -21,7 +21,7 @@ def quantity(number):
 
 @register.filter(name='ticket_question') 
 def ticket_question(cart_item):
-    event_questions = EventQuestion.objects.filter(tickets__id=cart_item.ticket.id).order_by("question__order")
+    event_questions = EventQuestion.objects.filter(tickets__id=cart_item.ticket.id, question__deleted=False).order_by("question__order")
     return event_questions
 
 
@@ -37,7 +37,8 @@ def ticket_question(cart_item):
 
 @register.filter(name='order_question') 
 def order_question(event):
-    order_questions = EventQuestion.objects.filter(event=event, order_question=True).order_by("question__order")
+    order_questions = EventQuestion.objects.filter(
+        event=event, order_question=True, question__deleted=False).order_by("question__order")
     return order_questions
 
 
@@ -87,9 +88,9 @@ def get_attendee_email_initial_value(data, quantity, ticket_id):
 
 
 @register.simple_tag
-def get_attendee_note_initial_value(data, quantity, ticket_id):
+def get_attendee_address_initial_value(data, quantity, ticket_id):
     try:
-        value = data["%s_%s_note" % (quantity, ticket_id)]
+        value = data["%s_%s_address" % (quantity, ticket_id)]
         return value
     except Exception as e:
         return ""

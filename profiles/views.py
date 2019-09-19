@@ -151,7 +151,7 @@ class ProfileCreateView(CreateView):
 		plain_message = strip_tags(html_message)
 		from_email = 'Arqam House <info@arqamhouse.com>'
 		to = [email]
-		# mail.send_mail(subject, plain_message, from_email, to, html_message=html_message)
+		mail.send_mail(subject, plain_message, from_email, to, html_message=html_message)
 
 		messages.success(request, 'Account Created! Please check your email to finish activation.')
 

@@ -117,8 +117,10 @@ class EventCheckoutForm(forms.Form):
 
 class EventForm(forms.ModelForm):
 
-	start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], widget=forms.DateTimeInput(attrs={"class":"form-control m-input", "placeholder":"Start", "required": True, "autocomplete": "off",}))
-	end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], widget=forms.DateTimeInput(attrs={"class":"form-control m-input", "placeholder":"End", "required": True, "autocomplete": "off"}))
+	start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"],  required=False, widget=forms.DateTimeInput(
+		attrs={"class": "form-control m-input", "placeholder": "Start", "autocomplete": "off"}))
+	end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], required=False,  widget=forms.DateTimeInput(
+		attrs={"class": "form-control m-input", "placeholder": "End", "autocomplete": "off"}))
 
 	class Meta:
 		model = Event
@@ -200,14 +202,16 @@ class EventForm(forms.ModelForm):
 	def clean_end(self):
 		start = self.cleaned_data.get('start')
 		end = self.cleaned_data.get('end')
-		today = timezone.now()
-		if start and end and start >= end:
-			print("Did it even come here")		
-			raise forms.ValidationError('The start date cannot be after the end date')
-		elif end <= today:
-			 raise forms.ValidationError('Please change the end date of your event to be after today!')
-		else:
-			return end
+
+		if start and end:
+			today = timezone.now()
+			if start and end and start >= end:
+				print("Did it even come here")		
+				raise forms.ValidationError('The start date cannot be after the end date')
+			elif end <= today:
+				raise forms.ValidationError('Please change the end date of your event to be after today!')
+			else:
+				return end
 
 
 

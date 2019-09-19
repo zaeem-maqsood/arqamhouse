@@ -21,7 +21,43 @@ Questions
 
 
 {% block scripts %}
-<script>
+
+<script type="text/javascript">
+
+
+$('#id_address').change(function () {
+	address = document.getElementById("id_address");
+	required = document.getElementById("id_address_required");
+
+	if (address.checked) {
+		required.disabled = false;
+		ajaxUpdateValues(address, required);
+	}
+
+	else {
+		required.checked = false;
+		required.disabled = true;
+		ajaxUpdateValues(address, required);
+	}
+});
+
+$('#id_address_required').change(function () {
+	address = document.getElementById("id_address");
+	required = document.getElementById("id_address_required");
+
+	if (address.checked) {
+		required.disabled = false;
+		ajaxUpdateValues(address, required);
+	}
+
+	else {
+		required.checked = false;
+		required.disabled = true;
+		ajaxUpdateValues(address, required);
+	}
+});
+
+
 
 function ajaxUpdateValues(object, required) {
 
@@ -49,37 +85,16 @@ function ajaxUpdateValues(object, required) {
 }
 
 
-// Function for notes
-function notes() {
-	notes = document.getElementById("id_notes");
-	required = document.getElementById("id_notes_required");
-
-	if (notes.checked) {
-		required.disabled = false;
-		ajaxUpdateValues(notes, required);
-	}
-
-	else {
-		required.checked = false;
-		required.disabled = true;
-		ajaxUpdateValues(notes, required);
-	}
-}
 
 
-$('#id_notes').change(function() {
-	notes();
-});
 
-$('#id_notes_required').change(function() {
-	notes();
-});
+
 // ------------------------------------------------------------------
 
 
 // Function for age
 
-function age() {
+$('#id_age').change(function() {
 	age = document.getElementById("id_age");
 	required = document.getElementById("id_age_required");
 
@@ -93,23 +108,29 @@ function age() {
 		required.disabled = true;
 		ajaxUpdateValues(age, required);
 	}
-}
-
-
-$('#id_age').change(function() {
-	age();
 });
 
 $('#id_age_required').change(function() {
-	age();
+	age = document.getElementById("id_age");
+	required = document.getElementById("id_age_required");
+
+	if (age.checked) {
+		required.disabled = false;
+		ajaxUpdateValues(age, required);
+	}
+
+	else {
+		required.checked = false;
+		required.disabled = true;
+		ajaxUpdateValues(age, required);
+	}
 });
 // ------------------------------------------------------------------
 
 
 
 // Function for gender
-
-function gender() {
+$('#id_gender').change(function() {
 	gender = document.getElementById("id_gender");
 	required = document.getElementById("id_gender_required");
 
@@ -123,15 +144,22 @@ function gender() {
 		required.disabled = true;
 		ajaxUpdateValues(gender, required);
 	}
-}
-
-
-$('#id_gender').change(function() {
-	gender();
 });
 
 $('#id_gender_required').change(function() {
-	gender();
+	gender = document.getElementById("id_gender");
+	required = document.getElementById("id_gender_required");
+
+	if (gender.checked) {
+		required.disabled = false;
+		ajaxUpdateValues(gender, required);
+	}
+
+	else {
+		required.checked = false;
+		required.disabled = true;
+		ajaxUpdateValues(gender, required);
+	}
 });
 // ------------------------------------------------------------------
 
@@ -154,7 +182,9 @@ $('#id_gender_required').change(function() {
 
 				<div class="row">
 					<div class="col-12">
-						<h3>Questions</h3>
+						<h3>Questions | <a style="font-weight: 200;" href="{{ event.list_answers_view }}" data-container="body" data-toggle="kt-tooltip"
+														data-placement="top" title=""
+														data-original-title="Click here to view answers to questions.">Answers</a></h3>
 					</div>
 				</div>
 
@@ -162,30 +192,9 @@ $('#id_gender_required').change(function() {
 					<div class="col-md-4">
 						<div class="row">
 							<div class="col-md-4">
-								<p>Notes</p>
-								<span class="kt-switch">
-									<label>
-										<input type="checkbox" {% if attendee_common_questions.notes %}checked{% else %}{% endif %} name="" style="user-select: auto;" id="id_notes">
-									<span></span>
-									</label>
-								</span>
-							</div>
-							<div class="col-md-4">
-								<p>Required</p>
-								<span class="kt-switch">
-									<label>
-										<input type="checkbox" {% if attendee_common_questions.notes_required %}checked{% else %}{% endif %} name="" style="user-select: auto;" id="id_notes_required">
-									<span></span>
-									</label>
-								</span>
-							</div>
-							<div class="col-md-4"></div>
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="row">
-							<div class="col-md-4">
-								<p>Age</p>
+								<p data-container="body" data-toggle="kt-tooltip"
+														data-placement="top" title=""
+														data-original-title="Ask attendees their age.">Age</p>
 								<span class="kt-switch">
 									<label>
 										<input type="checkbox" {% if attendee_common_questions.age %}checked{% else %}{% endif %} name="" style="user-select: auto;" id="id_age">
@@ -194,7 +203,8 @@ $('#id_gender_required').change(function() {
 								</span>
 							</div>
 							<div class="col-md-4">
-								<p>Required</p>
+								<p data-toggle="kt-tooltip" data-placement="top" title="" 
+								data-original-title="Make age a required question for all attendees.">Required</p>
 								<span class="kt-switch">
 									<label>
 										<input type="checkbox" {% if attendee_common_questions.age_required %}checked{% else %}{% endif %} name="" style="user-select: auto;" id="id_age_required">
@@ -208,7 +218,9 @@ $('#id_gender_required').change(function() {
 					<div class="col-md-4">
 						<div class="row">
 							<div class="col-md-4">
-								<p>Gender</p>
+								<p data-container="body" data-toggle="kt-tooltip"
+														data-placement="top" title=""
+														data-original-title="Ask attendees their gender.">Gender</p>
 								<span class="kt-switch">
 									<label>
 										<input type="checkbox" {% if attendee_common_questions.gender %}checked{% else %}{% endif %} name="" style="user-select: auto;" id="id_gender">
@@ -217,7 +229,8 @@ $('#id_gender_required').change(function() {
 								</span>
 							</div>
 							<div class="col-md-4">
-								<p>Required</p>
+								<p data-toggle="kt-tooltip" data-placement="top" title="" 
+								data-original-title="Make gender a required question for all attendees.">Required</p>
 								<span class="kt-switch">
 									<label>
 										<input type="checkbox" {% if attendee_common_questions.gender_required %}checked{% else %}{% endif %} name="" style="user-select: auto;" id="id_gender_required">
@@ -228,12 +241,41 @@ $('#id_gender_required').change(function() {
 							<div class="col-md-4"></div>
 						</div>
 					</div>
+					<div class="col-md-4">
+						<div class="row">
+							<div class="col-md-4">
+								<p data-container="body" data-toggle="kt-tooltip"
+														data-placement="top" title=""
+														data-original-title="Ask attendees their Address.">Address</p>
+								<span class="kt-switch">
+									<label>
+										<input type="checkbox" {% if attendee_common_questions.address %}checked{% else %}{% endif %}
+											name="" style="user-select: auto;" id="id_address">
+										<span></span>
+									</label>
+								</span>
+							</div>
+							<div class="col-md-4">
+								<p data-toggle="kt-tooltip" data-placement="top" title="" 
+								data-original-title="Make address a required question for all attendees.">Required</p>
+								<span class="kt-switch">
+									<label>
+										<input type="checkbox"
+											{% if attendee_common_questions.address_required %}checked{% else %}{% endif %} name=""
+											style="user-select: auto;" id="id_address_required">
+										<span></span>
+									</label>
+								</span>
+							</div>
+							<div class="col-md-4"></div>
+						</div>
+					</div>
 				</div>
 
 				<div class="row" style="padding-top:10px;">
 					<div class="col-12">
-						<p style="font-size: 0.8em;">These questions are asked once per ticket.<br>
-						Asking your attendees for their age and gender will enable analytics.</p>
+						<p style="font-size: 0.8em;">These questions are asked once for each attendee.<br>
+						Asking your attendees for their age, gender and address will enable analytics.</p>
 					</div>
 				</div>
 
@@ -242,9 +284,30 @@ $('#id_gender_required').change(function() {
 				{% for event_question in event_questions %}
 				<div class="row" style="padding-top:30px;">
 					<div class="col-md-12">
-						<a href="{{ event_question.update_question }}"><h4>{{ event_question.question.order }}. <span style="font-weight: 200;">{{ event_question.question.title }}</span></h4></a>
-						<p><i>{{ event_question.question.question_type }} question</i></p>
-					</div>
+						<h4 style="font-weight: 200;">{{ event_question.question.title }} | <a href="{{ event_question.update_question }}">Edit</a></h4>
+						<p style="margin-bottom: 5px;">{{ event_question.question.question_type }} question 
+							{% if event_question.question.required %}| <span style="color: #FF4500;">required</span>{% endif %}</p>
+						<p>
+							{% if event_question.order_question %}
+								This question is asked for every order
+								{% if event_question.tickets.all %} and if the buyer selects tickets 
+									{% for ticket in event_question.tickets.all %}
+									<span style="color:#4599d5;">| {{ ticket.title }}</span>
+									{% endfor %}
+								{% endif %}
+							{% else %}
+								{% if event_question.tickets.all %} 
+									This question is asked if the buyer selects tickets
+									{% for ticket in event_question.tickets.all %}
+									<span style="color:#4599d5;">| {{ ticket.title }}</span>
+									{% endfor %}
+								{% else %}
+									<span style="color:red;">This question is currently not being asked.</span>
+									Add it to orders or select tickets.
+								{% endif %}
+							{% endif %}
+						</p>
+					</div> 
 				</div>
 				{% endfor %}
 				{% endif %}

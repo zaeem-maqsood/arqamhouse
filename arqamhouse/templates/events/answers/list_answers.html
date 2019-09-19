@@ -1,0 +1,360 @@
+{% extends "backend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Orders | {{ event.title }}
+{% endblock title %}
+
+{% block page_title %}
+Orders
+{% endblock page_title %}
+
+{% block styles %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js" rel="stylesheet"
+    type="text/css" />
+<style type="text/css">
+    .row-padder {
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+
+<script type="text/javascript">
+    var ctx = document.getElementById("myChart");
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        aspectRatio: 2,
+        data: {
+            labels: ["Female", "Male", "No Data"],
+            datasets: [{
+                label: 'Genders',
+                data: {{ genders | safe }
+    },
+        backgroundColor: 'rgba(68, 153, 216, 0.2)',
+        borderColor: 'rgba(68, 153, 216, 1)',
+        borderWidth: 4,
+        lineTension: 0.1,
+        borderCapStyle: 'butt',
+        borderDashOffset: 3.0,
+        borderJoinStyle: 'miter',
+        pointBorderWidth: 6,
+        pointHoverRadius: 5,
+        pointHoverBorderWidth: 2,
+        pointRadius: 0.5,
+        pointHitRadius: 7,
+        xPadding: 25,
+
+	        }]
+	    },
+    options: {
+
+        legend: {
+            display: false,
+			},
+
+        tooltips: {
+            enabled: true,
+                mode: 'label',
+
+                    callbacks: {
+                label: function(item) {
+                    label = (Math.round(item.yLabel * 100) / 100).toFixed(0);
+                    label = label.toString();
+                    label = " " + label + " Attendees"
+                    return label
+                },
+            },
+        },
+
+        layout: {
+            padding: {
+                left: 0,
+                    right: 0,
+                        top: 10,
+                            bottom: 0
+            }
+        },
+
+        animation: {
+            duration: 4000,
+	        },
+
+        maintainAspectRatio: false,
+
+            scales: {
+            yAxes: [{
+
+                gridLines: {
+                    drawBorder: false,
+                    display: false,
+                },
+
+                ticks: {
+                    display: false,
+                    beginAtZero: true,
+                    suggestedMin: 0,
+                    fontSize: 30,
+                },
+
+            }],
+
+                xAxes: [{
+
+                    gridLines: {
+                        display: false,
+                    },
+
+                    ticks: {
+                        fontSize: 13,
+                    },
+
+                    stepSize: 5,
+                    position: 'bottom',
+
+                }],
+
+	        },
+
+
+        responsive: true,
+	    }
+	});
+</script>
+
+<script type="text/javascript">
+    var ctx2 = document.getElementById("myChart2");
+    var myChart2 = new Chart(ctx2, {
+        type: 'bar',
+        aspectRatio: 2,
+        data: {
+            labels: ["Under 12", "12-17", "17-24", "25-34", "35-44", "45-54", "55-64", "65-74", "Above 74", "No Data"],
+
+            datasets: [{
+                label: 'Attendees',
+                data: {{ ages | safe }
+    },
+        backgroundColor: 'rgba(68, 153, 216, 0.2)',
+        borderColor: 'rgba(68, 153, 216, 1)',
+        borderWidth: 4,
+        lineTension: 0.1,
+        borderCapStyle: 'butt',
+        borderDashOffset: 3.0,
+        borderJoinStyle: 'miter',
+        pointBorderWidth: 6,
+        pointHoverRadius: 5,
+        pointHoverBorderWidth: 2,
+        pointRadius: 0.5,
+        pointHitRadius: 7,
+        xPadding: 25,
+
+            }]
+	    },
+    options: {
+
+        legend: {
+            display: false,
+			},
+
+        tooltips: {
+            enabled: true,
+                mode: 'label',
+
+                    callbacks: {
+                label: function(item) {
+                    label = (Math.round(item.yLabel * 100) / 100).toFixed(0);
+                    label = label.toString();
+                    label = " " + label + " Attendees"
+                    return label
+                },
+            },
+        },
+
+        layout: {
+            padding: {
+                left: 0,
+                    right: 0,
+                        top: 10,
+                            bottom: 0
+            }
+        },
+
+        animation: {
+            duration: 4000,
+	        },
+
+        maintainAspectRatio: false,
+
+            scales: {
+            yAxes: [{
+
+                gridLines: {
+                    drawBorder: false,
+                    display: false,
+                },
+
+                ticks: {
+                    display: false,
+                    beginAtZero: true,
+                    suggestedMin: 0,
+                    fontSize: 30,
+                },
+
+            }],
+
+                xAxes: [{
+
+                    gridLines: {
+                        display: false,
+                    },
+
+                    ticks: {
+                        fontSize: 13,
+                    },
+
+                    stepSize: 5,
+                    position: 'bottom',
+
+                }],
+
+	        },
+
+
+        responsive: true,
+	    }
+	});
+</script>
+
+
+{% endblock scripts %}
+
+
+{% block content %}
+<style>
+    .dashboard-links {
+        color: #7396b0;
+    }
+</style>
+<div class="row align-items-center h-100">
+    <div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+
+                <div class="row" style="padding-bottom:40px;">
+                    <div class="col-12">
+                        <h3 style="margin-bottom: 10px;">Answers | <a style="font-weight: 200;" href="{{ event.list_questions_view }}" data-container="body" data-toggle="kt-tooltip"
+                            data-placement="top" title="" data-original-title="Click here to view your questions.">Questions</a></h3>
+                        {% if not event_questions %}
+                        <p>You don't have any custom questions yet. You can add cutom questions <a
+                                href="{{ event.list_questions_view }}">here</a>.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% for event_question in event_questions %}
+                <div class="row" style="padding-bottom:20px;">
+                    <div class="col-9">
+                        <p style="font-size:1.2em;">Q. {{ event_question.question.title }} | <a style="color: #4599d5;"
+                                href="{{ event_question.view_answers }}">View Answers</a></p>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        {% if attendee_common_question.age %}
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+
+                <div class="row" style="padding-bottom:30px;padding:20px;">
+                    <div class="col-12">
+                        <h5>Age | <a style="color: #4599d5;" href="{{ event.list_answers_analytic_view }}">View Answers</a></h5>
+                    </div>
+                </div>
+
+                {% if attendees %}
+                <div class="row" style="padding-bottom: 30px;padding: 30px;">
+                    <div class="col-md-12 col-12">
+                        <canvas id="myChart2" width="400" height="150"></canvas>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row text-center" style="padding-bottom:30px;padding:20px;">
+                    <div class="col-12">
+                        <p>Not enought information yet. As tickets start selling we'll update you.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+        {% endif %}
+
+        {% if attendee_common_question.gender %}
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+
+                <div class="row" style="padding-bottom:30px;padding:20px;">
+                    <div class="col-12">
+                        <h5>Gender | <a style="color: #4599d5;" href="#">View Answers</a></h5>
+                    </div>
+                </div>
+
+                {% if attendees %}
+                <div class="row" style="padding-bottom: 40px;padding: 30px;">
+                    <div class="col-md-12 col-12">
+                        <canvas id="myChart" width="400" height="150"></canvas>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row text-center" style="padding-bottom:30px;padding:20px;">
+                    <div class="col-12">
+                        <p>Not enought information yet. As tickets start selling we'll update you.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+        {% endif %}
+
+        {% if attendee_common_question.address %}
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+
+                <div class="row" style="padding-bottom:30px;padding:20px;">
+                    <div class="col-12">
+                        <h5>City | <a style="color: #4599d5;" href="#">View Answers</a></h5>
+                    </div>
+                </div>
+
+                {% if attendees %}
+                <div class="row" style="padding-bottom: 40px;padding:30px;">
+                    <div class="col-md-12 col-12">
+                        <canvas id="myChart" width="400" height="150"></canvas>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row text-center" style="padding-bottom:30px;padding:20px;">
+                    <div class="col-12">
+                        <p>Not enought information yet. As tickets start selling we'll update you.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+        {% endif %}
+
+
+
+    </div>
+</div>
+{% endblock content %}

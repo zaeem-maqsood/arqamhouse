@@ -30,12 +30,11 @@ class MutipleChoiceForm(forms.ModelForm):
 
 class QuestionForm(forms.ModelForm):
 
-	order = forms.IntegerField(min_value=0, widget=forms.NumberInput(attrs={"class":"form-control m-input", "placeholder":"1"}))
 
 	class Meta:
 		model = Question
 		fields = [
-			"title", "required", "help_text", "order", "question_type",
+			"title", "required", "help_text", "question_type",
 		]
 
 
@@ -53,7 +52,7 @@ class QuestionForm(forms.ModelForm):
 				"help_text": forms.Textarea(
 						attrs={
 							"class":"form-control m-input",
-							"placeholder":"Please refer to your tasete buds.",
+							"placeholder":"Enter some 'help text' here to help your ticket buyers answer this question.",
 							"rows" : 2,
 						}
 					),

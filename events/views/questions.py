@@ -39,11 +39,10 @@ class QuestionsListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMix
 		else:
 			required = False
 
-
-		if option == 'id_notes':
+		if option == 'id_address':
 			print(value)
-			attendee_common_questions.notes = value
-			attendee_common_questions.notes_required = required
+			attendee_common_questions.address = value
+			attendee_common_questions.address_required = required
 			attendee_common_questions.save()
 
 		if option == 'id_age':
@@ -56,8 +55,7 @@ class QuestionsListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMix
 			attendee_common_questions.gender_required = required
 			attendee_common_questions.save()
 
-			
-		return render(request, self.template_name, self.get_context_data())
+		return HttpResponse("Done")
 
 
 	def get(self, request, *args, **kwargs):

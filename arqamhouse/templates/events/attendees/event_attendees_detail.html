@@ -23,6 +23,17 @@ Attendee | {{ attendee.name }}
 {% block scripts %}
 <!--begin::Page Resources --> 
 
+<script>
+
+function initMap() {
+		var input = document.getElementById('autocomplete');
+		var autocomplete = new google.maps.places.Autocomplete(input);
+
+	}
+</script>
+
+<script type="text/javascript"
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnTiJMXoPzVLoo-ztKaRyCrjAocA0K3pQ&libraries=places&callback=initMap"></script>
 <!--end::Page Resources -->
 {% endblock scripts %}
 
@@ -54,64 +65,80 @@ Attendee | {{ attendee.name }}
 				</div>
 
 				<div class="row" style="padding-bottom:10px;">
-					<div class="col-md-4">
+					<div class="col-md-4 col-6">
 						<p style="font-weight: 600;margin-bottom: 0px;">Name</p>
 						<p>{{ attendee.name }}</p>
 					</div>
-					<div class="col-md-5">
+					<div class="col-md-5 col-6">
 						<p style="font-weight: 600;margin-bottom: 0px;"><a href="{{ attendee.order.get_order_view }}">Order ID</a></p>
-						<p>{{ attendee.order.transaction.payment_id }}</p>
+						<p>{{ attendee.order.id }}</p>
 					</div>
 				</div>
 
 				<div class="row" style="padding-bottom:10px;">
-					<div class="col-md-4">
+					<div class="col-md-4 col-12">
 						<p style="font-weight: 600;margin-bottom: 0px;">Ticket</p>
 						<p>{{ attendee.ticket.title }}</p>
 					</div>
-					{% if attendee.email %}
-					<div class="col-md-2">
-						<p style="font-weight: 600;margin-bottom: 0px;">Email</p>
-						<p>{{ attendee.email }}</p>
-					</div>
-					{% endif %}
 					{% if attendee.gender %}
-					<div class="col-md-2">
+					<div class="col-md-2 col-4">
 						<p style="font-weight: 600;margin-bottom: 0px;">Gender</p>
 						<p>{{ attendee.gender|title }}</p>
 					</div>
 					{% endif %}
 					{% if attendee.age %}
-					<div class="col-md-2">	
+					<div class="col-md-2 col-4">	
 						<p style="font-weight: 600;margin-bottom: 0px;">Age</p>
 						<p>{{ attendee.age }}</p>
 					</div>
 					{% endif %}
 				</div>
 
-				<div class="row" style="padding-bottom: 30px;">
+
+				<div class="row" style="padding-bottom:10px;">
+					{% if attendee.country %}
+					<div class="col-md-4 col-4">
+						<p style="font-weight: 600;margin-bottom: 0px;">Country</p>
+						<p>{{ attendee.country.name }}</p>
+					</div>
+					{% endif %}
+					{% if attendee.region %}
+					<div class="col-md-2 col-4">
+						<p style="font-weight: 600;margin-bottom: 0px;">Region</p>
+						<p>{{ attendee.region.name }}</p>
+					</div>
+					{% endif %}
+					{% if attendee.city %}
+					<div class="col-md-2 col-4">
+						<p style="font-weight: 600;margin-bottom: 0px;">City</p>
+						<p>{{ attendee.city.name }}</p>
+					</div>
+					{% endif %}
+				</div>
+
+				<div class="row" style="padding-bottom: 20px;">
 					<div class="col-md-12">
-						{% if attendee.note %}
-						<p style="font-weight: 600;margin-bottom: 5px;">Note</p>
-						<p>{{ attendee.note }}</p>
+						{% if attendee.address %}
+						<p style="font-weight: 600;margin-bottom: 5px;">Address</p>
+						<p>{{ attendee.address }}</p>
 						{% endif %}
 					</div>
 				</div>
 
-				<div class="row">
+				{% if answers %}
+				{% for answer in answers %}
+				<div class="row" style="padding-bottom: 20px;">
 					<div class="col-md-12">
-						{% if answers %}
-							{% for answer in answers %}
-							<p style="margin-bottom: 0px;font-weight: 600;">Q | {{ answer.question }}</p>
-							<p>A | {{ answer.value }}</p>
-							{% endfor %}
-						{% endif %}
+						<p style="margin-bottom: 0px;font-weight: 600;">Q | {{ answer.question }}</p>
+						<p>A | {{ answer.value }}</p>
 					</div>
 				</div>
+				{% endfor %}
+				{% endif %}
 
 
 				<form method="POST">{% csrf_token %}
-				<div class="row">
+				<div class="row" style="padding-top:40px;">
 					<div class="col-md-12">
 						<h4>Edit Details</h4>
 					</div>
@@ -157,18 +184,18 @@ Attendee | {{ attendee.name }}
 				</div>
 				{% endif %}
 
-				{% if attendee_common_questions.note %}
+				{% if attendee_common_questions.address %}
 				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
-					<div class="col-md-12">
-						<p style="margin-bottom: 4px;">Note</p>
-						<textarea name="note" id="note" placeholder="You can write additional notes or concerns about this attendee here." class="form-control m-input" rows="3" style="user-select: auto;" {% if attendee_common_questions.notes_required %}required{% endif %}>{{ attendee.note }}</textarea>
+					<div class="col-md-6">
+						<p style="margin-bottom: 4px;">Address</p>
+						<input name="address" id="autocomplete" class="form-control m-input" {% if attendee_common_questions.notes_required %}required{% endif %} value="{{ attendee.address }}">
 					</div>
 				</div>
 				{% endif %}
 
 				{% if answers %}
 				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
-					<div class="col-md-12">
+					<div class="col-md-10">
 						<hr>
 						{% for answer in answers %}
 							<div class="row" style="padding-top:10px;padding-bottom: 10px;">

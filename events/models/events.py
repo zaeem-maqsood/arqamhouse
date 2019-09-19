@@ -33,8 +33,8 @@ class Event(TimestampedModel):
 	title = models.CharField(max_length=120, null=True, blank=False)
 	url = models.CharField(max_length=120, null=True, blank=True)
 	slug = models.SlugField(max_length = 175, unique = False, blank=True)
-	start = models.DateTimeField(blank=False, null=True, default=timezone.now)
-	end = models.DateTimeField(blank=False, null=True)
+	start = models.DateTimeField(blank=True, null=True, default=timezone.now)
+	end = models.DateTimeField(blank=True, null=True)
 	short_description = models.TextField(null=True, blank=True)
 	venue_address = models.CharField(max_length=200, null=True, blank=True)
 	venue_name = models.CharField(max_length=200, null=True, blank=True)
@@ -112,6 +112,14 @@ class Event(TimestampedModel):
 
 	def list_questions_view(self):
 		view_name = "events:list_questions"
+		return reverse(view_name, kwargs={"slug": self.slug})
+
+	def list_answers_view(self):
+		view_name = "events:answers_list"
+		return reverse(view_name, kwargs={"slug": self.slug})
+
+	def list_answers_analytic_view(self):
+		view_name = "events:answers_list_analytic"
 		return reverse(view_name, kwargs={"slug": self.slug})
 
 	def create_question(self):

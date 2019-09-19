@@ -1,0 +1,8 @@
+{% load answers_template_tags %}
+{% for order in orders %}
+<tr>
+    <td><a href="{{ order.get_order_view }}">{{ order.name }}</a></td>
+    <td>{% get_answer_for_order order event_question %}</td>
+    <td><a href="{{ order.get_order_view }}" class="btn btn-primary btn-block">View</a></td>
+</tr>
+{% endfor %}
