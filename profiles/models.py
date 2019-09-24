@@ -66,13 +66,10 @@ class Profile(AbstractUser):
 
 	def _generate_slug(self):
 		max_length = self._meta.get_field('slug').max_length
-		# if self.url:
-		# 	value = self.url
-		# else:
 		value = self.name
 		slug_candidate = slug_original = slugify(value, allow_unicode=True)
 		for i in itertools.count(1):
-			if not House.objects.filter(slug=slug_candidate).exists():
+			if not Profile.objects.filter(slug=slug_candidate).exists():
 				break
 			slug_candidate = '{}-{}'.format(slug_original, i)
 

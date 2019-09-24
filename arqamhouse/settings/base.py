@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'payments',
     'events',
     'questions',
-    'descriptions',
 
 ]
 
@@ -90,42 +89,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'arqamhouse.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-
-# DATABASES = {    
-#     'default': {        
-#         'ENGINE': 'django.db.backends.sqlite3',        
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),    
-#     }
-# }
-
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'arqamhouse',
-#         'USER': 'arqamhouse',
-#         'PASSWORD': 'Ed81ae9600!',
-#         'HOST': 'localhost',
-#     }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'HOST': 'db',
-#         'PORT': 5432,
-#     }
-# }
-
-# import dj_database_url
-# db_from_env = dj_database_url.config()
-# DATABASES['default'].update(db_from_env)
-
+ADMINS = [('Zaeem Maqsood', 'errors@arqamhouse.com')]
 
 
 # Django cities settings
@@ -152,10 +116,18 @@ CELERY_BEAT_SCHEDULE = {
 
 
 # Sendgrid Email Backend
-DEFAULT_FROM_EMAIL = 'info@arqamhouse.com'
-EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+
 # SENDGRID_API_KEY = os.environ["SENDGRID_API_KEY"]
 SENDGRID_API_KEY = "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"
+
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+DEFAULT_FROM_EMAIL = 'Arqam House <info@arqamhouse.com>'
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 
 # To err on the side of caution, this defaults to True, so emails sent in DEBUG mode will not be delivered,
  # unless this setting is explicitly set to False.

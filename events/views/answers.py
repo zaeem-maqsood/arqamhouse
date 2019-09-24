@@ -252,6 +252,7 @@ class AnswersView(HouseAccountMixin, View):
 
 		if attendee_common_question.age or attendee_common_question.gender or attendee_common_question.address:
 			attendees = Attendee.objects.filter(order__event=event, active=True).order_by('age')
+			context["attendees"] = attendees
 			if attendee_common_question.age:
 				ages = self.get_ages(attendees)
 				context["ages"] = ages

@@ -12,21 +12,21 @@ from django.contrib import messages
 from itertools import chain
 from operator import attrgetter
 from django.conf import settings
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 
 from django.core import mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
 from houses.mixins import HouseAccountMixin
-from .models import Payout, Transaction, Refund, HousePayment, HouseBalance, HouseBalanceLog, PayoutSetting, Etransfer
-from .forms import AddFundsForm, PayoutForm, AddEtransferForm
+from .models import Payout, Transaction, Refund, HousePayment, HouseBalance, HouseBalanceLog, PayoutSetting, BankTransfer
+from .forms import AddFundsForm, PayoutForm, AddBankTransferForm
 
 
 # Create your views here.
-class UpdateETransferView(HouseAccountMixin, CreateView):
-	template_name = "payments/add_etransfer.html"
-	form_class = AddEtransferForm
+class UpdateBankTransferView(HouseAccountMixin, CreateView):
+	template_name = "payments/add_bank.html"
+	form_class = AddBankTransferForm
 	model = PayoutSetting
 
 	def get_success_url(self):
@@ -34,14 +34,22 @@ class UpdateETransferView(HouseAccountMixin, CreateView):
 		return reverse(view_name)
 
 	def get(self, request, *args, **kwargs):
-		etransfer_id = kwargs['etransfer_id']
-		self.object = Etransfer.objects.get(id=etransfer_id)
+		data = request.GET
+		print(data)
+		if 'institution_number' in data:
+				try:
+					return render(request, "payments/bank_images/%s.html" % (data["institution_number"]))
+				except Exception as e:
+					print(e)
+					return HttpResponse("")
+		bank_transfer_id = kwargs['bank_transfer_id']
+		self.object = BankTransfer.objects.get(id=bank_transfer_id)
 		return render(request, self.template_name, self.get_context_data())
 
 	
 	def post(self, request, *args, **kwargs):
-		etransfer_id = kwargs['etransfer_id']
-		self.object = Etransfer.objects.get(id=etransfer_id)
+		bank_transfer_id = kwargs['bank_transfer_id']
+		self.object = BankTransfer.objects.get(id=bank_transfer_id)
 		data = request.POST
 		house = self.get_house()
 		form = self.get_form()
@@ -53,19 +61,19 @@ class UpdateETransferView(HouseAccountMixin, CreateView):
 	def form_valid(self, form, request, data):
 		house = self.get_house()
 		self.object = form.save()
-		payout_method_name = data["payout_method_name"]
-		payout_setting = PayoutSetting.objects.get(house=house, etransfer=self.object)
+		payout_method_name = request.POST["payout_method_name"]
+		payout_setting = PayoutSetting.objects.get(house=house, bank_transfer=self.object)
 		payout_setting.name = payout_method_name
 		payout_setting.save()
-		messages.success(request, 'Payout Method Created!')
-		valid_data = super(UpdateETransferView, self).form_valid(form)
+		messages.success(request, 'Bank Account Updated!')
+		valid_data = super(UpdateBankTransferView, self).form_valid(form)
 		return valid_data
 
 	def get_context_data(self, *args, **kwargs):
 		context = {}
 		house = self.get_house()
 		form = self.get_form()
-		payout_setting = PayoutSetting.objects.get(house=house, etransfer=self.object)
+		payout_setting = PayoutSetting.objects.get(house=house, bank_transfer=self.object)
 		context["form"] = form
 		context["payout_setting"] = payout_setting
 		context["dashboard_events"] = self.get_events()
@@ -79,9 +87,9 @@ class UpdateETransferView(HouseAccountMixin, CreateView):
 
 
 
-class AddETransferView(HouseAccountMixin, CreateView):
-	template_name = "payments/add_etransfer.html"
-	form_class = AddEtransferForm
+class AddBankTransferView(HouseAccountMixin, CreateView):
+	template_name = "payments/add_bank.html"
+	form_class = AddBankTransferForm
 	model = PayoutSetting
 
 	def get_success_url(self):
@@ -89,6 +97,15 @@ class AddETransferView(HouseAccountMixin, CreateView):
 		return reverse(view_name)
 
 	def get(self, request, *args, **kwargs):
+
+		data = request.GET
+		print(data)
+		if 'institution_number' in data:
+				try:
+					return render(request, "payments/bank_images/%s.html" % (data["institution_number"]))
+				except Exception as e:
+					print(e)
+					return HttpResponse("")
 		self.object = None
 		return render(request, self.template_name, self.get_context_data())
 
@@ -105,10 +122,10 @@ class AddETransferView(HouseAccountMixin, CreateView):
 	def form_valid(self, form, request):
 		house = self.get_house()
 		self.object = form.save()
-		payout_method_name = form.cleaned_data["payout_method_name"]
-		payout_setting = PayoutSetting.objects.create(house=house, etransfer=self.object, name=payout_method_name)
+		payout_method_name = request.POST["payout_method_name"]
+		payout_setting = PayoutSetting.objects.create(house=house, bank_transfer=self.object, name=payout_method_name)
 		messages.success(request, 'Payout Method Created!')
-		valid_data = super(AddETransferView, self).form_valid(form)
+		valid_data = super(AddBankTransferView, self).form_valid(form)
 		return valid_data
 
 	def get_context_data(self, *args, **kwargs):

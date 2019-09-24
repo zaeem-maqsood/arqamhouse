@@ -1,56 +1,7 @@
 from .base import *
 
-from events.models import Event, AttendeeCommonQuestions, Checkin, EventCart, EventCartItem
+from events.models import Event, AttendeeCommonQuestions, EventCart, EventCartItem
 from core.constants import genders
-
-
-
-class CheckinForm(forms.ModelForm):
-
-	def __init__(self, attendees, *args, **kwargs):
-		
-		super(CheckinForm, self).__init__(*args, **kwargs)
-
-		for attendee in attendees:
-			self.fields["%s_attendee" % (attendee.id)] = forms.BooleanField(label=str(attendee.name), required=False, initial=True, widget=forms.CheckboxInput(attrs={"class":"", "onclick":"myFunction()"}))
-
-
-	class Meta:
-		model = Checkin
-		fields = [
-			"title", "auto_add_new_attendees", "password_protected", "password",
-		]
-
-		widgets = {
-
-				"title": forms.TextInput(
-						attrs={
-							"class":"form-control m-input message",
-							"placeholder":"Main Registration Checkin",
-							"required": True,
-							"maxlength": '100',
-						}
-					),
-
-				"password": forms.TextInput(
-						attrs={
-							"class":"form-control m-input message",
-							"placeholder":"secretpassword",
-							"required": False,
-							"maxlength": '100',
-						}
-					),
-
-				"auto_add_new_attendees": forms.CheckboxInput(
-						attrs={
-						}
-					),
-
-				"password_protected": forms.CheckboxInput(
-						attrs={
-						}
-					),
-			}
 
 
 
@@ -144,6 +95,7 @@ class EventForm(forms.ModelForm):
 						attrs={
 							"class":"form-control m-input",
 							"placeholder":"my-awesome-event",
+							"onkeyup": "ValidateURL(this);"
 						}
 					),
 

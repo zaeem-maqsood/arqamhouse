@@ -8,10 +8,6 @@
         <div class="col-md-12">
             <h2 style="margin-bottom:20px;font-weight: 400;color: #7c8a93;">{{ event.title }}</h2>
             <p class="">{{ event.short_description }}</p>
-            {% if tickets %}
-            <a class="btn btn--primary" href="{{ event.choose_tickets_view }}"><span class="btn__text">Get
-                    Tickets</span></a>
-            {% endif %}
         </div> 
     </div>
 
@@ -44,6 +40,14 @@
         </div>
         {% endif %}
 
+    </div>
+
+    <div class="row" style="padding-bottom: 40px;">
+        <div class="col-md-12">
+            {% if tickets %}
+            <a class="btn btn--primary" href="{{ event.choose_tickets_view }}"><span class="btn__text">Get Tickets</span></a>
+            {% endif %}
+        </div>
     </div>
     
 

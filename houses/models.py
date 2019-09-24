@@ -39,14 +39,6 @@ class House(TimestampedModel):
 	region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=False, null=True)
 	city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=True)
 
-	entity = models.CharField(max_length=150, choices=entity_types, default = 'individual', null=True, blank=True)
-	connect_account_created = models.BooleanField(default=False)
-	connected_stripe_account_id = models.CharField(max_length=200, null=True, blank=False)
-	front_side = models.ImageField(upload_to=temp_file_upload_location, blank=True, null=True)
-	back_side = models.ImageField(upload_to=temp_file_upload_location, blank=True, null=True)
-	legal_document = models.ImageField(upload_to=temp_file_upload_location, blank=True, null=True)
-	stripe_legal_document_id = models.CharField(max_length=200, null=True, blank=True)
-
 	def __str__(self):
 		return str(self.name)
 

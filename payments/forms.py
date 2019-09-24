@@ -1,34 +1,44 @@
 from django import forms
-from .models import Etransfer, PayoutSetting
+from .models import PayoutSetting, BankTransfer
 
 
-class AddEtransferForm(forms.ModelForm):
-
+class AddBankTransferForm(forms.ModelForm):
 
     class Meta:
-        model = Etransfer
+        model = BankTransfer
         fields = [
-            "email",
-            "password",
+            "transit",
+            "institution",
+            "account",
         ]
 
 
         widgets = {
-            "email": forms.EmailInput(
+            "transit": forms.TextInput(
                     attrs={
                         "class":"form-control m-input",
-                        "placeholder":"example@example.com",
+                        "onkeyup": "this.value = this.value.replace(/[^\d]/, '')",
+                        "placeholder": "12345",
                         "required": True
                     }
                 ),
-            "password": forms.TextInput(
+            "institution": forms.TextInput(
                     attrs={
                         "class":"form-control m-input",
-                        "placeholder":"password",
-                         "oninput" : "this.value=this.value.toLowerCase()",
+                        "placeholder":"001",
+                        "oninput": "this.value = this.value.replace(/[^\d]/, '')",
+                        "onkeyup": "GetBankImage(this)",
                         "required": True
                     }
                 ),
+            "account": forms.TextInput(
+                attrs={
+                    "class": "form-control m-input",
+                    "placeholder": "1234567",
+                    "oninput": "this.value = this.value.replace(/[^\d]/, '')",
+                    "required": True
+                }
+            ),
             }
 
 

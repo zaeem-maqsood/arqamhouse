@@ -28,6 +28,8 @@ django-heroku = "*"
 python-dotenv = "*"
 django-cleanup = "*"
 googlemaps = "*"
+coverage = "*"
+selenium = "*"
 
 [requires]
 python_version = "3.7"

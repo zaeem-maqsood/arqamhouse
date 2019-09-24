@@ -37,22 +37,34 @@ Payout History | {{ House }}
                 {% if payout_settings %}
                 
                 {% for payout_setting in payout_settings %}
-                <div class="row" style="padding-top: 20px;">
+                <div class="row" style="padding-bottom:10px;padding-top: 20px;">
                     <div class="col-md-12">
-                        <p style="font-size:1em;"><span style="font-weight: 600;font-size: 1.3em;">{{ payout_setting.name }} |</span> Electronic Mail Transfer</p>
+                        {% if payout_setting.bank_transfer.institution == '001' or payout_setting.bank_transfer.institution == '002' or payout_setting.bank_transfer.institution == '003' or payout_setting.bank_transfer.institution == '004' %}
+                            {% with template_name=payout_setting.bank_transfer.institution|stringformat:"s"|add:".html" %}
+                                {% include "payments/bank_images/"|add:template_name %}
+                            {% endwith %}
+                        {% endif %}
                     </div>
                 </div>
-                <div class="row" style="padding-bottom: 30px;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p style="font-size:1.2em;"><span style="font-weight: 400;">{{ payout_setting.name }} |</span> <a
+                                href="{{ payout_setting.bank_transfer.get_edit_url  }}">Edit</a></p>
+                    </div>
+                </div>
+                <div class="row" style="padding-bottom: 40px;">
                     <div class="col-md-5">
-                        <p style="margin-bottom: 0px;font-weight: 600;">Email Address</p>
-                        <p>{{ payout_setting.etransfer.email }}</p>
+                        
+                        <p style="margin-bottom:0px;">Account Number</p>
+                        <p>{{ payout_setting.bank_transfer.account|make_list|slice:':3'|join:'' }}****</p>
                     </div>
                     <div class="col-md-3">
-                        <p style="margin-bottom: 0px;font-weight: 600;">Password</p>
-                        <p>{{ payout_setting.etransfer.password }}</p>
+                        <p style="margin-bottom:0px;">Transit Number</p>
+                        <p>{{ payout_setting.bank_transfer.transit }}</p>
                     </div>
-                    <div class="col-md-4">
-                        <a href="{{ payout_setting.etransfer.get_edit_url }}" class="btn btn-primary">Edit</a>
+                    <div class="col-md-3">
+                        <p style="margin-bottom:0px;">Institution Number</p>
+                        <p>{{ payout_setting.bank_transfer.institution }}</p>
                     </div>
                 </div>
                 {% endfor %}
@@ -62,7 +74,7 @@ Payout History | {{ House }}
 
                 <div class="row" style="padding-top: 20px;">
                     <div class="col-lg-4 col-md-12">
-                        <a href="{% url 'payments:add_e_transfer' %}" class="btn btn-primary btn-block">Add E-Transfer Payout</a>
+                        <a href="{% url 'payments:add_bank' %}" class="btn btn-primary btn-block">Add Bank Account</a>
                     </div>
                 </div>
 

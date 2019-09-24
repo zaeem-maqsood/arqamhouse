@@ -183,14 +183,16 @@ class TicketUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 	def get_event(self, slug):
 		try:
 			event = Event.objects.get(slug=slug)
-		except:
+		except Exception as e:
+			print(e)
 			raise Http404
 		return event
 
-	def get_ticket(self, ticket_slug):
+	def get_ticket(self, event, ticket_slug):
 		try:
-			ticket = Ticket.objects.get(slug=ticket_slug)
-		except:
+			ticket = Ticket.objects.get(event=event, slug=ticket_slug)
+		except Exception as e:
+			print(e)
 			raise Http404
 		return ticket
 
@@ -229,7 +231,7 @@ class TicketUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 		
 		# Check to make sure event slug is correct
 		event = self.get_event(kwargs['slug'])
-		ticket = self.get_ticket(kwargs['ticket_slug'])
+		ticket = self.get_ticket(event, kwargs['ticket_slug'])
 
 		self.object = ticket
 
@@ -254,7 +256,7 @@ class TicketUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 
 		# Check to make sure event slug is correct
 		event = self.get_event(kwargs['slug'])
-		ticket = self.get_ticket(kwargs['ticket_slug'])
+		ticket = self.get_ticket(event, kwargs['ticket_slug'])
 
 		self.object = ticket
 

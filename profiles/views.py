@@ -1,3 +1,5 @@
+# Bismillah, In the name of God
+
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
@@ -19,7 +21,7 @@ from django.core import mail
 
 
 from .models import Profile
-from .forms import ProfileForm, LoginForm
+from .forms import ProfileForm, LoginForm, ProfileUpdateForm
 from .mixins import ProfileMixin
 from cities_light.models import City, Region, Country
 
@@ -251,7 +253,7 @@ class LoginView(FormView):
 		if profile is not None:
 			login(request, profile)
 		else:
-			form.add_error("email", "Invalid email. Please check for typos or create an account with us.")
+			form.add_error("email", "Please check your email to finish activating your account. If you need another email choose 'Recover Account'")
 			return self.render_to_response(self.get_context_data(form=form))
 
 		valid_data = super(LoginView, self).form_valid(form)
@@ -265,73 +267,37 @@ class LoginView(FormView):
 
 
 
-class ProfileDetailView(ProfileMixin, DetailView):
-	model = Profile
-	template_name = "profiles/profile_detail.html"
-
-	def get(self, request, *args, **kwargs):
-		context = {}
-		slug = self.kwargs['slug']
-		profile = self.get_profile(slug)
-		if not profile:
-			raise Http404
-		user = self.get_user(profile)
-		houses = self.get_houses(user)
-		does_profile_belong_to_user = self.does_profile_belong_to_user(profile)
-
-		context["does_profile_belong_to_user"] = does_profile_belong_to_user
-		context["profile"] = profile
-		context["houses"] = houses
-		return render(request, self.template_name, context)
-
-
-
 
 class ProfileUpdateView(HouseAccountMixin, UpdateView):
 	model = Profile
-	form_class = ProfileForm
+	form_class = ProfileUpdateForm
 	template_name = "profiles/profile_update.html"
 
 	def get_success_url(self):
-		slug = self.kwargs['slug']
 		view_name = "profiles:update"
-		return reverse(view_name, kwargs={"slug": slug})
+		return reverse(view_name)
 
 
 	def get_context_data(self, request, *args, **kwargs):
 		context = {}
 		form = self.get_form()
-		slug = self.kwargs['slug']
-		profile = self.get_profile(slug)
-		# if not 
+		profile = self.get_profile()
 		context["profile"] = profile
 		context["form"] = form
 		return context
 
 
 	def get(self, request, *args, **kwargs):
-		slug = self.kwargs['slug']
-		try:
-			profile = Profile.objects.get(slug=slug)
-		except:
-			raise Http404
-		self.object = profile
+		self.object = self.get_profile()
 		return self.render_to_response(self.get_context_data(request))
 
 
 	def post(self, request, *args, **kwargs):
 		data = request.POST
-
-		slug = self.kwargs['slug']
-		try:
-			profile = Profile.objects.get(slug=slug)
-		except:
-			raise Http404
-
-		self.object = profile
+		self.object = self.get_profile()
 		form = self.get_form()
-
 		if form.is_valid():
+			messages.success(request, 'Profile Updated!')
 			return self.form_valid(form)
 		else:
 			return self.form_invalid(form, request)

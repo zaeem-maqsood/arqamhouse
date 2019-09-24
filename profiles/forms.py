@@ -13,6 +13,63 @@ class LoginForm(forms.Form):
 
 
 
+class ProfileUpdateForm(forms.ModelForm):
+
+	class Meta():
+		model = Profile
+		fields = [
+			"name",
+			"region",
+			"city"
+		]
+
+		widgets = {
+				"name": forms.TextInput(
+					attrs={
+						"class": "form-control m-input",
+						"placeholder": "Name",
+										"required": True
+					}
+				),
+				"region": forms.Select(
+					attrs={
+						"required": True,
+						"class": "form-control m-input",
+					}
+				),
+				
+				"city": forms.Select(
+					attrs={
+						"required": True,
+						"class": "form-control m-input",
+					}
+				),
+			}
+
+	
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self.fields['city'].empty_label = "City"
+		self.fields['region'].empty_label = "Region"
+
+		self.fields['region'].queryset = self.instance.country.region_set.order_by('name')
+		self.fields['city'].queryset = self.instance.region.city_set.order_by('name')
+
+		self.fields["region"].label_from_instance = lambda obj: "%s" % obj.name
+		self.fields["city"].label_from_instance = lambda obj: "%s" % obj.name
+
+	def clean(self, *args, **kwargs):
+		cleaned_data = super(ProfileUpdateForm, self).clean(*args, **kwargs)
+		name = self.cleaned_data.get("name")
+
+		if len(name) <= 3:
+			raise forms.ValidationError(
+				"Please Enter A Name With More Than 2 Characters")
+		return cleaned_data
+
+
+
 class ProfileForm(UserCreationForm):
 
 	email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={"required" : True, "class":"validate-required", "placeholder": "Email", "autocomplete": "off"}))
@@ -56,25 +113,17 @@ class ProfileForm(UserCreationForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
-		self.fields['city'].empty_label = "City"
-		self.fields['region'].empty_label = "Region"
+		self.fields['city'].empty_label = None
+		self.fields['region'].empty_label = None
 
 		self.fields['city'].queryset = City.objects.all()
 		self.fields['region'].queryset = Region.objects.all()
 
-		
-		if 'region' in self.data:
-			try:
-				canada = Country.objects.get(name="Canada")
-				region_id = int(self.data.get('region'))
-				self.fields['region'].queryset = Region.objects.filter(country=canada).order_by('name')
-				self.fields['city'].queryset = City.objects.filter(region_id=region_id).order_by('name')
-			except (ValueError, TypeError):
-				pass  # invalid input from the client; ignore and fallback to empty City queryset
+		self.fields['region'].initial = Region.objects.get(name="Ontario")
+		self.fields['city'].initial = City.objects.get(name="Toronto")
 
-		elif self.instance.pk:
-			self.fields['region'].queryset = self.instance.country.region_set.order_by('name')
-			self.fields['city'].queryset = self.instance.country.city_set.order_by('name')
+		self.fields["region"].label_from_instance = lambda obj: "%s" % obj.name
+		self.fields["city"].label_from_instance = lambda obj: "%s" % obj.name
 
 
 

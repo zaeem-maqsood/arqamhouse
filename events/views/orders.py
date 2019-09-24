@@ -112,8 +112,10 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		context["active_attendees"] = active_attendees
 		event_order_refunds = EventOrderRefund.objects.filter(order=order)
 		if event_order_refunds:
-			total_payout = event_order_refunds.aggregate(Sum('refund__amount'))
-			total_payout = order.event_cart.total_no_fee - total_payout["refund__amount__sum"]
+			total_payout = event_order_refunds.aggregate(Sum('refund__house_amount'))
+			total_payout = order.event_cart.total_no_fee - total_payout["refund__house_amount__sum"]
+			if total_payout < 0.00:
+				total_payout = 0.00
 			total_payout = '{0:.2f}'.format(total_payout)
 			context["total_payout"] = total_payout
 
@@ -140,14 +142,18 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		attendees = Attendee.objects.filter(order=order)
 
 
-		print(data)
-
 		if 'Refund' in data:
 
 			attendee_to_be_refunded_id = data['Refund']
 			attendee_to_be_refunded = attendees.get(id=attendee_to_be_refunded_id)
 			ticket = attendee_to_be_refunded.ticket
-			amount = int(ticket.price * 100)
+			amount = int(attendee_to_be_refunded.ticket_buyer_price * 100)
+			house_amount = int(attendee_to_be_refunded.ticket_price * 100)
+
+			house = self.get_house()
+			house_balance = HouseBalance.objects.get(house=house)
+			house_balance.balance -= attendee_to_be_refunded.ticket_fee
+			house_balance.save()
 
 			if attendees.filter(active=True).count() == 1:
 				partial_refund = False
@@ -158,7 +164,8 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 
 			if attendee_to_be_refunded.active:
 				event_order_refund = EventOrderRefund.objects.create(order=order, attendee=attendee_to_be_refunded)
-				refund = Refund.objects.create(transaction=order.transaction, amount=(amount/100), partial_refund=partial_refund)
+				refund = Refund.objects.create(transaction=order.transaction, amount=(
+					amount/100), house_amount=(house_amount/100), partial_refund=partial_refund)
 				
 				event_order_refund.refund = refund
 				event_order_refund.save()
@@ -175,7 +182,6 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 
 				stripe.api_key = settings.STRIPE_SECRET_KEY
 				response = stripe.Refund.create(charge=order.transaction.payment_id, amount=amount)
-				print(response)
 
 
 		# User wants a full refund on the order
@@ -183,10 +189,11 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 
 			for attendee in attendees:
 				if attendee.active:
-					amount = int(attendee.ticket.price * 100)
+					amount = int(attendee.ticket_buyer_price * 100)
+					house_amount = int(attendee.ticket_price * 100)
 					event_order_refund = EventOrderRefund.objects.create(order=order, attendee=attendee)
-					print("Yes it is created Full Refund")
-					refund = Refund.objects.create(transaction=order.transaction, amount=(amount/100))
+					refund = Refund.objects.create(
+						transaction=order.transaction, amount=(amount/100), house_amount=(house_amount/100))
 					event_order_refund.refund = refund
 					event_order_refund.save()
 					attendee.active = False
@@ -196,7 +203,6 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 					attendee.ticket.save()
 					stripe.api_key = settings.STRIPE_SECRET_KEY
 					response = stripe.Refund.create(charge=order.transaction.payment_id, amount=amount)
-					print(response)
 
 				order.refunded = True
 				order.save()

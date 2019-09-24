@@ -33,8 +33,7 @@ Orders
             labels: ["Female", "Male", "No Data"],
             datasets: [{
                 label: 'Genders',
-                data: {{ genders | safe }
-    },
+                data: {{ genders | safe }},
         backgroundColor: 'rgba(68, 153, 216, 0.2)',
         borderColor: 'rgba(68, 153, 216, 1)',
         borderWidth: 4,
@@ -136,23 +135,22 @@ Orders
 
             datasets: [{
                 label: 'Attendees',
-                data: {{ ages | safe }
-    },
-        backgroundColor: 'rgba(68, 153, 216, 0.2)',
-        borderColor: 'rgba(68, 153, 216, 1)',
-        borderWidth: 4,
-        lineTension: 0.1,
-        borderCapStyle: 'butt',
-        borderDashOffset: 3.0,
-        borderJoinStyle: 'miter',
-        pointBorderWidth: 6,
-        pointHoverRadius: 5,
-        pointHoverBorderWidth: 2,
-        pointRadius: 0.5,
-        pointHitRadius: 7,
-        xPadding: 25,
+                data: {{ ages | safe }},
+            backgroundColor: 'rgba(68, 153, 216, 0.2)',
+            borderColor: 'rgba(68, 153, 216, 1)',
+            borderWidth: 4,
+            lineTension: 0.1,
+            borderCapStyle: 'butt',
+            borderDashOffset: 3.0,
+            borderJoinStyle: 'miter',
+            pointBorderWidth: 6,
+            pointHoverRadius: 5,
+            pointHoverBorderWidth: 2,
+            pointRadius: 0.5,
+            pointHitRadius: 7,
+            xPadding: 25,
 
-            }]
+        }]
 	    },
     options: {
 

@@ -42,26 +42,74 @@ function initMap() {
 }
 
 
+function ValidateURL(object) {
+
+	console.log(object.value)
+	var url = object.value;
+
+	$.ajax({
+		type: "GET",
+		url: '{{ request.path }}',
+		data: {
+			'url': url,
+		},
+
+		success: function (data) {
+			console.log(data)
+			if (data == 'not_taken') {
+				document.getElementById("id_url").style.borderColor = "green"; 
+				document.getElementById("url_message").innerHTML = "| Valid URL";
+				document.getElementById("url_message").style.color = 'green';
+			}
+			else {
+				document.getElementById("id_url").style.borderColor = "red";
+				document.getElementById("url_message").innerHTML = "| URL already taken";
+				document.getElementById("url_message").style.color = 'red';
+			}
+			
+
+		},
+		error: function (XMLHttpRequest, textStatus, errorThrown) {
+			alert(errorThrown);
+			//some stuff on failure
+		},
+	});
+
+}
+
+
 
 $('#id_url').bind('input propertychange', function() {
     value = $(this).val();
 	// Step 1
 	new_value = value.toLowerCase()
 	// Step 2
-	new_value = new_value.replace(/[^\w ]+/g, '')
+	new_value = new_value.replace(/[^\w ]+/g, '-')
 	// Step 3
 	new_value = new_value.replace(/ +/g, '-')
+
     $('#output').html(new_value);
 });
 
 function updateCountdown() {
-    // 140 is the max message length
-    var remaining = 100 - jQuery('.message').val().length;
-    jQuery('.countdown').text(remaining + ' characters remaining.');
+
+    value = '{{ event.slug }}';
+	console.log(value)
+	$('#output').html(value);
 }
+
+{% if event %}
+function preFillURLData() {
+	document.getElementById('id_url').defaultValue = '{{ event.slug }}';
+}
+{% endif %}
+
 
 jQuery(document).ready(function($) {
     updateCountdown();
+	{% if event %}
+	preFillURLData()
+	{% endif %}
     $('.message').change(updateCountdown);
     $('.message').keyup(updateCountdown);
 });
@@ -168,7 +216,7 @@ flatpickr("#id_end", {
 						{% if event.active %}
 						<div class="row" style="padding-bottom: 40px;">
 							<div class="col-md-8">
-								<p style="font-weight: 600;margin-bottom:0px;{% if form.url.errors %}color:red;{% endif %}">Custom URL</p>
+								<p style="font-weight: 600;margin-bottom:0px;{% if form.url.errors %}color:red;{% endif %}">Custom URL <span style="font-weight:200;" id='url_message'></span></p>
 								{{ form.url }}
 								{% for error in form.url.errors %}
 									<div class="alert m-alert--outline alert-danger" role="alert">
@@ -265,7 +313,7 @@ flatpickr("#id_end", {
 
 						<div class="row" style="padding-bottom: 30px;">
 							<div class="col-md-12">
-								<button type="submit" name="Create" value="Create" class="btn btn-primary btn-block">{% if update_event %}Update{% else %}Create{% endif %} Event</button>
+								<button type="submit" name="Create" value="Create" id="Create" class="btn btn-primary btn-block">{% if update_event %}Update{% else %}Create{% endif %} Event</button>
 							</div>
 						</div>
 						

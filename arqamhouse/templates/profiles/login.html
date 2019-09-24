@@ -36,7 +36,7 @@ Login | Arqam House
                         {% for message in messages %}
                         <div class="alert bg--{{ message.tags }}">
                             <div class="alert__body">
-                                <span>{{ message.tags|upper }}! {{ message }}</span>
+                                <span>{{ message }}</span>
                             </div>
                             <div class="alert__close"> × </div>
                         </div>
@@ -44,39 +44,40 @@ Login | Arqam House
                     </div>
                 </div>
 
+                {% if form.non_field_errors %}
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.non_field_errors %}
+                                <span>{{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                {% if form.email.errors %}
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                {% for error in form.email.errors %}
+                                <span>{{ error|escape }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="alert__close">×</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+
                 <form class="boxed boxed--border" action="" method="POST">{% csrf_token %}
-                    
-                    {% if form.non_field_errors %}
-                    <div class="row" style="padding-bottom: 20px;">
-                        <div class="col-md-12">
-                            <div class="alert bg--error">
-                                <div class="alert__body">
-                                    {% for error in form.non_field_errors %}
-                                    <span>{{ error|escape }}</span>
-                                    {% endfor %}
-                                </div>
-                                <div class="alert__close">×</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-
-                    {% if form.email.errors %}
-                    <div class="row" style="padding-bottom: 20px;">
-                        <div class="col-md-12">
-                            <div class="alert bg--error">
-                                <div class="alert__body">
-                                    {% for error in form.email.errors %}
-                                    <span>{{ error|escape }}</span>
-                                    {% endfor %}
-                                </div>
-                                <div class="alert__close">×</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
+                
                     <div class="row" style="padding-bottom: 20px;">
                         <div class="col-md-12">
                             <div class="col-md-12">

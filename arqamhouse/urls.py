@@ -33,7 +33,6 @@ urlpatterns = [
     path('events/', include('events.urls')),
     path('questions/', include('questions.urls')),
     path('payments/', include('payments.urls')),
-    path('descriptions/', include('descriptions.urls')),
 
     # path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
     path('password_reset/', auth_views.PasswordResetView.as_view(html_email_template_name='registration/password_reset_email.html'), name='password_reset'),

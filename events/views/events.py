@@ -16,14 +16,14 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.storage import FileSystemStorage
+from django.utils.text import slugify
 
 from houses.mixins import HouseAccountMixin
 from houses.models import HouseUser
 from questions.models import Question
-from descriptions.models import EventDescription, DescriptionElement
 from events.mixins import EventMixin
 from events.models import Event, AttendeeCommonQuestions, EventQuestion, Ticket, EventCart, EventCartItem, Answer, OrderAnswer, EventOrder, Attendee
-from events.forms import EventForm, EventCheckoutForm, CheckinForm
+from events.forms import EventForm, EventCheckoutForm
 from payments.models import Transaction
 
 
@@ -49,7 +49,7 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 
 
 	def get_total_sales(self, event):
-		orders = EventOrder.objects.filter(event=event, refunded=False).select_related("transaction")
+		orders = EventOrder.objects.filter(event=event, refunded=False, failed=False).select_related("transaction")
 		total_sales = decimal.Decimal(0.00)
 		for order in orders:
 			if order.transaction.amount:
@@ -114,44 +114,6 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 		context["event"] = event
 		context["request"] = request
 		return render(request, self.template_name, context)
-
-
-
-class EventDescriptionView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, EventMixin, ListView):
-	model = Event
-	template_name = "events/event_description.html"
-
-	def get_event(self, slug):
-		try:
-			event = Event.objects.get(slug=slug)
-			return event
-		except Exception as e:
-			print(e)
-			raise Http404
-
-	def get_event_description(self, event):
-		event_description = EventDescription.objects.get(event=event)
-		return event_description
-
-	def get_description_elements(self, event_description):
-		description_element = DescriptionElement.objects.filter(description=event_description).order_by("order")
-		return description_element
-
-
-	def get_context_data(self, *args, **kwargs):
-		context = {}
-		slug = self.kwargs['slug']
-		event = self.get_event(slug)
-		event_description = self.get_event_description(event)
-		description_elements = self.get_description_elements(event_description)
-
-		house = self.get_house()
-		context["description_elements"] = description_elements
-		context["event"] = event
-		context["events_tab"] = True
-		context["events"] = self.get_events()
-		context["house"] = house
-		return context
 
 
 
@@ -261,7 +223,7 @@ class EventCheckoutView(FormView):
 
 		for cart_item in cart_items:
 
-			attendee_questions = EventQuestion.objects.filter(tickets__id=cart_item.ticket.id).order_by("question__order")
+			attendee_questions = EventQuestion.objects.filter(tickets__id=cart_item.ticket.id, question__deleted=False, question__approved=True).order_by("question__order")
 
 			for quantity in range(cart_item.quantity):
 
@@ -294,7 +256,9 @@ class EventCheckoutView(FormView):
 					print(address)
 
 				attendee = Attendee.objects.create(
-					order=order, ticket=cart_item.ticket, name=name, email=email, age=age, gender=gender, address=address)
+					order=order, ticket=cart_item.ticket, name=name, email=email, age=age, gender=gender, address=address, 
+					ticket_buyer_price=cart_item.ticket.buyer_price, ticket_price=cart_item.ticket.price, ticket_fee=cart_item.ticket.fee,
+					ticket_pass_fee=cart_item.ticket.pass_fee)
 				attendee.save()
 
 				# Step 3c answers to custom questions
@@ -403,14 +367,6 @@ class EventLandingView(DetailView):
 		except Exception as e:
 			raise Http404
 
-	def get_event_description(self, event):
-		event_description = EventDescription.objects.get(event=event)
-		return event_description
-
-	def get_description_elements(self, event_description):
-		description_elements = DescriptionElement.objects.filter(description=event_description)
-		return description_elements
-
 	def is_owner(self, event):
 		profile = self.request.user
 		house = event.house
@@ -426,12 +382,8 @@ class EventLandingView(DetailView):
 		slug = kwargs['slug']
 		
 		event = self.get_event(slug)
-		event_description = self.get_event_description(event)
-		description_elements = self.get_description_elements(event_description)
 
 		context["is_owner"] = self.is_owner(event)
-		context["event_description"] = event_description
-		context["description_elements"] = description_elements
 		context["event"] = event
 		context["tickets"] = event.ticket_set.filter(sold_out=False).exists()
 		context["request"] = request
@@ -508,11 +460,7 @@ class EventCreateView(HouseAccountMixin, CreateView):
 		self.object.active = True
 		self.object.save()
 
-		# Create the event description object 
-		event_description = EventDescription.objects.create(event=self.object)
-		event_description.save()
-
-		messages.success(request, 'Event Published')
+		messages.success(request, 'Your event is live!')
 		valid_data = super(EventCreateView, self).form_valid(form)
 		return valid_data
 
@@ -529,7 +477,7 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 
 	def get_success_url(self):
 		view_name = "events:landing"
-		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
+		return reverse(view_name, kwargs={"slug": self.object.slug})
 
 	def get_success_delete_url(self):
 		view_name = "events:past"
@@ -566,14 +514,29 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 	def get(self, request, *args, **kwargs):
 		slug = kwargs['slug']
 		self.object = self.get_event(slug)
-		initial = {}
-		if self.object.start:
-			initial["start"] = self.object.start.strftime("%m/%d/%Y %I:%M %p")
-		if self.object.end:
-			initial["end"] = self.object.end.strftime("%m/%d/%Y %I:%M %p")
-		form = EventForm(instance=self.object, initial=initial)
-		
-		return self.render_to_response(self.get_context_data(form=form))
+
+		data = request.GET
+
+		if 'url' in data:
+			print(data)
+
+			url = data['url']
+			slugify_url = slugify(url)
+			print(slugify_url)
+			
+			if Event.objects.filter(slug=slugify_url).exists():
+				return HttpResponse("taken")
+			else:
+				return HttpResponse("not_taken")
+		else:
+			initial = {}
+			if self.object.start:
+				initial["start"] = self.object.start.strftime("%m/%d/%Y %I:%M %p")
+			if self.object.end:
+				initial["end"] = self.object.end.strftime("%m/%d/%Y %I:%M %p")
+			form = EventForm(instance=self.object, initial=initial)
+			
+			return self.render_to_response(self.get_context_data(form=form))
 
 	def post(self, request, *args, **kwargs):
 		slug = kwargs['slug']

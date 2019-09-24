@@ -1,0 +1,98 @@
+{% extends "backend/base.html" %}
+{% load static %}
+{% block title %}
+Payout History | {{ House }}
+{% endblock title %}
+
+
+{% block styles %}
+{% endblock styles %}
+
+
+{% block scripts %}
+<script>
+function GetBankImage(object) {
+
+    console.log(object.value)
+    var institution_number = object.value;
+
+    $.ajax({
+        type: "GET",
+        url: '{{ request.path }}',
+        data: {
+            'institution_number': institution_number,
+        },
+
+        success: function (data) {
+            console.log(data)
+            document.getElementById("bank_image").innerHTML = data;
+
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert(errorThrown);
+            //some stuff on failure
+        },
+    });
+
+}
+</script>
+{% endblock scripts %}
+
+
+{% block content %}
+
+<div class="row align-items-center h-100">
+    <div class="col-lg-8 offset-lg-2 col-md-12 col-12">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+                <form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-12" id="bank_image">
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-md-10">
+                            <p style="margin-bottom: 5px;font-weight: 500;">Nickname</p>
+                            <input maxlength="40" name="payout_method_name" value="{{ payout_setting.name }}"
+                                class="form-control m-input" type="text" id="payout_method_name" required
+                                placeholder=" 'Events Account' or 'Business account'">
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-10">
+                            <p style="margin-bottom: 5px;font-weight: 500;">Institution Number</p>
+                            {{ form.institution }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-10">
+                            <p style="margin-bottom: 5px;font-weight: 500;">Transit Number</p>
+                            {{ form.transit }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-10">
+                            <p style="margin-bottom: 5px;font-weight: 500;">Account Number</p>
+                            {{ form.account }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button id="customButton" type="submit" class="btn btn-primary">Add Bank Account</button>
+                        </div>
+                    </div>
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

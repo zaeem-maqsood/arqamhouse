@@ -154,21 +154,21 @@ color: #7396b0;
 						<!-- Display this only on mobile devices -->
 						<div class="row text-center d-block d-md-none" style="padding-bottom:30px;">
 							<div class="col-12">
-								<h3>{{ event.title }} | <a class="dashboard-links" href="{{ event.get_update_view }}"><i class="la la-cog" data-container="body" data-toggle="kt-tooltip"
-														data-placement="top" title=""
-														data-original-title="Edit event settings"></i></a> <a class="dashboard-links" href="{{ event.get_landing_view }}"><i class="la la-calendar-check-o" data-container="body" data-toggle="kt-tooltip"
-														data-placement="top" title=""
-														data-original-title="Go to event"></i></a></h3>
+								<h5>{{ event.title }} | <a class="dashboard-links" href="{{ event.get_update_view }}"><span style="font-size:0.8em;font-weight: 200;color:#FF4500;"
+										data-container="body" data-toggle="kt-tooltip" data-placement="top" title=""
+										data-original-title="Edit Event">Edit | </span></a> <a class="dashboard-links"
+									href="{{ event.get_landing_view }}"><span style="font-size:0.8em;font-weight: 200;color:#FF4500;" data-container="body"
+										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="View Event">View</span></a></5>
 							</div>
 						</div>
 						<!-- End here -->
 		
 						<div class="row row d-none d-sm-none d-md-flex" style="padding-bottom:30px;">
 							<div class="col-md-9">
-								<h3 style="font-weight: 400;">{{ event.title }} | <a class="dashboard-links" href="{{ event.get_update_view }}"><i class="la la-cog" data-container="body"
-										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Edit event settings"></i></a> <a
-									class="dashboard-links" href="{{ event.get_landing_view }}"><i class="la la-calendar-check-o" data-container="body"
-										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Go to event"></i></a></h3>
+								<h4 style="font-weight: 400;">{{ event.title }} | <a class="dashboard-links" href="{{ event.get_update_view }}"><span style="font-size:0.8em;font-weight: 200;color:#FF4500;" data-container="body"
+										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Edit Event">Edit | </span></a><a
+									class="dashboard-links" href="{{ event.get_landing_view }}"><span style="font-size:0.8em;font-weight: 200;color:#FF4500;" data-container="body"
+										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="View Event">View</span></a></h4>
 							</div>
 							<div class="col-md-3">
 								<h3 class="float-right" style="color: #91baa2;">${{ total_sales }}</h3>

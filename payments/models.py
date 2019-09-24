@@ -8,36 +8,23 @@ from django.urls import reverse
 # Create your models here.
 
 
-
-class Etransfer(models.Model):
-	email = models.EmailField(max_length=300, blank=False, null=False)
-	password = models.CharField(max_length=50, null=True, blank=True)
-
-	def __str__(self):
-		return (self.email)
-
-	def get_edit_url(self):
-		view_name = "payments:update_e_transfer"
-		return reverse(view_name, kwargs={"etransfer_id": self.pk})
-
-
 class BankTransfer(models.Model):
-	transit = models.PositiveIntegerField(blank=False, null=False)
-	institution = models.PositiveIntegerField(null=False, blank=False)
-	account = models.PositiveIntegerField(null=False, blank=False)
+	transit = models.CharField(max_length=5, blank=False, null=False)
+	institution = models.CharField(max_length=3, null=False, blank=False)
+	account = models.CharField(max_length=7, null=False, blank=False)
 
 	def __str__(self):
 		return (self.institution)
 
 	def get_edit_url(self):
-		view_name = "payments:update_e_transfer"
-		return reverse(view_name, kwargs={"etransfer_id": self.pk})
+		view_name = "payments:update_bank"
+		return reverse(view_name, kwargs={"bank_transfer_id": self.pk})
 
 
 class PayoutSetting(models.Model):
 	name = models.CharField(max_length=150, null=False, blank=False)
 	house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
-	etransfer = models.ForeignKey(Etransfer, on_delete=models.CASCADE, blank=True, null=True)
+	bank_transfer = models.ForeignKey(BankTransfer, on_delete=models.CASCADE, blank=True, null=True)
 
 	def __str__(self):
 		return (self.name)
@@ -97,7 +84,10 @@ class Transaction(models.Model):
 class Refund(models.Model):
 
 	transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, blank=False, null=False)
+	# Amount actually getting refunded
 	amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	# Amount to refund from houses account
+	house_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	partial_refund = models.BooleanField(default=False)
 	created_at = models.DateTimeField(default=timezone.now, null=True)
 
@@ -153,7 +143,7 @@ def house_balance_update(object_type, instance, *args, **kwargs):
 
 	if object_type == 'refund':
 		house_balance = HouseBalance.objects.get(house=instance.transaction.house)
-		house_balance.balance -= decimal.Decimal(instance.amount)
+		house_balance.balance -= decimal.Decimal(instance.house_amount)
 		house_balance.save()
 		house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, refund=instance, balance=house_balance.balance)
 		house_balance_log.save()

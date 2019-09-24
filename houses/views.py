@@ -29,7 +29,7 @@ from .mixins import HouseAccountMixin, HouseLandingMixin
 from django.contrib.auth.models import User
 from profiles.models import Profile
 from .models import House, HouseUser
-from .forms import AddUserToHouse, HouseUpdateForm, HouseChangeForm, HouseForm, ConnectIndividualVerificationForm, ConnectCompanyVerificationForm
+from .forms import AddUserToHouse, HouseUpdateForm, HouseChangeForm, HouseForm
 
 from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
 from profiles.models import Profile

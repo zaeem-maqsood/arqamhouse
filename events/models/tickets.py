@@ -1,4 +1,5 @@
 import decimal
+import itertools
 from django.db import models
 from django.urls import reverse
 from django.conf import settings
@@ -27,6 +28,7 @@ class Ticket(models.Model):
 	# Fee
 	fee = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 
+
 	min_amount = models.PositiveSmallIntegerField(blank=True, null=False, default=0)
 	max_amount = models.PositiveSmallIntegerField(blank=True, null=False, default=10)
 	description = models.TextField(blank=True, null=True)
@@ -41,6 +43,23 @@ class Ticket(models.Model):
 
 	def __str__(self):
 		return self.title
+
+	def _generate_slug(self):
+		max_length = self._meta.get_field('slug').max_length
+		value = self.title
+		slug_candidate = slug_original = slugify(value, allow_unicode=True)
+		for i in itertools.count(1):
+			if not Ticket.objects.filter(event=self.event, slug=slug_candidate).exists():
+				break
+			slug_candidate = '{}-{}'.format(slug_original, i)
+
+		self.slug = slug_candidate
+
+	def save(self, *args, **kwargs):
+		if not self.pk:
+			self._generate_slug()
+
+		super().save(*args, **kwargs)
 
 	def get_ticket_questions(self):
 		return self.ticketquestion_set.filter(ticket=self, deleted=False, approved=True).order_by('order')

@@ -8,23 +8,6 @@ Profile Update | {{ profile.name }}
 {{ profile.name }}
 {% endblock page_title %}
 
-
-{% block page_crumbs %}
-<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
-	<li class="m-nav__item m-nav__item--home">
-		<a href="#" class="m-nav__link m-nav__link--icon">
-		   <i class="fas fa-user"></i>
-		</a>
-	</li>
-	<li class="m-nav__separator">-</li>
-	<li class="m-nav__item">
-		<a href="" class="m-nav__link">
-			<span class="m-nav__link-text">Profile Update</span>
-		</a>
-	</li>
-</ul>
-{% endblock page_crumbs %}
-
 {% block styles %}
 <style type="text/css">
 	.row-padder {
@@ -34,66 +17,98 @@ Profile Update | {{ profile.name }}
 </style>
 {% endblock styles %}
 
+
+{% block scripts %}
+
+<script>
+	$("#id_country").change(function () {
+
+		var url = $("#profileForm").attr("data-regions-url");  // get the url of the `load_cities` view
+
+		var countryId = $(this).val();  // get the selected country ID from the HTML input
+
+		$.ajax({                       // initialize an AJAX request
+			url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+			data: {
+				'country': countryId       // add the country id to the GET parameters
+			},
+			success: function (data) {   // `data` is the return of the `load_cities` view function
+				console.log(data)
+				$("#id_region").html(data);  // replace the contents of the city input with the data that came from the server
+			}
+		});
+
+	});
+</script>
+
+<script>
+	$("#id_region").change(function () {
+
+		var url = $("#profileForm").attr("data-cities-url");  // get the url of the `load_cities` view
+
+		var regionId = $(this).val();  // get the selected country ID from the HTML input
+
+		$.ajax({                       // initialize an AJAX request
+			url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+			data: {
+				'region': regionId       // add the country id to the GET parameters
+			},
+			success: function (data) {   // `data` is the return of the `load_cities` view function
+				console.log(data)
+				$("#id_city").html(data);  // replace the contents of the city input with the data that came from the server
+			}
+		});
+
+	});
+</script>
+{% endblock scripts %}
+
+
 {% block content %}
-<div class="row">
-	<div class="col-md-10">
-		<!--begin::Portlet-->
-		<div class="m-portlet m-portlet--tab">
-			<!--begin::Form-->
-			<form class="m-form m-form--fit m-form--label-align-right" method="POST">{% csrf_token %}
-				<div class="m-portlet__body">
 
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-8 offset-lg-2 col-md-12 col-12">
+		<div class="kt-portlet kt-portlet--mobile" style="padding:30px;">
+			<div class="kt-portlet__body">
 
-					<div class="row row-padder">
-						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5>Name</h5>
-								{{ form.name }}
+				<div class="row" style="padding-bottom:30px;">
+					<div class="col-10 offset-1">
+
+						<form method="POST" action="" id="profileForm" data-regions-url="{% url 'profiles:ajax_load_regions' %}" data-cities-url="{% url 'profiles:ajax_load_cities' %}">{% csrf_token %}
+
+							<div class="row row-padder">
+								<div class="col-md-12">
+									<h5>Name</h5>
+									{{ form.name }}
+								</div>
 							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="form-group m-form__group">
-								<h5>Email</h5>
-								{{ form.email }}
+							
+							
+							<div class="row row-padder">
+								<div class="col-md-12">
+									<h5>Region</h5>
+									{{ form.region }}
+								</div>
 							</div>
-						</div>
-					</div>
 
-					
-					<div class="row row-padder">
-						<div class="col-md-4">
-							<div class="form-group m-form__group">
-								<h5>Region</h5>
-								{{ form.region }}
+							<div class="row row-padder">
+								<div class="col-md-12">
+									<h5>City</h5>
+									{{ form.city }}
+								</div>
 							</div>
-						</div>
-						<div class="col-md-4">
-							<div class="form-group m-form__group">
-								<h5>City</h5>
-								{{ form.city }}
+
+							<div class="row row-padder">
+								<div class="col-12">
+									<button type="submit" class="btn btn-primary btn-block">Update Profile</button>
+								</div>
 							</div>
-						</div>
-						<div class="col-md-4">
-							<div class="form-group m-form__group">
-								<h5>Timezone</h5>
-								{{ form.timezone }}
-							</div>
-						</div>
-					</div>
-
-
-				</div>
-
-				<div class="m-portlet__foot m-portlet__foot--fit">
-					<div class="m-form__actions">
-						<button type="submit" name="Create" value="Create" class="btn btn-primary btn-block">Update Profile</button>
+						</form>
 					</div>
 				</div>
 
-			</form>
-			<!--end::Form-->			
+			</div>
 		</div>
-		<!--end::Portlet-->
 	</div>
 </div>
 {% endblock content %}

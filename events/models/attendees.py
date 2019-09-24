@@ -12,6 +12,10 @@ class Attendee(TimestampedModel):
 
 	order = models.ForeignKey(EventOrder, on_delete=models.CASCADE, blank=False, null=False)
 	ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, blank=False, null=False)
+	ticket_price = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	ticket_buyer_price = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	ticket_fee = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	ticket_pass_fee = models.BooleanField(default=True)
 	name = models.CharField(max_length=150, null=True, blank=True)
 	email = models.EmailField(max_length=120, null=True, blank=True)
 	address = models.CharField(max_length=200, blank=True, null=True)

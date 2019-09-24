@@ -55,7 +55,7 @@ Order #{{ order.id }} | {{ event.title }}
 
 				<div class="row">
 					<div class="col-12">
-						<p><span style="font-weight:500;">Order ID</span> | {{ order.transaction.payment_id }}</p>
+						<p><span style="font-weight:500;">Order ID</span> | {{ order.id }}</p>
 					</div>
 				</div>
 
@@ -142,36 +142,11 @@ Order #{{ order.id }} | {{ event.title }}
 								{% for cart_item in event_cart_items %}
 								<tr>
 									<td style="color: grey;">{{ cart_item.ticket.title }}</td>
-									<td style="color: grey;">${{ cart_item.ticket.price }}</td>
+									<td style="color: grey;">${{ cart_item.ticket_price }}</td>
 									<td style="color: grey;">{{ cart_item.quantity }}</td>
-									<td style="color: #2584C7;">+${{ cart_item.cart_item_total_no_fee }}</td>
+									<td style="color: #2584C7;">+${{ cart_item.cart_item_total }}</td>
 								</tr>
 								{% endfor %}
-								
-								{% if event_order_refunds %}
-								<tr>
-									<td style="font-weight: 600;">Refunds</td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								{% endif %}
-								{% for event_order_refund in event_order_refunds %}
-								<tr>
-									<td>{{ event_order_refund.attendee.ticket.title }} ({{ event_order_refund.attendee.name }})</td>
-									<td>${{ event_order_refund.attendee.ticket.price }}</td>
-									<td>1</td>
-									<td style="color: #FF4500;">-${{ event_order_refund.refund.amount }}</td>
-								</tr>
-								{% endfor %}
-								{% if event_order_refunds %}
-								<tr>
-									<td></td>
-									<td></td>
-									<td><p style="color: grey;">Total payout to you</p></td>
-									<td><p style="color: #2584C7;">${{ total_payout }}</p></td>
-								</tr>
-								{% else %}
 								<tr>
 									<td></td>
 									<td></td>
@@ -189,6 +164,33 @@ Order #{{ order.id }} | {{ event.title }}
 									<td></td>
 									<td><p style="color: grey;">Total payout to you</p></td>
 									<td><p style="color: #2584C7;">${{ order.event_cart.total_no_fee }}</p></td>
+								</tr>
+								
+								{% if event_order_refunds %}
+								<tr>
+									<td style="font-weight: 600;">Refunds</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								
+								{% for event_order_refund in event_order_refunds %}
+								<tr>
+									<td>{{ event_order_refund.attendee.ticket.title }} ({{ event_order_refund.attendee.name }})</td>
+									<td>${{ event_order_refund.attendee.ticket_buyer_price }}</td>
+									<td>1</td>
+									<td style="color: #FF4500;">-${{ event_order_refund.refund.amount }}</td>
+								</tr>
+								{% endfor %}
+								<tr>
+									<td></td>
+									<td></td>
+									<td>
+										<p style="color: grey;">Total payout to you</p>
+									</td>
+									<td>
+										<p style="color: #2584C7;">${{ total_payout }}</p>
+									</td>
 								</tr>
 								{% endif %}
 							</tbody>

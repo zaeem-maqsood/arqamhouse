@@ -3,6 +3,8 @@ import itertools
 from core.models import TimestampedModel
 from houses.models import House
 
+from django.core.exceptions import ValidationError
+
 # Create your models here.
 
 
@@ -30,7 +32,7 @@ class EventManager(models.Manager):
 
 class Event(TimestampedModel):
 	house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
-	title = models.CharField(max_length=120, null=True, blank=False)
+	title = models.CharField(max_length=50, null=True, blank=False)
 	url = models.CharField(max_length=120, null=True, blank=True)
 	slug = models.SlugField(max_length = 175, unique = False, blank=True)
 	start = models.DateTimeField(blank=True, null=True, default=timezone.now)
@@ -54,6 +56,7 @@ class Event(TimestampedModel):
 			value = self.url
 		else:
 			value = self.title
+
 		slug_candidate = slug_original = slugify(value, allow_unicode=True)
 		for i in itertools.count(1):
 			if not Event.objects.filter(slug=slug_candidate).exists():
@@ -62,9 +65,26 @@ class Event(TimestampedModel):
 
 		self.slug = slug_candidate
 
+	
+	def _update_slug(self):
+		max_length = self._meta.get_field('slug').max_length
+		if self.url:
+			value = self.url
+		else:
+			value = self.title
+		updated_slug = slugify(value, allow_unicode=True)
+		if Event.objects.filter(slug=updated_slug).exists():
+			pass
+		else:
+			self.slug = updated_slug
+
+		
+
 	def save(self, *args, **kwargs):
 		if not self.pk:
 			self._generate_slug()
+		
+		self._update_slug()
 
 		super().save(*args, **kwargs)
 
@@ -84,10 +104,6 @@ class Event(TimestampedModel):
 
 	def get_event_dashboard(self):
 		view_name = "events:dashboard"
-		return reverse(view_name, kwargs={"slug": self.slug})
-
-	def get_event_description(self):
-		view_name = "events:description"
 		return reverse(view_name, kwargs={"slug": self.slug})
 
 	def create_free_ticket(self):
@@ -134,10 +150,6 @@ class Event(TimestampedModel):
 		view_name = "events:attendee_list"
 		return reverse(view_name, kwargs={"slug": self.slug})
 
-	def payout_view(self):
-		view_name = "payouts:event_payout"
-		return reverse(view_name, kwargs={"slug": self.slug})
-
 
 
 
@@ -146,15 +158,15 @@ class Event(TimestampedModel):
 # Checkin Model -------------------------
 # Check attendee app for corresponding 'CheckinAttendee' model
 
-class Checkin(models.Model):
-	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=False, null=False)
-	title = models.CharField(max_length=120, null=True, blank=False)
-	auto_add_new_attendees = models.BooleanField(default=True)
-	password_protected = models.BooleanField(default=True)
-	password = models.CharField(max_length=120, null=True, blank=False)
+# class Checkin(models.Model):
+# 	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=False, null=False)
+# 	title = models.CharField(max_length=120, null=True, blank=False)
+# 	auto_add_new_attendees = models.BooleanField(default=True)
+# 	password_protected = models.BooleanField(default=True)
+# 	password = models.CharField(max_length=120, null=True, blank=False)
 
-	def __str__(self):
-		return ("%s" % self.event.title)
+# 	def __str__(self):
+# 		return ("%s" % self.event.title)
 
 
 

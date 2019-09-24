@@ -36,7 +36,7 @@ def get_amount(instance):
         return instance.transaction.house_amount
     
     if instance.refund:
-        return instance.refund.amount
+        return instance.refund.house_amount
 
     if instance.payout:
         return instance.payout.amount
