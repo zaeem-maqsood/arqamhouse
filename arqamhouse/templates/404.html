@@ -1,0 +1,38 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+404 Not Found
+{% endblock title %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 col-lg-6">
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <img src="{% static 'images/logo.png' %}" style="max-height: 5em;">
+                    </div>
+                </div>
+
+                <h1>Uh-oh the page you're looking for can't be found.</h1>
+
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endblock content %}
