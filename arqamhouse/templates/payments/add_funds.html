@@ -85,6 +85,10 @@ function stripeTokenHandler(token) {
     form.submit();
 }
 
+$('form#id').submit(function () {
+    $(this).find(':input[type=submit]').prop('disabled', true);
+});
+
 </script>
 
 
@@ -131,7 +135,7 @@ jQuery(document).ready(function($) {
 	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
 		<div class="kt-portlet kt-portlet--mobile" style="padding: 10px;">
 			<div class="kt-portlet__body">
-                <form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
+                <form method="POST" id="checkoutForm" enctype="multipart/form-data" onSubmit="document.getElementById('customButton').disabled=true;">{% csrf_token %}
 
                 
 				<div class="row" style="padding-bottom:30px;">
