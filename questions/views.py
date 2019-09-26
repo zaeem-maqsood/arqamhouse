@@ -71,6 +71,7 @@ class MultipleChoiceCreateView(HouseAccountMixin, QuestionSecurityMixin, UserPas
 		self.object = form.save(commit=False)
 		self.object.question = self.get_question()
 		self.object.save()
+		self.object.question.save()
 		messages.success(request, 'Option added to question successfully!')
 		valid_data = super(MultipleChoiceCreateView, self).form_valid(form)
 		return valid_data
