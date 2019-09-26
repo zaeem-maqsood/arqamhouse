@@ -10,7 +10,7 @@ ALLOWED_HOSTS = ['arqam.herokuapp.com', 'arqamhouse.com', 'www.arqamhouse.com' ]
 # STRIPE_PUBLIC_KEY = 'pk_test_kqPiLNskd3LohLMfI49hnwzf'
 
 
-Production Keys
+# Production Keys
 STRIPE_SECRET_KEY = 'sk_live_4FvrAHAiKVjvUYouYDUAuT63'
 STRIPE_PUBLIC_KEY = 'pk_live_HV9p4w8uuKQelYHckqDC1m0d'
 
