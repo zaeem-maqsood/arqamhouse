@@ -6,15 +6,15 @@
     
     <div class="row" style="padding-bottom: 40px;">
         <div class="col-md-12">
-            <h2 style="margin-bottom:20px;font-weight: 400;color: #7c8a93;">{{ event.title }}</h2>
+            <h2 style="{% if event.short_description %}margin-bottom:20px;{% else %}margin-bottom:5px;{% endif %}font-weight: 400;color: #7c8a93;">{{ event.title }}</h2>
+            {% if event.short_description %}
             <p class="">{{ event.short_description }}</p>
+            {% endif %}
         </div> 
     </div>
-
-                                    
-    
+                         
+    {% if event.start or event.end %}
     <div class="row" style="padding-bottom:30px;">
-        {% if event.start or event.end %}
         <div class="col-md-12">
             <h3 style="margin-bottom: 5px;font-weight: 400;color: #7c8a93;"><i class="far fa-clock"></i>  When</h3>
             {% if event.start %}
@@ -24,11 +24,11 @@
             <p style="margin-bottom: 0;font-weight:700;">Ends on | <span style="font-weight:400;"> {{ event.end|date:"N nS Y, f a" }}</span></p>
             {% endif %}
         </div>
-        {% endif %}
     </div>
+    {% endif %}
 
-    <div class="row">
-        {% if event.venue_name or event.venue_address %}
+    {% if event.venue_name or event.venue_address %}
+    <div class="row" style="padding-bottom: 40px;">
         <div class="col-md-12">
             <h3 style="margin-bottom: 5px;font-weight: 400;color: #7c8a93;"><i class="fas fa-map-marker-alt"></i> Where</h3>
             {% if event.venue_name %}
@@ -38,17 +38,19 @@
             <p style="margin-bottom: 0;font-weight:700;">Address | <span style="font-weight:400;">{{ event.venue_address }}</span></p>
             {% endif %}
         </div>
-        {% endif %}
-
     </div>
+    {% endif %}
 
+    {% if event.deleted or not event.active %}
+    {% else %}
+    {% if tickets %}
     <div class="row" style="padding-bottom: 40px;">
-        <div class="col-md-12">
-            {% if tickets %}
-            <a class="btn btn--primary" href="{{ event.choose_tickets_view }}"><span class="btn__text">Get Tickets</span></a>
-            {% endif %}
+        <div class="col-md-12 col-lg-8 offset-lg-2">
+            <a class="btn btn--primary btn-block" href="{{ event.choose_tickets_view }}"><span class="btn__text">Get Tickets</span></a>
         </div>
     </div>
+    {% endif %}
+    {% endif %}
     
 
     </div>

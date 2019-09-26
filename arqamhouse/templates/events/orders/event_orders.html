@@ -74,14 +74,20 @@ jQuery(document).ready(function() {
 	color: #7396b0;
 }
 </style>
+
+
+
 <div class="row align-items-center h-100" >
 	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
 				<div class="row" style="padding-bottom:30px;">
-					<div class="col-12">
+					<div class="col-5">
 						<h3>Orders <span style="font-size: 0.8em;font-weight: 200;">| {{ orders.count }}</span></h3>
+					</div>
+					<div class="col-7">
+						<a href="{{ event.choose_tickets_view }}" class="btn btn-primary pull-right">Create Order</a>
 					</div>
 				</div>
 
@@ -105,7 +111,7 @@ jQuery(document).ready(function() {
 						<tbody id="dynamic">
 							{% for order in orders %}
 							<tr>
-								<td><a href="{{ order.get_order_view }}">{{ order.name }}</a></td>
+								<td><a href="{{ order.get_order_view }}">{{ order.name|title }}</a></td>
 								<td>$ {% if order.transaction.amount %}{{ order.transaction.amount }}{% else %}0.00{% endif %}</td>
 								<td>{{ order.attendee_set.all.count }}</td>
 								<td>
@@ -117,7 +123,11 @@ jQuery(document).ready(function() {
 										{% elif order.refunded %}
 											<span style="color:#FF4500;">Refunded</span>
 										{% else %}
+											{% if order.house_created %}
+											<span style="color:#2584C7;">House Created Order</span>
+											{% else %}
 											<span style="color:#2584C7;">Successful Order</span>
+											{% endif %}
 										{% endif %}
 									</p>
 								</td>

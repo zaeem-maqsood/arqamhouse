@@ -135,23 +135,43 @@ function initMap() {
                                 </div>
                             </div>
 
-                            {% for cart_item in cart_items %}
-                            <div class="row" style="padding-top: 20px;">
-                                <div class="col-md-6">
-                                    <p style="font-size: 1.1em;"> {{ cart_item.ticket.title }}</p>
+                            {% if cart.pay %}
+                                {% for cart_item in cart_items %}
+                                <div class="row" style="padding-top: 20px;">
+                                    <div class="col-md-6">
+                                        <p style="font-size: 1.1em;"> {{ cart_item.ticket.title }}</p>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p style="font-size: 1.1em;">${{ cart_item.ticket.buyer_price }}</p>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p style="font-size: 1.1em;font-weight:800;">x {{ cart_item.quantity }}</p>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p style="font-size: 1.1em;" class="float-right">${{ cart_item.cart_item_total }}</p>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <p style="font-size: 1.1em;">${{ cart_item.ticket.buyer_price }}</p>
+                                {% endfor %}
+                            {% else %}
+                                {% for cart_item in cart_items %}
+                                <div class="row" style="padding-top: 20px;">
+                                    <div class="col-md-6">
+                                        <p style="font-size: 1.1em;"> {{ cart_item.ticket.title }}</p>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p style="font-size: 1.1em;">$0.00</p>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p style="font-size: 1.1em;font-weight:800;">x {{ cart_item.quantity }}</p>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p style="font-size: 1.1em;" class="float-right">$0.00</p>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <p style="font-size: 1.1em;font-weight:800;">x {{ cart_item.quantity }}</p>
-                                </div>
-                                <div class="col-md-2">
-                                    <p style="font-size: 1.1em;" class="float-right">${{ cart_item.cart_item_total }}</p>
-                                </div>
-                            </div>
-                            {% endfor %}
+                                {% endfor %}
+                            {% endif %}
 
+                            {% if cart.pay %}
                             <div class="row" style="padding-top: 20px;">
                                 <div class="col-md-9">
                                     <p style="font-size: 1.1em;font-weight: 800;">Total</p>
@@ -160,6 +180,16 @@ function initMap() {
                                     <p style="font-size: 1.1em;font-weight: 800;" class="float-right">${{ cart.total }}</p>
                                 </div>
                             </div>
+                            {% else %}
+                            <div class="row" style="padding-top: 20px;">
+                                <div class="col-md-9">
+                                    <p style="font-size: 1.1em;font-weight: 800;">Total</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <p style="font-size: 1.1em;font-weight: 800;" class="float-right">$0.00</p>
+                                </div>
+                            </div>
+                            {% endif %}
 
                         </div>
                     </div>
@@ -261,7 +291,7 @@ function initMap() {
                                 <div class="row" style="padding-bottom: 20px;">
                                     <div class="col-md-12 col-lg-12">
                                         <p style="margin-bottom: 0;">Address</p>
-                                        <input name="{{ quantity }}_{{ cart_item.ticket.id }}_address" value="{% get_attendee_address_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_address" placeholder="123 Main Street" autocomplete="off" {% if attendee_common_questions.address_required %}required{% endif %}>
+                                        <input class="form-control m-input" name="{{ quantity }}_{{ cart_item.ticket.id }}_address" value="{% get_attendee_address_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_address" placeholder="123 Main Street" autocomplete="off" {% if attendee_common_questions.address_required %}required{% endif %}>
                                     </div>
                                 </div>
                                 {% endif %}
@@ -274,11 +304,11 @@ function initMap() {
                                             {% if event_question.question.question_type == "Long" %}
                                             <textarea maxlength="300" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" value="{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" placeholder="{{ event_question.question.help_text }}" class="validate-required" rows="3" style="user-select: auto;" {% if event_question.question.required %}required{% endif %}>{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}</textarea>
                                             {% elif event_question.question.question_type == "Multiple Choice" %}
-                                            <select name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" class="form-control m-input">
+                                            <select class="form-control m-input" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}">
                                                 {% if not event_question.question.required %}
                                                 <option value="None">------</option>
                                                 {% endif %}
-                                                {% for option in event_question.question.multiplechoice_set.all %}
+                                                {% for option in event_question.question|multiple_choice_option %}
                                                 <option {% get_attendee_question_initial_value_multiplechoice data quantity event_question.question.id cart_item.ticket.id option %} value="{{ option.title }}">{{ option.title }}</option>
                                                 {% endfor %}
                                             </select>
@@ -296,6 +326,7 @@ function initMap() {
                     {% endfor %}
 
 
+                    {% if cart.pay %}
                     <div class="row justify-content-center" style="padding-bottom:50px;">
                         <div class="col-md-12">
                             <div>
@@ -309,6 +340,7 @@ function initMap() {
                             </div>
                         </div>
                     </div>
+                    {% endif %}
 
                     <div class="row justify-content-center">
                         <div class="col-md-12">

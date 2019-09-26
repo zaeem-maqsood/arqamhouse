@@ -85,6 +85,10 @@ class HouseUpdateForm(forms.ModelForm):
 		if len(name) <= 3:
 			raise forms.ValidationError(
 				"Please Enter A Name With More Than 2 Characters")
+
+		checker_string = name.replace(" ", "")
+		if not checker_string.isalnum():
+			raise forms.ValidationError("No Special Characters Please")
 		return cleaned_data
 
 

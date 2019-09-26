@@ -296,9 +296,15 @@ $('#id_price').bind('input', function() {
 									<div class="col-md-6" style="padding-top: 20px;">
 										<button type="submit" name="{{ button_text }}" value="{{ button_text }}" class="btn btn-primary btn-block">{{ button_text }}</button>
 									</div>
+									{% if ticket.deleted %}
+									<div class="col-md-6" style="padding-top: 20px;">
+										<button type="submit" name="undo-delete" value="undo-delete" class="btn btn-danger btn-block">Undo Delete</button>
+									</div>
+									{% else %}
 									<div class="col-md-6" style="padding-top: 20px;">
 										<button type="submit" name="delete" value="delete" class="btn btn-danger btn-block">Delete Ticket</button>
 									</div>
+									{% endif %}
 							{% else %}
 								<div class="col-md-12">
 									<button type="submit" name="{{ button_text }}" value="{{ button_text }}" id="create-ticket" class="btn btn-primary btn-block">{{ button_text }}</button>

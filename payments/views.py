@@ -19,6 +19,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
 from houses.mixins import HouseAccountMixin
+from houses.models import HouseUser
 from .models import Payout, Transaction, Refund, HousePayment, HouseBalance, HouseBalanceLog, PayoutSetting, BankTransfer
 from .forms import AddFundsForm, PayoutForm, AddBankTransferForm
 
@@ -78,6 +79,7 @@ class UpdateBankTransferView(HouseAccountMixin, CreateView):
 		context["payout_setting"] = payout_setting
 		context["dashboard_events"] = self.get_events()
 		context["house"] = self.get_house()
+		context["update"] = True
 		return context
 
 
@@ -189,7 +191,7 @@ class PayoutView(HouseAccountMixin, FormView):
 			return self.form_invalid(form)
 
 
-	def send_payout_email(self, payout):
+	def send_payout_email_us(self, payout):
 		subject = 'New payout for %s' % (payout.house.name)
 		context = {}
 		context["payout"] = payout
@@ -202,13 +204,35 @@ class PayoutView(HouseAccountMixin, FormView):
 		mail.send_mail(subject, plain_message, from_email, to, html_message=html_message)
 		return "Done"
 
+	def send_payout_email_them(self, payout):
+
+		house_users = HouseUser.objects.filter(house=payout.house)
+		print(house_users)
+		emails = []
+		for house_user in house_users:
+			emails.append(str(house_user.profile.email))
+			print("Email sent to %s" % (house_user.profile.email))
+		subject = 'New payout for %s' % (payout.house.name)
+		context = {}
+		context["payout"] = payout
+		context["house"] = payout.house
+		context["payout_amount"] = '{0:.2f}'.format(payout.amount)
+		html_message = render_to_string('emails/payout_notify_them.html', context)
+		plain_message = strip_tags(html_message)
+		from_email = 'Payout Information <info@arqamhouse.com>'
+		to = emails
+		mail.send_mail(subject, plain_message, from_email,
+		               to, html_message=html_message, fail_silently=False)
+		return "Done"
+
 	
 	def form_valid(self, form, request, house_balance):
 		house = self.get_house()
 		amount = decimal.Decimal(form.cleaned_data["amount"])
 		payout_setting = form.cleaned_data["payout_setting"]
 		payout = Payout.objects.create(house=house, amount=amount, payout_setting=payout_setting)
-		self.send_payout_email(payout)
+		self.send_payout_email_us(payout)
+		self.send_payout_email_them(payout)
 		messages.success(request, 'Payout Requested!')
 		valid_data = super(PayoutView, self).form_valid(form)
 		return valid_data
@@ -224,7 +248,6 @@ class PayoutView(HouseAccountMixin, FormView):
 		total = '{0:.2f}'.format(house_balance.balance)
 
 		form = PayoutForm(house_balance.balance, house)
-		print(form)
 		context["form"] = form
 		context["payout_settings"] = payout_settings
 		context["house_balance"] = house_balance

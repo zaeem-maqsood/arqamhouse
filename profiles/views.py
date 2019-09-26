@@ -79,10 +79,8 @@ def activate_account(request, uidb64, token):
 		user.is_active = True
 		user.save()
 		login(request, user)
-		messages.success(request, 'Account Activated! Please login to continue.')
 		return HttpResponseRedirect(reverse('profiles:login'))
 	else:
-		messages.error(request, 'Account Not Activated. Please try again.')
 		return HttpResponseRedirect(reverse('profiles:login'))
 
 

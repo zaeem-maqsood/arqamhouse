@@ -25,18 +25,20 @@
 
 
 {% block content %}
-<form method="POST">{% csrf_token %}
-<div class="row">
-    <div class="col-md-8">
+
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+    <div class="col-lg-8 offset-lg-2 col-md-12 col-12">
 
         <div class="kt-portlet kt-portlet--mobile">
             <div class="kt-portlet__body">
+
+                <form method="POST">{% csrf_token %}
 
                 <div class="row" style="padding-top:30px;">
                     <div class="col-md-12">
                         <div class="row">
                             <div class="col-md-12">
-                                <p style="font-weight: 500;">Option Title</p>
+                                <p style="font-weight: 500;">Option</p>
                                 {{ form.title }}
                             </div>
                         </div>
@@ -49,9 +51,15 @@
                         <div class="col-md-6">
                             <button type="submit" name="update" value="update" class="btn btn-primary btn-block">Update Option</button>
                         </div>
+                        {% if option.deleted %}
+                        <div class="col-md-6">
+                            <button type="submit" name="undo-delete" value="undo-delete" class="btn btn-danger btn-block">Undo Delete</button>
+                        </div>
+                        {% else %}
                         <div class="col-md-6">
                             <button type="submit" name="delete" value="delete" class="btn btn-danger btn-block">Delete Option</button>
                         </div>
+                        {% endif %}
                 {% else %}
                     <div class="col-md-12">
                         <button type="submit" name="create" value="create" class="btn btn-primary btn-block">Create option</button>
@@ -59,11 +67,13 @@
                 {% endif %}
                 </div>
 
+                </form>
+
             </div>
         </div>
     </div>
 </div>
-</form>
+
 {% endblock content %}
 
 

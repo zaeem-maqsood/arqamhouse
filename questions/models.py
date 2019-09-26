@@ -31,12 +31,27 @@ class Question(models.Model):
 	def __str__(self):
 		return self.title
 
+	def _approve(self):
+		
+		if self.question_type == 'Multiple Choice':
+			multiple_choice = MultipleChoice.objects.filter(question=self, deleted=False)
+			if not multiple_choice.count() > 1:
+				self.approved = False
+			else:
+				self.approved = True
+
+	def save(self, *args, **kwargs):
+		self._approve()
+
+		super().save(*args, **kwargs)
+
 
 
 class MultipleChoice(models.Model):
 
 	question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=False, null=False)
 	title = models.CharField(max_length=100, null=True, blank=True)
+	deleted = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.title

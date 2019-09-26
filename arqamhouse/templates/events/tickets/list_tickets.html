@@ -41,7 +41,7 @@ Tickets
 				{% for ticket in tickets %}
 				<div class="row" style="padding-bottom: 50px;">
 					<div class="col-12">
-						<h5 style="font-size: 1.45rem;">{{ ticket.title }} {% if ticket.deleted %}| <span style="color:#FF4500;">Deleted</span> {% endif %}| <a href="{{ ticket.update_ticket_view }}">Edit</a></h5>
+						<h5 style="font-size: 1.2rem;font-weight: 400;">{{ ticket.title }} {% if ticket.deleted %}| <span style="color:#FF4500;">Deleted</span> {% endif %}| <a href="{{ ticket.update_ticket_view }}">Edit</a></h5>
 						<div class="progress">
 							<div class="progress-bar progress-bar-striped progress-bar-animated {{ ticket.percentage_color }}" role="progressbar" aria-valuenow="{{ ticket.amount_sold }}" aria-valuemin="0" aria-valuemax="{{ ticket.amount_available }}" style="width: {{ ticket.percentage_sold }}"></div>
 						</div>

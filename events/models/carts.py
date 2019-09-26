@@ -12,6 +12,8 @@ class EventCart(models.Model):
 	total_fee = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	arqam_charge = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	stripe_charge = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	pay = models.BooleanField(default=True)
+	house_created = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.event.title
@@ -56,10 +58,15 @@ class EventCart(models.Model):
 
 
 		# Calculate Stripe charge to us
-		stripe_charge = (total * stripe_fee) + stripe_base_fee
+		if total == 0.00:
+			stripe_charge = 0.00
+			arqam_charge = 0.00
 
-		# Calculate Arqam charge
-		arqam_charge = total - total_no_fee - stripe_charge
+		else:
+			# Calculate Stripe Charge
+			stripe_charge = (total * stripe_fee) + stripe_base_fee
+			# Calculate Arqam charge
+			arqam_charge = total - total_no_fee - stripe_charge
 
 		self.total_fee = total_fee
 		self.arqam_charge = arqam_charge
@@ -72,6 +79,7 @@ class EventCart(models.Model):
 
 
 class EventCartItem(models.Model):
+
 	event_cart = models.ForeignKey(EventCart, on_delete=models.CASCADE, blank=False, null=False)
 	ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, blank=False, null=False)
 	quantity = models.PositiveIntegerField(blank=True, null=False)
@@ -99,6 +107,8 @@ def event_cart_item_pre_save_reciever(sender, instance, *args, **kwargs):
 	if instance.ticket.free:
 		instance.ticket_price = 0.00
 		instance.cart_item_total = 0.00
+		instance.cart_item_total_no_fee = 0.00
+		instance.cart_item_fee = 0.00
 		instance.free_ticket = True
 	
 	# Scenario: Ticket is a paid ticket. If the ticket is a paid ticket set the 

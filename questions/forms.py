@@ -19,7 +19,7 @@ class MutipleChoiceForm(forms.ModelForm):
 				"title": forms.TextInput(
 						attrs={
 							"class":"form-control m-input message",
-							"placeholder":"Title",
+							"placeholder":"Option A",
 							"required": True,
 							"maxlength": '100',
 						}

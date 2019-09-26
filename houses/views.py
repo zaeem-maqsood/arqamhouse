@@ -226,6 +226,7 @@ class HouseUpdateView(HouseAccountMixin, FormView):
 
 	def post(self, request, *args, **kwargs):
 		data = request.POST
+		house = self.get_house()
 
 		print(data)
 		if 'house_user' in data:
@@ -245,10 +246,12 @@ class HouseUpdateView(HouseAccountMixin, FormView):
 				messages.success(request, 'House Updated!')
 				return self.form_valid(form, request, house)
 			else:
+				messages.warning(request, 'House Name Invalid')
 				return self.form_invalid(form)
 
 	def form_valid(self, form, request, house):
-
+		house = form.save()
+		house.save()
 		valid_data = super(HouseUpdateView, self).form_valid(form)
 		return valid_data
 

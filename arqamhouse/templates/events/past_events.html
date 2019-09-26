@@ -28,20 +28,11 @@ Past Events
 {% endblock scripts %}
 
 
-{% block page_crumbs %}
-<ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
-	<li class="m-nav__item">
-		<a href="{{ profile.get_update_url }}" class="m-nav__link">
-			<span class="m-nav__link-text">{{ house.name }}'s Past Events</span>
-		</a>
-	</li>
-</ul>
-{% endblock page_crumbs %}
 
 {% block content %}
 
-<div class="row">
-	<div class="col-lg-8 col-md-8">
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
 		
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
@@ -81,23 +72,16 @@ Past Events
 					
 		</div>
 
-	</div>
-</div>
 
-
-
-<div class="row">
-	<div class="col-lg-8 col-md-8">
-		
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
-
+		
 				<div class="row" style="padding-bottom: 10px;">
 					<div class="col-md-12">
 						<h4>Deleted Events</h4>
 					</div>
 				</div>
-
+		
 				{% if deleted_events %}
 				<table class="table table-bordered table-hover">
 					<tbody id="dynamic">
@@ -110,15 +94,17 @@ Past Events
 				</table>
 				{% else %}
 				<p>No deleted events</p>
-				{% endif %}	
-
+				{% endif %}
+		
 			</div>
-					
+		
 		</div>
+
+
+
 
 	</div>
 </div>
-
 {% endblock content %}
 
 

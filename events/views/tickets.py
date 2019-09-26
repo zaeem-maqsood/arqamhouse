@@ -291,6 +291,11 @@ class TicketUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 			self.object.save()
 			messages.success(request, 'Ticket Deleted Successfully!')
 
+		elif 'undo-delete' in data:
+			self.object.deleted = False
+			self.object.save()
+			messages.success(request, 'Ticket Recovered Successfully!')
+
 		else:
 			form.instance.price = price
 			form.instance.sale_price = sale_price

@@ -12,17 +12,20 @@ from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.timezone import datetime, timedelta
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.storage import FileSystemStorage
 from django.utils.text import slugify
+from weasyprint import HTML, CSS
+from django.utils.html import strip_tags
 
 from houses.mixins import HouseAccountMixin
 from houses.models import HouseUser
 from questions.models import Question
 from events.mixins import EventMixin
-from events.models import Event, AttendeeCommonQuestions, EventQuestion, Ticket, EventCart, EventCartItem, Answer, OrderAnswer, EventOrder, Attendee
+from events.models import (Event, AttendeeCommonQuestions, EventQuestion, Ticket, EventCart, 
+								EventCartItem, Answer, OrderAnswer, EventOrder, Attendee, EventEmailConfirmation)
 from events.forms import EventForm, EventCheckoutForm
 from payments.models import Transaction
 
@@ -97,7 +100,8 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 		
 		dashboard_events = self.get_events()
 		tickets = self.get_tickets(event)
-		questions = EventQuestion.objects.filter(event=event, question__deleted=False)
+		questions = EventQuestion.objects.filter(event=event, question__deleted=False, question__approved=True)
+		email = EventEmailConfirmation.objects.get(event=event)
 
 		if event.active == False:
 			context["inactive_event_tab"] = True
@@ -105,6 +109,7 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 		else:
 			context["event_tab"] = True
 
+		context["email"] = email
 		context["questions"] = questions
 		context["tickets"] = tickets
 		context["dashboard_events"] = dashboard_events
@@ -178,15 +183,18 @@ class EventCheckoutView(FormView):
 	def post(self, request, *args, **kwargs):
 		data = request.POST
 
-		print("STRIPE TOKEN")
-		print(data["stripeToken"])
-		stripe_token = data["stripeToken"]
-		print("\n\n")
 
 		slug = kwargs['slug']
 		event = self.get_event(slug)
 		cart = self.get_cart()
 		print(data)
+
+		# Only get the Stripe Token if payment enabled
+		if cart.pay:
+			print("STRIPE TOKEN")
+			print(data["stripeToken"])
+			stripe_token = data["stripeToken"]
+			print("\n\n")
 
 		# Step 1 Get buyer name and email address
 		name = data['name']
@@ -195,7 +203,9 @@ class EventCheckoutView(FormView):
 
 		transaction = Transaction.objects.create(house=event.house, name=name)
 		transaction.save()
-		order = EventOrder.objects.create(name=name, email=email, event=event, event_cart=cart, transaction=transaction)
+
+		order = EventOrder.objects.create(name=name, email=email, event=event, event_cart=cart, transaction=transaction, house_created=cart.house_created)
+		order.qrcode()
 		order.save()
 
 		print("\n")
@@ -204,7 +214,7 @@ class EventCheckoutView(FormView):
 		print(email)
 
 		# Step 2 Get Buyer questions and make answers
-		order_questions = EventQuestion.objects.filter(event=event, order_question=True, question__deleted=False).order_by("question__order")
+		order_questions = EventQuestion.objects.filter(event=event, order_question=True, question__deleted=False, question__approved=True).order_by("question__order")
 		for order_question in order_questions:
 			value = data["%s_order_question" % (order_question.question.id)] 
 
@@ -273,70 +283,116 @@ class EventCheckoutView(FormView):
 					answer.save()
 
 
+		# If there is a payment to be made
+		if cart.pay:
+			stripe.api_key = settings.STRIPE_SECRET_KEY
 			
-		stripe.api_key = settings.STRIPE_SECRET_KEY
-		
-		try:
-			charge = stripe.Charge.create(
-						amount = int(cart.total * 100),
-						currency = 'cad',
-						description = self.get_charge_description(event, order),
-						source = stripe_token,
-						statement_descriptor = 'Arqam House Inc.',
-					)
-			print(charge)
+			try:
+				charge = stripe.Charge.create(
+							amount = int(cart.total * 100),
+							currency = 'cad',
+							description = self.get_charge_description(event, order),
+							source = stripe_token,
+							statement_descriptor = 'Arqam House Inc.',
+						)
+				print(charge)
 
-			transaction.amount = cart.total
-			transaction.arqam_amount = cart.arqam_charge
-			transaction.stripe_amount = cart.stripe_charge
-			transaction.house_amount = cart.total_no_fee
+				transaction.amount = cart.total
+				transaction.arqam_amount = cart.arqam_charge
+				transaction.stripe_amount = cart.stripe_charge
+				transaction.house_amount = cart.total_no_fee
 
-			transaction.payment_id = charge['id']
-			transaction.failure_code = charge['failure_code']
-			transaction.failure_message = charge['failure_message']
-			transaction.last_four = charge.source['last4']
-			transaction.brand = charge.source['brand']
-			transaction.network_status = charge.outcome['network_status']
-			transaction.reason = charge.outcome['reason']
-			transaction.risk_level = charge.outcome['risk_level']
-			transaction.seller_message = charge.outcome['seller_message']
-			transaction.outcome_type = charge.outcome['type']
+				transaction.payment_id = charge['id']
+				transaction.failure_code = charge['failure_code']
+				transaction.failure_message = charge['failure_message']
+				transaction.last_four = charge.source['last4']
+				transaction.brand = charge.source['brand']
+				transaction.network_status = charge.outcome['network_status']
+				transaction.reason = charge.outcome['reason']
+				transaction.risk_level = charge.outcome['risk_level']
+				transaction.seller_message = charge.outcome['seller_message']
+				transaction.outcome_type = charge.outcome['type']
+				transaction.email = data['email']
+				transaction.name = charge.source['name']
+				transaction.address_line_1 = charge.source['address_line1']
+				transaction.address_state = charge.source['address_state']
+				transaction.address_postal_code = charge.source['address_zip']
+				transaction.address_city = charge.source['address_city']
+				transaction.address_country = charge.source['address_country']
+				transaction.save()
+
+				cart.processed = True
+				cart.update_tickets_available()
+				cart.save()
+				del request.session['cart']
+				request.session.modified = True
+
+				self.send_confirmation_email(event, data['email'], order)
+				messages.success(request, 'Check your email for tickets and further instructions.')
+
+				return HttpResponseRedirect(self.get_success_url())
+
+			except Exception as e:
+				print(e)
+				order.failed = True
+				transaction.failed = True
+				transaction.code_fail_reason = "Order Failed Due to Exception: %s" % (e)
+				order.save()
+				transaction.save()
+				cart.processed = False
+				cart.save()
+				del request.session['cart']
+				request.session.modified = True
+				messages.error(request, 'There was an error in proccessing your payment card. Please try again with a different payment card.')
+				return HttpResponseRedirect(self.get_success_url())
+
+
+		else:
+
+			transaction.amount = 0.00
+			transaction.arqam_amount = 0.00
+			transaction.stripe_amount = 0.00
+			transaction.house_amount = 0.00
+
 			transaction.email = data['email']
-			transaction.name = charge.source['name']
-			transaction.address_line_1 = charge.source['address_line1']
-			transaction.address_state = charge.source['address_state']
-			transaction.address_postal_code = charge.source['address_zip']
-			transaction.address_city = charge.source['address_city']
-			transaction.address_country = charge.source['address_country']
-			transaction.save()
 
 			cart.processed = True
 			cart.update_tickets_available()
 			cart.save()
 			del request.session['cart']
 			request.session.modified = True
+			self.send_confirmation_email(event, data['email'], order)
 			messages.success(request, 'Check your email for tickets and further instructions.')
-
-			return HttpResponseRedirect(self.get_success_url())
-
-		except Exception as e:
-			print(e)
-			order.failed = True
-			transaction.failed = True
-			transaction.code_fail_reason = "Order Failed Due to Exception: %s" % (e)
-			order.save()
-			transaction.save()
-			cart.processed = False
-			cart.save()
-			del request.session['cart']
-			request.session.modified = True
-			messages.error(request, 'There was an error in proccessing your payment card. Please try again with a different payment card.')
 			return HttpResponseRedirect(self.get_success_url())
 
 
 		return render(request, self.template_name, self.get_context_data(data))
 
+	def send_confirmation_email(self, event, email, order):
 
+		# PDF Attachment
+		pdf_context = {}
+		pdf_context["order"] = order
+		pdf_content = render_to_string('pdfs/ticket.html', pdf_context)
+		pdf_css = CSS(string=render_to_string('pdfs/ticket.css'))
+		pdf_file = HTML(string=pdf_content).write_pdf(stylesheets=[pdf_css])
+
+		# Compose Email
+		subject = 'Order Confirmation For %s' % (event.title)
+		email_confirmation = EventEmailConfirmation.objects.get(event=event)
+		context = {}
+		context["event"] = event
+		context["message"] = email_confirmation.message
+		html_content = render_to_string('emails/order_confirmation.html', context)
+		text_content = strip_tags(html_content)
+		from_email = 'Order Confirmation <info@arqamhouse.com>'
+		to = ['%s' % (email)]
+		email = EmailMultiAlternatives(subject=subject, body=text_content,
+		                               from_email=from_email, to=to)
+		email.attach_alternative(html_content, "text/html")
+		email.attach("ticket.pdf", pdf_file, 'application/pdf')
+		email.send()
+		return "Done"
 
 	def get_charge_description(self, event, order):
 		return ("Order #: %s for Event: %s (Event ID: %s)." % (order.id, event.title, event.id))
@@ -460,7 +516,11 @@ class EventCreateView(HouseAccountMixin, CreateView):
 		self.object.active = True
 		self.object.save()
 
-		messages.success(request, 'Your event is live!')
+		# Create Email confirmation object
+		email_confirmation = EventEmailConfirmation.objects.create(event=self.object)
+
+		messages.success(request, 'Your event is live! Click <a href="%s">here</a> to add tickets' %
+		                 (reverse('events:list_tickets', kwargs={'slug': self.object.slug})))
 		valid_data = super(EventCreateView, self).form_valid(form)
 		return valid_data
 

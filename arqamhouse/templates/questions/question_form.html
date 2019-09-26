@@ -81,10 +81,10 @@
                     <div class="col-md-10 offset-md-1">
                         <p style="font-weight: 500;">Options <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" 
                         data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" 
-                        data-original-title="Add options for your question."></i></p></p>
+                        data-original-title="Add options for your question."></i>{% if question.approved %}{% else %}<span style="color: #FF4500;font-weight: 300;"> You must add at least 2 options to activate this question</span>{% endif %}</p>
                         
                             {% for option in options %}
-                                <a href="{% url 'questions:update_option' one_to_one_type one_to_one_id question.id option.id %}"><p>{{ option.title }}</p></a>
+                                <a href="{% url 'questions:update_option' one_to_one_type one_to_one_id question.id option.id %}"><p>{{ option.title }} {% if option.deleted %}<span style="color: #FF4500;">- Deleted</span>{% endif %}</p></a>
                             {% endfor %}
                         <a class="btn btn-primary" href="{{ option_url }}">Add Option</a>
                     </div>

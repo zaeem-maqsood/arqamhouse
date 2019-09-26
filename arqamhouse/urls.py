@@ -20,11 +20,12 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
 from houses.views import DashboardView, ConnectVerificationView, ChangeEntityTypeView
-from .views import HomePageView
+from .views import HomePageView, ReportErrorView
 
 urlpatterns = [
 
     path('', HomePageView.as_view(), name='home'),
+    path('report', ReportErrorView.as_view(), name='report'),
     path('change-entity', ChangeEntityTypeView.as_view(), name='change_entity'),
     path('verification', ConnectVerificationView.as_view(), name='verification'),
     path('house/', include('houses.urls')),

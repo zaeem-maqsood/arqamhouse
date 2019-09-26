@@ -1,94 +1,77 @@
+<!doctype html>
 <html>
- <head>
-  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-  <!-- Latest compiled and minified CSS -->
- </head>
- <body>
+
+<head>
+  <meta charset="utf-8">
+  <link href="ticket.css" media="print" rel="stylesheet">
+  <title>Order Confirmation</title>
+  <meta name="description" content="Order Confirmation">
+  <meta name="author" content="Zaeem Maqsood">
+</head>
+
+<body>
+  
+  <h1 style="font-weight: 400;">Order Confirmation</h1>
+  <p style="font-size:0.9em;font-weight: 600;">Name | <span style="font-weight: 400;">{{ order.name }}</span></p>
+  <p style="font-size:0.9em;font-weight: 600;">Created at | <span style="font-weight: 400;">{{ order.created_at|date:"N nS Y, f a" }}</span></p>
+  <p style="font-size:0.9em;font-weight: 600;">Email | <span style="font-weight: 400;">{{ order.email }}</span></p>
+  <p style="font-size:0.9em;font-weight: 600;">Event | <span style="font-weight: 400;">{{ order.event.title }}</span></p>
+
+  <aside style="padding-top:30px;">
+
+    {% if order.event.start or order.event.end %}
+    <address id="from">
+      <span style="font-weight: 400;font-size:1.5em;color:#4599d5;">When</span>
+      <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Starts on | <span style="font-weight: 400;">{{ order.event.start|date:"N nS Y, f a" }}</span></p>
+      {% endif %}
+      {% if order.event.end %}
+      <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Ends on | <span style="font-weight: 400;">{{ order.event.end|date:"N nS Y, f a" }}</span></p>
+    </address>
+    {% endif %}
+
+    {% if order.event.venue_name or order.event.venue_address %}
+    <address id="to">
+      <span style="font-weight: 400;font-size:1.5em;color:#4599d5;">Where</span>
+      {% if order.event.venue_name %}
+      <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Venue | <span style="font-weight: 400;">{{ order.event.venue_name }}</span></p>
+      {% endif %}
+      {% if order.event.venue_address %}
+      <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Address | <span style="font-weight: 400;">{{ order.event.venue_address }}</span></p>
+      {% endif %}
+    </address>
+    {% endif %}
+
+  </aside>
+
+  <dl id="informations">
+    <img src="{{ order.code.url }}" style="max-height: 100px;">
+  </dl>
+
+  <div style="padding-top:30px;"></div>
+  <h2 style="font-weight: 400;font-size: 1.5em;color:#4599d5;">Attendees</h2>
+  <table>
+    <thead>
+      <th>Attendee</th>
+      <th>Ticket</th>
+      <th>Cost</th>
+    </thead>
+    <tbody>
+      {% for attendee in order.attendee_set.all %}
+      <tr>
+        <td>{{ attendee.name }}</td>
+        <td>{{ attendee.ticket.title }}</td>
+        <td>${{ attendee.ticket.buyer_price }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td></td>
+        <td>Total</td>
+        <td>${{ order.event_cart.total }}</td>
+      </tr>
+    </tbody>
+  </table>
 
 
-<div class="row" style="padding-bottom: 60px;">
-  <div class="col-12">
-      <img src="https://s3-us-west-1.amazonaws.com/arqam-static/static/images/Arqam.png" style="height: 100px;">
-  </div>
-</div>
+</body>
 
-
-<div class="row">
-  <div class="col-8">
-    <h3 style="font-weight: 300;color: grey;">{{ order.event.title }}</h3>
-    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;">Presented by {{ order.event.house }}</p>
-    <br>
-    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;font-size: 1.3em;">When</p>
-    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;">{{ order.event.start }} - {{ order.event.end }}</p>
-
-    <br>
-    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;font-size: 1.3em;">Where</p>
-    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;">{{ order.event.venue_name }}</p>
-    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;">located at {{ order.event.venue_address }}</p>
-  </div>
-  <div class="col-3">
-      <img src="{{ order.code.url }}" style="height: 200px;">
-  </div>
-</div>
-
-<br>
-<br>
-
-<div class="row">
-  <div class="col-md-12">
-
-    <h3 style="font-weight: 200;color: grey;">Order Details</h3>
-    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;">Order ID: {{ order.transaction.payment_id }}</p>
-    <p style="color: grey;margin-top: 0px;margin-bottom: 0px;">Buyer: {{ order.name|title }}</p>
-
-    <br>
-    
-    <table class="table">
-      <thead>
-        <tr>
-          <th style="color: grey;">Ticket</th>
-          <th style="color: grey;">Price</th>
-          <th style="color: grey;">Quantity</th>
-          <th style="color: grey;">Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for cart_item in order.event_cart.eventcartitem_set.all %}
-        <tr>
-          <td><p style="color: grey;">{{ cart_item.ticket.title }}</p></td>
-          <td><p style="color: grey;">${{ cart_item.ticket.price }}</p></td>
-          <td><p style="color: grey;">{{ cart_item.quantity }}</p></td>
-          <td><p style="color: grey;">${{ cart_item.cart_item_total_no_fee }}</p></td>
-        </tr>
-        {% endfor %}
-        <tr>
-            <td></td>
-            <td></td>
-            <td><p style="color: grey;">Total</p></td>
-            <td><p style="color: grey;">${{ order.event_cart.total_no_fee }}</p></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td><p style="color: grey;">Arqam House Payment &amp; Processing Fee</p></td>
-            <td><p style="color: grey;">${{ order.event_cart.total_fee }}</p></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td><p style="color: grey;">Order Total</p></td>
-            <td><p style="color: grey;">${{ order.event_cart.total }}</p></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-
-
-
-
-
- </body>
 </html>

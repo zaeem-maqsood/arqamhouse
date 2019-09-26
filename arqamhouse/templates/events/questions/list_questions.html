@@ -288,23 +288,27 @@ $('#id_gender_required').change(function() {
 						<p style="margin-bottom: 5px;">{{ event_question.question.question_type }} question 
 							{% if event_question.question.required %}| <span style="color: #FF4500;">required</span>{% endif %}</p>
 						<p>
-							{% if event_question.order_question %}
-								This question is asked for every order
-								{% if event_question.tickets.all %} and if the buyer selects tickets 
-									{% for ticket in event_question.tickets.all %}
-									<span style="color:#4599d5;">| {{ ticket.title }}</span>
-									{% endfor %}
+							{% if event_question.question.approved %}
+								{% if event_question.order_question %}
+									This question is asked for every order
+									{% if event_question.tickets.all %} and if the buyer selects tickets 
+										{% for ticket in event_question.tickets.all %}
+										<span style="color:#4599d5;">| {{ ticket.title }}</span>
+										{% endfor %}
+									{% endif %}
+								{% else %}
+									{% if event_question.tickets.all %} 
+										This question is asked if the buyer selects tickets
+										{% for ticket in event_question.tickets.all %}
+										<span style="color:#4599d5;">| {{ ticket.title }}</span>
+										{% endfor %}
+									{% else %}
+										<span style="color:red;">This question is currently not being asked.</span>
+										Add it to orders or select tickets.
+									{% endif %}
 								{% endif %}
 							{% else %}
-								{% if event_question.tickets.all %} 
-									This question is asked if the buyer selects tickets
-									{% for ticket in event_question.tickets.all %}
-									<span style="color:#4599d5;">| {{ ticket.title }}</span>
-									{% endfor %}
-								{% else %}
-									<span style="color:red;">This question is currently not being asked.</span>
-									Add it to orders or select tickets.
-								{% endif %}
+								<span style="color:red;">This question is currently not being asked. You must provide at least 2 options to choose from.</span>
 							{% endif %}
 						</p>
 					</div> 

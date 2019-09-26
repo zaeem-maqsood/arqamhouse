@@ -3,12 +3,8 @@
 {% load static %}
 
 {% block title %}
-Login | Arqam House
+Report Error
 {% endblock title %}
-
-{% block footer %}
-{% include "frontend/footer.html" %}
-{% endblock footer %}
 
 {% block styles %}
 {% endblock styles %}
@@ -25,18 +21,23 @@ Login | Arqam House
         <div class="row">
             <div class="col-md-9 col-lg-6">
 
-                <div class="row d-none d-sm-none d-md-block" style="padding-bottom: 20px;">
+                <div class="row" style="padding-bottom: 20px;">
                     <div class="col-md-12">
                         <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
                     </div>
                 </div>
 
-                <div class="row" style="padding-bottom:15px;">
+                <h3>Thanks for helping out!</h3>
+                <p>Arqam House is constantly trying to improve. Please provide us with information on any concerns you may be experiencing on our site.</p>
+                <p>If you are writing about a technical issue that you have come across please try to be as thorough as possible.</p>
+                <p>We don't ask for your contact information, however you may provide it in the message if you would like us to follow-up with you.</p>
+
+                <div class="row" style="padding-bottom:15px;padding-top:30px;">
                     <div class="col-md-12">
                         {% for message in messages %}
                         <div class="alert bg--{{ message.tags }}">
                             <div class="alert__body">
-                                <span>{{ message.tags|upper }}! {{ message }}</span>
+                                <span>{{ message }}</span>
                             </div>
                             <div class="alert__close"> × </div>
                         </div>
@@ -45,44 +46,27 @@ Login | Arqam House
                 </div>
 
                 <form class="boxed boxed--border" action="" method="POST">{% csrf_token %}
-
-                    {% if form.non_field_errors %}
-                    <div class="row" style="padding-bottom: 20px;">
-                        <div class="col-md-12">
-                            <div class="alert bg--error">
-                                <div class="alert__body">
-                                    {% for error in form.non_field_errors %}
-                                    <span>{{ error|escape }}</span>
-                                    {% endfor %}
-                                </div>
-                                <div class="alert__close">×</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-
-                    {% if form.email.errors %}
-                    <div class="row" style="padding-bottom: 20px;">
-                        <div class="col-md-12">
-                            <div class="alert bg--error">
-                                <div class="alert__body">
-                                    {% for error in form.email.errors %}
-                                    <span>{{ error|escape }}</span>
-                                    {% endfor %}
-                                </div>
-                                <div class="alert__close">×</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
+                
                     <div class="row" style="padding-bottom: 20px;">
                         <div class="col-md-12">
                             <div class="col-md-12">
-                                <p>
-                                    Your password has been set. You may <a href="{% url 'profiles:login' %}">sign in</a> now.
-                                </p>
+                                {{ form.name }}
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                {{ form.message }}
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                <button class="btn btn--primary type--uppercase" type="submit">Send Message</button>
                             </div>
                         </div>
                     </div>

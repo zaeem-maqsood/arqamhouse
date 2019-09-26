@@ -39,12 +39,6 @@ jQuery(document).ready(function($) {
 			<div class="kt-portlet__body">
                 <form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
 
-                
-				<div class="row" style="padding-bottom:10px;">
-					<div class="col-12">
-                        <h3>Payout</h3>
-					</div>
-                </div>
 
                 <div class="row text-center" style="padding-bottom:30px;">
                     <div class="{% if house_balance.balance > 0 %}col-lg-2{% else %}col-lg-12{% endif %} col-4" style="padding-top: 30px;">
@@ -86,9 +80,9 @@ jQuery(document).ready(function($) {
                     </div>
                     {% endif %}
                 {% else %}
-                    <div class="row" style="padding-bottom:30px;">
+                    <div class="row text-center" style="padding-bottom:30px;">
                         <div class="col-md-12">
-                            <a href="#" class="btn btn-primary">Add Payout Method</a>
+                            <a href="{% url 'payments:add_bank' %}" class="btn btn-primary btn-block">Add Payout Method</a>
                         </div>
                     </div>
                 {% endif %}

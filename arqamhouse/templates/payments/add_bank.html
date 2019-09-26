@@ -82,11 +82,19 @@ function GetBankImage(object) {
                         </div>
                     </div>
 
+                    {% if update %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button id="customButton" type="submit" class="btn btn-primary">Update Bank Account</button>
+                        </div>
+                    </div>
+                    {% else %}
                     <div class="row">
                         <div class="col-md-12">
                             <button id="customButton" type="submit" class="btn btn-primary">Add Bank Account</button>
                         </div>
                     </div>
+                    {% endif %}
 
 
                 </form>

@@ -32,6 +32,7 @@ class EventOrder(models.Model):
 	note = models.TextField(blank=True, null=True)
 	pdf = models.FileField(upload_to=pdf_location, blank=True, null=True)
 	code = models.ImageField(upload_to=qrcode_location, blank=True, null=True)
+	house_created = models.BooleanField(default=False)
 
 	def __str__(self):
 		return ("%s" % self.name)
@@ -49,7 +50,7 @@ class EventOrder(models.Model):
 			box_size=10,
 			border=4,
 		)
-		qr.add_data('http://google.ca')
+		qr.add_data('https://www.arqamhouse.com/events/%s' % (self.event.slug))
 		qr.make(fit=True)
 		img = qr.make_image(fill_color="black", back_color="white")
 

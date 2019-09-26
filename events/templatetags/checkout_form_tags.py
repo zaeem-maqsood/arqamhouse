@@ -1,5 +1,6 @@
 from django import template
 from events.models import EventQuestion, EventCart, EventCartItem
+from questions.models import MultipleChoice
 from django.http import HttpResponse
 from django.utils.html import escape, mark_safe
 
@@ -21,10 +22,14 @@ def quantity(number):
 
 @register.filter(name='ticket_question') 
 def ticket_question(cart_item):
-    event_questions = EventQuestion.objects.filter(tickets__id=cart_item.ticket.id, question__deleted=False).order_by("question__order")
+    event_questions = EventQuestion.objects.filter(tickets__id=cart_item.ticket.id, question__deleted=False, question__approved=True).order_by("question__order")
     return event_questions
 
 
+@register.filter(name='multiple_choice_option')
+def multiple_choice_option(question):
+    multiple_choice_options = MultipleChoice.objects.filter(question=question, deleted=False)
+    return multiple_choice_options
 
 
 
@@ -38,7 +43,7 @@ def ticket_question(cart_item):
 @register.filter(name='order_question') 
 def order_question(event):
     order_questions = EventQuestion.objects.filter(
-        event=event, order_question=True, question__deleted=False).order_by("question__order")
+        event=event, order_question=True, question__deleted=False, question__approved=True).order_by("question__order")
     return order_questions
 
 

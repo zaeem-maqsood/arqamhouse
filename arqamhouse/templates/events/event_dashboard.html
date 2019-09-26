@@ -154,10 +154,10 @@ color: #7396b0;
 						<!-- Display this only on mobile devices -->
 						<div class="row text-center d-block d-md-none" style="padding-bottom:30px;">
 							<div class="col-12">
-								<h5>{{ event.title }} | <a class="dashboard-links" href="{{ event.get_update_view }}"><span style="font-size:0.8em;font-weight: 200;color:#FF4500;"
+								<h5>{{ event.title }} | <a class="dashboard-links" href="{{ event.get_update_view }}"><span style="font-size:0.8em;font-weight: 200;color:#4499d8;"
 										data-container="body" data-toggle="kt-tooltip" data-placement="top" title=""
 										data-original-title="Edit Event">Edit | </span></a> <a class="dashboard-links"
-									href="{{ event.get_landing_view }}"><span style="font-size:0.8em;font-weight: 200;color:#FF4500;" data-container="body"
+									href="{{ event.get_landing_view }}"><span style="font-size:0.8em;font-weight: 200;color:#4499d8;" data-container="body"
 										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="View Event">View</span></a></5>
 							</div>
 						</div>
@@ -165,9 +165,9 @@ color: #7396b0;
 		
 						<div class="row row d-none d-sm-none d-md-flex" style="padding-bottom:30px;">
 							<div class="col-md-9">
-								<h4 style="font-weight: 400;">{{ event.title }} | <a class="dashboard-links" href="{{ event.get_update_view }}"><span style="font-size:0.8em;font-weight: 200;color:#FF4500;" data-container="body"
+								<h4 style="font-weight: 400;">{{ event.title }} | <a class="dashboard-links" href="{{ event.get_update_view }}"><span style="font-size:0.8em;font-weight: 200;color:#4499d8;" data-container="body"
 										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Edit Event">Edit | </span></a><a
-									class="dashboard-links" href="{{ event.get_landing_view }}"><span style="font-size:0.8em;font-weight: 200;color:#FF4500;" data-container="body"
+									class="dashboard-links" href="{{ event.get_landing_view }}"><span style="font-size:0.8em;font-weight: 200;color:#4499d8;" data-container="body"
 										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="View Event">View</span></a></h4>
 							</div>
 							<div class="col-md-3">
@@ -198,7 +198,7 @@ color: #7396b0;
 		
 		<div class="row">
 			<div class="col-lg-2 offset-lg-1 col-md-4 col-6">
-				<div class="kt-portlet kt-portlet--mobile" {% if not tickets %}style="background-color: #e56d00ad;"{% endif %}>
+				<div class="kt-portlet kt-portlet--mobile" {% if not tickets %}style="background-color: #4599d5;"{% endif %}>
 					<div class="kt-portlet__body">
 						<div class="row text-center">
 							<div class="col-12">
@@ -213,7 +213,7 @@ color: #7396b0;
 			</div>
 
 			<div class="col-lg-2 col-md-4 col-6">
-				<div class="kt-portlet kt-portlet--mobile" {% if tickets %}{% if not questions %}style="background-color: #e56d00ad;"{% endif %}{% endif %}>
+				<div class="kt-portlet kt-portlet--mobile" {% if tickets %}{% if not questions %}style="background-color: #4599d5;"{% endif %}{% endif %}>
 					<div class="kt-portlet__body">
 						<div class="row text-center">
 							<div class="col-12">
@@ -228,11 +228,11 @@ color: #7396b0;
 			</div>
 
 			<div class="col-lg-2 col-md-4 col-6">
-				<div class="kt-portlet kt-portlet--mobile">
+				<div class="kt-portlet kt-portlet--mobile" {% if tickets %}{% if not email.message %}style="background-color: #4599d5;"{% endif %}{% endif %}>
 					<div class="kt-portlet__body">
 						<div class="row text-center">
 							<div class="col-12">
-								<a class="dashboard-links" href="{{ event.get_email_confirmation_view }}">
+								<a class="dashboard-links" {% if tickets %}{% if not email.message  %}style="color:white;"{% endif %}{% endif %} href="{{ event.get_email_confirmation_view }}">
 									<i class="la la-envelope" style="font-size:3em;"></i>
 									<p style="padding-top: 10px;">Email</p>
 								</a>

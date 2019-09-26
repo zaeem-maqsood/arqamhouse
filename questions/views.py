@@ -117,6 +117,7 @@ class MultipleChoiceUpdateView(HouseAccountMixin, QuestionSecurityMixin, UserPas
 	def get_context_data(self, *args, **kwargs):
 		context = {}
 		form = self.get_form()
+		context["option"] = self.object
 		context["form"] = form
 		context["dashboard_events"] = self.get_events()
 		context["update"] = True
@@ -133,8 +134,24 @@ class MultipleChoiceUpdateView(HouseAccountMixin, QuestionSecurityMixin, UserPas
 	
 	def form_valid(self, form, request):
 		data = request.POST
-		self.object = form.save()
-		messages.success(request, 'Option updated successfully!')
+
+		if 'delete' in data:
+			self.object.deleted = True
+			self.object.save()
+			self.object.question.save()
+			messages.success(request, 'Option Deleted Successfully!')
+
+		elif 'undo-delete' in data:
+			self.object.deleted = False
+			self.object.save()
+			self.object.question.save()
+			messages.success(request, 'Option Recovered Successfully!')
+		
+		else:
+			self.object = form.save()
+			self.object.question.save()
+			messages.success(request, 'Option updated successfully!')
+
 		valid_data = super(MultipleChoiceUpdateView, self).form_valid(form)
 		return valid_data
 
@@ -322,7 +339,7 @@ class QuestionUpdateView(HouseAccountMixin, QuestionSecurityMixin, UserPassesTes
 			context["dashboard_events"] = self.get_events()
 
 
-		options = MultipleChoice.objects.filter(question=self.object)
+		options = MultipleChoice.objects.filter(question=self.object).order_by("deleted")
 
 		context["options"] = options
 		context["question"] = self.object

@@ -34,6 +34,8 @@ Create House
         text-align: left;
     }
 }
+
+
 </style>
 
 
@@ -57,7 +59,7 @@ Create House
                 {% for message in messages %}
                 <div class="alert bg--{{ message.tags }}">
                     <div class="alert__body">
-                        <span>{{ message }}</span>
+                        <span>{{ message|safe }}</span>
                     </div>
                     <div class="alert__close"> × </div>
                 </div>

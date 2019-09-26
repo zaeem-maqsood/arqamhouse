@@ -46,7 +46,7 @@ Order #{{ order.id }} | {{ event.title }}
 							{% elif order.refunded %}
 								<span style="color:#FF4500;"> This order has been refunded</span>
 							{% else %}
-								<span style="color:#2584C7;">Successful Order</span>
+								<span style="color:#2584C7;">Successful Order {% if order.house_created %}- Created by House{% endif %}</span>
 							{% endif %}
 						</p>
 						
@@ -61,7 +61,7 @@ Order #{{ order.id }} | {{ event.title }}
 
 				<div class="row">
 					<div class="col-md-4">
-						<p><span style="font-weight:500;">Name</span> | {{ order.name }}</p>
+						<p><span style="font-weight:500;">Name</span> | {{ order.name|title }}</p>
 					</div>
 					<div class="col-md-8">
 						<p><span style="font-weight:500;">Email</span> | {{ order.email }}</p>
@@ -73,13 +73,15 @@ Order #{{ order.id }} | {{ event.title }}
 						<p><span style="font-weight:500;">Payment Card</span> | {% include "events/orders/brands.html" with order=order.transaction %}</p>
 					</div>
 					<div class="col-md-4">
-						<p><span style="font-weight:500;">Last Four Digits</span> | {{ order.transaction.last_four }}</p>
+						<p><span style="font-weight:500;">Last Four Digits</span> | {% if order.transaction.last_four %}{{ order.transaction.last_four }}{% else %}No Payment{% endif %}</p>
 					</div>
 					<div class="col-md-4">
-						<p><span style="font-weight:500;">Outcome</span> | {{ order.transaction.outcome_type|title }}</p>
+						<p><span style="font-weight:500;">Outcome</span> | {% if order.transaction.outcome_type %}{{ order.transaction.outcome_type|title }}{% else %}No Payment{% endif %}</p>
 					</div>
 				</div>
 
+				{% if order.failed %}
+				{% else %}
 				<div class="row" style="padding-top: 40px;">
 					<div class="col-12">
 						<h4>Attendees</h4>
@@ -96,14 +98,21 @@ Order #{{ order.id }} | {{ event.title }}
 									<td style="vertical-align: inherit;"><p style="margin:0 auto;">{{ forloop.counter }}</p></td>
 									<td style="vertical-align: inherit;"><p style="margin:0 auto;">{{ attendee.ticket }}</p></td>
 									<td style="vertical-align: inherit;"><a href="{{ attendee.get_attendee_view }}"><p style="margin:0 auto;">{{ attendee.name }}</p></a></td>
-									{% if attendee.active %}
-										{% if attendee.ticket.price <= house_balance.balance %}
-											<td><button type="submit" name="Refund" value="{{ attendee.id }}" class="btn btn-warning btn-block">Refund</button></td>
+									{% if order.event_cart.pay %}
+										{% if attendee.active %}
+											{% if attendee.ticket.price <= house_balance.balance %}
+												<td><button type="submit" name="Refund" value="{{ attendee.id }}" class="btn btn-warning btn-block">Refund</button></td>
+											{% else %}
+												{% if attendee.ticket.free %}
+												<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#FFBE00;">Free Ticket</p>
+												</td>
+												{% else %}
+												<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#FFBE00;">Refund Not Available</p></td>
+												{% endif %}
+											{% endif %}
 										{% else %}
-											<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#FFBE00;">Refund Not Available</p></td>
+										<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#FF4500;">Refunded</p></td>
 										{% endif %}
-									{% else %}
-									<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#FF4500;">Refunded</p></td>
 									{% endif %}
 								</tr>
 								{% endfor %}
@@ -112,13 +121,16 @@ Order #{{ order.id }} | {{ event.title }}
 					</div>
 				</div>
 				
-				{% if active_attendees.count > 1  and order.event_cart.total <= house_balance.balance %}
-				<div class="row">
-					<div class="col-12">
-						<button type="submit" name="Full Refund" value="Full Refund" class="btn btn-outline-danger btn-block">Refund Entire Order</button>
+				{% if not order.house_created %}
+					{% if active_attendees.count > 1  and order.event_cart.total <= house_balance.balance %}
+					<div class="row">
+						<div class="col-12">
+							<button type="submit" name="Full Refund" value="Full Refund" class="btn btn-outline-danger btn-block">Refund Entire Order</button>
+						</div>
 					</div>
-				</div>
+					{% endif %}
 				{% endif %}
+
 				</form>
 
 				<div class="row" style="padding-top: 50px;">
@@ -139,32 +151,73 @@ Order #{{ order.id }} | {{ event.title }}
 								</tr>
 							</thead>
 							<tbody>
-								{% for cart_item in event_cart_items %}
-								<tr>
-									<td style="color: grey;">{{ cart_item.ticket.title }}</td>
-									<td style="color: grey;">${{ cart_item.ticket_price }}</td>
-									<td style="color: grey;">{{ cart_item.quantity }}</td>
-									<td style="color: #2584C7;">+${{ cart_item.cart_item_total }}</td>
-								</tr>
-								{% endfor %}
-								<tr>
-									<td></td>
-									<td></td>
-									<td><p style="color: grey;">Total charged to customer</p></td>
-									<td><p style="color: grey;">${{ order.event_cart.total }}</p></td>
-								</tr>
-								<tr>
-									<td></td>
-									<td></td>
-									<td><p style="color: grey;">Payment &amp; processing fee</p></td>
-									<td><p style="color: grey;">${{ order.event_cart.total_fee }}</p></td>
-								</tr>
-								<tr>
-									<td></td>
-									<td></td>
-									<td><p style="color: grey;">Total payout to you</p></td>
-									<td><p style="color: #2584C7;">${{ order.event_cart.total_no_fee }}</p></td>
-								</tr>
+								{% if not order.event_cart.pay %}
+									{% for cart_item in event_cart_items %}
+									<tr>
+										<td style="color: grey;">{{ cart_item.ticket.title }}</td>
+										<td style="color: grey;">$0.00</td>
+										<td style="color: grey;">{{ cart_item.quantity }}</td>
+										<td style="color: #2584C7;">$0.00</td>
+									</tr>
+									{% endfor %}
+									<tr>
+										<td></td>
+										<td></td>
+										<td>
+											<p style="color: grey;">Total charged to customer</p>
+										</td>
+										<td>
+											<p style="color: grey;">$0.00</p>
+										</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td></td>
+										<td>
+											<p style="color: grey;">Payment &amp; processing fee</p>
+										</td>
+										<td>
+											<p style="color: grey;">$0.00</p>
+										</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td></td>
+										<td>
+											<p style="color: grey;">Total payout to you</p>
+										</td>
+										<td>
+											<p style="color: #2584C7;">$0.00</p>
+										</td>
+									</tr>
+								{% else %}
+									{% for cart_item in event_cart_items %}
+									<tr>
+										<td style="color: grey;">{{ cart_item.ticket.title }}</td>
+										<td style="color: grey;">${{ cart_item.ticket_price }}</td>
+										<td style="color: grey;">{{ cart_item.quantity }}</td>
+										<td style="color: #2584C7;">+${{ cart_item.cart_item_total }}</td>
+									</tr>
+									{% endfor %}
+									<tr>
+										<td></td>
+										<td></td>
+										<td><p style="color: grey;">Total charged to customer</p></td>
+										<td><p style="color: grey;">${{ order.event_cart.total }}</p></td>
+									</tr>
+									<tr>
+										<td></td>
+										<td></td>
+										<td><p style="color: grey;">Payment &amp; processing fee</p></td>
+										<td><p style="color: grey;">${{ order.event_cart.total_fee }}</p></td>
+									</tr>
+									<tr>
+										<td></td>
+										<td></td>
+										<td><p style="color: grey;">Total payout to you</p></td>
+										<td><p style="color: #2584C7;">${{ order.event_cart.total_no_fee }}</p></td>
+									</tr>
+								{% endif %}
 								
 								{% if event_order_refunds %}
 								<tr>
@@ -197,6 +250,7 @@ Order #{{ order.id }} | {{ event.title }}
 						</table>
 					</div>
 				</div>
+				{% endif %}
 			</div>
 		</div>		
 	</div>
