@@ -6,16 +6,6 @@
 {{ button_text }} | {{ House.name }}
 {% endblock title %}
 
-{% block page_title %}
-
-{% if button_text == "Create Ticket" %}
-{% if free_ticket %}Create Free Ticket{% elif paid_ticket %}Create Paid Ticket{% elif donation_ticket %}Create Donation Ticket{% endif %}
-{% else %}
-{{ button_text }}
-{% endif %}
-
-{% endblock page_title %}
-
 {% block styles %}
 <style type="text/css">
 	.row-padder {

@@ -3,16 +3,9 @@
 {% load static %}
 
 {% block title %}
-Update Event | {{ House.name }}
+{% if update_event %}Update{% else %}Create{% endif %} Event | {{ house.name }}
 {% endblock title %}
 
-{% block page_title %}
-{% if update_event %}
-{{ event.title }}
-{% else %}
-New Event
-{% endif %}
-{% endblock page_title %}
 
 {% block styles %}
 <style type="text/css">
