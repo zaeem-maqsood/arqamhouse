@@ -56,7 +56,10 @@ class DashboardView(HouseAccountMixin, DetailView):
 
 			sales_sum = 0
 			for transaction in transactions_for_day:
-				sales_sum += transaction.house_amount
+				if transaction.house_amount:
+					sales_sum += transaction.house_amount
+				else:
+					sales_sum += decimal.Decimal(0.00)
 
 			sales_label.append('{0:.2f}'.format(sales_sum))
 			day_label.append("%s %s" % (one_day_earlier.strftime('%b'), one_day_earlier.day))
