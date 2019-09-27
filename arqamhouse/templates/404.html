@@ -21,7 +21,7 @@
         <div class="row">
             <div class="col-md-9 col-lg-6">
 
-                <div class="row" style="padding-bottom: 20px;">
+                <div class="row d-none d-sm-none d-md-block" style="padding-bottom: 20px;">
                     <div class="col-md-12">
                         <img src="{% static 'images/logo.png' %}" style="max-height: 5em;">
                     </div>
@@ -30,7 +30,7 @@
                 <h3>The page you're looking for can't be found.</h3>
                 <h5>If you think this is a valid url and you are still recieving this message please contact us and help us get this issue solved.</h5>
 
-                <a style="color: white;" href="" class="btn btn--primary type--uppercase">Help Us Fix It</a>
+                <a style="color: white;" href="{% url 'report' %}" class="btn btn--primary type--uppercase">Help Us Fix It</a>
 
             </div>
         </div>

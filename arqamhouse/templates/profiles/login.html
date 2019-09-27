@@ -6,9 +6,9 @@
 Login | Arqam House 
 {% endblock title %}
 
-{% block footer %}
-	{% include "frontend/footer.html" %}
-{% endblock footer %}
+{# block footer #}
+	{# include "frontend/footer.html" #}
+{# endblock footer #}
 
 {% block styles %}
 {% endblock styles %}
@@ -25,7 +25,7 @@ Login | Arqam House
         <div class="row">
             <div class="col-md-9 col-lg-6">
 
-                <div class="row" style="padding-bottom: 20px;">
+                <div class="row d-none d-sm-none d-md-block" style="padding-bottom: 20px;">
                     <div class="col-md-12">
                         <img src="{% static 'images/logo.png' %}" style="max-height: 5em;">
                     </div>

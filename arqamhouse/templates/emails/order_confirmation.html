@@ -230,7 +230,7 @@
                                                                         <!--[if (gte mso 9)|(IE)]>
       <td width="300.000px" valign="top" style="padding: 0px 0px 0px 0px;border-collapse: collapse;" >
     <![endif]-->
-
+                                                                        {% if event.start or event.end %}
                                                                         <table width="300.000"
                                                                             style="width:300.000px;border-spacing:0;border-collapse:collapse;margin:0px 0px 0px 0px;"
                                                                             cellpadding="0" cellspacing="0" align="left"
@@ -263,6 +263,7 @@
                                                                                                             </span></span></span>
                                                                                                 </div>
 
+                                                                                                {% if event.start %}
                                                                                                 <div
                                                                                                     style="user-select: auto;">
                                                                                                     <span
@@ -280,7 +281,9 @@
                                                                                                                 </font>
                                                                                                             </span></span></span>
                                                                                                 </div>
+                                                                                                {% endif %}
 
+                                                                                                {% if event.end %}
                                                                                                 <div
                                                                                                     style="user-select: auto;">
                                                                                                     <span
@@ -298,6 +301,7 @@
                                                                                                                 </font>
                                                                                                             </span></span></span>
                                                                                                 </div>
+                                                                                                {% endif %}
 
                                                                                             </td>
                                                                                         </tr>
@@ -306,6 +310,7 @@
                                                                                 </td>
                                                                             </tr>
                                                                         </table>
+                                                                        {% endif %}
 
                                                                         <!--[if (gte mso 9)|(IE)]>
       </td>
@@ -313,7 +318,7 @@
                                                                         <!--[if (gte mso 9)|(IE)]>
       <td width="300.000px" valign="top" style="padding: 0px 0px 0px 0px;border-collapse: collapse;" >
     <![endif]-->
-
+                                                                        {% if event.venue_name or event.venue_address %}
                                                                         <table width="300.000"
                                                                             style="width:300.000px;border-spacing:0;border-collapse:collapse;margin:0px 0px 0px 0px;"
                                                                             cellpadding="0" cellspacing="0" align="left"
@@ -346,6 +351,7 @@
                                                                                                             </span></span></span>
                                                                                                 </div>
 
+                                                                                                {% if event.venue_name %}
                                                                                                 <div
                                                                                                     style="user-select: auto;">
                                                                                                     <span
@@ -362,7 +368,9 @@
                                                                                                                 </font>
                                                                                                             </span></span></span>
                                                                                                 </div>
+                                                                                                {% endif %}
 
+                                                                                                {% if event.venue_address %}
                                                                                                 <div
                                                                                                     style="user-select: auto;">
                                                                                                     <span
@@ -379,6 +387,7 @@
                                                                                                                 </font>
                                                                                                             </span></span></span>
                                                                                                 </div>
+                                                                                                {% endif %}
 
                                                                                             </td>
                                                                                         </tr>
@@ -387,6 +396,7 @@
                                                                                 </td>
                                                                             </tr>
                                                                         </table>
+                                                                        {% endif %}
 
                                                                         <!--[if (gte mso 9)|(IE)]>
       </td>

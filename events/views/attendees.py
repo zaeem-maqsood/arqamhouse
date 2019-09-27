@@ -96,8 +96,8 @@ class AttendeeListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 			else:
 				row.append("Yes")
 
-			if attendee.note:
-				row.append(attendee.note)
+			if attendee.address:
+				row.append(attendee.address)
 			else:
 				row.append("No Notes")
 

@@ -166,13 +166,6 @@ Manage | {{ house.name }}
                 <div class="row" style="padding-bottom:30px;">
                     <div class="col-8 offset-2">
 
-                        <div class="row" style="padding-bottom:30px;">
-                            <div class="col-12">
-                                <h4>Hello {{ profile.name }},</h4>
-                                <p>You're currently in your '{{ house.name }}' house</p>
-                            </div>
-                        </div>
-
                         <form method="POST" id="houseForm" action="">{% csrf_token %}
                             
                             <div class="row" style="padding-bottom:30px;">
@@ -184,7 +177,7 @@ Manage | {{ house.name }}
 
                             <div class="row" style="padding-bottom:30px;">
                                 <div class="col-12">
-                                    <button type="submit" class="btn btn-primary btn-block">Add User</button>
+                                    <button type="submit" class="btn btn-primary btn-block">Add Account</button>
                                 </div>
                             </div>
                     
@@ -201,7 +194,7 @@ Manage | {{ house.name }}
                                     <p>{{ current_house_user.profile.email }}</p>
                                 </div>
                                 <div class="col-4">
-                                    <button class="btn btn-info btn-block">You</button>
+                                    <button class="btn btn-info btn-block" type="button">You</button>
                                 </div>
                             </div>
 

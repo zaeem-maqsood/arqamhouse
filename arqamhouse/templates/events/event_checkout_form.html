@@ -218,7 +218,7 @@ function initMap() {
                                 <div class="col-md-12 col-lg-12">
                                     <p style="margin-bottom: 0;">{{ order_question.question.title }}</p>
                                     {% if order_question.question.question_type == "Long" %}
-                                    <textarea maxlength="300" name="{{ order_question.question.id }}_order_question" id="{{ order_question.question.id }}_order_question" placeholder="{{ order_question.question.help_text }}" class="validate-required" rows="3" style="user-select: auto;" {% if order_question.question.required %}required{% endif %}>{% get_order_question_initial_value data order_question.question.id %}</textarea>
+                                    <textarea maxlength="300" name="{{ order_question.question.id }}_order_question" id="{{ order_question.question.id }}_order_question" placeholder="{% if order_question.question.help_text %}{{ order_question.question.help_text }}{% endif %}" class="validate-required" rows="3" style="user-select: auto;" {% if order_question.question.required %}required{% endif %}>{% get_order_question_initial_value data order_question.question.id %}</textarea>
                                     {% elif order_question.question.question_type == "Multiple Choice" %}
                                     <select name="{{ order_question.question.id }}_order_question" value="{% get_order_question_initial_value data order_question.question.id %}" id="{{ order_question.question.id }}_order_question" class="form-control">
                                         {% if not order_question.question.required %}
@@ -229,7 +229,7 @@ function initMap() {
                                         {% endfor %}
                                     </select>
                                     {% else %}
-                                    <input maxlength="300"  name="{{ order_question.question.id }}_order_question" value="{% get_order_question_initial_value data order_question.question.id %}" class="validate-required" type="text" id="{{ order_question.question.id }}_order_question" {% if order_question.question.required %}required{% endif %} placeholder="{{ order_question.question.help_text }}">
+                                    <input maxlength="300"  name="{{ order_question.question.id }}_order_question" value="{% get_order_question_initial_value data order_question.question.id %}" class="validate-required" type="text" id="{{ order_question.question.id }}_order_question" {% if order_question.question.required %}required{% endif %} placeholder="{% if order_question.question.help_text %}{{ order_question.question.help_text }}{% endif %}">
                                     {% endif %}
                                 </div>
                             </div>
@@ -302,7 +302,7 @@ function initMap() {
                                         <div class="col-md-12 col-lg-12">
                                             <p style="margin-bottom: 0;">{{ event_question.question.title }}</p>
                                             {% if event_question.question.question_type == "Long" %}
-                                            <textarea maxlength="300" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" value="{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" placeholder="{{ event_question.question.help_text }}" class="validate-required" rows="3" style="user-select: auto;" {% if event_question.question.required %}required{% endif %}>{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}</textarea>
+                                            <textarea maxlength="300" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" value="{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" placeholder="{% if event_question.question.help_text %}{{ event_question.question.help_text }}{% endif %}" class="validate-required" rows="3" style="user-select: auto;" {% if event_question.question.required %}required{% endif %}>{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}</textarea>
                                             {% elif event_question.question.question_type == "Multiple Choice" %}
                                             <select class="form-control m-input" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}">
                                                 {% if not event_question.question.required %}
@@ -313,7 +313,7 @@ function initMap() {
                                                 {% endfor %}
                                             </select>
                                             {% else %}
-                                            <input maxlength="300" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" value="{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}" class="validate-required" type="text" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" size="30" {% if event_question.question.required %}required{% endif %} placeholder="{{ event_question.question.help_text }}">
+                                            <input maxlength="300" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" value="{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}" class="validate-required" type="text" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" size="30" {% if event_question.question.required %}required{% endif %} placeholder="{% if event_question.question.help_text %}{{ event_question.question.help_text }}{% endif %}">
                                             {% endif %}
                                         </div>
                                     </div>

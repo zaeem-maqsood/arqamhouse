@@ -50,7 +50,6 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 		tickets = Ticket.objects.filter(event=event, deleted=False)
 		return tickets
 
-
 	def get_total_sales(self, event):
 		orders = EventOrder.objects.filter(event=event, refunded=False, failed=False).select_related("transaction")
 		total_sales = decimal.Decimal(0.00)
@@ -63,7 +62,6 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 	def graph_data(self, event):
 		
 		today = timezone.now()
-		print(today)
 		days_earlier = today - timedelta(days=10)
 		attendees = Attendee.objects.filter(order__event=event, order__created_at__range=(days_earlier, today), active=True)
 
@@ -81,23 +79,18 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 			tickets_label.append("%s" % (tickets_sum))
 			day_label.append("%s %s" % (one_day_earlier.strftime('%b'), one_day_earlier.day))
 
-		
 		tickets_label = list(reversed(tickets_label))
 		day_label = list(reversed(day_label))
-
 		graph_data = {'tickets_label':tickets_label, 'day_label':day_label}
 		return graph_data
 			
 
 	def get(self, request, *args, **kwargs):
 
-
 		context = {}
 		slug = kwargs['slug']
 		house = self.get_house()
 		event = self.get_event(slug)
-
-		
 		dashboard_events = self.get_events()
 		tickets = self.get_tickets(event)
 		questions = EventQuestion.objects.filter(event=event, question__deleted=False, question__approved=True)
@@ -112,9 +105,10 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 		context["email"] = email
 		context["questions"] = questions
 		context["tickets"] = tickets
-		context["dashboard_events"] = dashboard_events
 		context["total_sales"] = self.get_total_sales(event)
 		context["graph_data"] = self.graph_data(event)
+
+		context["dashboard_events"] = dashboard_events
 		context["house"] = house
 		context["event"] = event
 		context["request"] = request

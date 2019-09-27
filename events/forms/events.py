@@ -69,7 +69,7 @@ class EventCheckoutForm(forms.Form):
 class EventForm(forms.ModelForm):
 
 	start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"],  required=False, widget=forms.DateTimeInput(
-		attrs={"class": "form-control m-input", "placeholder": "Start", "autocomplete": "off"}))
+		attrs={"class": "form-control m-input", "placeholder": "Start", "autocomplete": "off", "onchange": "endDateTime(this)"}))
 	end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], required=False,  widget=forms.DateTimeInput(
 		attrs={"class": "form-control m-input", "placeholder": "End", "autocomplete": "off"}))
 

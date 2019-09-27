@@ -9,7 +9,7 @@ from django.db.models.signals import pre_save, post_save
 from events.models import Event
 
 
-# We charge customers a base fee of 30 cents and a percentage of 3% of the ticket price
+# We charge customers a base fee of 30 cents and a percentage of 4% of the ticket price
 # PER TICKET. 
 
 
@@ -61,24 +61,9 @@ class Ticket(models.Model):
 
 		super().save(*args, **kwargs)
 
-	def get_ticket_questions(self):
-		return self.ticketquestion_set.filter(ticket=self, deleted=False, approved=True).order_by('order')
-
 	def update_ticket_view(self):
 		view_name = "events:update_ticket"
 		return reverse(view_name, kwargs={"slug": self.event.slug, "ticket_slug": self.slug})
-
-	def create_ticket_simple_question(self):
-		view_name = "events:questions:ticket_create_simple"
-		return reverse(view_name, kwargs={"slug": self.event.slug, "ticket_slug": self.slug, "type":"simple"})
-
-	def create_ticket_paragraph_question(self):
-		view_name = "events:questions:ticket_create_paragraph"
-		return reverse(view_name, kwargs={"slug": self.event.slug, "ticket_slug": self.slug, "type":"paragraph"})
-
-	def create_ticket_multiple_choice_question(self):
-		view_name = "events:questions:ticket_create_multiple_choice"
-		return reverse(view_name, kwargs={"slug": self.event.slug, "ticket_slug": self.slug, "type":"multiple choice"})
 
 	def percentage_color(self):
 		ratio = self.amount_sold / self.amount_available
@@ -96,26 +81,7 @@ class Ticket(models.Model):
 		return "{0:.0f}%".format(ratio * 100)
 
 
-def create_slug(instance, new_slug=None):
-
-	slug = slugify(instance.title)
-		
-	if new_slug is not None:
-		slug = new_slug
-	qs = Ticket.objects.filter(slug=slug, event=instance.event)
-	exists = qs.count() > 1
-
-	if exists:
-		new_slug = "%s-%s" %(slug, qs.first().id)
-		return create_slug(instance, new_slug=new_slug)
-
-	return slug
-
-
 def ticket_pre_save_reciever(sender, instance, *args, **kwargs):
-
-	# Create ticket slug
-	instance.slug = create_slug(instance)
 
 	# Set the min amount, max amount, and amount available 
 	if not instance.min_amount:
