@@ -136,24 +136,26 @@ class ProfileCreateView(CreateView):
 
 		# Save form
 		self.object = form.save(commit=False)
-		self.object.is_active = False
+		self.object.is_active = True #Change this to false and when we want email authntication again.
 		self.object.save()
 
-		current_site = get_current_site(request)
-		subject = 'Finish Activating Your Account'
-		context = {}
-		context["name"] = name
-		context["user"] = self.object
-		context["domain"] = current_site.domain
-		context["uid"] = urlsafe_base64_encode(force_bytes(self.object.pk))
-		context["token"] = account_activation_token.make_token(self.object)
-		html_message = render_to_string('emails/account_activation.html', context)
-		plain_message = strip_tags(html_message)
-		from_email = 'Arqam House <info@arqamhouse.com>'
-		to = [email]
-		mail.send_mail(subject, plain_message, from_email, to, html_message=html_message)
+		# Uncomment this when we want email activation again
+		# current_site = get_current_site(request)
+		# subject = 'Finish Activating Your Account'
+		# context = {}
+		# context["name"] = name
+		# context["user"] = self.object
+		# context["domain"] = current_site.domain
+		# context["uid"] = urlsafe_base64_encode(force_bytes(self.object.pk))
+		# context["token"] = account_activation_token.make_token(self.object)
+		# html_message = render_to_string('emails/account_activation.html', context)
+		# plain_message = strip_tags(html_message)
+		# from_email = 'Arqam House <info@arqamhouse.com>'
+		# to = [email]
+		# mail.send_mail(subject, plain_message, from_email, to, html_message=html_message)
+		# messages.success(request, 'Account Created! Please check your email to finish activation.')
 
-		messages.success(request, 'Account Created! Please check your email to finish activation.')
+		messages.success(request, 'Account Created! Login to continue.')
 
 		valid_data = super(ProfileCreateView, self).form_valid(form)
 		return valid_data
