@@ -29,8 +29,6 @@ class ReportErrorView(FormView):
 	def get(self, request, *args, **kwargs):
 		context = {}
 		profile = request.user
-		print(profile)
-		print(profile.house)
 		context["profile"] = profile
 		form = ReportErrorForm()
 		context["form"] = form
