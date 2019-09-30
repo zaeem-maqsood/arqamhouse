@@ -11,8 +11,7 @@ Orders
 {% endblock page_title %}
 
 {% block styles %}
-<link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js" rel="stylesheet"
-    type="text/css" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js" rel="stylesheet" type="text/css" />
 <style type="text/css">
     .row-padder {
         padding-top: 15px;
@@ -124,6 +123,118 @@ Orders
 	    }
 	});
 </script>
+
+
+
+
+<!-- Cities -->
+
+<script type="text/javascript">
+    var ctx1 = document.getElementById("myChart1");
+    var myChart1 = new Chart(ctx1, {
+        type: 'bar',
+        aspectRatio: 2,
+        data: {
+            labels: {{ cities|safe }},
+            datasets: [{
+                label: 'Genders',
+                data: {{ values|safe}},
+        backgroundColor: 'rgba(68, 153, 216, 0.2)',
+        borderColor: 'rgba(68, 153, 216, 1)',
+        borderWidth: 4,
+        lineTension: 0.1,
+        borderCapStyle: 'butt',
+        borderDashOffset: 3.0,
+        borderJoinStyle: 'miter',
+        pointBorderWidth: 6,
+        pointHoverRadius: 5,
+        pointHoverBorderWidth: 2,
+        pointRadius: 0.5,
+        pointHitRadius: 7,
+        xPadding: 25,
+
+	        }]
+	    },
+    options: {
+
+        legend: {
+            display: false,
+			},
+
+        tooltips: {
+            enabled: true,
+                mode: 'label',
+
+                    callbacks: {
+                label: function(item) {
+                    label = (Math.round(item.yLabel * 100) / 100).toFixed(0);
+                    label = label.toString();
+                    label = " " + label + " Attendees"
+                    return label
+                },
+            },
+        },
+
+        layout: {
+            padding: {
+                left: 0,
+                    right: 0,
+                        top: 10,
+                            bottom: 0
+            }
+        },
+
+        animation: {
+            duration: 4000,
+	        },
+
+        maintainAspectRatio: false,
+
+            scales: {
+            yAxes: [{
+
+                gridLines: {
+                    drawBorder: false,
+                    display: false,
+                },
+
+                ticks: {
+                    display: false,
+                    beginAtZero: true,
+                    suggestedMin: 0,
+                    fontSize: 30,
+                },
+
+            }],
+
+                xAxes: [{
+
+                    gridLines: {
+                        display: false,
+                    },
+
+                    ticks: {
+                        fontSize: 13,
+                    },
+
+                    stepSize: 5,
+                    position: 'bottom',
+
+                }],
+
+	        },
+
+
+        responsive: true,
+	    }
+	});
+</script>
+<!-- End Cities -->
+
+
+
+
+
 
 <script type="text/javascript">
     var ctx2 = document.getElementById("myChart2");
@@ -336,7 +447,7 @@ Orders
                 {% if attendees %}
                 <div class="row" style="padding-bottom: 40px;padding:30px;">
                     <div class="col-md-12 col-12">
-                        <canvas id="myChart" width="400" height="150"></canvas>
+                        <canvas id="myChart1" width="400" height="150"></canvas>
                     </div>
                 </div>
                 {% else %}

@@ -168,6 +168,24 @@ class AnswersView(HouseAccountMixin, View):
 			print(e)
 			raise Http404
 
+	
+	def get_cities(self, attendees):
+
+		data = {}
+		data["No Data"] = 0 
+		for attendee in attendees:
+			if attendee.city:
+				if attendee.city.name in data:
+					data[attendee.city.name] += 1
+				else:
+					data[attendee.city.name] = 1
+			else:
+				data["No Data"] += 1
+
+		return data
+
+
+
 	def get_ages(self, attendees):
 		ages = []
 		under_12 = 0
@@ -250,6 +268,7 @@ class AnswersView(HouseAccountMixin, View):
 		context["event_questions"] = event_questions
 		context["attendee_common_question"] = attendee_common_question
 
+
 		if attendee_common_question.age or attendee_common_question.gender or attendee_common_question.address:
 			attendees = Attendee.objects.filter(order__event=event, active=True).order_by('age')
 			context["attendees"] = attendees
@@ -259,6 +278,17 @@ class AnswersView(HouseAccountMixin, View):
 			if attendee_common_question.gender:
 				genders = self.get_genders(attendees)
 				context["genders"] = genders
+			if attendee_common_question.address:
+				data = self.get_cities(attendees)
+				cities, values = [], []
+				for city, value in data.items():
+					cities.append(city)
+					values.append(value)
+
+				context["cities"] = cities
+				context["values"] = values
+				print(cities)
+				print(values)
 
 		context["house"] = house
 		context["event"] = event

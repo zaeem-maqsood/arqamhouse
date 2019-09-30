@@ -61,7 +61,7 @@ class AttendeeListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 		worksheet.title = 'Attendees'
 
 		# Define the titles for columns
-		columns = ['Name', 'Ticket', 'Gender', 'Age', 'Refunded', 'Note']
+		columns = ['Name', 'Ticket', 'Gender', 'Age', 'Refunded', 'Country', 'Region', 'City', 'Address']
 		for event_question in event_questions:
 			columns.append(event_question.question.title)
 		row_num = 1
@@ -97,9 +97,15 @@ class AttendeeListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 				row.append("Yes")
 
 			if attendee.address:
+				row.append(attendee.country.name)
+				row.append(attendee.region.name)
+				row.append(attendee.city.name)
 				row.append(attendee.address)
 			else:
-				row.append("No Notes")
+				row.append("No Country")
+				row.append("No Region")
+				row.append("No City")
+				row.append("No Address")
 
 			for event_question in event_questions:
 				value = "N/A"
@@ -130,9 +136,9 @@ class AttendeeListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 
 		name_column_dimensions.width = 30
 		ticket_name_column_dimensions.width = 30
-		note_column_dimensions.width = 50
+		note_column_dimensions.width = 30
 
-		for x in range(7, (event_questions.count() + 7)):
+		for x in range(7, (event_questions.count() + 10)):
 			column_letter = get_column_letter(x)
 			column_dimensions = worksheet.column_dimensions[column_letter]
 			column_dimensions.width = 40

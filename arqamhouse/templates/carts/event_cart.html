@@ -29,6 +29,12 @@ Choose Tickets | {{ event.title }}
 {% block scripts %}
 <script type="text/javascript">
 
+	// $(window).bind("pageshow", function () {
+	// 	var form = $('form');
+	// 	// let the browser natively reset defaults
+	// 	form[0].reset();
+	// });
+
 $( document ).ready(function() {
     calculatePrice();
 });

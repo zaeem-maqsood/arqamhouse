@@ -111,7 +111,7 @@ Orders
                                         <td>{% if attendee.age %}{{ attendee.age }}{% else %}No Data{% endif %}</td>
                                         <td>{% if attendee.gender %}{{ attendee.gender }}{% else %}No Data{% endif %}</td>
                                         <td>{% if attendee.city %}{{ attendee.city.name }}, {{ attendee.city.region.name }}{% else %}No Data{% endif %}</td>
-                                        <td><a href="#" class="btn btn-primary btn-block">Edit</a></td>
+                                        <td><a href="{{ attendee.get_attendee_view }}" class="btn btn-primary btn-block">Edit</a></td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

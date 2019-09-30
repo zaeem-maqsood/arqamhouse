@@ -34,14 +34,20 @@ class AddTicketsToCartView(FormView):
 
 	def check_if_user_is_owner(self, event):
 		profile = self.request.user
-		if event.house == profile.house:
-			return True
-		else:
+
+		try:
+			if event.house == profile.house:
+				return True
+			else:
+				return False
+		except Exception as e:
+			print(e)
 			return False
 
 
 	def post(self, request, *args, **kwargs):
 		data = request.POST
+		print("\n\n\nPOST Call Triggered\n\n\n")
 		slug = kwargs['slug']
 		event = self.get_event(slug)
 		form = TicketsToCartForm(event=event, data=request.POST)
@@ -92,6 +98,7 @@ class AddTicketsToCartView(FormView):
 
 		owner = self.check_if_user_is_owner(event)
 
+		print("\n\n\nget Call Triggered\n\n\n")
 		context["owner"] = owner
 		context["form"] = form
 		context["event"] = event
@@ -108,6 +115,9 @@ class AddTicketsToCartView(FormView):
 	def form_valid(self, form, request, event, pay, house_created):
 		cart_id = request.session.get('cart') 
 		cart = EventCart.objects.get(id=cart_id)
+
+		# Delete all cart items before proceeding
+		cart_items = EventCartItem.objects.filter(event_cart=cart).delete()
 
 		tickets = self.get_tickets(event)
 

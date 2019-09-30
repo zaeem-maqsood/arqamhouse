@@ -1,8 +1,24 @@
 {% for order in orders %}
 <tr>
-    <td><a href="{{ order.get_order_view }}">{{ order.name }}</a></td>
+    <td><a href="{{ order.get_order_view }}">{{ order.name|title }}</a></td>
     <td>$ {% if order.transaction.amount %}{{ order.transaction.amount }}{% else %}0.00{% endif %}</td>
     <td>{{ order.attendee_set.all.count }}</td>
-    <td>{% if order.failed %}<i style="font-size:1.5em;color:#e37f7f;" class="far fa-times-circle"></i>{% else %}<i style="font-size:1.5em;color:#62c262;" class="far fa-check-circle"></i>{% endif %}</td>
+    <td>
+        <p style="font-weight:500;">
+            {% if order.failed %}
+            <span style="color:#FF4500;">Failed Order</span>
+            {% elif order.partial_refund %}
+            <span style="color:#FFBE00;">Partially Refunded</span>
+            {% elif order.refunded %}
+            <span style="color:#FF4500;">Refunded</span>
+            {% else %}
+            {% if order.house_created %}
+            <span style="color:#2584C7;">House Created Order</span>
+            {% else %}
+            <span style="color:#2584C7;">Successful Order</span>
+            {% endif %}
+            {% endif %}
+        </p>
+    </td>
 </tr>
 {% endfor %}
