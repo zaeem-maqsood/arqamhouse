@@ -89,6 +89,7 @@ function calculatePrice() {
     }
 	total = total.toFixed(2);
 
+	{% if owner %}
 	console.log(total)
 	if (total == 0.00) {
 		document.getElementById("checkout").disabled = true;
@@ -96,6 +97,7 @@ function calculatePrice() {
 	else {
 		document.getElementById("checkout").disabled = false;
 	}
+	{% endif %}
 
 	total = total.toString()
     document.getElementById("new_price_div").innerHTML = "Order Total $" + total;
