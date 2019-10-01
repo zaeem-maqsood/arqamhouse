@@ -138,16 +138,16 @@ function initMap() {
                             {% if cart.pay %}
                                 {% for cart_item in cart_items %}
                                 <div class="row" style="padding-top: 20px;">
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 col-12">
                                         <p style="font-size: 1.1em;"> {{ cart_item.ticket.title }}</p>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-2 col-4">
                                         <p style="font-size: 1.1em;">${{ cart_item.ticket.buyer_price }}</p>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-2 col-4">
                                         <p style="font-size: 1.1em;font-weight:800;">x {{ cart_item.quantity }}</p>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-2 col-4">
                                         <p style="font-size: 1.1em;" class="float-right">${{ cart_item.cart_item_total }}</p>
                                     </div>
                                 </div>
@@ -173,19 +173,19 @@ function initMap() {
 
                             {% if cart.pay %}
                             <div class="row" style="padding-top: 20px;">
-                                <div class="col-md-9">
+                                <div class="col-md-9 col-9">
                                     <p style="font-size: 1.1em;font-weight: 800;">Total</p>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3 col-3">
                                     <p style="font-size: 1.1em;font-weight: 800;" class="float-right">${{ cart.total }}</p>
                                 </div>
                             </div>
                             {% else %}
                             <div class="row" style="padding-top: 20px;">
-                                <div class="col-md-9">
+                                <div class="col-md-9 col-9">
                                     <p style="font-size: 1.1em;font-weight: 800;">Total</p>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3 col-3">
                                     <p style="font-size: 1.1em;font-weight: 800;" class="float-right">$0.00</p>
                                 </div>
                             </div>
