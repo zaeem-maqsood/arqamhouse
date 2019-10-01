@@ -76,7 +76,7 @@ class EventForm(forms.ModelForm):
 	class Meta:
 		model = Event
 		fields = [
-			"title", "url", "venue_name", "venue_address", "short_description", "image", "start", "end"
+			"title", "url", "venue_name", "venue_address", "short_description", "start", "end"
 		]
 
 
@@ -125,12 +125,12 @@ class EventForm(forms.ModelForm):
 						}
 					),
 
-				"image": forms.FileInput(
-						attrs={
-							"onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
-							"class":"form-control m-input dropzone",
-						}
-					),
+				# "image": forms.FileInput(
+				# 		attrs={
+				# 			"onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
+				# 			"class":"form-control m-input dropzone",
+				# 		}
+				# 	),
 			}
 
 

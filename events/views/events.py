@@ -151,7 +151,6 @@ class EventCheckoutView(FormView):
 		cart_items = EventCartItem.objects.filter(event_cart=cart)
 
 		attendee_common_questions = AttendeeCommonQuestions.objects.get(event=event)
-		print(attendee_common_questions.age)
 			
 		context["cart_items"] = cart_items
 		context["cart"] = cart
@@ -167,7 +166,6 @@ class EventCheckoutView(FormView):
 		# Check if the user should be here in the first place
 		cart = self.get_cart()
 		cart_items = EventCartItem.objects.filter(event_cart=cart)
-		print(cart_items)
 		if not cart_items.exists():
 			return HttpResponseRedirect(self.get_success_url())
 
@@ -176,51 +174,37 @@ class EventCheckoutView(FormView):
 
 	def post(self, request, *args, **kwargs):
 		data = request.POST
-
-
 		slug = kwargs['slug']
 		event = self.get_event(slug)
 		cart = self.get_cart()
-		print(data)
 
 		# Only get the Stripe Token if payment enabled
 		if cart.pay:
-			print("STRIPE TOKEN")
-			print(data["stripeToken"])
 			stripe_token = data["stripeToken"]
-			print("\n\n")
 
-		# Step 1 Get buyer name and email address
+		# Get buyer name and email address
 		name = data['name']
-
 		email = data['email']
 
+		# Create Transaction Object
 		transaction = Transaction.objects.create(house=event.house, name=name)
 		transaction.save()
 
+		# Create Order Object
 		order = EventOrder.objects.create(name=name, email=email, event=event, event_cart=cart, transaction=transaction, house_created=cart.house_created)
 		order.qrcode()
 		order.save()
 
-		print("\n")
-		print("---------------------------- Buyer name and email")
-		print(name)
-		print(email)
-
-		# Step 2 Get Buyer questions and make answers
+		# Get Buyer questions and make answers
 		order_questions = EventQuestion.objects.filter(event=event, order_question=True, question__deleted=False, question__approved=True).order_by("question__order")
 		for order_question in order_questions:
 			value = data["%s_order_question" % (order_question.question.id)] 
 
-			print("\n")
-			print("---------------------------- Order Questions")
-			print(value)
-
+			# Create Order answers
 			order_answer = OrderAnswer.objects.create(question=order_question, value=value, order=order)
 			order_answer.save()
 
-
-		# Step 3 get answers from attendees 
+		# get answers from attendees 
 		cart_items = EventCartItem.objects.filter(event_cart=cart)
 		attendee_common_questions = AttendeeCommonQuestions.objects.get(event=event)
 		
@@ -289,7 +273,6 @@ class EventCheckoutView(FormView):
 							source = stripe_token,
 							statement_descriptor = 'Arqam House Inc.',
 						)
-				print(charge)
 
 				transaction.amount = cart.total
 				transaction.arqam_amount = cart.arqam_charge
@@ -449,7 +432,6 @@ class PastEventsView(HouseAccountMixin, UserPassesTestMixin, EventMixin, ListVie
 	def test_func(self):
 		house_users = HouseUser.objects.filter(profile=self.request.user)
 		house = self.get_house()
-		print(house)
 		for house_user in house_users:
 			if house == house_user.house:
 				return True
@@ -562,7 +544,6 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		if self.object.active:
 			context["event_tab"] = True
 		context["dashboard_events"] = self.get_events()
-		print(self.get_events())
 		return context
 
 	def get(self, request, *args, **kwargs):
@@ -572,11 +553,9 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		data = request.GET
 
 		if 'url' in data:
-			print(data)
 
 			url = data['url']
 			slugify_url = slugify(url)
-			print(slugify_url)
 			
 			if Event.objects.filter(slug=slugify_url).exists():
 				return HttpResponse("taken")

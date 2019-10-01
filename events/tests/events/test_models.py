@@ -72,11 +72,6 @@ class EventModelTestCase(TestCase):
         view = event.create_donation_ticket()
         self.assertEqual(view, '/events/test-1/tickets/create/donation')
 
-    def test_choose_tickets_view(self):
-        event = Event.objects.get(slug="test-1")
-        view = event.choose_tickets_view()
-        self.assertEqual(view, '/events/test-1/tickets')
-
     def test_list_tickets_view(self):
         event = Event.objects.get(slug="test-1")
         view = event.list_tickets_view()

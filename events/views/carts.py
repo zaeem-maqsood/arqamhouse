@@ -47,7 +47,7 @@ class AddTicketsToCartView(FormView):
 
 	def post(self, request, *args, **kwargs):
 		data = request.POST
-		print("\n\n\nPOST Call Triggered\n\n\n")
+		
 		slug = kwargs['slug']
 		event = self.get_event(slug)
 		form = TicketsToCartForm(event=event, data=request.POST)
@@ -68,7 +68,6 @@ class AddTicketsToCartView(FormView):
 		else:
 			return self.form_invalid(form)
 
-
 	def get(self, request, *args, **kwargs):
 		
 		context = {}
@@ -77,8 +76,8 @@ class AddTicketsToCartView(FormView):
 		event = self.get_event(slug)
 		tickets = self.get_tickets(event)
 
-		if not tickets.filter(sold_out=False).exists():
-			return HttpResponseRedirect(self.get_event_landing())
+		# if not tickets.filter(sold_out=False).exists():
+		# 	return HttpResponseRedirect(self.get_event_landing())
 
 		# Check if event is deleted or archived.
 		if event.deleted or not event.active:
@@ -98,7 +97,6 @@ class AddTicketsToCartView(FormView):
 
 		owner = self.check_if_user_is_owner(event)
 
-		print("\n\n\nget Call Triggered\n\n\n")
 		context["owner"] = owner
 		context["form"] = form
 		context["event"] = event
@@ -151,9 +149,6 @@ class AddTicketsToCartView(FormView):
 
 			if quantity != 0:
 				cart_item = EventCartItem.objects.create(event_cart=cart, ticket=ticket, quantity=quantity, donation_amount=donation_amount)
-
-		print("This is pay")
-		print(pay)
 
 		if cart.total == 0.00:
 			pay = False
