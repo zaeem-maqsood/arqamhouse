@@ -18,10 +18,6 @@ class AddTicketsToCartView(FormView):
 		view_name = "events:choose_tickets"
 		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
 
-	def get_event_landing(self):
-		view_name = "events:landing"
-		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
-
 	def get_tickets(self, event):
 		return Ticket.objects.filter(event=event, deleted=False)
 
@@ -80,8 +76,8 @@ class AddTicketsToCartView(FormView):
 		# 	return HttpResponseRedirect(self.get_event_landing())
 
 		# Check if event is deleted or archived.
-		if event.deleted or not event.active:
-			return HttpResponseRedirect(self.get_event_landing())
+		# if event.deleted or not event.active:
+		# 	return HttpResponseRedirect(self.get_event_landing())
 
 
 		form = TicketsToCartForm(event=event)

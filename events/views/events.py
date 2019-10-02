@@ -388,43 +388,6 @@ class EventCheckoutView(FormView):
 
 
 
-
-class EventLandingView(DetailView):
-	model = Event
-	template_name = "events/event_landing.html"
-
-	def get_event(self, slug):
-		try:
-			event = Event.objects.get(slug=slug)
-			return event
-		except Exception as e:
-			raise Http404
-
-	def is_owner(self, event):
-		profile = self.request.user
-		house = event.house
-		try:
-			house_user = HouseUser.objects.get(house=house, profile=profile)
-			return True
-		except Exception as e:
-			print(e)	
-			return False	
-
-	def get(self, request, *args, **kwargs):
-		context = {}
-		slug = kwargs['slug']
-		
-		event = self.get_event(slug)
-
-		context["is_owner"] = self.is_owner(event)
-		context["event"] = event
-		context["tickets"] = event.ticket_set.filter(sold_out=False).exists()
-		context["request"] = request
-		return render(request, self.template_name, context)
-
-
-
-
 class PastEventsView(HouseAccountMixin, UserPassesTestMixin, EventMixin, ListView):
 	model = Event
 	template_name = "events/past_events.html"
@@ -493,7 +456,7 @@ class EventCreateView(HouseAccountMixin, CreateView):
 		self.object.save()
 
 		# Create Email confirmation object
-		email_confirmation = EventEmailConfirmation.objects.create(event=self.object)
+		# email_confirmation = EventEmailConfirmation.objects.create(event=self.object)
 
 		messages.success(request, 'Your event is live! Click <a href="%s">here</a> to add tickets' %
 		                 (reverse('events:list_tickets', kwargs={'slug': self.object.slug})))
@@ -512,7 +475,7 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 	template_name = "events/event_form.html"
 
 	def get_success_url(self):
-		view_name = "events:landing"
+		view_name = "events:update"
 		return reverse(view_name, kwargs={"slug": self.object.slug})
 
 	def get_success_delete_url(self):

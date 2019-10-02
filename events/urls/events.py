@@ -1,6 +1,6 @@
 from .base import *
 
-from events.views import (EventLandingView, EventCreateView, EventUpdateView, PastEventsView, EventCheckoutView, EventDashboardView,
+from events.views import (EventCreateView, EventUpdateView, PastEventsView, EventCheckoutView, EventDashboardView,
                           AddTicketsToCartView)
 
 

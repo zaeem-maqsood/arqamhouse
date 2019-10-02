@@ -151,6 +151,17 @@ class Event(TimestampedModel):
 		return reverse(view_name, kwargs={"slug": self.slug})
 
 
+def event_post_save_reciever(sender, instance, *args, **kwargs):
+
+	from events.models import EventEmailConfirmation
+	try:
+		# Check if email conf exists
+		EventEmailConfirmation.objects.get(event=instance)
+	except:
+		# Create Email Confirmation object
+		EventEmailConfirmation.objects.create(event=instance)
+
+post_save.connect(event_post_save_reciever, sender=Event)
 
 
 
