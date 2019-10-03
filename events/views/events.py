@@ -142,14 +142,11 @@ class EventCheckoutView(FormView):
 
 	def get_context_data(self, data=None, *args, **kwargs):
 		context = {}
-
 		request = self.request
 		slug = self.kwargs['slug']
 		event = self.get_event(slug)
-		
 		cart = self.get_cart()
 		cart_items = EventCartItem.objects.filter(event_cart=cart)
-
 		attendee_common_questions = AttendeeCommonQuestions.objects.get(event=event)
 			
 		context["cart_items"] = cart_items
@@ -192,7 +189,6 @@ class EventCheckoutView(FormView):
 
 		# Create Order Object
 		order = EventOrder.objects.create(name=name, email=email, event=event, event_cart=cart, transaction=transaction, house_created=cart.house_created)
-		order.qrcode()
 		order.save()
 
 		# Get Buyer questions and make answers
@@ -220,42 +216,37 @@ class EventCheckoutView(FormView):
 				gender = None
 				address = None
 				
-				print("\n")
-				print("---------------------------- Attendee Common Questions")
 				# Step 3a get the name 
 				name = data["%s_%s_name" % (quantity, cart_item.ticket.id)]
-				print(name)
 
 				# Step 3b answers to common questions
 				if attendee_common_questions.email:
 					email = data["%s_%s_email" % (quantity, cart_item.ticket.id)]
-					print(email)
 
 				if attendee_common_questions.age:
 					age = data["%s_%s_age" % (quantity, cart_item.ticket.id)]
-					print(age)
 
 				if attendee_common_questions.gender:
-					gender = data["%s_%s_gender" % (quantity, cart_item.ticket.id)]
-					print(gender) 
+					gender = data["%s_%s_gender" % (quantity, cart_item.ticket.id)] 
 
 				if attendee_common_questions.address:
 					address = data["%s_%s_address" % (quantity, cart_item.ticket.id)]
-					print(address)
 
-				attendee = Attendee.objects.create(
-					order=order, ticket=cart_item.ticket, name=name, email=email, age=age, gender=gender, address=address, 
-					ticket_buyer_price=cart_item.ticket.buyer_price, ticket_price=cart_item.ticket.price, ticket_fee=cart_item.ticket.fee,
-					ticket_pass_fee=cart_item.ticket.pass_fee)
+				if cart_item.donation_ticket:
+					attendee = Attendee.objects.create(
+						order=order, ticket=cart_item.ticket, name=name, email=email, age=age, gender=gender, address=address,
+						ticket_buyer_price=cart_item.donation_buyer_amount, ticket_price=cart_item.donation_amount, ticket_fee=cart_item.donation_fee,
+						ticket_pass_fee=True)
+				else:
+					attendee = Attendee.objects.create(
+						order=order, ticket=cart_item.ticket, name=name, email=email, age=age, gender=gender, address=address, 
+						ticket_buyer_price=cart_item.ticket.buyer_price, ticket_price=cart_item.ticket.price, ticket_fee=cart_item.ticket.fee,
+						ticket_pass_fee=cart_item.ticket.pass_fee)
 				attendee.save()
 
 				# Step 3c answers to custom questions
 				for attendee_question in attendee_questions:
 					value = data["%s_%s_%s" % (quantity, attendee_question.question.id, cart_item.ticket.id)]
-
-					print("\n")
-					print("---------------------------- Attendee Custom Questions")
-					print(value)
 
 					answer = Answer.objects.create(question=attendee_question, value=value, attendee=attendee)
 					answer.save()
@@ -304,9 +295,11 @@ class EventCheckoutView(FormView):
 				del request.session['cart']
 				request.session.modified = True
 
+				print("Cart Processed")
+				print(cart.processed)
+
 				self.send_confirmation_email(event, data['email'], order)
 				messages.success(request, 'Check your email for tickets and further instructions.')
-
 				return HttpResponseRedirect(self.get_success_url())
 
 			except Exception as e:
@@ -367,7 +360,7 @@ class EventCheckoutView(FormView):
 		email = EmailMultiAlternatives(subject=subject, body=text_content,
 		                               from_email=from_email, to=to)
 		email.attach_alternative(html_content, "text/html")
-		email.attach("ticket.pdf", pdf_file, 'application/pdf')
+		email.attach("confirmation.pdf", pdf_file, 'application/pdf')
 		email.send()
 		return "Done"
 
@@ -454,9 +447,6 @@ class EventCreateView(HouseAccountMixin, CreateView):
 		self.object = form.save()
 		self.object.active = True
 		self.object.save()
-
-		# Create Email confirmation object
-		# email_confirmation = EventEmailConfirmation.objects.create(event=self.object)
 
 		messages.success(request, 'Your event is live! Click <a href="%s">here</a> to add tickets' %
 		                 (reverse('events:list_tickets', kwargs={'slug': self.object.slug})))

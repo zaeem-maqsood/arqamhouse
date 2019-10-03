@@ -1,0 +1,266 @@
+{% extends "frontend/base.html" %}
+{% load ticket_form_tags %}
+{% load static %}
+
+{% block title %}
+Order #{{ order.number }} | {{ order.event.title }}
+{% endblock title %}
+
+{% block styles %}
+<style>
+    .boxed {
+        border-radius: 15px;
+    }
+
+    .boxed.boxed--lg {
+        padding: 15px;
+    }
+
+    .bg--secondary {
+        background: #ffffff;
+    }
+</style>
+
+{% endblock styles %}
+
+
+{% block scripts %}
+
+{% endblock scripts %}
+
+
+{% block content %}
+
+<section class="switchable feature-large" style="padding-top: 2rem;">
+    <div class="container">
+
+
+        
+        <div class="row justify-content-around" style="padding:40px;padding-bottom: 0px;">
+            <div class="col-lg-9 col-md-12 col-12" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 40px;border-radius: 15px;">
+                
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-md-12">
+                        <h4 style="color: #2584C7;font-weight: 500;">Order Details</h4>
+                        <p style="margin-bottom:0px;">Order # {{ order.number }}</p>
+                        <p style="margin-bottom:0px;">Order placed on {{ order.created_at }}</p>
+                        <p style="font-weight:500;">
+                            {% if order.failed %}
+                            <span style="color:#FF4500;"> Order Failed</span>
+                            {% elif order.partial_refund %}
+                            <span style="color:#FFBE00;"> This order has been partially refunded</span>
+                            {% elif order.refunded %}
+                            <span style="color:#FF4500;"> This order has been refunded</span>
+                            {% else %}
+                            <span style="color:#2584C7;">Successful Order {% if order.house_created %}- Created by House{% endif %}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-md-4">
+                        <p><span style="font-weight:700;">Name</span> | {{ order.name|title }}</p>
+                    </div>
+                    <div class="col-md-8">
+                        <p><span style="font-weight:700;">Email</span> | {{ order.email }}</p>
+                    </div>
+                </div>
+                
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-md-4">
+                        <p><span style="font-weight:700;">Payment Card</span> |
+                            {{ order.transaction.brand }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><span style="font-weight:700;">Last Four Digits</span> |
+                            {% if order.transaction.last_four %}{{ order.transaction.last_four }}{% else %}No Payment{% endif %}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><span style="font-weight:700;">Outcome</span> |
+                            {% if order.transaction.outcome_type %}{{ order.transaction.outcome_type|title }}{% else %}No
+                            Payment{% endif %}</p>
+                    </div>
+                </div>
+
+
+
+                {% if order.failed %}
+                {% else %}
+                <div class="row" style="padding-top: 40px;">
+                    <div class="col-12">
+                        <h4 style="color: #2584C7">Attendees</h4>
+                    </div>
+                </div>
+                
+                
+                <div class="row text-center">
+                    <div class="col-12">
+                        <table class="table table-hover" width="100%">
+                            <tbody>
+                                {% for attendee in attendees %}
+                                <tr>
+                                    <td style="vertical-align: inherit;">
+                                        <p style="margin:0 auto;">{{ forloop.counter }}</p>
+                                    </td>
+                                    <td style="vertical-align: inherit;">
+                                        <p style="margin:0 auto;">{{ attendee.ticket }}</p>
+                                    </td>
+                                    <td style="vertical-align: inherit;">
+                                        <p style="margin:0 auto;">{{ attendee.name }}</p>
+                                    </td>
+
+                                    {% if order.event_cart.pay %}
+                                        {% if attendee.active %}
+
+                                            {% if attendee.ticket.free %}
+                                            <td style="vertical-align: inherit;">
+                                                <p style="margin:0 auto;color:#2584C7;">Free Ticket</p>
+                                            </td>
+                                            {% elif attendee.ticket.donation %}
+                                            <td style="vertical-align: inherit;">
+                                                <p style="margin:0 auto;color:#2584C7;">Donation Ticket</p>
+                                            </td>
+                                            {% else %}
+                                            <td style="vertical-align: inherit;">
+                                                <p style="margin:0 auto;color:#2584C7;">Paid Ticket</p>
+                                            </td>
+                                            {% endif %}
+
+                                        {% else %}
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;color:#FF4500;">Refunded</p>
+                                        </td>
+                                        {% endif %}
+
+                                    {% endif %}
+
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                
+                
+                <div class="row" style="padding-top: 50px;">
+                    <div class="col-12">
+                        <h4 style="color: #2584C7">Order Breakdown</h4>
+                    </div>
+                </div>
+                
+                <div class="row" style="padding-top:10px;">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Ticket</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if not order.event_cart.pay %}
+                                        {% for cart_item in event_cart_items %}
+                                        <tr>
+                                            <td style="color: grey;">{{ cart_item.ticket.title }}</td>
+                                            <td style="color: grey;">$0.00</td>
+                                            <td style="color: grey;">{{ cart_item.quantity }}</td>
+                                            <td style="color: #2584C7;">$0.00</td>
+                                        </tr>
+                                        {% endfor %}
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td>
+                                                <p style="color: grey;">Total</p>
+                                            </td>
+                                            <td>
+                                                <p style="color: grey;">$0.00</p>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+
+                                        {% for cart_item in event_cart_items %}
+                                        <tr>
+                                            <td style="color: grey;">{{ cart_item.ticket.title }}</td>
+                                            <td style="color: grey;">${{ cart_item.ticket_price }}</td>
+                                            <td style="color: grey;">{{ cart_item.quantity }}</td>
+                                            <td style="color: #2584C7;">+${{ cart_item.cart_item_total }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td>
+                                                <p style="color: grey;">Total Paid</p>
+                                            </td>
+                                            <td>
+                                                <p style="color: #2584C7;;">${{ order.event_cart.total }}</p>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                    
+                                    {% if event_order_refunds %}
+                                    <tr>
+                                        <td style="font-weight: 600;">Refunds</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                    
+                                    {% for event_order_refund in event_order_refunds %}
+                                    <tr>
+                                        <td>{{ event_order_refund.attendee.ticket.title }} ({{ event_order_refund.attendee.name }})</td>
+                                        <td>${{ event_order_refund.attendee.ticket_buyer_price }}</td>
+                                        <td>1</td>
+                                        <td style="color: #FF4500;">-${{ event_order_refund.refund.amount }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <p style="color: grey;">Total Paid</p>
+                                        </td>
+                                        <td>
+                                            <p style="color: #2584C7;">${{ total_payout }}</p>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+            </div>
+        </div>
+
+        
+
+    </div>
+</section>
+
+
+
+
+<section class="text-center" style="padding-bottom: 40px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}"
+                        style="max-height: 5em;margin-bottom:0px;"></a>
+                <p>Arqam House Inc.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock content %}

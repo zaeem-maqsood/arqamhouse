@@ -27,16 +27,6 @@ class AttendeeCommonQuestions(models.Model):
 
 
 
-def event_post_save_reciever(sender, instance, *args, **kwargs):
-	try:
-		attendee_common_questions = AttendeeCommonQuestions.objects.get(event=instance)
-	except:
-		AttendeeCommonQuestions.objects.create(event=instance)
-
-
-post_save.connect(event_post_save_reciever, sender=Event)
-
-
 
 class EventQuestion(models.Model):
 

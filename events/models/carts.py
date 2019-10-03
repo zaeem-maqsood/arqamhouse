@@ -84,6 +84,8 @@ class EventCartItem(models.Model):
 	ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, blank=False, null=False)
 	quantity = models.PositiveIntegerField(blank=True, null=False)
 	donation_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	donation_buyer_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	donation_fee = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	free_ticket = models.BooleanField(default=False)
 	paid_ticket = models.BooleanField(default=False)
 	donation_ticket = models.BooleanField(default=False)
@@ -139,10 +141,26 @@ def event_cart_item_pre_save_reciever(sender, instance, *args, **kwargs):
 	# later on down the road.
 	elif instance.ticket.donation:
 		instance.donation_ticket = True
-		instance.ticket_price = instance.donation_amount
+
+		# Donation tickets don't have a tiket.fee parameter that we can use
+		# so we have to calculate it now
+		price_to_calculate = decimal.Decimal(instance.donation_amount)
+		# Get the Arqam platform fee from settings
+		platform_fee = decimal.Decimal(settings.PLATFORM_FEE/100)
+		# Get the Arqam platform base fee from settings
+		platform_base_fee = decimal.Decimal(settings.PLATFORM_BASE_FEE)
+		# Calculate fee
+		fee  = decimal.Decimal((price_to_calculate * platform_fee)) + platform_base_fee
+		instance.donation_fee = fee
+		instance.donation_buyer_amount = price_to_calculate + fee
+
+		instance.ticket_price = price_to_calculate + fee
 		quantity = instance.quantity
-		instance.cart_item_total_no_fee = (instance.donation_amount * quantity)
-		instance.cart_item_total = (instance.donation_amount * quantity)
+
+		instance.cart_item_total_no_fee = (price_to_calculate * quantity)
+		instance.cart_item_total = ((price_to_calculate + fee) * quantity)
+		instance.cart_item_fee = (fee * quantity)
+
 		instance.pass_fee = True
 
 

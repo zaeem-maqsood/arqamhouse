@@ -70,8 +70,8 @@ function initMap() {
 						<p>{{ attendee.name }}</p>
 					</div>
 					<div class="col-md-4 col-6">
-						<p style="font-weight: 600;margin-bottom: 0px;"><a href="{{ attendee.order.get_order_view }}">Order ID</a></p>
-						<p>{{ attendee.order.id }}</p>
+						<p style="font-weight: 600;margin-bottom: 0px;">Order # | <a href="{{ attendee.order.get_order_view }}">View</a></p>
+						<p>{{ attendee.order.number }}</p>
 					</div>
 				</div>
 

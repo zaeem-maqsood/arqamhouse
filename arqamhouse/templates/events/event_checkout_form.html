@@ -138,11 +138,15 @@ function initMap() {
                             {% if cart.pay %}
                                 {% for cart_item in cart_items %}
                                 <div class="row" style="padding-top: 20px;">
-                                    <div class="col-md-6 col-12">
+                                    <div class="col-md-5 col-12">
                                         <p style="font-size: 1.1em;"> {{ cart_item.ticket.title }}</p>
                                     </div>
-                                    <div class="col-md-2 col-4">
+                                    <div class="col-md-3 col-4">
+                                        {% if cart_item.donation_ticket %}
+                                        <p style="font-size: 1.1em;">${{ cart_item.donation_amount }} <span style="font-size: 0.7em;">+ ${{ cart_item.cart_item_fee }}</span></p>
+                                        {% else %}
                                         <p style="font-size: 1.1em;">${{ cart_item.ticket.buyer_price }}</p>
+                                        {% endif %}
                                     </div>
                                     <div class="col-md-2 col-4">
                                         <p style="font-size: 1.1em;font-weight:800;">x {{ cart_item.quantity }}</p>
@@ -155,10 +159,10 @@ function initMap() {
                             {% else %}
                                 {% for cart_item in cart_items %}
                                 <div class="row" style="padding-top: 20px;">
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <p style="font-size: 1.1em;"> {{ cart_item.ticket.title }}</p>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <p style="font-size: 1.1em;">$0.00</p>
                                     </div>
                                     <div class="col-md-2">

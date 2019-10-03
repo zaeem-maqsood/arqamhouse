@@ -12,6 +12,7 @@
 <body>
   
   <h1 style="font-weight: 400;">Order Confirmation</h1>
+  <p style="font-size:0.9em;font-weight: 600;">Order # | <span style="font-weight: 400;">{{ order.number }}</span></p>
   <p style="font-size:0.9em;font-weight: 600;">Name | <span style="font-weight: 400;">{{ order.name }}</span></p>
   <p style="font-size:0.9em;font-weight: 600;">Created at | <span style="font-weight: 400;">{{ order.created_at }}</span></p>
   <p style="font-size:0.9em;font-weight: 600;">Email | <span style="font-weight: 400;">{{ order.email }}</span></p>
@@ -48,7 +49,7 @@
   </dl>
 
   <div style="padding-top:30px;"></div>
-  <h2 style="font-weight: 400;font-size: 1.5em;color:#4599d5;">Attendees</h2>
+  <h2 style="font-weight: 400;font-size: 1.5em;color:#4599d5;">Summary</h2>
   <table>
     <thead>
       <th>Attendee</th>

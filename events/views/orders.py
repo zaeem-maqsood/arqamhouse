@@ -9,12 +9,14 @@ from events.models import Event, EventOrder, Attendee, EventOrderRefund, EventQu
 from payments.models import Refund, HouseBalance
 from questions.models import Question
 
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.storage import FileSystemStorage
 from weasyprint import HTML, CSS
+from django.utils.html import strip_tags
 
+	
 
 
 class OrderListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, ListView):
@@ -74,6 +76,51 @@ class OrderListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, 
 
 
 
+
+
+class OrderPublicDetailView(DetailView):
+	model = EventOrder
+	template_name = "events/orders/event_order_detail_public.html"
+
+	def get_order(self, order_id):
+		try:
+			order = EventOrder.objects.get(public_id=order_id)
+			return order
+		except Exception as e:
+			print(e)
+			raise Http404
+
+	def get(self, request, *args, **kwargs):
+		context = {}
+		order_id = self.kwargs['public_id']
+		order = self.get_order(order_id)
+		event = order.event
+
+		attendees = Attendee.objects.filter(order=order)
+		active_attendees = attendees.filter(active=True)
+		context["active_attendees"] = active_attendees
+		event_order_refunds = EventOrderRefund.objects.filter(order=order)
+		if event_order_refunds:
+			total_payout = event_order_refunds.aggregate(Sum('refund__amount'))
+			total_payout = order.event_cart.total - \
+				total_payout["refund__amount__sum"]
+			if total_payout < 0.00:
+				total_payout = 0.00
+			total_payout = '{0:.2f}'.format(total_payout)
+			context["total_payout"] = total_payout
+
+		context["event_cart_items"] = order.event_cart.eventcartitem_set.all
+		context["event"] = event
+		context["order"] = order
+		context["event_order_refunds"] = event_order_refunds
+		context["attendees"] = attendees
+
+		return render(request, self.template_name, context)
+
+
+
+
+
 class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, FormView):
 	model = EventOrder
 	template_name = "events/orders/event_order_detail.html"
@@ -92,7 +139,7 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 
 	def get_order(self, order_id):
 		try:
-			order = EventOrder.objects.get(pk=order_id)
+			order = EventOrder.objects.get(public_id=order_id)
 			return order
 		except Exception as e:
 			print(e)
@@ -102,7 +149,7 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		context = {}
 
 		slug = self.kwargs['slug']
-		order_id = self.kwargs['pk']
+		order_id = self.kwargs['public_id']
 		event = self.get_event(slug)
 		order = self.get_order(order_id)
 		house = self.get_house()
@@ -133,10 +180,49 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 	def get(self, request, *args, **kwargs):
 		return self.render_to_response(self.get_context_data())
 
+
+	def send_refund_confirmation_email(self, order):
+		
+		# PDF Attachment
+		pdf_context = {}
+		event_order_refunds = EventOrderRefund.objects.filter(order=order)
+		pdf_context["event_order_refunds"] = event_order_refunds
+		if event_order_refunds:
+			total_payout = event_order_refunds.aggregate(Sum('refund__amount'))
+			total_payout = order.event_cart.total - total_payout["refund__amount__sum"]
+			if total_payout < 0.00:
+				total_payout = 0.00
+			total_payout = '{0:.2f}'.format(total_payout)
+			pdf_context["total_payout"] = total_payout
+		
+		pdf_context["order"] = order
+		pdf_content = render_to_string('pdfs/refund_summary.html', pdf_context)
+		pdf_css = CSS(string=render_to_string('pdfs/ticket.css'))
+		pdf_file = HTML(string=pdf_content).write_pdf(stylesheets=[pdf_css])
+
+		# Compose Email
+		subject = 'Order Refund For %s' % (order.event.title)
+		context = {}
+		context["event"] = order.event
+		context["order"] = order
+		html_content = render_to_string('emails/order_refund.html', context)
+		text_content = strip_tags(html_content)
+		from_email = 'Order Refund <info@arqamhouse.com>'
+		to = ['%s' % (order.email)]
+		email = EmailMultiAlternatives(subject=subject, body=text_content,
+		                               from_email=from_email, to=to)
+		email.attach_alternative(html_content, "text/html")
+		email.attach("updated_confirmation.pdf", pdf_file, 'application/pdf')
+		email.send()
+		return "Done"
+
+
+
 	def post(self, request, *args, **kwargs):
 		data = request.POST
+		print(data)
 		slug = kwargs['slug']
-		order_id = kwargs['pk']
+		order_id = kwargs['public_id']
 		event = self.get_event(slug)
 		order = self.get_order(order_id)
 		attendees = Attendee.objects.filter(order=order)
@@ -182,6 +268,10 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 
 				stripe.api_key = settings.STRIPE_SECRET_KEY
 				response = stripe.Refund.create(charge=order.transaction.payment_id, amount=amount)
+			
+			# Send Confirmation Email
+			self.send_refund_confirmation_email(order)
+
 
 
 		# User wants a full refund on the order
@@ -207,8 +297,8 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 				order.refunded = True
 				order.save()
 
-				
-			
+			# Send Confirmation email
+			self.send_refund_confirmation_email(order)
 
 
 		return render(request, self.template_name, self.get_context_data(data))

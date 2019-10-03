@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link href="ticket.css" media="print" rel="stylesheet">
+    <title>Order Confirmation</title>
+    <meta name="description" content="Order Confirmation">
+    <meta name="author" content="Zaeem Maqsood">
+</head>
+
+<body>
+
+    <h1 style="font-weight: 400;">Order Confirmation</h1>
+    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;">Order # | <span style="font-weight: 400;margin-bottom: 0px;">{{ order.number }}</span></p>
+    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;">Name | <span style="font-weight: 400;margin-bottom: 0px;">{{ order.name }}</span></p>
+    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;">Status |
+        {% if order.failed %}
+        <span style="color:#FF4500;font-weight: 400;"> Order Failed</span>
+        {% elif order.partial_refund %}
+        <span style="color:#FFBE00;font-weight: 400;"> This order has been partially refunded</span>
+        {% elif order.refunded %}
+        <span style="color:#FF4500;font-weight: 400;"> This order has been refunded</span>
+        {% else %}
+        <span style="color:#2584C7;font-weight: 400;">Successful Order {% if order.house_created %}- Created by House{% endif %}</span>
+        {% endif %}
+    </p>
+    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;">Created at | <span
+            style="font-weight: 400;">{{ order.created_at }}</span></p>
+    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;">Email | <span style="font-weight: 400;">{{ order.email }}</span></p>
+    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;">Event | <span style="font-weight: 400;">{{ order.event.title }}</span>
+    </p>
+
+    <dl id="informations">
+        <img src="{{ order.code.url }}" style="max-height: 100px;">
+    </dl>
+
+    <div style="padding-top:30px;"></div>
+    <h2 style="font-weight: 400;font-size: 1.5em;color:#4599d5;">Summary</h2>
+    <table>
+        <thead>
+            <th>Attendee</th>
+            <th>Ticket</th>
+            <th>Cost</th>
+        </thead>
+        <tbody>
+            {% if order.event_cart.pay %}
+                {% for attendee in order.attendee_set.all %}
+                <tr>
+                    <td>{{ attendee.name }}</td>
+                    <td>{{ attendee.ticket.title }}</td>
+                    <td>${{ attendee.ticket.buyer_price }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td></td>
+                    <td>Total</td>
+                    <td>${{ order.event_cart.total }}</td>
+                </tr>
+            {% else %}
+                {% for attendee in order.attendee_set.all %}
+                <tr>
+                    <td>{{ attendee.name }}</td>
+                    <td>{{ attendee.ticket.title }}</td>
+                    <td>$0.00</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td></td>
+                    <td>Total</td>
+                    <td>$0.00</td>
+                </tr>
+            {% endif %}
+
+            {% if event_order_refunds %}
+            <tr>
+                <td style="font-weight: 600;">Refunds</td>
+                <td></td>
+                <td></td>
+            </tr>
+            
+            {% for event_order_refund in event_order_refunds %}
+            <tr>
+                <td>{{ event_order_refund.attendee.ticket.title }} ({{ event_order_refund.attendee.name }})</td>
+                <td>${{ event_order_refund.attendee.ticket_buyer_price }}</td>
+                <td style="color: #FF4500;">-${{ event_order_refund.refund.amount }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td></td>
+                <td>
+                    <p style="color: grey;">Total</p>
+                </td>
+                <td>
+                    <p style="color: #2584C7;">${{ total_payout }}</p>
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+
+</body>
+
+</html>

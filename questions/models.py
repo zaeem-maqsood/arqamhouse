@@ -23,7 +23,7 @@ class Question(models.Model):
 	order = models.PositiveSmallIntegerField(blank=True, null=False, default=1)
 	help_text = models.CharField(max_length=150, null=True, blank=True)
 	required = models.BooleanField(default=False)
-	question_type = models.CharField(max_length=50, blank=False, null=False, choices=QUESTION_CHOICES, default='simple')
+	question_type = models.CharField(max_length=50, blank=False, null=False, choices=QUESTION_CHOICES, default='Simple')
 	slug = models.SlugField(max_length = 375, unique = False, blank=True)
 	deleted = models.BooleanField(default=False)
 	approved = models.BooleanField(default=True)

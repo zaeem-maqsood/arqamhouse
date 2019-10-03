@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-Order #{{ order.id }} | {{ event.title }}
+Order #{{ order.number }} | {{ event.title }}
 {% endblock title %}
 
 {% block page_title %}
@@ -21,6 +21,24 @@ Order #{{ order.id }} | {{ event.title }}
 
 
 {% block scripts %}
+<script>
+
+	// Disables buttons when form is submitted
+	$('form').submit(function () {
+		// Bail out if the form contains validation errors
+		if ($.validator && !$(this).valid()) return;
+
+		var form = $(this);
+		$(this).find('input[type="submit"], button[type="submit"]').each(function (index) {
+			// Create a disabled clone of the submit button
+			$(this).clone(false).removeAttr('id').prop('disabled', true).insertBefore($(this));
+
+			// Hide the actual submit button and move it to the beginning of the form
+			$(this).hide();
+			form.prepend($(this));
+		});
+	});
+</script>
 {% endblock scripts %}
 
 {% block content %}
@@ -55,7 +73,7 @@ Order #{{ order.id }} | {{ event.title }}
 
 				<div class="row">
 					<div class="col-12">
-						<p><span style="font-weight:500;">Order ID</span> | {{ order.id }}</p>
+						<p><span style="font-weight:500;">Order #</span> | {{ order.number }}</p>
 					</div>
 				</div>
 
@@ -88,7 +106,7 @@ Order #{{ order.id }} | {{ event.title }}
 					</div>
 				</div>
 
-				<form method="POST">{% csrf_token %}
+				<form method="POST" >{% csrf_token %}
 				<div class="row text-center">
 					<div class="col-12">
 						<table class="table table-bordered table-hover" width="100%">
@@ -100,8 +118,8 @@ Order #{{ order.id }} | {{ event.title }}
 									<td style="vertical-align: inherit;"><a href="{{ attendee.get_attendee_view }}"><p style="margin:0 auto;">{{ attendee.name }}</p></a></td>
 									{% if order.event_cart.pay %}
 										{% if attendee.active %}
-											{% if attendee.ticket.price <= house_balance.balance %}
-												<td><button type="submit" name="Refund" value="{{ attendee.id }}" class="btn btn-warning btn-block">Refund</button></td>
+											{% if attendee.ticket_price <= house_balance.balance %}
+												<td><button type="submit" id="Refund" name="Refund" value="{{ attendee.id }}" class="btn btn-warning btn-block">Refund</button></td>
 											{% else %}
 												{% if attendee.ticket.free %}
 												<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#FFBE00;">Free Ticket</p>
@@ -121,7 +139,7 @@ Order #{{ order.id }} | {{ event.title }}
 					</div>
 				</div>
 				
-				{% if not order.house_created %}
+				{% if order.event_cart.pay %}
 					{% if active_attendees.count > 1  and order.event_cart.total <= house_balance.balance %}
 					<div class="row">
 						<div class="col-12">
