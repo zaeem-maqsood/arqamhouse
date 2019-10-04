@@ -31,12 +31,28 @@ class MultipleChoiceCreateView(HouseAccountMixin, QuestionSecurityMixin, UserPas
 			one_to_one_object = Event.objects.get(id=one_to_one_id)
 		return one_to_one_object
 
+	def get_question_url(self):
+		one_to_one_type = self.kwargs['one_to_one_type']
+		one_to_one_id = self.kwargs['one_to_one_id']
+		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
+
+		question = self.get_question()
+		view_name = "questions:update_question"
+		return reverse(view_name, kwargs={"one_to_one_type": one_to_one_type, "one_to_one_id": one_to_one_id, "pk": question.id})
+
 	def get_success_url(self):
 		one_to_one_type = self.kwargs['one_to_one_type']
 		one_to_one_id = self.kwargs['one_to_one_id']
 		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
-		view_name = "questions:update_question"
-		return reverse(view_name, kwargs={"one_to_one_type": one_to_one_type, "one_to_one_id":one_to_one_id, "pk": self.object.question.id})
+
+		# Check how many options are already made 
+		options = MultipleChoice.objects.filter(question=self.object.question)
+		if options.count() < 2:
+			view_name = "questions:create_option"
+			return reverse(view_name, kwargs={"one_to_one_type": one_to_one_type, "one_to_one_id": one_to_one_id, "pk": self.object.question.id})
+		else:
+			view_name = "questions:update_question"
+			return reverse(view_name, kwargs={"one_to_one_type": one_to_one_type, "one_to_one_id":one_to_one_id, "pk": self.object.question.id})
 		
 
 	def get(self, request, *args, **kwargs):
@@ -54,7 +70,8 @@ class MultipleChoiceCreateView(HouseAccountMixin, QuestionSecurityMixin, UserPas
 		form = self.get_form()
 		context["form"] = form
 		context["dashboard_events"] = self.get_events()
-
+		context["question"] = self.get_question()
+		context["question_url"] = self.get_question_url()
 		return context
 
 	def post(self, request, *args, **kwargs):
@@ -189,8 +206,13 @@ class QuestionCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
 		one_to_one_type = self.kwargs['one_to_one_type']
 		one_to_one_id = self.kwargs['one_to_one_id']
 		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
-		view_name = "%s:list_questions" % (one_to_one_type)
-		return reverse(view_name, kwargs={"slug": one_to_one_object.slug})
+
+		if self.object.question_type == "Multiple Choice":
+			view_name = "questions:create_option"
+			return reverse(view_name, kwargs={"one_to_one_type": one_to_one_type, "one_to_one_id": one_to_one_id, "pk": self.object.id})
+		else:
+			view_name = "%s:list_questions" % (one_to_one_type)
+			return reverse(view_name, kwargs={"slug": one_to_one_object.slug})
 
 
 	def get_one_to_one_object(self, one_to_one_type, one_to_one_id):
