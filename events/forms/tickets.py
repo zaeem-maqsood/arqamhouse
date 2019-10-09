@@ -11,7 +11,7 @@ class DonationTicketForm(forms.ModelForm):
 	class Meta:
 		model = Ticket
 		fields = [
-			"title", "description", "amount_available"
+			"title", "description", "amount_available", "express"
 		]
 
 		widgets = {
@@ -32,6 +32,9 @@ class DonationTicketForm(forms.ModelForm):
 							"rows": '3'
 						}
 					),
+
+				"express": forms.CheckboxInput(),
+
 				}
 
 
@@ -55,7 +58,7 @@ class FreeTicketForm(DonationTicketForm):
 	class Meta:
 		model = Ticket
 		fields = [
-			"title", "description", "min_amount", "max_amount", "amount_available"
+			"title", "description", "min_amount", "max_amount", "amount_available", "express"
 		]
 
 		widgets = {
@@ -87,7 +90,7 @@ class PaidTicketForm(FreeTicketForm):
 	class Meta:
 		model = Ticket
 		fields = [
-			"title", "description", "price", "pass_fee", "min_amount", "max_amount", "amount_available"
+			"title", "description", "price", "pass_fee", "min_amount", "max_amount", "amount_available", "express"
 		]
 
 		widgets = {

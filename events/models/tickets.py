@@ -28,6 +28,7 @@ class Ticket(models.Model):
 	# Fee
 	fee = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 
+	express = models.BooleanField(default=False)
 
 	min_amount = models.PositiveSmallIntegerField(blank=True, null=False, default=0)
 	max_amount = models.PositiveSmallIntegerField(blank=True, null=False, default=10)

@@ -242,7 +242,7 @@ class QuestionCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
 
 
 		if one_to_one_type == "events":
-			tickets = Ticket.objects.filter(event=one_to_one_object, deleted=False)
+			tickets = Ticket.objects.filter(event=one_to_one_object, deleted=False, express=False)
 			context["tickets"] = tickets
 
 		context["event_tab"] = True
@@ -354,7 +354,7 @@ class QuestionUpdateView(HouseAccountMixin, QuestionSecurityMixin, UserPassesTes
 		context["one_to_one_id"] = one_to_one_id
 
 		if one_to_one_type == "events":
-			tickets = Ticket.objects.filter(event=one_to_one_object, deleted=False)
+			tickets = Ticket.objects.filter(event=one_to_one_object, deleted=False, express=False)
 			context["event_question"] = self.object.eventquestion
 			context["tickets"] = tickets
 			context["event"] = one_to_one_object

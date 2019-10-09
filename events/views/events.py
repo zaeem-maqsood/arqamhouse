@@ -207,49 +207,65 @@ class EventCheckoutView(FormView):
 
 		for cart_item in cart_items:
 
-			attendee_questions = EventQuestion.objects.filter(tickets__id=cart_item.ticket.id, question__deleted=False, question__approved=True).order_by("question__order")
+			if cart_item.ticket.express:
+				for quantity in range(cart_item.quantity):
 
-			for quantity in range(cart_item.quantity):
+					name = "%s-%s" % (order.name, int(quantity)+1)
+					if cart_item.donation_ticket:
+						attendee = Attendee.objects.create(
+							order=order, ticket=cart_item.ticket, name=name, email=email,
+							ticket_buyer_price=cart_item.donation_buyer_amount, ticket_price=cart_item.donation_amount, ticket_fee=cart_item.donation_fee,
+							ticket_pass_fee=True)
+					else:
+						attendee = Attendee.objects.create(
+							order=order, ticket=cart_item.ticket, name=name, email=email, 
+							ticket_buyer_price=cart_item.ticket.buyer_price, ticket_price=cart_item.ticket.price, ticket_fee=cart_item.ticket.fee,
+							ticket_pass_fee=cart_item.ticket.pass_fee)
+					attendee.save()
 
-				email = None
-				age = None
-				gender = None
-				address = None
-				
-				# Step 3a get the name 
-				name = data["%s_%s_name" % (quantity, cart_item.ticket.id)]
+			else:
+				attendee_questions = EventQuestion.objects.filter(tickets__id=cart_item.ticket.id, question__deleted=False, question__approved=True).order_by("question__order")
+				for quantity in range(cart_item.quantity):
 
-				# Step 3b answers to common questions
-				if attendee_common_questions.email:
-					email = data["%s_%s_email" % (quantity, cart_item.ticket.id)]
+					attendee_email = None
+					age = None
+					gender = None
+					address = None
+					
+					# Step 3a get the attendee_name
+					attendee_name = data["%s_%s_name" % (quantity, cart_item.ticket.id)]
 
-				if attendee_common_questions.age:
-					age = data["%s_%s_age" % (quantity, cart_item.ticket.id)]
+					# Step 3b answers to common questions
+					if attendee_common_questions.email:
+						attendee_email = data["%s_%s_email" % (quantity, cart_item.ticket.id)]
 
-				if attendee_common_questions.gender:
-					gender = data["%s_%s_gender" % (quantity, cart_item.ticket.id)] 
+					if attendee_common_questions.age:
+						age = data["%s_%s_age" % (quantity, cart_item.ticket.id)]
 
-				if attendee_common_questions.address:
-					address = data["%s_%s_address" % (quantity, cart_item.ticket.id)]
+					if attendee_common_questions.gender:
+						gender = data["%s_%s_gender" % (quantity, cart_item.ticket.id)] 
 
-				if cart_item.donation_ticket:
-					attendee = Attendee.objects.create(
-						order=order, ticket=cart_item.ticket, name=name, email=email, age=age, gender=gender, address=address,
-						ticket_buyer_price=cart_item.donation_buyer_amount, ticket_price=cart_item.donation_amount, ticket_fee=cart_item.donation_fee,
-						ticket_pass_fee=True)
-				else:
-					attendee = Attendee.objects.create(
-						order=order, ticket=cart_item.ticket, name=name, email=email, age=age, gender=gender, address=address, 
-						ticket_buyer_price=cart_item.ticket.buyer_price, ticket_price=cart_item.ticket.price, ticket_fee=cart_item.ticket.fee,
-						ticket_pass_fee=cart_item.ticket.pass_fee)
-				attendee.save()
+					if attendee_common_questions.address:
+						address = data["%s_%s_address" % (quantity, cart_item.ticket.id)]
 
-				# Step 3c answers to custom questions
-				for attendee_question in attendee_questions:
-					value = data["%s_%s_%s" % (quantity, attendee_question.question.id, cart_item.ticket.id)]
+					if cart_item.donation_ticket:
+						attendee = Attendee.objects.create(
+							order=order, ticket=cart_item.ticket, name=attendee_name, email=attendee_email, age=age, gender=gender, address=address,
+							ticket_buyer_price=cart_item.donation_buyer_amount, ticket_price=cart_item.donation_amount, ticket_fee=cart_item.donation_fee,
+							ticket_pass_fee=True)
+					else:
+						attendee = Attendee.objects.create(
+							order=order, ticket=cart_item.ticket, name=attendee_name, email=attendee_email, age=age, gender=gender, address=address,
+							ticket_buyer_price=cart_item.ticket.buyer_price, ticket_price=cart_item.ticket.price, ticket_fee=cart_item.ticket.fee,
+							ticket_pass_fee=cart_item.ticket.pass_fee)
+					attendee.save()
 
-					answer = Answer.objects.create(question=attendee_question, value=value, attendee=attendee)
-					answer.save()
+					# Step 3c answers to custom questions
+					for attendee_question in attendee_questions:
+						value = data["%s_%s_%s" % (quantity, attendee_question.question.id, cart_item.ticket.id)]
+
+						answer = Answer.objects.create(question=attendee_question, value=value, attendee=attendee)
+						answer.save()
 
 
 		# If there is a payment to be made
