@@ -260,6 +260,7 @@ $('#id_{{ ticket.id }}').change(function() {
             		</div>
 					{% endfor %}
 
+					{% if discount_code %}
 					<div class="row" style="padding-bottom:20px;padding-top:20px;">
 						<div class="col-md-8">
 							<p style="font-size: 1.3em;margin-bottom: 5px;">Discount Code</p>
@@ -268,6 +269,7 @@ $('#id_{{ ticket.id }}').change(function() {
 							{{ form.discount_code }}
 						</div>
 					</div>
+					{% endif %}
 				</div>
 				
 				

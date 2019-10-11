@@ -93,6 +93,9 @@ class AddTicketsToCartView(FormView):
 
 		owner = self.check_if_user_is_owner(event)
 
+		discount_code = EventDiscount.objects.filter(event=event).exists()
+		context["discount_code"] = discount_code
+
 		context["owner"] = owner
 		context["form"] = form
 		context["event"] = event
