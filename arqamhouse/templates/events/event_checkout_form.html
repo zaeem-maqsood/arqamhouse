@@ -91,6 +91,7 @@ function stripeTokenHandler(token) {
 
   // Submit the form
   form.submit();
+  document.getElementById('customButton').disabled = true;
 }
 
 
@@ -121,7 +122,7 @@ function initMap() {
 <section style="padding-top: 5rem;padding-bottom:0px;">
     <div class="container">
 
-        <form id="checkoutForm" method="POST" onSubmit="document.getElementById('customButton').disabled=true;">{% csrf_token %}
+        <form id="checkoutForm" method="POST" onSubmit="">{% csrf_token %}
 
             <div class="row justify-content-center" style="padding-bottom: 50px;">
                 <div class="col-md-8 col-10" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 50px;border-radius: 15px;">
@@ -152,7 +153,17 @@ function initMap() {
                                         <p style="font-size: 1.1em;font-weight:800;">x {{ cart_item.quantity }}</p>
                                     </div>
                                     <div class="col-md-2 col-4">
-                                        <p style="font-size: 1.1em;" class="float-right">${{ cart_item.cart_item_total }}</p>
+                                        <p style="font-size: 1.1em;margin-bottom: 0px;" class="float-right">${{ cart_item.cart_item_total }}</p>
+                                        {% if cart_item.discount_code_activated %}
+                                        <p style="font-size: 0.8em;color: red;margin-bottom:0px;line-height: 15px;text-align: right;"
+                                            data-tooltip="Discount code {{ cart.discount_code.code }} gives you a {% if cart_item.discount_fixed_amount %} ${{ cart_item.discount_fixed_amount }} {% else %} {{ cart_item.discount_percentage_amount }}% {% endif %} discount per '{{ cart_item.ticket.title }}' ticket." 
+                                            class="float-right">
+                                            {% if cart_item.discount_fixed_amount %}
+                                            ${{ cart_item.discount_fixed_amount }} Discount
+                                            {% else %}
+                                            {{ cart_item.discount_percentage_amount }}% Discount
+                                            {% endif %}</p>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 {% endfor %}
@@ -176,6 +187,28 @@ function initMap() {
                             {% endif %}
 
                             {% if cart.pay %}
+                                {% if cart.invalid_discount_code %}
+                                <div class="row" style="padding-top: 20px;">
+                                    <div class="col-md-9 col-9">
+                                        <p style="font-size: 0.9em;font-weight: 800;">Discount Code</p>
+                                    </div>
+                                    <div class="col-md-3 col-3">
+                                        <p style="font-size: 0.9em;font-weight: 800;color: red;" class="float-right">Invalid Code</p>
+                                    </div>
+                                </div>
+                                {% else %}
+                                {% if cart.discount_code %}
+                                <div class="row" style="padding-top: 20px;">
+                                    <div class="col-md-9 col-9">
+                                        <p style="font-size: 0.8em;font-weight: 800;">Discount Code</p>
+                                    </div>
+                                    <div class="col-md-3 col-3">
+                                        <p style="font-size: 0.9em;font-weight: 800;color: #4a90e2;" class="float-right">{{ cart.discount_code.code }}</p>
+                                    </div>
+                                </div>
+                                {% else %}
+                                {% endif %}
+                                {% endif %}
                             <div class="row" style="padding-top: 20px;">
                                 <div class="col-md-9 col-9">
                                     <p style="font-size: 1.1em;font-weight: 800;">Total</p>
@@ -209,18 +242,18 @@ function initMap() {
                             </div>
                             <div class="row">
                                 <div class="col-md-6 col-lg-6">
-                                    <p style="margin-bottom: 0;">Name</p>
+                                    <p style="margin-bottom: 0;"><i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i> Name</p>
                                     <input pattern="[a-zA-Z ]*" title="No numbers please" maxlength="100" class="validate-required" type="text" name="name" id="name" size="30" required placeholder="Full Name" value="{{ data.name }}">
                                 </div>
                                 <div class="col-md-6 col-lg-6">
-                                    <p style="margin-bottom: 0;">Email</p>
+                                    <p style="margin-bottom: 0;"><i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i> Email</p>
                                     <input class="validate-required" maxlength="150" type="email" name="email" id="email" size="30" required placeholder="email@address.com" value="{{ data.email }}">
                                 </div>
                             </div>
                             {% for order_question in event|order_question %}
                             <div class="row" style="padding-top: 20px;">
                                 <div class="col-md-12 col-lg-12">
-                                    <p style="margin-bottom: 0;">{{ order_question.question.title }}</p>
+                                    <p style="margin-bottom: 0;">{% if order_question.question.required %}<i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i>{% endif %} {{ order_question.question.title }}</p>
                                     {% if order_question.question.question_type == "Long" %}
                                     <textarea maxlength="300" name="{{ order_question.question.id }}_order_question" id="{{ order_question.question.id }}_order_question" placeholder="{% if order_question.question.help_text %}{{ order_question.question.help_text }}{% endif %}" class="validate-required" rows="3" style="user-select: auto;" {% if order_question.question.required %}required{% endif %}>{% get_order_question_initial_value data order_question.question.id %}</textarea>
                                     {% elif order_question.question.question_type == "Multiple Choice" %}
@@ -258,7 +291,7 @@ function initMap() {
 
                                     <div class="row" style="padding-bottom: 20px;">
                                         <div class="col-md-6 col-lg-6">
-                                            <p style="margin-bottom: 0;">Full Name</p>
+                                            <p style="margin-bottom: 0;"><i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i> Full Name</p>
                                             <input pattern="[a-zA-Z ]*" title="No numbers please" class="validate-required" type="text" name="{{ quantity }}_{{ cart_item.ticket.id }}_name" value="{% get_attendee_name_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_name" size="30" required placeholder="Full Name">
                                         </div>
                                         {% if attendee_common_questions.email %}
@@ -274,13 +307,13 @@ function initMap() {
                                     <div class="row" style="padding-bottom: 20px;">
                                         {% if attendee_common_questions.age %}
                                         <div class="col-md-6 col-lg-6">
-                                            <p style="margin-bottom: 0;">Age</p>
+                                            <p style="margin-bottom: 0;">{% if attendee_common_questions.age_required %}<i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i>{% endif %} Age</p>
                                             <input class="validate-required" name="{{ quantity }}_{{ cart_item.ticket.id }}_age" value="{% get_attendee_age_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_age" type="number" min="0" max="100" {% if attendee_common_questions.age_required %}required{% endif %}>
                                         </div>
                                         {% endif %}
                                         {% if attendee_common_questions.gender %}
                                         <div class="col-md-6 col-lg-6">
-                                            <p style="margin-bottom: 0;">Gender</p>
+                                            <p style="margin-bottom: 0;">{% if attendee_common_questions.gender_required %}<i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i>{% endif %} Gender</p>
                                             <select id="{{ quantity }}_{{ cart_item.ticket.id }}_gender" name="{{ quantity }}_{{ cart_item.ticket.id }}_gender" class="validate-required">
                                                 {% if not attendee_common_questions.gender_required %}
                                                 <option value="None">------</option>
@@ -296,7 +329,7 @@ function initMap() {
                                     {% if attendee_common_questions.address %}
                                     <div class="row" style="padding-bottom: 20px;">
                                         <div class="col-md-12 col-lg-12">
-                                            <p style="margin-bottom: 0;">Address</p>
+                                            <p style="margin-bottom: 0;">{% if attendee_common_questions.address_required %}<i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i>{% endif %} Address</p>
                                             <input class="form-control m-input" name="{{ quantity }}_{{ cart_item.ticket.id }}_address" value="{% get_attendee_address_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_address" placeholder="123 Main Street" autocomplete="off" {% if attendee_common_questions.address_required %}required{% endif %}>
                                         </div>
                                     </div>
@@ -306,7 +339,7 @@ function initMap() {
                                     {% for event_question in cart_item|ticket_question %}
                                         <div class="row" style="padding-bottom: 20px;">
                                             <div class="col-md-12 col-lg-12">
-                                                <p style="margin-bottom: 0;">{{ event_question.question.title }}</p>
+                                                <p style="margin-bottom: 0;">{% if event_question.question.required %}<i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i>{% endif %}  {{ event_question.question.title }}</p>
                                                 {% if event_question.question.question_type == "Long" %}
                                                 <textarea maxlength="300" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" value="{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" placeholder="{% if event_question.question.help_text %}{{ event_question.question.help_text }}{% endif %}" class="validate-required" rows="3" style="user-select: auto;" {% if event_question.question.required %}required{% endif %}>{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}</textarea>
                                                 {% elif event_question.question.question_type == "Multiple Choice" %}

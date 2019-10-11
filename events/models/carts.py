@@ -1,6 +1,7 @@
 from .base import *
 from .events import Event
 from .tickets import Ticket
+from .discounts import EventDiscount
 
 
 # Create your models here.
@@ -14,6 +15,8 @@ class EventCart(models.Model):
 	stripe_charge = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	pay = models.BooleanField(default=True)
 	house_created = models.BooleanField(default=False)
+	invalid_discount_code = models.BooleanField(default=False)
+	discount_code = models.ForeignKey(EventDiscount, on_delete=models.CASCADE, blank=True, null=True)
 
 	def __str__(self):
 		return self.event.title
@@ -91,9 +94,15 @@ class EventCartItem(models.Model):
 	donation_ticket = models.BooleanField(default=False)
 	pass_fee = models.BooleanField(default=False)
 	ticket_price = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	ticket_buyer_price = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	ticket_fee = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	cart_item_total_no_fee = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	cart_item_total = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	cart_item_fee = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	discount_code_activated = models.BooleanField(default=False)
+	discount_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	discount_fixed_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+	discount_percentage_amount = models.PositiveSmallIntegerField(blank=True, null=True)
 
 	
 
@@ -108,26 +117,77 @@ def event_cart_item_pre_save_reciever(sender, instance, *args, **kwargs):
 	# also set the 'free_ticket' boolean indicator on
 	if instance.ticket.free:
 		instance.ticket_price = 0.00
+		instance.ticket_buyer_price = 0.00
+		instance.ticket_fee = 0.00
 		instance.cart_item_total = 0.00
 		instance.cart_item_total_no_fee = 0.00
 		instance.cart_item_fee = 0.00
 		instance.free_ticket = True
 	
-	# Scenario: Ticket is a paid ticket. If the ticket is a paid ticket set the 
-	# 'ticket_price' to the buyer price created in the ticket model
-	# Get the quantity from the model
-	# set the 'cart_item_total' by multiplying the 'ticket_price' by the quantity
-	# set the 'paid_ticket' boolean indicator on 
+	# Scenario: Ticket is a paid ticket.
 	elif instance.ticket.paid:
+
+		# Set the flag to paid ticket
 		instance.paid_ticket = True
-		instance.ticket_price = instance.ticket.buyer_price
-		quantity = instance.quantity
-		if instance.ticket.pass_fee:
-			instance.cart_item_total_no_fee = (instance.ticket.price * quantity)
+
+		# Check if there is a discount code that can be applied to this cart item
+		if instance.event_cart.discount_code and instance.ticket in instance.event_cart.discount_code.tickets.all():
+
+			# Discount code activated flag
+			instance.discount_code_activated = True
+
+			# find out if the discount code is a fixed amount or a percentage amount
+			# take the price of the ticket 'ticket.price' and subtract the discount from it 
+			discount_code = instance.event_cart.discount_code
+			if discount_code.use_fixed_amount:
+				discount_ticket_price = instance.ticket.price - discount_code.fixed_amount
+				instance.discount_fixed_amount = discount_code.fixed_amount
+			else:
+				discount_ticket_price = instance.ticket.price - (instance.ticket.price * decimal.Decimal(discount_code.percentage_amount/100))
+				instance.discount_percentage_amount = discount_code.percentage_amount
+
+			# Save the new ticket price value
+			instance.ticket_price = discount_ticket_price 
+			# Save the discount amount
+			instance.discount_amount = instance.ticket.buyer_price - discount_ticket_price
+
+
+			platform_fee = decimal.Decimal(settings.PLATFORM_FEE/100)
+			platform_base_fee = decimal.Decimal(settings.PLATFORM_BASE_FEE)
+			# Find out the new fee based off the discounts applied to the ticket price
+			fee = decimal.Decimal((discount_ticket_price * platform_fee)) + platform_base_fee
+			instance.ticket_fee = fee
+
+			# Set the quantity
+			quantity = instance.quantity
+
+			# Check if the organizer wants to pass the fee or absorb the fee
+			# Find out the new discounted ticket buyer price 
+			if instance.ticket.pass_fee:
+				instance.cart_item_total_no_fee = (discount_ticket_price * quantity)
+				discount_ticket_buyer_price = (discount_ticket_price + fee)
+			else:
+				instance.cart_item_total_no_fee = ((discount_ticket_price - fee) * quantity)
+				discount_ticket_buyer_price = (discount_ticket_price)
+
+			# Save the new ticket buyer price
+			instance.ticket_buyer_price = discount_ticket_buyer_price
+				
+			instance.cart_item_total = (discount_ticket_buyer_price * quantity)
+			instance.cart_item_fee = (fee * quantity)
+
+
 		else:
-			instance.cart_item_total_no_fee = ((instance.ticket.price - instance.ticket.fee) * quantity)
-		instance.cart_item_total = (instance.ticket.buyer_price * quantity)
-		instance.cart_item_fee = (instance.ticket.fee * quantity)
+			instance.ticket_price = instance.ticket.price
+			instance.ticket_buyer_price = instance.ticket.buyer_price
+			instance.ticket_fee = instance.ticket.fee
+			quantity = instance.quantity
+			if instance.ticket.pass_fee:
+				instance.cart_item_total_no_fee = (instance.ticket.price * quantity)
+			else:
+				instance.cart_item_total_no_fee = ((instance.ticket.price - instance.ticket.fee) * quantity)
+			instance.cart_item_total = (instance.ticket.buyer_price * quantity)
+			instance.cart_item_fee = (instance.ticket.fee * quantity)
 
 		# Check if the fee is passed on, if so set the 'pass_fee' boolean indicator
 		if instance.ticket.pass_fee:
@@ -154,7 +214,8 @@ def event_cart_item_pre_save_reciever(sender, instance, *args, **kwargs):
 		instance.donation_fee = fee
 		instance.donation_buyer_amount = price_to_calculate + fee
 
-		instance.ticket_price = price_to_calculate + fee
+		instance.ticket_price = price_to_calculate
+		instance.ticket_buyer_price = price_to_calculate + fee
 		quantity = instance.quantity
 
 		instance.cart_item_total_no_fee = (price_to_calculate * quantity)

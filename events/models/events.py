@@ -130,6 +130,14 @@ class Event(TimestampedModel):
 		view_name = "events:list_questions"
 		return reverse(view_name, kwargs={"slug": self.slug})
 
+	def list_discounts_view(self):
+		view_name = "events:list_discounts"
+		return reverse(view_name, kwargs={"slug": self.slug})
+
+	def create_discount_view(self):
+		view_name = "events:create_discount"
+		return reverse(view_name, kwargs={"slug": self.slug})
+
 	def list_answers_view(self):
 		view_name = "events:answers_list"
 		return reverse(view_name, kwargs={"slug": self.slug})

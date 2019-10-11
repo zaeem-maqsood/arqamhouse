@@ -1,0 +1,93 @@
+{% extends "backend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Questions | {{ event.title }}
+{% endblock title %}
+
+{% block page_title %}
+Questions
+{% endblock page_title %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+
+{% endblock scripts %}
+
+{% block content %}
+
+
+
+
+
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+				<form method="POST">{% csrf_token %}
+
+				<div class="row">
+					<div class="col-12">
+						<h3>Discount Codes</h3>
+					</div>
+				</div>
+
+
+				
+				{% for discount_code in discount_codes %}
+				<div class="row" style="padding-top:30px;">
+					<div class="col-md-12">
+						<h4 style="font-weight: 200;">{{ discount_code.code }} | <a href="{{ discount_code.get_update_view }}">Edit</a></h4>
+						<p style="margin-bottom: 5px;">{% if discount_code.use_fixed_amount %}Fixed Amount Discount of | <span style="color:red;">${{discount_code.fixed_amount }}</span>{% else %}Percentage Discount | <span style="color:red;">{{discount_code.percentage_amount }}%</span>{% endif %}</p>
+						<p>
+                            {% if discount_code.tickets.all.count > 1 %}
+                                Valid for the following tickets |
+                                {% for ticket in discount_code.tickets.all %}
+                                <a href="{{ ticket.update_ticket_view }}">{{ ticket.title }}, </a>
+                                {% endfor %}
+                            {% else %}
+                            <span style="color:red;">This code isn't applied to any ticket yet!</span>
+                            {% endif %}
+						</p>
+					</div> 
+				</div>
+				{% endfor %}
+
+				<div class="row" style="padding-top:30px;">
+					<div class="col-md-12">
+						<a href="{{ event.create_discount_view }}" class="btn btn-primary">Create Discount Code</a>
+					</div>
+				</div>
+
+			</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

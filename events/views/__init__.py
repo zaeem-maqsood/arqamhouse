@@ -6,5 +6,5 @@ from .questions import *
 from .orders import *
 from .attendees import *
 from .answers import *
-from .descriptions import *
+from .discounts import *
 from .emails import *

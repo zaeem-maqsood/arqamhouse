@@ -33,7 +33,12 @@ Tickets | {{ event.title }}
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
-				<br>
+				<div class="row" style="padding-bottom: 50px;">
+					<div class="col-12">
+						<h3 style="display: inline-block;">Tickets</h3>
+						<a class="btn btn-primary pull-right" href="{{ event.list_discounts_view }}">Discount Codes</a>
+					</div>
+				</div>
 
 				{% for ticket in tickets %}
 				<div class="row" style="padding-bottom: 50px;">

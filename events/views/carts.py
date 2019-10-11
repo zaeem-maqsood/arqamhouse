@@ -1,6 +1,6 @@
 from .base import *
 
-from events.models import Event, Ticket, EventCart, EventCartItem
+from events.models import Event, Ticket, EventCart, EventCartItem, EventDiscount
 from events.forms import TicketsToCartForm
 from houses.models import HouseUser
 
@@ -109,6 +109,22 @@ class AddTicketsToCartView(FormView):
 	def form_valid(self, form, request, event, pay, house_created):
 		cart_id = request.session.get('cart') 
 		cart = EventCart.objects.get(id=cart_id)
+
+		if EventDiscount.objects.filter(event=event).exists():
+			cart.discount_code = None
+			discount_code = form.cleaned_data["discount_code"]
+			try:
+				event_discount = EventDiscount.objects.get(code=discount_code)
+				cart.discount_code = event_discount
+				cart.invalid_discount_code = False
+			except Exception as e:
+				print(e)
+				print(discount_code)
+				if discount_code == "":
+					cart.invalid_discount_code = False
+				else:
+					cart.invalid_discount_code = True
+			cart.save()
 
 		# Delete all cart items before proceeding
 		cart_items = EventCartItem.objects.filter(event_cart=cart).delete()

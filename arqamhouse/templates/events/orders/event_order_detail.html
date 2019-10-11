@@ -143,7 +143,7 @@ Order #{{ order.number }} | {{ event.title }}
 					{% if active_attendees.count > 1  and order.event_cart.total <= house_balance.balance %}
 					<div class="row">
 						<div class="col-12">
-							<button type="submit" name="Full Refund" value="Full Refund" class="btn btn-outline-danger btn-block">Refund Entire Order</button>
+							<button type="submit" name="Full Refund" value="Full Refund" class="btn btn-danger pull-left">Refund Entire Order</button>
 						</div>
 					</div>
 					{% endif %}
@@ -212,11 +212,42 @@ Order #{{ order.number }} | {{ event.title }}
 									{% for cart_item in event_cart_items %}
 									<tr>
 										<td style="color: grey;">{{ cart_item.ticket.title }}</td>
-										<td style="color: grey;">${{ cart_item.ticket_price }}</td>
+										<td style="color: grey;">
+											<p style="margin-bottom: 0px;">${{ cart_item.ticket_buyer_price }}</p>
+											{% if cart_item.discount_code_activated %}
+											<p style="font-size: 0.8em;color: #ff7b1b;margin-bottom:0px;line-height: 15px;"
+												data-tooltip="Discount code {{ order.event_cart.discount_code.code }} gives you a {% if cart_item.discount_fixed_amount %} ${{ cart_item.discount_fixed_amount }} {% else %} {{ cart_item.discount_percentage_amount }}% {% endif %} discount per {{ cart_item.ticket.title }} ticket.">
+												{% if cart_item.discount_fixed_amount %}
+												${{ cart_item.discount_fixed_amount }} Discount Applied
+												{% else %}
+												{{ cart_item.discount_percentage_amount }}% Discount Applied
+												{% endif %}</p>
+											{% endif %}
+										</td>
 										<td style="color: grey;">{{ cart_item.quantity }}</td>
-										<td style="color: #2584C7;">+${{ cart_item.cart_item_total }}</td>
+										<td style="color: #2584C7;">
+											<p style="margin-bottom: 0px;">${{ cart_item.cart_item_total }}</p>
+										</td>
 									</tr>
 									{% endfor %}
+									{% if order.event_cart.invalid_discount_code %}
+									<tr>
+										<td></td>
+										<td></td>
+										<td><p style="color: grey;">Discount Code</p></td>
+										<td><p style="color: grey;">Invalid Code Used</p></td>
+									</tr>
+									{% else %}
+										{% if order.event_cart.discount_code %}
+										<tr>
+											<td></td>
+											<td></td>
+											<td><p style="color: grey;">Discount Code</p></td>
+											<td><p style="color: #ff7b1b;">{{ order.event_cart.discount_code.code }}</p></td>
+										</tr>
+										{% else %}
+										{% endif %}
+									{% endif %}
 									<tr>
 										<td></td>
 										<td></td>
@@ -247,10 +278,10 @@ Order #{{ order.number }} | {{ event.title }}
 								
 								{% for event_order_refund in event_order_refunds %}
 								<tr>
-									<td>{{ event_order_refund.attendee.ticket.title }} ({{ event_order_refund.attendee.name }})</td>
-									<td>${{ event_order_refund.attendee.ticket_buyer_price }}</td>
-									<td>1</td>
-									<td style="color: #FF4500;">-${{ event_order_refund.refund.amount }}</td>
+									<td style="color: grey;">{{ event_order_refund.attendee.ticket.title }} ({{ event_order_refund.attendee.name }})</td>
+									<td style="color: grey;">${{ event_order_refund.attendee.ticket_buyer_price }}</td>
+									<td style="color: grey;">1</td>
+									<td style="color: #FF4500;">${{ event_order_refund.refund.amount }}</td>
 								</tr>
 								{% endfor %}
 								<tr>

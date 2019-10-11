@@ -210,17 +210,17 @@ class EventCheckoutView(FormView):
 			if cart_item.ticket.express:
 				for quantity in range(cart_item.quantity):
 
-					name = "%s-%s" % (order.name, int(quantity)+1)
+					attendee_name = "%s-%s" % (order.name, int(quantity)+1)
 					if cart_item.donation_ticket:
 						attendee = Attendee.objects.create(
-							order=order, ticket=cart_item.ticket, name=name, email=email,
+							order=order, ticket=cart_item.ticket, name=attendee_name, email=email,
 							ticket_buyer_price=cart_item.donation_buyer_amount, ticket_price=cart_item.donation_amount, ticket_fee=cart_item.donation_fee,
 							ticket_pass_fee=True)
 					else:
 						attendee = Attendee.objects.create(
-							order=order, ticket=cart_item.ticket, name=name, email=email, 
-							ticket_buyer_price=cart_item.ticket.buyer_price, ticket_price=cart_item.ticket.price, ticket_fee=cart_item.ticket.fee,
-							ticket_pass_fee=cart_item.ticket.pass_fee)
+							order=order, ticket=cart_item.ticket, name=attendee_name, email=email,
+							ticket_buyer_price=cart_item.ticket_buyer_price, ticket_price=cart_item.ticket_price, ticket_fee=cart_item.ticket_fee,
+							ticket_pass_fee=cart_item.pass_fee)
 					attendee.save()
 
 			else:
@@ -256,8 +256,8 @@ class EventCheckoutView(FormView):
 					else:
 						attendee = Attendee.objects.create(
 							order=order, ticket=cart_item.ticket, name=attendee_name, email=attendee_email, age=age, gender=gender, address=address,
-							ticket_buyer_price=cart_item.ticket.buyer_price, ticket_price=cart_item.ticket.price, ticket_fee=cart_item.ticket.fee,
-							ticket_pass_fee=cart_item.ticket.pass_fee)
+							ticket_buyer_price=cart_item.ticket_buyer_price, ticket_price=cart_item.ticket_price, ticket_fee=cart_item.ticket_fee,
+							ticket_pass_fee=cart_item.pass_fee)
 					attendee.save()
 
 					# Step 3c answers to custom questions

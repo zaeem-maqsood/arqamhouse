@@ -177,9 +177,9 @@ class EventCheckoutViewTest(TestCase):
                 self.assertEqual(attendee.ticket_fee, round(decimal.Decimal(0.50),2))
                 self.assertEqual(attendee.ticket_pass_fee, True)
             else:
-                self.assertEqual(attendee.ticket_price, None)
+                self.assertEqual(attendee.ticket_price, round(decimal.Decimal(0.00),2))
                 self.assertEqual(attendee.ticket_buyer_price, round(decimal.Decimal(0.00),2))
-                self.assertEqual(attendee.ticket_fee, None)
+                self.assertEqual(attendee.ticket_fee, round(decimal.Decimal(0.00),2))
                 
             self.assertEqual(attendee.name, "Zaeem Maqsood")
             self.assertEqual(attendee.age, 24)

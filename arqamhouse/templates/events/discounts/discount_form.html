@@ -1,0 +1,124 @@
+{% extends "backend/base.html" %}
+{% load static %}
+{% load question_tags %}
+
+{% block title %}
+Add Bank | {{ house.name }}
+{% endblock title %}
+
+
+{% block styles %}
+{% endblock styles %}
+
+
+{% block scripts %}
+{% endblock scripts %}
+
+
+{% block content %}
+
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+    <div class="col-lg-8 offset-lg-2 col-md-12 col-12">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body" style="padding: 50px;">
+                <form method="POST" id="discount_form" enctype="multipart/form-data">{% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% for error in form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.code.errors %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% for error in form.code.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-md-12">
+                            <p style="margin-bottom: 5px;font-weight: 500;">Code</p>
+                            {{ form.code }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-md-5">
+                            <p style="margin-bottom: 5px;font-weight: 500;">Fixed Discount</p>
+                            {{ form.fixed_amount }}
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <h3 style="margin-top: 25px;font-weight: 500;">OR</h3>
+                        </div>
+                        <div class="col-md-5">
+                            <p style="margin-bottom: 5px;font-weight: 500;">Percentage Discount</p>
+                            {{ form.percentage_amount }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-6">
+                            <p style="margin-bottom: 5px;font-weight: 500;">Uses</p>
+                            {{ form.total_uses }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-top: 30px;">
+                        <div class="col-md-12">
+                            <p style="font-weight: 500;">Choose tickets this discount applies too
+                            <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" 
+                            data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" 
+                            data-original-title="Switch on the tickets where you would like this discount to be applied."></i></p>
+                        </div>
+                    </div>
+
+                    {% for ticket in tickets %}
+                    <div class="row" style="padding-bottom:10px;">
+                        <div class="col-md-12">
+                            <p>{{ forloop.counter }}. {{ ticket.title }}</p>
+                            <span class="kt-switch">
+                                <label>
+                                    <input type="checkbox" {% if discount_code %}{{ ticket|ticket_checked:discount_code }}{% endif %}
+                                        name="{{ ticket.id }}" style="user-select: auto;" id="ticket_{{ ticket.id }}">
+                                    <span></span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+
+                    {% if update %}
+                    <div class="row" style="padding-top:20px;">
+                        <div class="col-md-12">
+                            <button id="customButton" type="submit" class="btn btn-primary">Update Discount Code</button>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="row" style="padding-top:20px;">
+                        <div class="col-md-12">
+                            <button id="customButton" type="submit" class="btn btn-primary">Create Discount Code</button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

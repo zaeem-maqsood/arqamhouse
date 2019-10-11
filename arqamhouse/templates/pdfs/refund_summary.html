@@ -49,9 +49,19 @@
                 <tr>
                     <td>{{ attendee.name }}</td>
                     <td>{{ attendee.ticket.title }}</td>
-                    <td>${{ attendee.ticket.buyer_price }}</td>
+                    <td>${{ attendee.ticket_buyer_price }}</td>
                 </tr>
                 {% endfor %}
+
+                {% if order.event_cart.discount_code %}
+                <tr>
+                    <td></td>
+                    <td>Discount Code</td>
+                    <td style="color: #ff7b1b;">{{ order.event_cart.discount_code.code }}</td>
+                </tr>
+                {% else %}
+                {% endif %}
+
                 <tr>
                     <td></td>
                     <td>Total</td>
