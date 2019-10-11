@@ -146,35 +146,76 @@ def event_cart_item_pre_save_reciever(sender, instance, *args, **kwargs):
 				discount_ticket_price = instance.ticket.price - (instance.ticket.price * decimal.Decimal(discount_code.percentage_amount/100))
 				instance.discount_percentage_amount = discount_code.percentage_amount
 
-			# Save the new ticket price value
-			instance.ticket_price = discount_ticket_price 
-			# Save the discount amount
-			instance.discount_amount = instance.ticket.buyer_price - discount_ticket_price
+			# Check to make sure the the new discount price is greater than 1
+			if discount_ticket_price >= decimal.Decimal(1.00):
+
+				# Save the new ticket price value
+				instance.ticket_price = discount_ticket_price 
+				# Save the discount amount
+				instance.discount_amount = instance.ticket.buyer_price - discount_ticket_price
 
 
-			platform_fee = decimal.Decimal(settings.PLATFORM_FEE/100)
-			platform_base_fee = decimal.Decimal(settings.PLATFORM_BASE_FEE)
-			# Find out the new fee based off the discounts applied to the ticket price
-			fee = decimal.Decimal((discount_ticket_price * platform_fee)) + platform_base_fee
-			instance.ticket_fee = fee
+				platform_fee = decimal.Decimal(settings.PLATFORM_FEE/100)
+				platform_base_fee = decimal.Decimal(settings.PLATFORM_BASE_FEE)
+				# Find out the new fee based off the discounts applied to the ticket price
+				fee = decimal.Decimal((discount_ticket_price * platform_fee)) + platform_base_fee
+				instance.ticket_fee = fee
 
-			# Set the quantity
-			quantity = instance.quantity
+				# Set the quantity
+				quantity = instance.quantity
 
-			# Check if the organizer wants to pass the fee or absorb the fee
-			# Find out the new discounted ticket buyer price 
-			if instance.ticket.pass_fee:
-				instance.cart_item_total_no_fee = (discount_ticket_price * quantity)
-				discount_ticket_buyer_price = (discount_ticket_price + fee)
+				# Check if the organizer wants to pass the fee or absorb the fee
+				# Find out the new discounted ticket buyer price 
+				if instance.ticket.pass_fee:
+					instance.cart_item_total_no_fee = (discount_ticket_price * quantity)
+					discount_ticket_buyer_price = (discount_ticket_price + fee)
+				else:
+					instance.cart_item_total_no_fee = ((discount_ticket_price - fee) * quantity)
+					discount_ticket_buyer_price = (discount_ticket_price)
+
+				# Save the new ticket buyer price
+				instance.ticket_buyer_price = discount_ticket_buyer_price
+					
+				instance.cart_item_total = (discount_ticket_buyer_price * quantity)
+				instance.cart_item_fee = (fee * quantity)
+
+			# If the discount is greater than the ticket original price make it free
 			else:
-				instance.cart_item_total_no_fee = ((discount_ticket_price - fee) * quantity)
-				discount_ticket_buyer_price = (discount_ticket_price)
 
-			# Save the new ticket buyer price
-			instance.ticket_buyer_price = discount_ticket_buyer_price
-				
-			instance.cart_item_total = (discount_ticket_buyer_price * quantity)
-			instance.cart_item_fee = (fee * quantity)
+				discount_ticket_price = decimal.Decimal(0.00)
+				if discount_code.use_fixed_amount:
+					instance.discount_fixed_amount = instance.ticket.buyer_price
+				else:
+					instance.discount_percentage_amount = 100
+
+				# Save the new ticket price value
+				instance.ticket_price = discount_ticket_price
+				# Save the discount amount
+				instance.discount_amount = instance.ticket.buyer_price - discount_ticket_price
+
+				platform_fee = decimal.Decimal(settings.PLATFORM_FEE/100)
+				platform_base_fee = decimal.Decimal(settings.PLATFORM_BASE_FEE)
+				# Find out the new fee based off the discounts applied to the ticket price
+				fee = decimal.Decimal(0.00)
+				instance.ticket_fee = fee
+
+				# Set the quantity
+				quantity = instance.quantity
+
+				# Check if the organizer wants to pass the fee or absorb the fee
+				# Find out the new discounted ticket buyer price
+				if instance.ticket.pass_fee:
+					instance.cart_item_total_no_fee = (discount_ticket_price * quantity)
+					discount_ticket_buyer_price = (discount_ticket_price + fee)
+				else:
+					instance.cart_item_total_no_fee = ((discount_ticket_price - fee) * quantity)
+					discount_ticket_buyer_price = (discount_ticket_price)
+
+				# Save the new ticket buyer price
+				instance.ticket_buyer_price = discount_ticket_buyer_price
+
+				instance.cart_item_total = (discount_ticket_buyer_price * quantity)
+				instance.cart_item_fee = (fee * quantity)
 
 
 		else:

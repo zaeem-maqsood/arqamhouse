@@ -51,7 +51,7 @@ Questions
 						<h4 style="font-weight: 200;">{{ discount_code.code }} | <a href="{{ discount_code.get_update_view }}">Edit</a></h4>
 						<p style="margin-bottom: 5px;">{% if discount_code.use_fixed_amount %}Fixed Amount Discount of | <span style="color:red;">${{discount_code.fixed_amount }}</span>{% else %}Percentage Discount | <span style="color:red;">{{discount_code.percentage_amount }}%</span>{% endif %}</p>
 						<p>
-                            {% if discount_code.tickets.all.count > 1 %}
+                            {% if discount_code.tickets.all.count >= 1 %}
                                 Valid for the following tickets |
                                 {% for ticket in discount_code.tickets.all %}
                                 <a href="{{ ticket.update_ticket_view }}">{{ ticket.title }}, </a>

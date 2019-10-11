@@ -180,7 +180,17 @@ function initMap() {
                                         <p style="font-size: 1.1em;font-weight:800;">x {{ cart_item.quantity }}</p>
                                     </div>
                                     <div class="col-md-2">
-                                        <p style="font-size: 1.1em;" class="float-right">$0.00</p>
+                                        <p style="font-size: 1.1em;margin-bottom: 0px;" class="float-right">$0.00</p>
+                                        {% if cart_item.discount_code_activated %}
+                                        <p style="font-size: 0.8em;color: red;margin-bottom:0px;line-height: 15px;text-align: right;"
+                                            data-tooltip="Discount code {{ cart.discount_code.code }} gives you a {% if cart_item.discount_fixed_amount %} ${{ cart_item.discount_fixed_amount }} {% else %} {{ cart_item.discount_percentage_amount }}% {% endif %} discount per '{{ cart_item.ticket.title }}' ticket."
+                                            class="float-right">
+                                            {% if cart_item.discount_fixed_amount %}
+                                            ${{ cart_item.discount_fixed_amount }} Discount
+                                            {% else %}
+                                            {{ cart_item.discount_percentage_amount }}% Discount
+                                            {% endif %}</p>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 {% endfor %}
