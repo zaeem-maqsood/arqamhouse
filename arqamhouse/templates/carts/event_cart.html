@@ -190,11 +190,11 @@ $('#id_{{ ticket.id }}').change(function() {
 									<h5 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="far fa-clock"></i> When</h5>
 									{% if event.start %}
 									<p style="margin-bottom: 0;font-weight:600;">Starts | <span style="font-weight:400;">
-											{{ event.start|date:"N nS Y, f a" }}</span></p>
+											{{ event.start|date:"N n Y, f a" }}</span></p>
 									{% endif %}
 									{% if event.end %}
 									<p style="margin-bottom: 0;font-weight:600;">Ends | <span style="font-weight:400;">
-											{{ event.end|date:"N nS Y, f a" }}</span></p>
+											{{ event.end|date:"N n Y, f a" }}</span></p>
 									{% endif %}
 								</div>
 								{% endif %}
