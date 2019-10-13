@@ -172,9 +172,9 @@ $('#id_{{ ticket.id }}').change(function() {
 							<div class="row text-center" style="padding: 20px;">
 								<div class="col-md-12">
 									{% if event.start or event.end or event.venue_name or event.venue_address%}
-									<h4 style="margin-bottom:5px;font-weight: 400;color: #4498d4;">{{ event.title }}</h4>
+									<h4 style="margin-bottom:0px;font-weight: 400;color: #4498d4;">{{ event.title }}</h4>
 									{% else %}
-									<h2 style="margin-bottom:5px;font-weight: 400;color: #4498d4;">{{ event.title }}</h2>
+									<h2 style="margin-bottom:0px;font-weight: 400;color: #4498d4;">{{ event.title }}</h2>
 									{% endif %}
 									<p style="font-size: 0.8em;">Presented by {{ event.house.name }}</p>
 									{% if event.short_description %}
@@ -190,11 +190,11 @@ $('#id_{{ ticket.id }}').change(function() {
 									<h5 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="far fa-clock"></i> When</h5>
 									{% if event.start %}
 									<p style="margin-bottom: 0;font-weight:600;">Starts | <span style="font-weight:400;">
-											{{ event.start|date:"N n Y, f a" }}</span></p>
+											{{ event.start|date:"N jS Y, f a" }}</span></p>
 									{% endif %}
 									{% if event.end %}
 									<p style="margin-bottom: 0;font-weight:600;">Ends | <span style="font-weight:400;">
-											{{ event.end|date:"N n Y, f a" }}</span></p>
+											{{ event.end|date:"N jS Y, f a" }}</span></p>
 									{% endif %}
 								</div>
 								{% endif %}

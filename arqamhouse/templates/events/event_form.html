@@ -106,11 +106,6 @@ jQuery(document).ready(function($) {
     $('.message').change(updateCountdown);
     $('.message').keyup(updateCountdown);
 
-	{% if event.start %}
-	end_date_time = document.getElementById("id_end").disabled = false;
-	{% else %}
-	end_date_time = document.getElementById("id_end").disabled = true;
-	{% endif %}
 });
 
 
@@ -124,7 +119,7 @@ flatpickr("#id_start", {
 });
 
 
-{% if event.end %}
+
 flatpickr("#id_end", {
 	enableTime: true,
 	altFormat: "F j, Y",
@@ -133,7 +128,7 @@ flatpickr("#id_end", {
 	maxDate: new Date().fp_incr(365),
 
 });
-{% endif %}
+
 
 
 function endDateTime(object) {
