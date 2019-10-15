@@ -1,5 +1,6 @@
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView, FormView
+from django.views.generic.base import TemplateView
 from django.shortcuts import render, redirect
 from django.core import mail
 from django.template.loader import render_to_string
@@ -7,6 +8,10 @@ from django.utils.html import strip_tags
 from django.contrib import messages
 
 from .forms import ReportErrorForm
+
+
+class ApplePayVerificationView(TemplateView):
+	template_name = 'static/apple-developer-merchantid-domain-association'
 
 
 class HomePageView(View):

@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
 from houses.views import DashboardView, ConnectVerificationView, ChangeEntityTypeView
-from .views import HomePageView, ReportErrorView
+from .views import HomePageView, ReportErrorView, ApplePayVerificationView
 from events.views import OrderPublicDetailView
 
 urlpatterns = [
@@ -36,6 +36,8 @@ urlpatterns = [
     path('questions/', include('questions.urls')),
     path('payments/', include('payments.urls')),
     path('orders/<public_id>/', OrderPublicDetailView.as_view(), name='order_detail_public'),
+    path('.well-known/apple-developer-merchantid-domain-association', ApplePayVerificationView.as_view(), name='apple_verification'),
+
 
     # path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
     path('password_reset/', auth_views.PasswordResetView.as_view(html_email_template_name='registration/password_reset_email.html'), name='password_reset'),
