@@ -245,17 +245,17 @@ function initMap() {
 
                     <div class="row justify-content-center" style="padding-bottom: 50px;">
                         <div class="col-md-12">
-                            <div class="row" style="padding-bottom: 20px;">
+                            <div class="row">
                                 <div class="col-md-12 col-lg-12">
                                     <p style="font-weight: 600;font-size: 1.4em;color: #4a90e2;">Buyer Details</p>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6 col-lg-6">
+                                <div class="col-md-6 col-lg-6" style="padding-top:20px;">
                                     <p style="margin-bottom: 0;"><i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i> Name</p>
                                     <input pattern="[a-zA-Z ]*" title="No numbers please" maxlength="100" class="validate-required" type="text" name="name" id="name" size="30" required placeholder="Full Name" value="{{ data.name }}">
                                 </div>
-                                <div class="col-md-6 col-lg-6">
+                                <div class="col-md-6 col-lg-6" style="padding-top:20px;">
                                     <p style="margin-bottom: 0;"><i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i> Email</p>
                                     <input class="validate-required" maxlength="150" type="email" name="email" id="email" size="30" required placeholder="email@address.com" value="{{ data.email }}">
                                 </div>
@@ -322,7 +322,7 @@ function initMap() {
                                         </div>
                                         {% endif %}
                                         {% if attendee_common_questions.gender %}
-                                        <div class="col-md-6 col-lg-6">
+                                        <div class="col-md-6 col-lg-6" style="padding-top:20px;">
                                             <p style="margin-bottom: 0;">{% if attendee_common_questions.gender_required %}<i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i>{% endif %} Gender</p>
                                             <select id="{{ quantity }}_{{ cart_item.ticket.id }}_gender" name="{{ quantity }}_{{ cart_item.ticket.id }}_gender" class="validate-required">
                                                 {% if not attendee_common_questions.gender_required %}
@@ -382,7 +382,7 @@ function initMap() {
                     <div class="row justify-content-center" style="padding-bottom:50px;">
                         <div class="col-md-12">
                             <div>
-                                <label for="card-element" style="font-weight: 600;font-size: 1.4em;color: #4a90e2;margin-bottom: 15px;">Payment</label>
+                                <label for="card-element" style="font-weight: 600;font-size: 1.4em;color: #4a90e2;margin-bottom: 15px;" >Payment <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle" data-tooltip="Payments are processed through our trusted partner stripe.com. "></i></label>
                                 <div id="card-element">
                                     <!-- A Stripe Element will be inserted here. -->
                                 </div>

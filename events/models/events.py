@@ -5,7 +5,18 @@ from houses.models import House
 
 from django.core.exceptions import ValidationError
 
+
 # Create your models here.
+
+# Validate Event Image is less than 10MB
+def validate_file_size(value):
+    filesize = value.size
+
+    if filesize > 10485760:
+        raise ValidationError(
+            "The maximum file size that can be uploaded is 10MB")
+    else:
+        return value
 
 
 def image_location(instance, filename):
@@ -41,7 +52,7 @@ class Event(TimestampedModel):
 	venue_address = models.CharField(max_length=200, null=True, blank=True)
 	venue_name = models.CharField(max_length=200, null=True, blank=True)
 	short_description = models.TextField(blank=True, null=True)
-	image = models.ImageField(upload_to=image_location, null=True, blank=True)
+	image = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
 	public = models.BooleanField(default=True)
 	active = models.BooleanField(default=True)
 	deleted = models.BooleanField(default=False)

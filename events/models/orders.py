@@ -15,7 +15,7 @@ def pdf_location(instance, filename):
 
 
 def qrcode_location(instance, filename):
-	return "order_qrcodes/%s/%s/%s/%s" % (instance.event.house.slug, instance.event.slug, instance.public_id, filename)
+	return "order_qrcodes/%s/%s" % (instance.public_id, filename)
 
 
 
@@ -32,7 +32,7 @@ class EventOrder(models.Model):
 	refunded = models.BooleanField(default=False)
 	note = models.TextField(blank=True, null=True)
 	pdf = models.FileField(upload_to=pdf_location, blank=True, null=True)
-	code = models.ImageField(upload_to=qrcode_location, blank=True, null=True)
+	code = models.ImageField(upload_to=qrcode_location, max_length=500, blank=True, null=True)
 	number = models.PositiveIntegerField(null=True, blank=True, default=0)
 	public_id = models.CharField(max_length=150, null=True, blank=True)
 	house_created = models.BooleanField(default=False)

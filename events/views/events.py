@@ -481,7 +481,7 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 	template_name = "events/event_form.html"
 
 	def get_success_url(self):
-		view_name = "events:update"
+		view_name = "events:landing"
 		return reverse(view_name, kwargs={"slug": self.object.slug})
 
 	def get_success_delete_url(self):
