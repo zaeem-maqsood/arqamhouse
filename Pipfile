@@ -30,6 +30,7 @@ django-cleanup = "*"
 googlemaps = "*"
 coverage = "*"
 selenium = "*"
+django-froala-editor = "*"
 
 [requires]
 python_version = "3.7"
