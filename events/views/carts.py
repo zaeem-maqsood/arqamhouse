@@ -100,6 +100,7 @@ class AddTicketsToCartView(FormView):
 		context["form"] = form
 		context["event"] = event
 		context["tickets"] = tickets
+		context["time"] = timezone.now()
 		return render(request, self.template_name, context)
 
 

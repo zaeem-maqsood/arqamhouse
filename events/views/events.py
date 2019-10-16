@@ -587,6 +587,7 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		context["form"] = form
 		context["house"] = house
 		context["event"] = self.object
+		context["time"] = timezone.now()
 		
 		if self.object.active == False:
 			context["inactive_event_tab"] = True

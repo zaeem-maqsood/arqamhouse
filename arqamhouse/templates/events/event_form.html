@@ -315,7 +315,7 @@ function endDateTime(object) {
 										<div class="row" style="padding-bottom: 40px;">
 											<div class="col-md-5" style="padding: 30px;">
 												{% if form.instance.image %}
-												<img id="image-placeholder" src="{{ form.instance.image.url }}?lastmod={{ form.instance.end|date:"Y-m-d" }}"
+												<img id="image-placeholder" src="{{ form.instance.image.url }}?lastmod={{ time }}"
 													alt="Event Image" width="100%" />
 												<br>
 												<br>

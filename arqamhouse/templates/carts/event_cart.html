@@ -192,9 +192,9 @@ $('#id_{{ ticket.id }}').change(function() {
 							</div>
 
 							{% if event.image %}
-							<div class="row" style="padding-bottom:30px;padding: 20px;">
+							<div class="row" style="padding-bottom:30px;padding: 40px;">
 								<div class="col-md-6 offset-md-3 col-sm-10 offset-sm-1 col-xs-10">
-									<img src="{{ event.image.url }}">
+									<img src="{{ event.image.url }}?lastmod={{ time }}">
 								</div>
 							</div>
 							{% endif %}
@@ -222,8 +222,8 @@ $('#id_{{ ticket.id }}').change(function() {
 											{{ event.venue_name }}</span></p>
 									{% endif %}
 									{% if event.venue_address %}
-									<p style="margin-bottom: 0;font-weight:600;">Address | <span
-											style="font-weight:400;">{{ event.venue_address }}</span></p>
+									<p style="margin-bottom: 0;font-weight:600;">Address | <a href="https://www.google.com/maps/place/{{ event.venue_address|urlencode }}" target="blank"
+											style="font-weight:400;">{{ event.venue_address }}</a></p>
 									{% endif %}
 								</div>
 								{% endif %}
