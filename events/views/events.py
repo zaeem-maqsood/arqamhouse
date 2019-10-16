@@ -20,6 +20,8 @@ from django.utils.text import slugify
 from weasyprint import HTML, CSS
 from django.utils.html import strip_tags
 
+from django.core.validators import validate_email
+
 from houses.mixins import HouseAccountMixin
 from houses.models import HouseUser
 from questions.models import Question
@@ -140,7 +142,7 @@ class EventCheckoutView(FormView):
 
 
 
-	def get_context_data(self, data=None, *args, **kwargs):
+	def get_context_data(self, data=None, errors=None, *args, **kwargs):
 		context = {}
 		request = self.request
 		slug = self.kwargs['slug']
@@ -149,6 +151,7 @@ class EventCheckoutView(FormView):
 		cart_items = EventCartItem.objects.filter(event_cart=cart)
 		attendee_common_questions = AttendeeCommonQuestions.objects.get(event=event)
 			
+		context["errors"] = errors
 		context["cart_items"] = cart_items
 		context["cart"] = cart
 		context["attendee_common_questions"] = attendee_common_questions
@@ -169,11 +172,91 @@ class EventCheckoutView(FormView):
 		return render(request, self.template_name, self.get_context_data())
 
 
+	def validate_data(self, data, event, cart):
+		errors = {}
+
+		# Check buyer name and email
+		print(data["name"])
+		if data["name"] == "":
+			errors["name"] = "Please enter the buyers full name."
+
+		if data["email"] == "":
+			errors["email"] = "Please enter your email address. Watch for typos, your tickets get sent there!"
+		else:
+			try:
+				validate_email(data["email"])
+			except:
+				errors["email"] = "Invalid email address, please enter a valid email address so we can send your ticket there!"
+
+
+		order_questions = EventQuestion.objects.filter(event=event, order_question=True, question__deleted=False, question__approved=True).order_by("question__order")
+		for order_question in order_questions:
+			value = data["%s_order_question" % (order_question.question.id)]
+
+			if order_question.question.required and value == "":
+				if order_question.question.question_type == "Simple" or order_question.question.question_type == "Long":
+					errors["%s_order_question" % (
+						order_question.question.id)] = "Please enter a valid answer for question '%s'." % (order_question.question.title)
+
+		cart_items = EventCartItem.objects.filter(event_cart=cart)
+		attendee_common_questions = AttendeeCommonQuestions.objects.get(event=event)
+
+		for cart_item in cart_items:
+			if not cart_item.ticket.express:
+				for quantity in range(cart_item.quantity):
+					attendee_name = data["%s_%s_name" % (quantity, cart_item.ticket.id)]
+					
+					if attendee_name == "":
+						errors["%s_%s_name" % (quantity, cart_item.ticket.id)] = "Please enter the attendees full name."
+
+					if attendee_common_questions.age:
+						attendee_age = data["%s_%s_age" % (quantity, cart_item.ticket.id)]
+
+						if attendee_common_questions.age_required:
+							if attendee_age == "":
+								errors["%s_%s_age" % (quantity, cart_item.ticket.id)] = "Please enter the attendees age."
+
+					if attendee_common_questions.address:
+						try:
+							attendee_address = data["%s_%s_address" % (quantity, cart_item.ticket.id)]
+							if attendee_common_questions.address_required:
+								if attendee_address == "":
+									errors["%s_%s_address" % (quantity, cart_item.ticket.id)] = "Please enter the attendees address."
+						except:
+							pass
+
+					attendee_questions = EventQuestion.objects.filter(tickets__id=cart_item.ticket.id, question__deleted=False, question__approved=True).order_by("question__order")
+					for attendee_question in attendee_questions:
+						value = data["%s_%s_%s" % (quantity, attendee_question.question.id, cart_item.ticket.id)]
+
+						if attendee_question.question.required and value == "":
+							if attendee_question.question.question_type == "Simple" or attendee_question.question.question_type == "Long":
+								errors["%s_%s_%s" % (quantity, attendee_question.question.id, cart_item.ticket.id)] = "Please enter a valid answer for question '%s'." % (attendee_question.question.title)
+
+
+		return errors
+
+
+
 	def post(self, request, *args, **kwargs):
 		data = request.POST
+
+		print("\n\nerrors")
+		print(data)
+		print("errors\n\n")
+
+		errors = {}
 		slug = kwargs['slug']
 		event = self.get_event(slug)
 		cart = self.get_cart()
+
+		errors = self.validate_data(data, event, cart)
+		print("\n\nerrors")
+		print(errors)
+		print("errors\n\n")
+
+		if errors:
+			return self.render_to_response(self.get_context_data(data=data, errors=errors))
 
 		# Only get the Stripe Token if payment enabled
 		if cart.pay:
@@ -194,7 +277,7 @@ class EventCheckoutView(FormView):
 		# Get Buyer questions and make answers
 		order_questions = EventQuestion.objects.filter(event=event, order_question=True, question__deleted=False, question__approved=True).order_by("question__order")
 		for order_question in order_questions:
-			value = data["%s_order_question" % (order_question.question.id)] 
+			value = data["%s_order_question" % (order_question.question.id)]
 
 			# Create Order answers
 			order_answer = OrderAnswer.objects.create(question=order_question, value=value, order=order)
@@ -246,7 +329,10 @@ class EventCheckoutView(FormView):
 						gender = data["%s_%s_gender" % (quantity, cart_item.ticket.id)] 
 
 					if attendee_common_questions.address:
-						address = data["%s_%s_address" % (quantity, cart_item.ticket.id)]
+						try:
+							address = data["%s_%s_address" % (quantity, cart_item.ticket.id)]
+						except:
+							address = "N/A"
 
 					if cart_item.donation_ticket:
 						attendee = Attendee.objects.create(

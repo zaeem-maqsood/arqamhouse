@@ -3,6 +3,8 @@ from .base import *
 from events.models import Event, AttendeeCommonQuestions, EventCart, EventCartItem
 from core.constants import genders
 
+from froala_editor.widgets import FroalaEditor
+
 
 
 class EventCheckoutForm(forms.Form):
@@ -73,10 +75,13 @@ class EventForm(forms.ModelForm):
 	end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], required=False,  widget=forms.DateTimeInput(
 		attrs={"class": "form-control m-input", "placeholder": "End", "autocomplete": "off"}))
 
+	description = forms.CharField(widget=FroalaEditor(
+		options={'toolbarInline': False, 'attribution': False, 'tableStyles': 'table'}))
+
 	class Meta:
 		model = Event
 		fields = [
-			"title", "url", "venue_name", "venue_address", "short_description", "start", "end", "image"
+			"title", "url", "venue_name", "venue_address", "description", "start", "end", "image"
 		]
 
 
@@ -112,16 +117,6 @@ class EventForm(forms.ModelForm):
 							"class":"form-control m-input",
 							"placeholder":"123 Main Street",
 							"id":"autocomplete",
-						}
-					),
-
-
-				"short_description": forms.Textarea(
-						attrs={
-							"class":"form-control m-input",
-							"placeholder":"Give you event a short and sweet description to hook in potential ticket buyers. Totally optional.",
-							"rows": '4',
-							'maxlength': '300',
 						}
 					),
 

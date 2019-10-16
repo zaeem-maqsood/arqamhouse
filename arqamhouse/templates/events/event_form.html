@@ -17,6 +17,8 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+<link href="https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/css/froala_editor.pkgd.min.css" rel="stylesheet"
+	type="text/css" />
 
 {% endblock styles %}
 
@@ -24,6 +26,8 @@
 {% block scripts %}
 <!--begin::Page Resources --> 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script type="text/javascript"
+	src="https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/js/froala_editor.pkgd.min.js"></script>
 
 <script type="text/javascript">
 
@@ -294,46 +298,72 @@ function endDateTime(object) {
 							</div>
 						</div>
 
-						<div class="row" style="padding-bottom: 20px;">
-							<div class="col-md-12">
-								<p style="font-weight: 600;margin-bottom:0px;{% if form.short_description.errors %}color:red;{% endif %}">Short Description</p>
-								{{ form.short_description }}
-								<br>
-								{% for error in form.short_description.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-											{{ error }}
+
+
+						<div style="padding-bottom: 30px;" class="accordion" id="accordionExample4">
+							<div class="card">
+								<div class="card-header" id="headingTwo4" style="background-color: #dcf0ff;">
+									<div class="card-title collapsed" data-toggle="collapse" data-target="#collapseThree4" aria-expanded="false"
+										aria-controls="collapseThree4">
+										<i class="la la-plus"></i> Optional Details
 									</div>
-								{% endfor %}
+								</div>
+								<div id="collapseThree4" class="collapse" aria-labelledby="headingThree1" data-parent="#accordionExample4">
+									<div class="card-body">
+						
+										
+										<div class="row" style="padding-bottom: 40px;">
+											<div class="col-md-5" style="padding: 30px;">
+												{% if form.instance.image %}
+												<img id="image-placeholder" src="{{ form.instance.image.url }}?lastmod={{ form.instance.end|date:"Y-m-d" }}"
+													alt="Event Image" width="100%" />
+												<br>
+												<br>
+												{% if form.instance.image %}<button type="submit" class="btn btn-outline-danger btn-block" name="Remove"
+													value="Remove">Remove Image</button>{% endif %}
+												{% else %}
+												<img id="image-placeholder" src="{% static 'images/event_flyer_placeholder.jpg' %}" alt="Event Image"
+													width="100%" />
+												{% endif %}
+											</div>
+											<div class="col-md-7" style="padding: 30px;">
+												<p style="font-weight: 600;margin-bottom:0px;{% if form.image.errors %}color:red;{% endif %}">Image</p>
+												{{ form.image }}
+												<br>
+												{% for error in form.image.errors %}
+												<div class="alert m-alert--outline alert-danger" role="alert">
+													{{ error }}
+												</div>
+												{% endfor %}
+												<p class="text-center" style="padding-top: 20px;padding-bottom: 20px;">We suggest a standard 8.5" X 11" flyer
+													but you can use any image you'd like.</p>
+										
+											</div>
+										</div>
+										
+										{{ form.media }}
+										<div class="row" style="padding-bottom: 20px;">
+											<div class="col-md-12">
+												<p style="font-weight: 600;margin-bottom:0px;{% if form.description.errors %}color:red;{% endif %}">Description
+												</p>
+												{{ form.description }}
+												<br>
+												{% for error in form.description.errors %}
+												<div class="alert m-alert--outline alert-danger" role="alert">
+													{{ error }}
+												</div>
+												{% endfor %}
+											</div>
+										</div>
+										
+						
+									</div>
+								</div>
 							</div>
 						</div>
 
-						<div class="row" style="padding-bottom: 20px;">
-							<div class="col-md-4" style="padding: 30px;">
-								{% if form.instance.image %}
-								<img id="image-placeholder" src="{{ form.instance.image.url }}?lastmod={{ form.instance.end|date:"Y-m-d" }}"
-									alt="Event Image" width="100%" />
-								<br>
-								<br>
-								{% if form.instance.image %}<button type="submit" class="btn btn-outline-danger btn-block" name="Remove"
-									value="Remove">Remove Image</button>{% endif %}
-								{% else %}
-								<img id="image-placeholder" src="{% static 'images/event_flyer_placeholder.jpg' %}" alt="Event Image"
-									width="100%" />
-								{% endif %}
-							</div>
-							<div class="col-md-8" style="padding: 30px;">
-								<p style="font-weight: 600;margin-bottom:0px;{% if form.image.errors %}color:red;{% endif %}">Image</p>
-								{{ form.image }}
-								<br>
-								{% for error in form.image.errors %}
-									<div class="alert m-alert--outline alert-danger" role="alert">
-										{{ error }}
-									</div>
-								{% endfor %}
-								<p class="text-center" style="padding-top: 20px;padding-bottom: 20px;">We suggest a standard 8.5" X 11" flyer but you can use any image you'd like.</p>
 
-							</div>
-						</div>
+						
 
 
 						<div class="row" style="padding-bottom: 30px;">

@@ -12,9 +12,9 @@ from django.core.exceptions import ValidationError
 def validate_file_size(value):
     filesize = value.size
 
-    if filesize > 10485760:
+    if filesize > 5242880:
         raise ValidationError(
-            "The maximum file size that can be uploaded is 10MB")
+            "The maximum file size that can be uploaded is 5MB")
     else:
         return value
 
@@ -51,7 +51,7 @@ class Event(TimestampedModel):
 	short_description = models.TextField(null=True, blank=True)
 	venue_address = models.CharField(max_length=200, null=True, blank=True)
 	venue_name = models.CharField(max_length=200, null=True, blank=True)
-	short_description = models.TextField(blank=True, null=True)
+	description = models.TextField(blank=True, null=True)
 	image = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
 	public = models.BooleanField(default=True)
 	active = models.BooleanField(default=True)

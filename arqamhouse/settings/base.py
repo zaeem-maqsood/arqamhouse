@@ -238,6 +238,7 @@ STATICFILES_DIRS = [
 # MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "media")
 
 
-
+FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'code_beautifier', 'colors', 'draggable', 'emoticons', 'font_family', 'font_size', 'inline_style', 'link', 'lists', 'paragraph_format', 'paragraph_style', 'quick_insert', 'quote', 'table',
+                         'url')
 
 
