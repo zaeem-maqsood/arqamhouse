@@ -205,7 +205,7 @@ function endDateTime(object) {
 
 <form method="POST" enctype="multipart/form-data" autocomplete="off" onSubmit="document.getElementById('Create').disabled = true;">{% csrf_token %}
 <div class="row {% if event.active %}align-items-center h-100{% endif %}{% if not event %} align-items-center h-100{% endif %}" {% if event.active %}style="padding: 3rem 0px 3rem 0px;"{% endif %}  {% if not event %}style="padding: 3rem 0px 3rem 0px;"{% endif %}>
-    <div class="{% if event.active %}col-lg-10 offset-lg-1 col-md-12 col-12{% else %}col-lg-8{% endif %}{% if not event %} offset-lg-1{% endif %}">
+    <div class="{% if event.active %}col-lg-8 offset-lg-2 col-md-12 col-12{% else %}col-lg-8{% endif %}{% if not event %} offset-lg-1{% endif %}">
         <div class="kt-portlet kt-portlet--mobile" style="padding:20px;">
             <div class="kt-portlet__body">
 				
@@ -301,7 +301,7 @@ function endDateTime(object) {
 
 
 						<div class="row" style="padding-bottom: 40px;">
-							<div class="col-md-5" style="padding: 30px;">
+							<div class="col-md-4" style="padding: 30px;">
 								{% if form.instance.image %}
 								<img id="image-placeholder" src="{{ form.instance.image.url }}?lastmod={{ form.instance.end|date:"Y-m-d" }}"
 									alt="Event Image" width="100%" />
@@ -314,7 +314,7 @@ function endDateTime(object) {
 									width="100%" />
 								{% endif %}
 							</div>
-							<div class="col-md-7" style="padding: 30px;">
+							<div class="col-md-8" style="padding: 30px;">
 								<p style="font-weight: 600;margin-bottom:0px;{% if form.image.errors %}color:red;{% endif %}">Image</p>
 								{{ form.image }}
 								<br>
@@ -358,7 +358,7 @@ function endDateTime(object) {
 	</div>
 	
 	{% if update_event %}
-	<div class="{% if event.active %}col-lg-10 offset-lg-1 col-md-12 col-12{% else %}col-lg-4{% endif %}">
+	<div class="{% if event.active %}col-lg-8 offset-lg-2 col-md-12 col-12{% else %}col-lg-4{% endif %}">
 
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
