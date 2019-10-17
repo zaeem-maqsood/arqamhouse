@@ -1,16 +1,13 @@
-<!-- See arqamhouse.views -->
 {% extends "frontend/base.html" %}
 
+{% load static %}
+
 {% block title %}
-Create House
+Login | Arqam House
 {% endblock title %}
 
-{% block navigation %}
-	{% include "frontend/navigation.html" %}
-{% endblock navigation %}
-
 {% block footer %}
-	{% include "frontend/footer.html" %}
+{% include "frontend/footer.html" %}
 {% endblock footer %}
 
 {% block styles %}
@@ -20,8 +17,192 @@ Create House
 {% endblock top_page_scripts %}
 
 {% block scripts %}
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+	calculateBuyerTicketCostAndOrganizerTicketValue()
+});
+
+
+
+
+
+function calculateBuyerTicketCostAndOrganizerTicketValue() {
+var price = 0.00;
+var new_price = 0.00;
+var buyer_ticket_cost = 0.00;
+var organizer_ticket_value = 0.00;
+
+// Get the price elements
+price = document.getElementById("id_price");
+
+
+// Check and see if price element value is not null
+if (price != null) {
+price = price.value;
+}
+
+if (price) {
+new_price = parseFloat(price);
+}
+
+// use the regular price
+
+// Check the value of the "pass fee" checkbox
+
+buyer_ticket_cost = (new_price + (new_price * 0.04) + 0.30);
+fee = (new_price * 0.04) + 0.30
+organizer_ticket_value = new_price;
+
+
+// Convert to 2 decimal places
+buyer_ticket_cost = buyer_ticket_cost.toFixed(2);
+organizer_ticket_value = organizer_ticket_value.toFixed(2);
+fee = fee.toFixed(2);
+
+// Set the Values to 0 if there is no input
+if (isNaN(buyer_ticket_cost)) {
+buyer_ticket_cost = 0.00;
+}
+if (isNaN(organizer_ticket_value)) {
+organizer_ticket_value = 0.00;
+}
+if (isNaN(fee)) {
+	fee = 0.00;
+}
+
+
+// Display Buyer Cost
+buyer_ticket_cost = buyer_ticket_cost.toString()
+document.getElementById("new_price_div").innerHTML = "$" + buyer_ticket_cost;
+
+// Display Organizer Ticket Value
+	fee = fee.toString()
+document.getElementById("amount_received_div").innerHTML = "$" + fee;
+
+
+}
+
+
+$('#id_pass_fee').change(function() {
+calculateBuyerTicketCostAndOrganizerTicketValue()
+});
+
+
+$('#id_price').bind('input', function() {
+calculateBuyerTicketCostAndOrganizerTicketValue()
+});
+</script>
 {% endblock scripts %}
 
 {% block content %}
-<h1>Arqam House</h1>
+<section class="text-center" style="padding-bottom: 20px;">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 col-lg-12">
+
+				<div class="row" style="padding-bottom: 20px;">
+					<div class="col-md-12">
+						<a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+					</div>
+				</div>
+
+				<div class="row" style="padding-bottom: 40px;">
+					<div class="col-md-12 col-10">
+						<h4 style="color: grey;">An event managment app that doesn't scare you.</h4>
+						<a href="{% url 'profiles:login' %}">Give it a try</a>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<!--end of row-->
+	</div>
+	<!--end of container-->
+</section>
+<section>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6">
+				<div class="feature feature--featured feature-5 boxed boxed--lg boxed--border">
+					<i class="icon icon-Duplicate-Window"></i>
+					<div class="feature__body">
+						<h5>The power of simplicity</h5>
+						<p style="min-height: 0px;">
+							Get the important details to your attendees as fast as possible. With our simple event pages and checkout experience attendees will have a fluid experience. 
+						</p>
+						<a href="{% url 'profiles:login' %}">Try it out</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="feature feature--featured feature-5 boxed boxed--lg boxed--border">
+					<i class="icon icon-Life-Safer"></i>
+					<div class="feature__body">
+						<h5>Multiple house owners</h5>
+						<p style="min-height: 0px;">
+							Working with a team? You can add others to your house and allow them to help out. You may also create or join any number of houses, all from your single Arqam House account.  
+						</p>
+						<a href="{% url 'profiles:login' %}">Try it out</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="feature feature--featured feature-5 boxed boxed--lg boxed--border">
+					<i class="icon icon-Pantone"></i>
+					<div class="feature__body">
+						<h5>The Lowest Fee</h5>
+						<p style="min-height: 0px;">
+							Free tickets are free.
+							Paid tickets are 4% + $0.30. That <strong style="color: #4a90e2;">includes payment processing.</strong>
+						</p>
+						<a href="{% url 'profiles:login' %}">Try it out</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="feature feature--featured feature-5 boxed boxed--lg boxed--border">
+					<i class="icon icon-Fingerprint"></i>
+					<div class="feature__body">
+						<h5>Built For Small Organizations</h5>
+						<p style="min-height: 0px;">
+							Arqam House is 'house' first. That means we don't use your event to promote other events.
+						</p>
+						<a href="{% url 'profiles:login' %}">Try it out</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--end of row-->
+	</div>
+	<!--end of container-->
+</section>
+
+
+<section>
+	<div class="container">
+		<div class="row text-center">
+			<div class="col-md-10 offset-md-1 col-10 offset-1">
+				<h2 style="color:#4a90e2;">Pricing</h2>
+				<h4 style="color:grey;">Enter a ticket price and see how much it'll cost you</h4>
+			</div>
+		</div>
+		<div class="row text-center">
+			<div class="col-md-2 offset-md-5 col-sm-4 offset-sm-4 col-6 offset-3">
+				<input type="number" name="price" value="5.00" class="" min="1.00" max="2000.00" step="0.01" required="" id="id_price">
+				<p>Ticket Price</p>
+			</div>
+		</div>
+		<div class="row text-center" style="padding-top:40px;">
+			<div class="col-md-4 offset-md-2 col-6">
+				<h3 class="m--font-success" id="amount_received_div" style="margin-bottom: 0px;">$0.00</h3>
+				<p>Total Fee</p>
+			</div>
+			<div class="col-md-4 col-6">
+				<h3 class="m--font-info" id="new_price_div" style="margin-bottom: 0px;">$0.00</h3>
+				<p>New Ticket Price</p>
+			</div>
+		</div>
+	</div>
+</section>
 {% endblock content %}
