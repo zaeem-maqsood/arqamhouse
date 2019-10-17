@@ -15,7 +15,7 @@ class AddTicketsToCartView(FormView):
 		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
 
 	def get_failure_url(self):
-		view_name = "events:choose_tickets"
+		view_name = "events:landing"
 		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
 
 	def get_tickets(self, event):
@@ -118,7 +118,7 @@ class AddTicketsToCartView(FormView):
 			cart.discount_code = None
 			discount_code = form.cleaned_data["discount_code"]
 			try:
-				event_discount = EventDiscount.objects.get(code=discount_code)
+				event_discount = EventDiscount.objects.get(code=discount_code, deleted=False, finished=False)
 				cart.discount_code = event_discount
 				cart.invalid_discount_code = False
 			except Exception as e:
@@ -147,7 +147,10 @@ class AddTicketsToCartView(FormView):
 			check = self.check_remaining_tickets(ticket, quantity)
 			if check:
 				tickets_left = ticket.amount_available - ticket.amount_sold
-				messages.error(request, "%s tickets available for '%s'" % (tickets_left, ticket.title))
+				if tickets_left == 1:
+					messages.error(request, "Sorry, there is only %s '%s' ticket left." % (tickets_left, ticket.title))
+				else:
+					messages.error(request, "Sorry, there are only %s '%s' tickets left." % (tickets_left, ticket.title))
 				return HttpResponseRedirect(self.get_failure_url())
 
 

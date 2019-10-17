@@ -49,7 +49,7 @@ Add Bank | {{ house.name }}
 
                     <div class="row" style="padding-bottom:30px;">
                         <div class="col-md-12">
-                            <p style="margin-bottom: 5px;font-weight: 500;">Code</p>
+                            <p style="margin-bottom: 5px;font-weight: 500;"><i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i> Code</p>
                             {{ form.code }}
                         </div>
                     </div>
@@ -68,14 +68,42 @@ Add Bank | {{ house.name }}
                         </div>
                     </div>
 
+                    {% if form.total_uses.errors %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% for error in form.total_uses.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
                     <div class="row" style="padding-bottom:30px;">
                         <div class="col-6">
-                            <p style="margin-bottom: 5px;font-weight: 500;">Uses</p>
+                            <p style="margin-bottom: 5px;font-weight: 500;"> <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip"
+                                data-placement="top" title="" data-original-title="The amount of orders this code can be used in."></i> Uses {% if update %}<span style="font-weight: 200;">| Used so far : {{ form.instance.used }}</span>{% endif %}</p>
                             {{ form.total_uses }}
                         </div>
                     </div>
 
-                    <div class="row" style="padding-top: 30px;">
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-lg-4 col-md-12">
+                            <p style="margin-bottom:0px;"><i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle"
+                                    data-container="body" data-toggle="kt-tooltip" data-placement="top" title=""
+                                    data-original-title="Switch on to stop the use of this discount code"></i>
+                                Finished</p>
+                            <span class="kt-switch">
+                                <label>
+                                    {{ form.finished }}
+                                    <span></span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-md-12">
                             <p style="font-weight: 500;">Choose tickets this discount applies too
                             <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" 
@@ -101,15 +129,24 @@ Add Bank | {{ house.name }}
 
 
                     {% if update %}
-                    <div class="row" style="padding-top:20px;">
-                        <div class="col-md-12">
-                            <button id="customButton" type="submit" class="btn btn-primary">Update Discount Code</button>
+                    <div class="row">
+                        <div class="col-md-6" style="padding-top:20px;">
+                            <button id="updateDiscountCode" type="submit" class="btn btn-block btn-primary">Update Code</button>
                         </div>
+                        {% if form.instance.deleted %}
+                        <div class="col-md-6" style="padding-top: 20px;">
+                            <button type="submit" name="undo-delete" value="undo-delete" class="btn btn-danger btn-block">Undo Delete</button>
+                        </div>
+                        {% else %}
+                        <div class="col-md-6" style="padding-top: 20px;">
+                            <button type="submit" name="delete" value="delete" class="btn btn-danger btn-block">Delete Code</button>
+                        </div>
+                        {% endif %}
                     </div>
                     {% else %}
                     <div class="row" style="padding-top:20px;">
                         <div class="col-md-12">
-                            <button id="customButton" type="submit" class="btn btn-primary">Create Discount Code</button>
+                            <button id="createDiscountCode" type="submit" class="btn btn-primary">Create Code</button>
                         </div>
                     </div>
                     {% endif %}
