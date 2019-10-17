@@ -103,8 +103,9 @@ function preFillURLData() {
 
 
 jQuery(document).ready(function($) {
-    updateCountdown();
+    
 	{% if event %}
+	updateCountdown();
 	preFillURLData()
 	{% endif %}
     $('.message').change(updateCountdown);
@@ -204,7 +205,7 @@ function endDateTime(object) {
 
 <form method="POST" enctype="multipart/form-data" autocomplete="off" onSubmit="document.getElementById('Create').disabled = true;">{% csrf_token %}
 <div class="row {% if event.active %}align-items-center h-100{% endif %}{% if not event %} align-items-center h-100{% endif %}" {% if event.active %}style="padding: 3rem 0px 3rem 0px;"{% endif %}  {% if not event %}style="padding: 3rem 0px 3rem 0px;"{% endif %}>
-    <div class="{% if event.active %}col-lg-8 offset-lg-2 col-md-12 col-12{% else %}col-lg-8{% endif %}{% if not event %} offset-lg-2{% endif %}">
+    <div class="{% if event.active %}col-lg-10 offset-lg-1 col-md-12 col-12{% else %}col-lg-8{% endif %}{% if not event %} offset-lg-1{% endif %}">
         <div class="kt-portlet kt-portlet--mobile" style="padding:20px;">
             <div class="kt-portlet__body">
 				
@@ -299,71 +300,49 @@ function endDateTime(object) {
 						</div>
 
 
-
-						<div style="padding-bottom: 30px;" class="accordion" id="accordionExample4">
-							<div class="card">
-								<div class="card-header" id="headingTwo4" style="background-color: #dcf0ff;">
-									<div class="card-title collapsed" data-toggle="collapse" data-target="#collapseThree4" aria-expanded="false"
-										aria-controls="collapseThree4">
-										<i class="la la-plus"></i> Optional Details
-									</div>
+						<div class="row" style="padding-bottom: 40px;">
+							<div class="col-md-5" style="padding: 30px;">
+								{% if form.instance.image %}
+								<img id="image-placeholder" src="{{ form.instance.image.url }}?lastmod={{ form.instance.end|date:"Y-m-d" }}"
+									alt="Event Image" width="100%" />
+								<br>
+								<br>
+								{% if form.instance.image %}<button type="submit" class="btn btn-outline-danger btn-block" name="Remove"
+									value="Remove">Remove Image</button>{% endif %}
+								{% else %}
+								<img id="image-placeholder" src="{% static 'images/event_flyer_placeholder.jpg' %}" alt="Event Image"
+									width="100%" />
+								{% endif %}
+							</div>
+							<div class="col-md-7" style="padding: 30px;">
+								<p style="font-weight: 600;margin-bottom:0px;{% if form.image.errors %}color:red;{% endif %}">Image</p>
+								{{ form.image }}
+								<br>
+								{% for error in form.image.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+									{{ error }}
 								</div>
-								<div id="collapseThree4" class="collapse" aria-labelledby="headingThree1" data-parent="#accordionExample4">
-									<div class="card-body">
+								{% endfor %}
+								<p class="text-center" style="padding-top: 20px;padding-bottom: 20px;">We suggest a standard 8.5" X 11" flyer
+									but you can use any image you'd like.</p>
 						
-										
-										<div class="row" style="padding-bottom: 40px;">
-											<div class="col-md-5" style="padding: 30px;">
-												{% if form.instance.image %}
-												<img id="image-placeholder" src="{{ form.instance.image.url }}?lastmod={{ time }}"
-													alt="Event Image" width="100%" />
-												<br>
-												<br>
-												{% if form.instance.image %}<button type="submit" class="btn btn-outline-danger btn-block" name="Remove"
-													value="Remove">Remove Image</button>{% endif %}
-												{% else %}
-												<img id="image-placeholder" src="{% static 'images/event_flyer_placeholder.jpg' %}" alt="Event Image"
-													width="100%" />
-												{% endif %}
-											</div>
-											<div class="col-md-7" style="padding: 30px;">
-												<p style="font-weight: 600;margin-bottom:0px;{% if form.image.errors %}color:red;{% endif %}">Image</p>
-												{{ form.image }}
-												<br>
-												{% for error in form.image.errors %}
-												<div class="alert m-alert--outline alert-danger" role="alert">
-													{{ error }}
-												</div>
-												{% endfor %}
-												<p class="text-center" style="padding-top: 20px;padding-bottom: 20px;">We suggest a standard 8.5" X 11" flyer
-													but you can use any image you'd like.</p>
-										
-											</div>
-										</div>
-										
-										{{ form.media }}
-										<div class="row" style="padding-bottom: 20px;">
-											<div class="col-md-12">
-												<p style="font-weight: 600;margin-bottom:0px;{% if form.description.errors %}color:red;{% endif %}">Description
-												</p>
-												{{ form.description }}
-												<br>
-												{% for error in form.description.errors %}
-												<div class="alert m-alert--outline alert-danger" role="alert">
-													{{ error }}
-												</div>
-												{% endfor %}
-											</div>
-										</div>
-										
-						
-									</div>
-								</div>
 							</div>
 						</div>
-
-
 						
+						{{ form.media }}
+						<div class="row" style="padding-bottom: 20px;">
+							<div class="col-md-12">
+								<p style="font-weight: 600;margin-bottom:0px;{% if form.description.errors %}color:red;{% endif %}">Description
+								</p>
+								{{ form.description }}
+								<br>
+								{% for error in form.description.errors %}
+								<div class="alert m-alert--outline alert-danger" role="alert">
+									{{ error }}
+								</div>
+								{% endfor %}
+							</div>
+						</div>
 
 
 						<div class="row" style="padding-bottom: 30px;">
@@ -379,7 +358,7 @@ function endDateTime(object) {
 	</div>
 	
 	{% if update_event %}
-	<div class="{% if event.active %}col-lg-8 offset-lg-2 col-md-12 col-12{% else %}col-lg-4{% endif %}">
+	<div class="{% if event.active %}col-lg-10 offset-lg-1 col-md-12 col-12{% else %}col-lg-4{% endif %}">
 
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
