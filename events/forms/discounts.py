@@ -14,6 +14,7 @@ class DiscountForm(forms.ModelForm):
             "total_uses",
             "start",
             "end",
+            "finished"
         ]
 
         widgets = {
@@ -43,6 +44,10 @@ class DiscountForm(forms.ModelForm):
                     "placeholder": "100",
                 }
             ),
+            "finished": forms.CheckboxInput(
+                attrs={
+                }
+            ),
         }
 
 
@@ -56,3 +61,12 @@ class DiscountForm(forms.ModelForm):
                 "Please enter a code with more than 3 characters and less than 20 characters")
 
         return cleaned_data
+
+    def clean_total_uses(self):
+        total_uses = self.cleaned_data.get('total_uses')
+        if total_uses is not None:
+            if self.instance.used > total_uses:
+                raise forms.ValidationError(
+                    'This code has already been used %s times, please choose a greater number.' % (self.instance.used))
+            else:
+                return total_uses

@@ -136,6 +136,10 @@ def event_cart_item_pre_save_reciever(sender, instance, *args, **kwargs):
 			# Discount code activated flag
 			instance.discount_code_activated = True
 
+			# Reduce used amount on discount code
+			instance.event_cart.discount_code.used += 1
+			instance.event_cart.discount_code.save()
+
 			# find out if the discount code is a fixed amount or a percentage amount
 			# take the price of the ticket 'ticket.price' and subtract the discount from it 
 			discount_code = instance.event_cart.discount_code

@@ -36,14 +36,16 @@ Tickets | {{ event.title }}
 				<div class="row" style="padding-bottom: 50px;">
 					<div class="col-12">
 						<h3 style="display: inline-block;">Tickets</h3>
+						{% if show_discount_code_button %}
 						<a class="btn btn-primary pull-right" href="{{ event.list_discounts_view }}">Discount Codes</a>
+						{% endif %}
 					</div>
 				</div>
 
 				{% for ticket in tickets %}
 				<div class="row" style="padding-bottom: 50px;">
 					<div class="col-12">
-						<h5 style="font-size: 1.2rem;font-weight: 400;">{{ ticket.title }} {% if ticket.deleted %}| <span style="color:#FF4500;">Deleted</span> {% endif %}| <a href="{{ ticket.update_ticket_view }}">Edit</a></h5>
+						<h5 style="font-size: 1.2rem;font-weight: 400;">{{ ticket.title }} {% if ticket.sold_out %}| <span style="color:#FF4500;">Sold Out </span>{% endif %} {% if ticket.deleted %}| <span style="color:#FF4500;">Deleted</span> {% endif %}| <a href="{{ ticket.update_ticket_view }}">Edit</a></h5>
 						<div class="progress">
 							<div class="progress-bar progress-bar-striped progress-bar-animated {{ ticket.percentage_color }}" role="progressbar" aria-valuenow="{{ ticket.amount_sold }}" aria-valuemin="0" aria-valuemax="{{ ticket.amount_available }}" style="width: {{ ticket.percentage_sold }}"></div>
 						</div>
@@ -52,7 +54,7 @@ Tickets | {{ event.title }}
 								<p style="margin-bottom: 3px;"><span style="font-weight: 400;">{% if ticket.free %}Free Ticket{% elif ticket.paid %}Paid Ticket{% else %}Donation Ticket{% endif %}</span></p>
 							</div>
 							<div class="col-md-6">
-								<p style="margin-bottom: 3px;" class="float-right"><span style="font-weight: 400;">{{ ticket.amount_sold }} / {{ ticket.amount_available }}</span></p>
+								<p style="margin-bottom: 3px;font-weight: 400;" class="float-right"> {{ ticket.amount_sold }} / {{ ticket.amount_available }}</p>
 							</div>
 							
 						</div>

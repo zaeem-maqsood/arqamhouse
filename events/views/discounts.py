@@ -55,19 +55,29 @@ class DiscountUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
             return self.form_invalid(form)
 
     def form_valid(self, form, request, event):
-        house = self.get_house()
-        self.object = form.save()
-        self.object.event = event
-        tickets = Ticket.objects.filter(event=event, paid=True)
-
         data = request.POST
 
-        self.object.tickets.clear()
-        for ticket in tickets:
-            if str(ticket.id) in data:
-                self.object.tickets.add(ticket)
+        if "delete" in data:
+            self.object.deleted = True
+            self.object.save()
+            messages.success(request, 'Code Deleted Successfully!')
 
-        messages.success(request, 'Discount Code Updated')
+        elif 'undo-delete' in data:
+            self.object.deleted = False
+            self.object.save()
+            messages.success(request, 'Code Recovered Successfully!')
+
+        else:
+            house = self.get_house()
+            self.object = form.save()
+            self.object.event = event
+            tickets = Ticket.objects.filter(event=event, paid=True)
+            self.object.tickets.clear()
+            for ticket in tickets:
+                if str(ticket.id) in data:
+                    self.object.tickets.add(ticket)
+            messages.success(request, 'Discount Code Updated')
+            
         valid_data = super(DiscountUpdateView, self).form_valid(form)
         return valid_data
 
