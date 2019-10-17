@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_cleanup.apps.CleanupConfig',
+    'django_hosts',
     'storages',
     'cities_light',
     'houses',
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django_hosts.middleware.HostsRequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
     # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -62,9 +64,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_hosts.middleware.HostsResponseMiddleware',
 ]
 
 ROOT_URLCONF = 'arqamhouse.urls'
+ROOT_HOSTCONF = 'arqamhouse.hosts'
+DEFAULT_HOST = 'www'
 
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 102400
@@ -241,4 +246,8 @@ STATICFILES_DIRS = [
 FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'code_beautifier', 'colors', 'draggable', 'emoticons', 'font_family', 'font_size', 'inline_style', 'link', 'lists', 'paragraph_format', 'paragraph_style', 'quick_insert', 'quote', 'table',
                          'url')
 
+
+FROALA_EDITOR_OPTIONS = {
+    'key': 'PYC4mB3B15B11A7C4A5dxhjA-21pvpurgH3gjkD-17D2E2F2C1E4F1A1B8D7E6==',
+}
 

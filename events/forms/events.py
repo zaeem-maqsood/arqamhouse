@@ -75,8 +75,7 @@ class EventForm(forms.ModelForm):
 	end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], required=False,  widget=forms.DateTimeInput(
 		attrs={"class": "form-control m-input", "placeholder": "End", "autocomplete": "off"}))
 
-	description = forms.CharField(widget=FroalaEditor(
-		options={'toolbarInline': False, 'attribution': False, 'tableStyles': 'table'}))
+	description = forms.CharField(required=False, widget=FroalaEditor(options={'toolbarInline': False, 'attribution': False, 'tableStyles': 'table'}))
 
 	class Meta:
 		model = Event
