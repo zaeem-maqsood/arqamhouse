@@ -61,7 +61,7 @@ class AttendeeListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 		worksheet.title = 'Attendees'
 
 		# Define the titles for columns
-		columns = ['Name', 'Ticket', 'Gender', 'Age', 'Refunded', 'Country', 'Region', 'City', 'Address']
+		columns = ['Name', 'Ticket', 'Gender', 'Age', 'Refunded', 'Address', 'City', 'Region', 'Country', ]
 		for event_question in event_questions:
 			columns.append(event_question.question.title)
 		row_num = 1
@@ -97,23 +97,21 @@ class AttendeeListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 				row.append("Yes")
 
 			if attendee.address:
-				row.append(attendee.country.name)
-				row.append(attendee.region.name)
-				row.append(attendee.city.name)
 				row.append(attendee.address)
+				row.append(attendee.city.name)
+				row.append(attendee.region.name)
+				row.append(attendee.country.name)
 			else:
-				row.append("No Country")
-				row.append("No Region")
-				row.append("No City")
 				row.append("No Address")
+				row.append("No City")
+				row.append("No Region")
+				row.append("No Country")
 
 			for event_question in event_questions:
 				value = "N/A"
 				for answer in answers:
-					if answer.question == event_question:
+					if answer.question.pk == event_question.pk:
 						value = answer.value
-					else:
-						value = "N/A"
 				row.append(value)
 		
 
