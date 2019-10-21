@@ -1,3 +1,4 @@
+{% load tz %}
 <!doctype html>
 <html>
 
@@ -14,7 +15,7 @@
   <h1 style="font-weight: 400;">Order Confirmation</h1>
   <p style="font-size:0.9em;font-weight: 600;">Order # | <span style="font-weight: 400;">{{ order.number }}</span></p>
   <p style="font-size:0.9em;font-weight: 600;">Name | <span style="font-weight: 400;">{{ order.name }}</span></p>
-  <p style="font-size:0.9em;font-weight: 600;">Created at | <span style="font-weight: 400;">{{ order.created_at }}</span></p>
+  <p style="font-size:0.9em;font-weight: 600;">Created at | <span style="font-weight: 400;">{{ order.created_at|localtime }}</span></p>
   <p style="font-size:0.9em;font-weight: 600;">Email | <span style="font-weight: 400;">{{ order.email }}</span></p>
   <p style="font-size:0.9em;font-weight: 600;">Event | <span style="font-weight: 400;">{{ order.event.title }}</span></p>
 
@@ -23,10 +24,10 @@
     {% if order.event.start or order.event.end %}
     <address id="from">
       <span style="font-weight: 400;font-size:1.5em;color:#4599d5;">When</span>
-      <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Starts on | <span style="font-weight: 400;">{{ order.event.start|date:"N nS Y, f a" }}</span></p>
+      <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Starts on | <span style="font-weight: 400;">{{ order.event.start|localtime|date:"N jS Y, f a" }}</span></p>
       {% endif %}
       {% if order.event.end %}
-      <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Ends on | <span style="font-weight: 400;">{{ order.event.end|date:"N nS Y, f a" }}</span></p>
+      <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Ends on | <span style="font-weight: 400;">{{ order.event.end|localtime|date:"N jS Y, f a" }}</span></p>
     </address>
     {% endif %}
 

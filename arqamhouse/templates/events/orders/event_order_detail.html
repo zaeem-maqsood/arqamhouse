@@ -1,5 +1,5 @@
 {% extends "backend/base.html" %}
-
+{% load tz %}
 {% load static %}
 
 {% block title %}
@@ -55,7 +55,7 @@ Order #{{ order.number }} | {{ event.title }}
 				<div class="row">
 					<div class="col-12">
 						<h4>Order Details</h4>
-						<p>Order placed on {{ order.created_at }}</p>
+						<p>Order placed on {{ order.created_at|localtime }}</p>
 						<p style="font-weight:500;">
 							{% if order.failed %}
 								<span style="color:#FF4500;"> Order Failed</span>

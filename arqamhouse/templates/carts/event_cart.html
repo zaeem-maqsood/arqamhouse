@@ -1,4 +1,5 @@
 {% extends "frontend/base.html" %}
+{% load tz %}
 {% load ticket_form_tags %}
 {% load static %}
 
@@ -206,11 +207,11 @@ $('#id_{{ ticket.id }}').change(function() {
 									<h5 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="far fa-clock"></i> When</h5>
 									{% if event.start %}
 									<p style="margin-bottom: 0;font-weight:600;">Starts | <span style="font-weight:400;">
-											{{ event.start|date:"N jS Y, f a" }}</span></p>
+											{{ event.start|localtime|date:"N jS Y, f a" }}</span></p>
 									{% endif %}
 									{% if event.end %}
 									<p style="margin-bottom: 0;font-weight:600;">Ends | <span style="font-weight:400;">
-											{{ event.end|date:"N jS Y, f a" }}</span></p>
+											{{ event.end|localtime|date:"N jS Y, f a" }}</span></p>
 									{% endif %}
 								</div>
 								{% endif %}
