@@ -1,3 +1,4 @@
+{% load tz %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html data-editor-version="2" class="sg-campaigns" xmlns="http://www.w3.org/1999/xhtml">
 
@@ -277,7 +278,7 @@
                                                                                                                         style="user-select: auto;"><strong
                                                                                                                             style="user-select: auto;">Starts
                                                                                                                             on</strong>
-                                                                                                                        | {{ event.start|date:"N nS Y, f a" }}</span>
+                                                                                                                        | {{ event.start|localtime|date:"N jS Y, f a" }}</span>
                                                                                                                 </font>
                                                                                                             </span></span></span>
                                                                                                 </div>
@@ -297,7 +298,7 @@
                                                                                                                         style="user-select: auto;"><strong
                                                                                                                             style="user-select: auto;">End
                                                                                                                             on</strong>
-                                                                                                                        | {{ event.end|date:"N nS Y, f a" }}</span>
+                                                                                                                        | {{ event.end|localtime|date:"N jS Y, f a" }}</span>
                                                                                                                 </font>
                                                                                                             </span></span></span>
                                                                                                 </div>
