@@ -364,8 +364,25 @@ class EventCheckoutView(FormView):
 							currency = 'cad',
 							description = self.get_charge_description(event, order),
 							source = stripe_token,
-							statement_descriptor = 'Arqam House Inc.',
+							metadata = {
+                                    	'transaction_amount': cart.total,
+										'transaction_arqam_amount': cart.arqam_charge,
+										'transaction_stripe_amount': cart.stripe_charge,
+										'transaction_house_amount': cart.total_no_fee,
+										'buyer_email': data['email'],
+										'buyer_name': data['name'],
+										'order_id': order.public_id,
+										'event_name': order.event.title,
+										'event_id': order.event.pk,
+										'house_name': order.event.house.name,
+										'house_id': order.event.house.pk
+										},
+                                    statement_descriptor=self.get_charge_descriptor(event),
 						)
+
+				print("Charge goes here")
+				print(charge)
+				print("Charge goes here")
 
 				transaction.amount = cart.total
 				transaction.arqam_amount = cart.arqam_charge
@@ -373,8 +390,6 @@ class EventCheckoutView(FormView):
 				transaction.house_amount = cart.total_no_fee
 
 				transaction.payment_id = charge['id']
-				transaction.failure_code = charge['failure_code']
-				transaction.failure_message = charge['failure_message']
 				transaction.last_four = charge.source['last4']
 				transaction.brand = charge.source['brand']
 				transaction.network_status = charge.outcome['network_status']
@@ -401,7 +416,31 @@ class EventCheckoutView(FormView):
 				print(cart.processed)
 
 				self.send_confirmation_email(event, data['email'], order)
+				self.send_owner_confirmation_email(event, order)
 				messages.success(request, 'Check your email for tickets and further instructions.')
+				return HttpResponseRedirect(self.get_success_url())
+
+			except stripe.error.CardError as e:
+				print(e)
+
+				transaction.payment_id = e.error.charge
+				transaction.failure_code = e.error.code
+				transaction.failure_message = e.error.message
+				transaction.outcome_type = e.error.type
+				transaction.network_status = e.http_status
+				transaction.reason = e.error.param
+				transaction.email = order.email
+
+				order.failed = True
+				transaction.failed = True
+				transaction.code_fail_reason = e.error.message
+				order.save()
+				transaction.save()
+				cart.processed = False
+				cart.save()
+				del request.session['cart']
+				request.session.modified = True
+				messages.error(request, "%s Please try again." % (e.error.message))
 				return HttpResponseRedirect(self.get_success_url())
 
 			except Exception as e:
@@ -466,14 +505,35 @@ class EventCheckoutView(FormView):
 		email.send()
 		return "Done"
 
+	def send_owner_confirmation_email(self, event, order):
+
+		house_users = HouseUser.objects.filter(house=event.house)
+		to_emails = []
+		for house_user in house_users:
+			to_emails.append(house_user.profile.email)
+		# Compose Email
+		subject = 'New Order For %s' % (event.title)
+		context = {}
+		context["event"] = event
+		context["order"] = order
+		html_content = render_to_string('emails/owner_order_confirmation.html', context)
+		text_content = strip_tags(html_content)
+		from_email = 'New Order <info@arqamhouse.com>'
+		to = to_emails
+		email = EmailMultiAlternatives(subject=subject, body=text_content,
+		                               from_email=from_email, to=to)
+		email.attach_alternative(html_content, "text/html")
+		email.send()
+		return "Done"
+
 	def get_charge_description(self, event, order):
 		return ("Order #: %s for Event: %s (Event ID: %s)." % (order.id, event.title, event.id))
 
 
 	def get_charge_descriptor(self, event):
-		event_title = event.title
+		event_title = "AH* %s" % (event.title)
 		if len(event_title) > 20:
-			descriptor = event.house.name
+			descriptor = "AH* %s" % (event.house.name)
 			if len(descriptor) > 20:
 				descriptor = 'Arqam House Inc.'
 		else:

@@ -59,6 +59,8 @@ Order #{{ order.number }} | {{ event.title }}
 						<p style="font-weight:500;">
 							{% if order.failed %}
 								<span style="color:#FF4500;"> Order Failed</span>
+								<br>
+								Message to buyer | <span style="color:#FF4500;">{{ order.transaction.code_fail_reason }}</span>
 							{% elif order.partial_refund %}
 								<span style="color:#FFBE00;"> This order has been partially refunded</span>
 							{% elif order.refunded %}

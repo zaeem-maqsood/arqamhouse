@@ -9,11 +9,88 @@ Payments | {{ house.name }}
 
 
 {% block styles %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
 
 {% endblock styles %}
 
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+
+
+const toDateCalendar = new flatpickr(document.getElementById('id_end'), {
+		altFormat: "F j, Y",
+		dateFormat: "Y-m-d",
+		maxDate: "today",
+		
+	}
+);
+
+
+const fromDateCalendar = new flatpickr(document.getElementById('id_start'), {
+		altFormat: "F j, Y",
+		dateFormat: "Y-m-d",
+		minDate: "2019-09-12",
+		maxDate: "today",
+		onChange: function (dateStr, dateObj) {
+			toDateCalendar.set("minDate", dateObj);
+			// Filter(dateStr, toDateCalendar.dateStr);
+		}
+	}
+);
+
+
+function Filter(object) {
+
+	var start = document.getElementById("id_start");
+	var end = document.getElementById("id_end");
+	var log_type = document.getElementById("log_type");
+
+	var reset = '';
+	if (object != undefined) {
+		reset = object.value;
+		start.value = '';
+		end.value = '';
+		log_type.value = 'all';
+
+	}
+
+
+	if (start.value && end.value || log_type) {
+
+		start = start.value;
+		end = end.value;
+		log_type = log_type.value;
+
+		var token = '{{csrf_token}}';
+
+		$.ajax({
+			type: "POST",
+			headers: { "X-CSRFToken": token },
+			url: '{{ request.path }}',
+			data: {
+				'start': start,
+				'end': end,
+				'log_type': log_type,
+				'reset': reset
+			},
+
+			success: function (data) {
+				document.getElementById("dynamic").innerHTML = data;
+
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				alert(errorThrown);
+				//some stuff on failure
+			},
+		});
+
+	}
+	
+}
+</script>
 {% endblock scripts %}
 
 
@@ -30,32 +107,62 @@ Payments | {{ house.name }}
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
-				<div class="row" style="padding-bottom:30px;">
-					<div class="col-12">
-						<h3>Payments</h3>
+				<div class="row" style="padding-bottom: 30px;">
+					<div class="col-md-7" style="padding-bottom: 20px;">
+						<h3 style="margin-bottom:0px;">
+							Payments
+						</h3>
+					</div>
+					<div class="col-md-5 ">
+						<h3 class="pull-right" style="color: #91baa2;">{{ house_balance.balance }}</h3>
 					</div>
 				</div>
 
-				<table class="table table-bordered table-hover">
-					<thead class="thead-light">
-						<tr>
-							<th>Amount</th>
-							<th>Description</th>
-							<th class="d-none d-sm-none d-md-table-cell">Balance</th>
-							<th class="d-none d-sm-none d-md-table-cell">Date</th>
-						</tr>
-					</thead>
-					<tbody id="dynamic">
-						{% for house_balance_log in house_balance_logs %}
-						<tr>
-							<td style="font-weight: {% get_type_font_weight house_balance_log %};font-size: 1.2em;">${% get_amount house_balance_log %}</td>
-							<td style="color: {% get_type_color house_balance_log %};font-weight: 400;">{% autoescape off %}{% get_type_icon house_balance_log %} {% get_type house_balance_log %}{% endautoescape %}</td>
-							<td class="d-none d-sm-none d-md-table-cell" style="font-weight: {% get_type_font_weight house_balance_log %};font-size: 1.2em;">${{ house_balance_log.balance }}</td>
-							<td class="d-none d-sm-none d-md-table-cell" style="font-size: 0.9em;">{{ house_balance_log.created_at }}</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
+				<div class="row">
+					<div class="col-md-3" style="padding-bottom: 20px;">
+						<input type="text" name="start" class="form-control m-input flatpickr-input active" placeholder="Start"
+							autocomplete="off" onchange="Filter()" id="id_start" style="user-select: auto;">
+					</div>
+					<div class="col-md-3" style="padding-bottom: 20px;">
+						<input type="text" name="end" class="form-control m-input flatpickr-input active" placeholder="End" autocomplete="off"
+							id="id_end" onchange="Filter()" style="user-select: auto;">
+					</div>
+					<div class="col-md-3" style="padding-bottom: 20px;">
+						<select class="form-control" id="log_type" onchange="Filter()">
+							<option value="all">All</option>
+							<option value="transaction">Payments</option>
+							<option value="refund">Refunds</option>
+							<option value="payout">Payouts</option>
+							<option value="house_payment">Funds Added</option>
+						</select>
+					</div>
+					<div class="col-md-3" style="padding-bottom: 20px;">
+						<button value="reset" class="btn btn-danger btn-block" onclick="Filter(this)">Reset</button>
+					</div>
+				</div>
+
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover">
+						<thead class="thead-light">
+							<tr>
+								<th>Amount</th>
+								<th style="padding-right: 50px;">Description</th>
+								<th>Balance</th>
+								<th style="padding-right: 120px;">Date</th>
+							</tr>
+						</thead>
+						<tbody id="dynamic">
+							{% for house_balance_log in house_balance_logs %}
+							<tr>
+								<td style="font-weight: {% get_type_font_weight house_balance_log %};font-size: 1.2em;">${% get_amount house_balance_log %}</td>
+								<td style="color: {% get_type_color house_balance_log %};font-weight: 400;">{% autoescape off %}{% get_type_icon house_balance_log %} {% get_type house_balance_log %}{% endautoescape %}</td>
+								<td style="font-weight: {% get_type_font_weight house_balance_log %};font-size: 1.2em;">${{ house_balance_log.balance }}</td>
+								<td  style="font-size: 0.9em;">{{ house_balance_log.created_at }}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
 
 			</div>
 		</div>

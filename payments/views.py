@@ -1,6 +1,7 @@
 from django.shortcuts import render
 import decimal
 import stripe 
+import datetime
 from django.db.models import Sum
 from django.shortcuts import render
 from django.urls import reverse
@@ -13,6 +14,7 @@ from itertools import chain
 from operator import attrgetter
 from django.conf import settings
 from django.http import Http404, HttpResponseRedirect, HttpResponse
+from django.utils import timezone
 
 from django.core import mail
 from django.template.loader import render_to_string
@@ -267,18 +269,66 @@ class PayoutView(HouseAccountMixin, FormView):
 class PaymentListView(HouseAccountMixin, View):
 	template_name = "payments/list.html"
 
-	def get_house_balance_logs(self, house):
-		house_balance = HouseBalance.objects.get(house=house)
+	def get_house_balance_logs(self, house_balance):
 		house_balance_logs = HouseBalanceLog.objects.filter(house_balance=house_balance).order_by("-created_at")
 		return house_balance_logs
 
 	def get(self, request, *args, **kwargs):
 		return render(request, self.template_name, self.get_context_data())
 
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+		print(data)
+		house = self.get_house()
+		house_balance = HouseBalance.objects.get(house=house)
+		house_balance_logs = self.get_house_balance_logs(house_balance)
+
+		if not data['reset'] == 'reset':
+
+			start = data["start"]
+			end = data["end"]
+
+			log_type = data["log_type"]
+			print(log_type)
+
+			if start and end:
+				today = timezone.now()
+				start_year = int(start[0:4])
+				end_year = int(end[0:4])
+
+				start_month = int(start[5:7])
+				end_month = int(end[5:7])
+
+				start_day = int(start[8:10])
+				end_day = int(end[8:10])
+				print(start_day)
+				print(end_day)
+
+				house_balance_logs = house_balance_logs.filter(created_at__gte=datetime.date(start_year, start_month, start_day), created_at__lte=datetime.date(end_year, end_month, end_day))
+
+			if log_type:
+				if log_type == 'transaction':
+					house_balance_logs = house_balance_logs.filter(transaction__isnull=False)
+				elif log_type == 'refund':
+					house_balance_logs = house_balance_logs.filter(refund__isnull=False)
+				elif log_type == 'payout':
+					house_balance_logs = house_balance_logs.filter(payout__isnull=False)
+				elif log_type == 'house_payment':
+					house_balance_logs = house_balance_logs.filter(house_payment__isnull=False)
+				else:
+					house_balance_logs = house_balance_logs
+
+
+		html = render_to_string('payments/house_balance_logs_dynamic_table_body.html', {'house_balance_logs': house_balance_logs, 'request': request})
+		return HttpResponse(html)
+
+
 	def get_context_data(self, data=None, *args, **kwargs):
 		context = {}
 		house = self.get_house()
-		house_balance_logs = self.get_house_balance_logs(house)
+		house_balance = HouseBalance.objects.get(house=house)
+		house_balance_logs = self.get_house_balance_logs(house_balance)
+		context["house_balance"] = house_balance
 		context["house_balance_logs"] = house_balance_logs
 		context["dashboard_events"] = self.get_events()
 		context["house"] = self.get_house()

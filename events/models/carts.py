@@ -7,6 +7,7 @@ from .discounts import EventDiscount
 # Create your models here.
 class EventCart(models.Model):
 	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=False, null=False)
+	created_at = models.DateTimeField(default=timezone.now)
 	processed = models.BooleanField(default=False)
 	total_no_fee = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
 	total = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
