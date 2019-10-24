@@ -61,7 +61,7 @@ class AttendeeListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 		worksheet.title = 'Attendees'
 
 		# Define the titles for columns
-		columns = ['Name', 'Ticket', 'Gender', 'Age', 'Refunded', 'Address', 'City', 'Region', 'Country', ]
+		columns = ['Name', 'Ticket', 'Order No.', 'Gender', 'Age', 'Refunded', 'Address', 'City', 'Region', 'Country', ]
 		for event_question in event_questions:
 			columns.append(event_question.question.title)
 		row_num = 1
@@ -81,6 +81,7 @@ class AttendeeListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 			row = []
 			row.append(attendee.name)
 			row.append(attendee.ticket.title)
+			row.append(attendee.order.number)
 			if attendee.gender:
 				row.append(attendee.gender)
 			else:
@@ -136,7 +137,7 @@ class AttendeeListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 		ticket_name_column_dimensions.width = 30
 		note_column_dimensions.width = 30
 
-		for x in range(7, (event_questions.count() + 10)):
+		for x in range(7, (event_questions.count() + 11)):
 			column_letter = get_column_letter(x)
 			column_dimensions = worksheet.column_dimensions[column_letter]
 			column_dimensions.width = 40
@@ -152,7 +153,7 @@ class AttendeeListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixi
 		all_attendees = Attendee.objects.filter(order__event=event).order_by('order__created_at')
 
 		if 'Export To Excel' in data:
-			return self.export_to_excel(event, all_attendees)
+			return self.export_to_excel(event, all_attendees.filter(order__failed=False))
 
 		search_terms = data["search"].split()
 

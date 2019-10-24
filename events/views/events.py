@@ -296,12 +296,12 @@ class EventCheckoutView(FormView):
 					attendee_name = "%s-%s" % (order.name, int(quantity)+1)
 					if cart_item.donation_ticket:
 						attendee = Attendee.objects.create(
-							order=order, ticket=cart_item.ticket, name=attendee_name, email=email,
+							order=order, ticket=cart_item.ticket, name=attendee_name, email=email, gender=None,
 							ticket_buyer_price=cart_item.donation_buyer_amount, ticket_price=cart_item.donation_amount, ticket_fee=cart_item.donation_fee,
 							ticket_pass_fee=True)
 					else:
 						attendee = Attendee.objects.create(
-							order=order, ticket=cart_item.ticket, name=attendee_name, email=email,
+							order=order, ticket=cart_item.ticket, name=attendee_name, email=email, gender=None,
 							ticket_buyer_price=cart_item.ticket_buyer_price, ticket_price=cart_item.ticket_price, ticket_fee=cart_item.ticket_fee,
 							ticket_pass_fee=cart_item.pass_fee)
 					attendee.save()
