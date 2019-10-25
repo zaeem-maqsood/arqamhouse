@@ -56,8 +56,8 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 		orders = EventOrder.objects.filter(event=event, refunded=False, failed=False).select_related("transaction")
 		total_sales = decimal.Decimal(0.00)
 		for order in orders:
-			if order.transaction.amount:
-				total_sales += order.transaction.amount
+			if order.transaction.house_amount:
+				total_sales += order.transaction.house_amount
 		return total_sales
 
 
