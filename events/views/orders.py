@@ -43,6 +43,15 @@ class OrderListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, 
 		all_orders = EventOrder.objects.filter(event=event).order_by('created_at')
 		search_terms = data["search"].split()
 
+		if data['filter'] == '':
+			all_orders = all_orders.filter(failed=False)
+		elif data['filter'] == 'successful':
+			all_orders = all_orders.filter(failed=False)
+		elif data['filter'] == 'failed':
+			all_orders = all_orders.filter(failed=True)
+		else:
+			all_orders = all_orders
+
 		if data["search"] == '':
 			orders = all_orders
 		else:
@@ -64,7 +73,7 @@ class OrderListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, 
 		context = {}
 		house = self.get_house()
 		event = self.get_event(self.kwargs['slug'])
-		orders = EventOrder.objects.filter(event=event).order_by('-created_at')
+		orders = EventOrder.objects.filter(event=event, failed=False).order_by('-created_at')
 		print(orders)
 		
 		context["house"] = house

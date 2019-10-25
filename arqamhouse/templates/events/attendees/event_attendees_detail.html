@@ -94,7 +94,7 @@ function initMap() {
 					{% endif %}
 				</div>
 
-
+				{% if attendee.country or attendee.region or attendee.city %}
 				<div class="row" style="padding-bottom:10px;">
 					{% if attendee.country %}
 					<div class="col-md-4 col-4">
@@ -115,19 +115,20 @@ function initMap() {
 					</div>
 					{% endif %}
 				</div>
+				{% endif %}
 
+				{% if attendee.address %}
 				<div class="row" style="padding-bottom: 20px;">
 					<div class="col-md-12">
-						{% if attendee.address %}
 						<p style="font-weight: 600;margin-bottom: 5px;">Address</p>
 						<p>{{ attendee.address }}</p>
-						{% endif %}
 					</div>
 				</div>
+				{% endif %}
 
 				{% if answers %}
 				{% for answer in answers %}
-				<div class="row" style="padding-bottom: 20px;">
+				<div class="row" style="padding-bottom: 40px;">
 					<div class="col-md-12">
 						<p style="margin-bottom: 0px;font-weight: 600;">Q | {{ answer.question }}</p>
 						<p>A | {{ answer.value }}</p>
@@ -138,7 +139,7 @@ function initMap() {
 
 
 				<form method="POST">{% csrf_token %}
-				<div class="row" style="padding-top:40px;">
+				<div class="row">
 					<div class="col-md-12">
 						<h4>Edit Details</h4>
 					</div>
