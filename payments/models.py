@@ -11,7 +11,7 @@ from django.urls import reverse
 class BankTransfer(models.Model):
 	transit = models.CharField(max_length=5, blank=False, null=False)
 	institution = models.CharField(max_length=3, null=False, blank=False)
-	account = models.CharField(max_length=7, null=False, blank=False)
+	account = models.CharField(max_length=12, null=False, blank=False)
 
 	def __str__(self):
 		return (self.institution)

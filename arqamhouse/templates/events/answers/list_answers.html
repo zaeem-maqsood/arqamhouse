@@ -356,8 +356,10 @@ Orders
 
                 <div class="row" style="padding-bottom:40px;">
                     <div class="col-12">
-                        <h3 style="margin-bottom: 10px;">Answers | <a style="font-weight: 200;" href="{{ event.list_questions_view }}" data-container="body" data-toggle="kt-tooltip"
-                            data-placement="top" title="" data-original-title="Click here to view your questions.">Questions</a></h3>
+                        <h3 style="margin-bottom: 10px;display: inline-block;">Answers</h3>
+                        <a class="btn btn-primary pull-right" href="{{ event.list_questions_view }}" data-container="body"
+                            data-toggle="kt-tooltip" data-placement="top" title=""
+                            data-original-title="Click here to view questions.">View Questions</a>
                         {% if not event_questions %}
                         <p>You don't have any custom questions yet. You can add cutom questions <a
                                 href="{{ event.list_questions_view }}">here</a>.</p>
@@ -366,7 +368,7 @@ Orders
                 </div>
 
                 {% for event_question in event_questions %}
-                <div class="row" style="padding-bottom:20px;">
+                <div class="row" style="padding-bottom:10px;">
                     <div class="col-9">
                         <p style="font-size:1.2em;">Q. {{ event_question.question.title }} | <a style="color: #4599d5;"
                                 href="{{ event_question.view_answers }}">View Answers</a></p>

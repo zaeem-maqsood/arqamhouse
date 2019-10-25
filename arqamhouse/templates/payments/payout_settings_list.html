@@ -40,8 +40,8 @@ Payment Settings | {{ house.name }}
                 
                 {% for payout_setting in payout_settings %}
                 <div class="row" style="padding-bottom:10px;padding-top: 20px;">
-                    <div class="col-md-12">
-                        {% if payout_setting.bank_transfer.institution == '001' or payout_setting.bank_transfer.institution == '002' or payout_setting.bank_transfer.institution == '003' or payout_setting.bank_transfer.institution == '004' %}
+                    <div class="col-md-3">
+                        {% if payout_setting.bank_transfer.institution == '001' or payout_setting.bank_transfer.institution == '002' or payout_setting.bank_transfer.institution == '003' or payout_setting.bank_transfer.institution == '004' or payout_setting.bank_transfer.institution == '006' or payout_setting.bank_transfer.institution == '010' or payout_setting.bank_transfer.institution == '614' or payout_setting.bank_transfer.institution == '815' or payout_setting.bank_transfer.institution == '828' %}
                             {% with template_name=payout_setting.bank_transfer.institution|stringformat:"s"|add:".html" %}
                                 {% include "payments/bank_images/"|add:template_name %}
                             {% endwith %}

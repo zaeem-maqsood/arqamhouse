@@ -179,6 +179,10 @@ class PayoutView(HouseAccountMixin, FormView):
 		return reverse(view_name)
 
 	def get(self, request, *args, **kwargs):
+
+		stripe.api_key = 'sk_live_4FvrAHAiKVjvUYouYDUAuT63'
+		balance = stripe.Balance.retrieve()
+		print(balance)
 		return render(request, self.template_name, self.get_context_data())
 
 	

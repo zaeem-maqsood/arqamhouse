@@ -1,5 +1,5 @@
 {% extends "backend/base.html" %}
-
+{% load tz %}
 {% load static %}
 
 {% block title %}
@@ -57,11 +57,11 @@ function ChangeText(object) {
                         <h4 style="font-weight: 200;">When</h4>
                         {% if event.start %}
                         <p style="margin-bottom: 0;font-weight:500;">Starts on | <span style="font-weight:200;">
-                                {{ event.start|date:"N nS Y, f a" }}</span></p>
+                                {{ event.start|localtime|date:"N jS Y, f a" }}</span></p>
                         {% endif %}
                         {% if event.end %}
                         <p style="margin-bottom: 0;font-weight:500;">Ends on | <span style="font-weight:200;">
-                                {{ event.end|date:"N nS Y, f a" }}</span></p>
+                                {{ event.end|localtime|date:"N jS Y, f a" }}</span></p>
                         {% endif %}
                     </div>
                     {% endif %}

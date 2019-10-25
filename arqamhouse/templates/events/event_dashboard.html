@@ -141,7 +141,11 @@ Dashboard | {{ event.title }}
 
 .dashboard-links {
 color: #7396b0;
+}
 
+.btn-outline-danger {
+    color: #d96724;
+    border-color: #d96724;
 }
 </style>
 <div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
@@ -152,6 +156,16 @@ color: #7396b0;
 				<div class="kt-portlet kt-portlet--mobile" style="padding:10px;">
 					<div class="kt-portlet__body">
 
+						<div class="row d-none d-sm-none d-md-flex" style="padding-bottom:10px;">
+							<div class="col-md-9">
+								<h4 style="font-weight: 400;">{{ event.title }}</h4>
+							</div>
+							<div class="col-md-3">
+								<h3 class="float-right" style="color: #91baa2;">${{ total_sales }}</h3>
+							</div>
+						</div>
+
+
 						<!-- Display this only on mobile devices -->
 						<div class="row text-center d-block d-md-none" style="padding-bottom:30px;">
 							<div class="col-12">
@@ -159,28 +173,32 @@ color: #7396b0;
 										data-container="body" data-toggle="kt-tooltip" data-placement="top" title=""
 										data-original-title="Edit Event">Edit, </span></a> <a class="dashboard-links"
 									href="{{ event.get_landing_view }}"><span style="font-size:0.8em;font-weight: 200;color:#4499d8;" data-container="body"
-										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="View Event">View</span></a></5>
+										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="View Event">View</span></a></h5>
 							</div>
 						</div>
 						<!-- End here -->
-		
-						<div class="row row d-none d-sm-none d-md-flex" style="padding-bottom:30px;">
-							<div class="col-md-9">
-								<h4 style="font-weight: 400;">{{ event.title }} | <a class="dashboard-links" href="{{ event.get_update_view }}"><span style="font-size:0.8em;font-weight: 200;color:#4499d8;" data-container="body"
-										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="Edit Event">Edit, </span></a><a
-									class="dashboard-links" href="{{ event.get_landing_view }}"><span style="font-size:0.8em;font-weight: 200;color:#4499d8;" data-container="body"
-										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="View Event">View</span></a></h4>
-							</div>
-							<div class="col-md-3">
-								<h3 class="float-right" style="color: #91baa2;">${{ total_sales }}</h3>
-							</div>
-						</div>
 								
 						<div class="row">
 							<div class="col-12">
 								<canvas id="myChart2" width="400" height="200"></canvas>
 							</div>
 						</div>
+
+						<div class="row text-center d-none d-sm-none d-md-flex" style="padding-top:30px;">
+							<div class="col-md-4">
+								<a href="{{ event.get_update_view }}" class="btn btn-block btn-outline-hover-primary btn-elevate dashboard-links"><i
+										class="la la-edit"></i> Edit Event</a>
+							</div>
+							<div class="col-md-4">
+								<a href="{{ event.get_landing_view }}" class="btn btn-block btn-outline-hover-primary btn-elevate dashboard-links"><i
+										class="la la-external-link"></i> View Event</a>
+							</div>
+							<div class="col-md-4">
+								<a href="{{ event.get_landing_view }}" class="btn btn-block btn-outline-hover-primary btn-elevate dashboard-links"><i
+										class="la la-pause"></i> Pause Sales</a>
+							</div>
+						</div>
+
 
 						<!-- Display this only on mobile devices -->
 						<div class="row text-center d-block d-sm-block d-md-none" style="padding-top:30px;">
