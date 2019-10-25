@@ -531,7 +531,8 @@ class EventCheckoutView(FormView):
 
 
 	def get_charge_descriptor(self, event):
-		event_title = "AH* %s" % (event.title)
+		event_title = ''.join(e for e in event.title if e.isalnum())
+		event_title = "AH* %s" % (event_title)
 		if len(event_title) > 20:
 			descriptor = "AH* %s" % (event.house.name)
 			if len(descriptor) > 20:
