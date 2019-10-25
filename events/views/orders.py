@@ -73,7 +73,7 @@ class OrderListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, 
 		context = {}
 		house = self.get_house()
 		event = self.get_event(self.kwargs['slug'])
-		orders = EventOrder.objects.filter(event=event, failed=False).order_by('-created_at')
+		orders = EventOrder.objects.filter(event=event, failed=False).order_by('created_at')
 		print(orders)
 		
 		context["house"] = house
