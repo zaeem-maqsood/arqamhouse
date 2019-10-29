@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 
 from cities_light.models import City, Region, Country
+from arqamhouse.aws.utils import PrivateMediaStorage
 
 
 # ------------------------------------------- Constants -----------------------------------------
@@ -17,9 +18,10 @@ roles = (
 		)
 
 
-entity_types = (
+house_types = (
 			('individual', 'Individual'),
 			('company', 'Company'),
+			('nonprofit', 'Nonprofit'),
 		)
 
 
@@ -38,6 +40,11 @@ class House(TimestampedModel):
 	country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=False, null=True)
 	region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=False, null=True)
 	city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=True)
+	address = models.CharField(max_length=200, null=True, blank=True)
+	postal_code = models.CharField(max_length=6, null=True, blank=True)
+	house_type = models.CharField(max_length=150, choices=house_types, default='individual')
+	ip_address = models.CharField(max_length=200, null=True, blank=True)
+	verified = models.BooleanField(default=False)
 
 	def __str__(self):
 		return str(self.name)
@@ -96,8 +103,22 @@ class HouseUser(TimestampedModel):
 		return "%s - %s - %s" % (self.profile, self.house, self.role)
 
 
+def id_location(instance, filename):
+	return "%s/director_id/%s" % (instance.house.slug, filename)
+
+class HouseDirector(TimestampedModel):
+	house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
+	dob_year = models.PositiveIntegerField(blank=True, null=True)
+	dob_month = models.PositiveIntegerField(blank=True, null=True)
+	dob_day = models.PositiveIntegerField(blank=True, null=True)
+	first_name = models.CharField(max_length=120, null=True, blank=False)
+	last_name = models.CharField(max_length=120, null=True, blank=False)
+	front_id = models.FileField(upload_to=id_location, storage=PrivateMediaStorage())
+	back_id = models.FileField(upload_to=id_location, storage=PrivateMediaStorage())
 
 
+	def __str__(self):
+		return "%s" % (self.house.name)
 
 
 

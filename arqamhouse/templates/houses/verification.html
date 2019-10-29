@@ -1,0 +1,107 @@
+{% extends "backend/base.html" %}
+{% load static %}
+{% block title %}
+Verification | {{ house.name }}
+{% endblock title %}
+
+
+{% block css_vendors %}
+{% endblock css_vendors %}
+
+{% block vendors %}
+{% endblock vendors %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+    function changeHouse(object) {
+
+        console.log(object.value)
+        var house_user = object.value;
+        var token = '{{csrf_token}}';
+
+        $.ajax({
+            type: "POST",
+            headers: { "X-CSRFToken": token },
+            url: '{{ request.path }}',
+            data: {
+                'house_user': house_user,
+            },
+
+            success: function (data) {
+                console.log("HELLOO");
+                location.reload();
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(errorThrown);
+                //some stuff on failure
+            },
+        });
+
+    }
+</script>
+
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+
+{% endblock page_crumbs %}
+
+{% block content %}
+<style>
+    .dashboard-links {
+        color: #7396b0;
+    }
+</style>
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+    <div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+        <div class="kt-portlet kt-portlet--mobile" style="padding:10px;">
+            <div class="kt-portlet__body">
+
+                <form method="POST" id="houseForm" action="">{% csrf_token %}
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-12">
+                            <h4 style="margin-bottom:0px;">Verification <i style="color: #4399d5;" class="fa fa-check-circle" data-container="body"
+                                                        data-toggle="kt-tooltip" data-placement="top" title=""
+                                                        data-original-title="Verified houses have a blue checkmark next to their events."></i></h4>
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-12">
+                            <p style="margin-bottom:0px;">Verification in Arqam House is required to enable larger payouts, collect sales tax, or issue tax-deductible receipts if
+                            you’re a non-profit.</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4" style="padding: 30px;">
+                            <h1><i class="la la-user"></i></h1>
+                            <h5>Individual House</h5>
+                            <p>You are an individual entity that will use Arqam House for personal uses. You cannot issue sales receipts with an individual account, attendees will not receive receipts.</p>
+                            <button type="submit" name="house_type" value="Individual" class="btn btn-primary btn-block">Choose</button>
+                        </div>
+                        <div class="col-md-4" style="padding: 30px;">
+                            <h1><i class="la la-suitcase"></i></h1>
+                            <h5>Business House</h5>
+                            <p>You will be using Arqam House as a business entity. You will be able to charge sales tax on receipts and Arqam house will facilitate issuing receipts on your behalf.</p>
+                            <button type="submit" name="house_type" value="Business" class="btn btn-primary btn-block">Choose</button>
+                        </div>
+                        <div class="col-md-4" style="padding: 30px;">
+                            <h1><i class="la la-leaf"></i></h1>
+                            <h5>Nonprofit House</h5>
+                            <p>You will be using Arqam House as a nonprofit with charitable status. Arqam House will facilitate in the creation of tax deductible receipts for your attendees.</p>
+                            <button type="submit" name="house_type" value="Nonprofit" class="btn btn-primary btn-block">Choose</button>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

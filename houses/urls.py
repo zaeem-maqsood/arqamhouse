@@ -20,7 +20,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from .views import (HouseCreateView, HouseLandingView,
-                    DashboardView, HouseUpdateView, AddUserToHouseView)
+                    DashboardView, HouseUpdateView, AddUserToHouseView, HouseVerificationView)
 
 
 app_name="houses"
@@ -39,5 +39,8 @@ urlpatterns = [
 
 	# Manage Users
 	path('manage', AddUserToHouseView.as_view(), name='manage'),
+
+    # Verifiy House
+	path('verify', HouseVerificationView.as_view(), name='verify'),
 
 ]

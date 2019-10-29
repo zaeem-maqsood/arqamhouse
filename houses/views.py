@@ -36,6 +36,46 @@ from profiles.models import Profile
 from payments.models import HouseBalance, HouseBalanceLog, Transaction, PayoutSetting
 
 
+class HouseVerificationView(HouseAccountMixin, FormView):
+	model = House
+	template_name = "houses/verification.html"
+
+	def get_success_url(self):
+		view_name = "houses:verify"
+		return reverse(view_name)
+
+	def get(self, request, *args, **kwargs):
+		return self.render_to_response(self.get_context_data())
+
+	def get_context_data(self, *args, **kwargs):
+		context = {}
+		house = self.get_house()
+		profile = self.request.user
+		current_house_user = HouseUser.objects.get(profile=profile, house=house)
+		context["current_house_user"] = current_house_user
+		context["profile"] = profile
+		context["house"] = house
+		context["dashboard_events"] = self.get_events()
+		return context
+
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+		print(data)
+		if 'house_type' in data:
+
+			messages.info(request, '%s House Chosen' % (data["house_type"]))
+			return HttpResponseRedirect(self.get_success_url())
+
+		form = AddUserToHouse(data=data)
+
+		if form.is_valid():
+			return self.form_valid(form, request)
+		else:
+			return self.form_invalid(form)
+
+	
+
+
 
 # Create your views here.
 class DashboardView(HouseAccountMixin, DetailView):
