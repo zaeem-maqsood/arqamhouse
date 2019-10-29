@@ -1,5 +1,6 @@
 from .base import *
 
+import tempfile
 import qrcode
 import decimal
 import stripe
@@ -99,11 +100,31 @@ class OrderPublicDetailView(DetailView):
 			print(e)
 			raise Http404
 
+	def view_tickets(self, event, order):
+
+		# PDF Attachment
+		pdf_context = {}
+		pdf_context["order"] = order
+		pdf_content = render_to_string('pdfs/ticket.html', pdf_context)
+		pdf_css = CSS(string=render_to_string('pdfs/ticket.css'))
+
+		# Creating http response
+		response = HttpResponse(content_type='application/pdf;')
+		response['Content-Disposition'] = 'inline; filename=list_people.pdf'
+
+		pdf_file = HTML(string=pdf_content).write_pdf(
+			response, stylesheets=[pdf_css])
+		return response
+
 	def get(self, request, *args, **kwargs):
 		context = {}
+		data = request.GET
 		order_id = self.kwargs['public_id']
 		order = self.get_order(order_id)
 		event = order.event
+
+		if 'view_tickets' in data:
+			return self.view_tickets(event, order)
 
 		attendees = Attendee.objects.filter(order=order)
 		active_attendees = attendees.filter(active=True)
@@ -226,6 +247,23 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		return "Done"
 
 
+	def view_tickets(self, event, order):
+
+		# PDF Attachment
+		pdf_context = {}
+		pdf_context["order"] = order
+		pdf_content = render_to_string('pdfs/ticket.html', pdf_context)
+		pdf_css = CSS(string=render_to_string('pdfs/ticket.css'))
+		
+
+		# Creating http response
+		response = HttpResponse(content_type='application/pdf;')
+		response['Content-Disposition'] = 'inline; filename=list_people.pdf'
+
+		pdf_file = HTML(string=pdf_content).write_pdf(response, stylesheets=[pdf_css])
+		return response
+
+
 
 	def post(self, request, *args, **kwargs):
 		data = request.POST
@@ -235,6 +273,9 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		event = self.get_event(slug)
 		order = self.get_order(order_id)
 		attendees = Attendee.objects.filter(order=order)
+
+		if 'view_tickets' in data:
+			return self.view_tickets(event, order)
 
 
 		if 'Refund' in data:

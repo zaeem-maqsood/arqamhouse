@@ -151,13 +151,18 @@ Order #{{ order.number }} | {{ event.title }}
 					{% endif %}
 				{% endif %}
 
-				</form>
+				
 
 				<div class="row" style="padding-top: 50px;">
 					<div class="col-12">
-						<h4>Order Breakdown</h4>
+						<h4 style="display: inline-block;">Order Breakdown</h4>
+						{% if not order.failed %}
+						<button type="submit" name="view_tickets" value="view_tickets" class="btn btn-primary pull-right">Confirmation PDF</button>
+						{% endif %}
 					</div>
 				</div>
+
+				</form>
 
 				<div class="row" style="padding-top:10px;">
 					<div class="col-md-12">
