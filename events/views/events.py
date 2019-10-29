@@ -492,7 +492,9 @@ class EventCheckoutView(FormView):
 		subject = 'Order Confirmation For %s' % (event.title)
 		email_confirmation = EventEmailConfirmation.objects.get(event=event)
 		context = {}
+		house_users = HouseUser.objects.filter(house=event.house, profile__is_superuser=False)
 		context["event"] = event
+		context["house_users"] = house_users
 		context["message"] = email_confirmation.message
 		html_content = render_to_string('emails/order_confirmation.html', context)
 		text_content = strip_tags(html_content)
@@ -507,7 +509,7 @@ class EventCheckoutView(FormView):
 
 	def send_owner_confirmation_email(self, event, order):
 
-		house_users = HouseUser.objects.filter(house=event.house)
+		house_users = HouseUser.objects.filter(house=event.house, profile__is_superuser=False)
 		to_emails = []
 		for house_user in house_users:
 			to_emails.append(house_user.profile.email)

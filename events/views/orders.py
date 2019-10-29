@@ -6,6 +6,7 @@ import decimal
 import stripe
 from django.db.models import Sum
 from houses.mixins import HouseAccountMixin
+from houses.models import HouseUser
 from events.models import Event, EventOrder, Attendee, EventOrderRefund, EventQuestion, EventCart, EventCartItem
 from payments.models import Refund, HouseBalance
 from questions.models import Question
@@ -182,6 +183,11 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		event = self.get_event(slug)
 		order = self.get_order(order_id)
 		house = self.get_house()
+		house_users = HouseUser.objects.filter(house=event.house, profile__is_superuser=False)
+
+		print("house users")
+		print(house_users)
+
 		house_balance = HouseBalance.objects.get(house=house)
 		attendees = Attendee.objects.filter(order=order)
 		active_attendees = attendees.filter(active=True)
