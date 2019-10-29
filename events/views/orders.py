@@ -105,15 +105,14 @@ class OrderPublicDetailView(DetailView):
 		# PDF Attachment
 		pdf_context = {}
 		pdf_context["order"] = order
+		
 		pdf_content = render_to_string('pdfs/ticket.html', pdf_context)
 		pdf_css = CSS(string=render_to_string('pdfs/ticket.css'))
 
-		# Creating http response
-		response = HttpResponse(content_type='application/pdf;')
-		response['Content-Disposition'] = 'inline; filename=list_people.pdf'
+		pdf_file = HTML(string=pdf_content).write_pdf(stylesheets=[pdf_css])
 
-		pdf_file = HTML(string=pdf_content).write_pdf(
-			response, stylesheets=[pdf_css])
+		response = HttpResponse(pdf_file, content_type='application/pdf;')
+		response['Content-Disposition'] = 'inline; filename=confirmation.pdf'
 		return response
 
 	def get(self, request, *args, **kwargs):
