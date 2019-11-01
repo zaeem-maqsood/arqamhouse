@@ -1,2 +1,4 @@
 arqamhouse/static
 arqamhouse/settings/local.py
+
+celerybeat.pid
