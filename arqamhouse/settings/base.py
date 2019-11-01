@@ -104,20 +104,20 @@ CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PP
 
 
 # Celery stuff 
-CELERY_BROKER_URL = 'redis://redis:6379'
-CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 
 # System wide Cron jobs using Celery 
-CELERY_BEAT_SCHEDULE = {
-    'hello': {
-        'task': 'events.tasks.hello',
-        'schedule': crontab()  # execute every minute
-    }
-}
+# CELERY_BEAT_SCHEDULE = {
+#     'hello': {
+#         'task': 'events.tasks.hello',
+#         'schedule': crontab()  # execute every minute
+#     }
+# }
 
 
 # Sendgrid Email Backend
@@ -190,57 +190,6 @@ STRIPE_BASE_FEE = 0.30
 PLATFORM_FEE = 4.0
 PLATFORM_BASE_FEE = 0.30
 
-
-# AWS_ACCESS_KEY_ID = "AKIAJLQ5COLYAR6REXEQ"
-# AWS_SECRET_ACCESS_KEY = "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"
-
-
-
-# AWS_FILE_EXPIRE = 200
-# AWS_PRELOAD_METADATA = True
-# AWS_QUERYSTRING_AUTH = True
-
-# DEFAULT_FILE_STORAGE = 'arqamhouse.utils.MediaRootS3BotoStorage'
-# STATICFILES_STORAGE = 'arqamhouse.utils.StaticRootS3BotoStorage'
-# AWS_STORAGE_BUCKET_NAME = 'arqam-static'
-# AWS_S3_REGION_NAME = 'us-west-1'
-
-# S3_URL = '//%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
-# MEDIA_URL = '//%s.s3.amazonaws.com/media/' % AWS_STORAGE_BUCKET_NAME
-# MEDIA_ROOT = MEDIA_URL
-# STATIC_URL = S3_URL + 'static/'
-# ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
-
-# import datetime
-
-# two_months = datetime.timedelta(days=61)
-# date_two_months_later = datetime.date.today() + two_months
-# expires = date_two_months_later.strftime("%A, %d %B %Y 20:00:00 GMT")
-
-# AWS_HEADERS = { 
-#     'Expires': expires,
-#     'Cache-Control': 'max-age=%d' % (int(two_months.total_seconds()), ),
-# }
-
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-
-# STATICFILES_DIRS = [
-#      os.path.join(BASE_DIR, "static"),
-#  ]
-
-
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-
-# del DATABASES['default']['OPTIONS']['sslmode']
-# STATIC_URL = '/static/'
-# MEDIA_URL = '/media/'
-
-# STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "staticfiles")
-# MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "media")
 
 
 FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'code_beautifier', 'colors', 'draggable', 'emoticons', 'font_family', 'font_size', 'inline_style', 'link', 'lists', 'paragraph_format', 'paragraph_style', 'quick_insert', 'quote', 'table',

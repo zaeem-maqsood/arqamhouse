@@ -29,7 +29,7 @@ from .mixins import HouseAccountMixin, HouseLandingMixin
 from django.contrib.auth.models import User
 from profiles.models import Profile
 from .models import House, HouseUser
-from .forms import AddUserToHouse, HouseUpdateForm, HouseChangeForm, HouseForm
+from .forms import AddUserToHouse, HouseUpdateForm, HouseChangeForm, HouseForm, HouseVerificationForm
 
 from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
 from profiles.models import Profile
@@ -52,6 +52,10 @@ class HouseVerificationView(HouseAccountMixin, FormView):
 		house = self.get_house()
 		profile = self.request.user
 		current_house_user = HouseUser.objects.get(profile=profile, house=house)
+
+		form = HouseVerificationForm(instance=house)
+
+		context["form"] = form
 		context["current_house_user"] = current_house_user
 		context["profile"] = profile
 		context["house"] = house
@@ -61,17 +65,29 @@ class HouseVerificationView(HouseAccountMixin, FormView):
 	def post(self, request, *args, **kwargs):
 		data = request.POST
 		print(data)
+		house = self.get_house()
 		if 'house_type' in data:
-
+			house.house_type = data["house_type"]
+			house.save()
 			messages.info(request, '%s House Chosen' % (data["house_type"]))
 			return HttpResponseRedirect(self.get_success_url())
 
-		form = AddUserToHouse(data=data)
+		form = HouseVerificationForm(instance=house, data=data)
 
 		if form.is_valid():
 			return self.form_valid(form, request)
 		else:
 			return self.form_invalid(form)
+
+	def form_valid(self, form, request):
+		self.object = form.save()
+		valid_data = super(HouseVerificationView, self).form_valid(form)
+		return valid_data
+
+	def form_invalid(self, form):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form))
+
 
 	
 

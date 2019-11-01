@@ -26,7 +26,7 @@ from houses.mixins import HouseAccountMixin
 from houses.models import HouseUser
 from questions.models import Question
 from events.mixins import EventMixin
-from events.models import (Event, AttendeeCommonQuestions, EventQuestion, Ticket, EventCart, 
+from events.models import (Event, AttendeeCommonQuestions, EventQuestion, Ticket, EventCart, ChargeError,
 								EventCartItem, Answer, OrderAnswer, EventOrder, Attendee, EventEmailConfirmation)
 from events.forms import EventForm, EventCheckoutForm
 from payments.models import Transaction
@@ -86,6 +86,22 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 		graph_data = {'tickets_label':tickets_label, 'day_label':day_label}
 		return graph_data
 			
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+		print(data)
+		slug = kwargs['slug']
+		event = self.get_event(slug)
+		if 'stop_sales' in data:
+			if data['stop_sales'] == 'true':
+				event.ticket_sales = False
+				messages.warning(request, 'Ticket sales are now stopped. You may resume them at any time.')
+			else:
+				event.ticket_sales = True
+				messages.success(request, 'Ticket sales have resumed.')
+			event.save()
+
+		view_name = "events:dashboard"
+		return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
 
 	def get(self, request, *args, **kwargs):
 
@@ -255,24 +271,119 @@ class EventCheckoutView(FormView):
 		print(errors)
 		print("errors\n\n")
 
+		# =========================================== FIRST CHECK =================================================
+		# The first check is to see if the form is passing basic validation on the data. Once we know the form is valid 
+		# we can comfortably create the order and transaction models and move onto checking if payment is also valid.
 		if errors:
 			return self.render_to_response(self.get_context_data(data=data, errors=errors))
 
-		# Only get the Stripe Token if payment enabled
-		if cart.pay:
-			stripe_token = data["stripeToken"]
 
 		# Get buyer name and email address
 		name = data['name']
 		email = data['email']
 
+
+		# =================================== SECOND CHECK (if payment required) =====================---============
+		# Only get the Stripe Token if payment enabled
+		if cart.pay:
+			stripe_token = data["stripeToken"]
+
+
+			# =========================================== Check if the charge succeeds or not ====================================================================
+			stripe.api_key = settings.STRIPE_SECRET_KEY
+
+			charge = None
+			
+			try:
+				charge = stripe.Charge.create(
+							amount = int(cart.total * 100),
+							currency = 'cad',
+							description = self.get_charge_description(event, cart),
+							source = stripe_token,
+							metadata = {
+								'transaction_amount': cart.total,
+								'transaction_arqam_amount': cart.arqam_charge,
+								'transaction_stripe_amount': cart.stripe_charge,
+								'transaction_house_amount': cart.total_no_fee,
+								'buyer_email': data['email'],
+								'buyer_name': data['name'],
+								'cart_id': cart.id,
+								'event_name': event.title,
+								'event_id': event.pk,
+								'house_name': event.house.name,
+								'house_id': event.house.pk
+								},
+							statement_descriptor=self.get_charge_descriptor(event),
+						)
+
+				print("Charge goes here")
+				print(charge)
+				print("Charge goes here")
+
+			except stripe.error.CardError as e:
+				print(e)
+				errors["payment"] = e.error.message
+				charge_error = ChargeError.objects.create(event_cart=cart,
+					payment_id=e.error.charge, failure_code=e.error.code, failure_message=e.error.message, outcome_type=e.error.type, network_status=e.http_status, reason=e.error.param, email=data["email"], name=data["name"])
+				return self.render_to_response(self.get_context_data(data=data, errors=errors))
+				
+			except stripe.error.RateLimitError as e:
+				# Too many requests made to the API too quickly
+				print(e)
+				errors["payment"] = "Your payment was not processed. A network error prevented payment processing, please try again later."
+				self.send_error_email(event, e, data)
+				return self.render_to_response(self.get_context_data(data=data, errors=errors))
+
+			except stripe.error.InvalidRequestError as e:
+				# Invalid parameters were supplied to Stripe's API
+				print(e)
+				errors["payment"] = "Your payment was not processed. A network error prevented payment processing, please try again later."
+				self.send_error_email(event, e, data)
+				return self.render_to_response(self.get_context_data(data=data, errors=errors))
+
+			except stripe.error.AuthenticationError as e:
+				# Authentication with Stripe's API failed
+				# (maybe you changed API keys recently)
+				print(e)
+				errors["payment"] = "Your payment was not processed. A network error prevented payment processing, please try again later."
+				self.send_error_email(event, e, data)
+				return self.render_to_response(self.get_context_data(data=data, errors=errors))
+
+			except stripe.error.APIConnectionError as e:
+				# Network communication with Stripe failed
+				print(e)
+				errors["payment"] = "Your payment was not processed. A network error prevented payment processing, please try again later."
+				self.send_error_email(event, e, data)
+				return self.render_to_response(self.get_context_data(data=data, errors=errors))
+
+			except stripe.error.StripeError as e:
+				# Display a very generic error to the user, and maybe send
+				# yourself an email
+				print(e)
+				errors["payment"] = "Your payment was not processed. A network error prevented payment processing, please try again later."
+				self.send_error_email(event, e, data)
+				return self.render_to_response(self.get_context_data(data=data, errors=errors))
+			
+			except Exception as e:
+				print(e)
+				errors["payment"] = "Your payment was not processed. A network error prevented payment processing, please try again later."
+				self.send_error_email(event, e, data)
+				return self.render_to_response(self.get_context_data(data=data, errors=errors))
+
+
+
+
+		# ====================================================  Handling all the form data =======================================================================
+		# we know that this information is valid and won't giev and issues. All we have to do is save it here basically.
+
+
 		# Create Transaction Object
 		transaction = Transaction.objects.create(house=event.house, name=name)
-		transaction.save()
+		# transaction.save()
 
 		# Create Order Object
 		order = EventOrder.objects.create(name=name, email=email, event=event, event_cart=cart, transaction=transaction, house_created=cart.house_created)
-		order.save()
+		# order.save()
 
 		# Get Buyer questions and make answers
 		order_questions = EventQuestion.objects.filter(event=event, order_question=True, question__deleted=False, question__approved=True).order_by("question__order")
@@ -353,111 +464,46 @@ class EventCheckoutView(FormView):
 						answer = Answer.objects.create(question=attendee_question, value=value, attendee=attendee)
 						answer.save()
 
-
+		# ==============================  FINALIZE AND SAVE TRANSCATION AND ORDER INFORMATION =============================================
 		# If there is a payment to be made
 		if cart.pay:
-			stripe.api_key = settings.STRIPE_SECRET_KEY
 			
-			try:
-				charge = stripe.Charge.create(
-							amount = int(cart.total * 100),
-							currency = 'cad',
-							description = self.get_charge_description(event, order),
-							source = stripe_token,
-							metadata = {
-                                    	'transaction_amount': cart.total,
-										'transaction_arqam_amount': cart.arqam_charge,
-										'transaction_stripe_amount': cart.stripe_charge,
-										'transaction_house_amount': cart.total_no_fee,
-										'buyer_email': data['email'],
-										'buyer_name': data['name'],
-										'order_id': order.public_id,
-										'event_name': order.event.title,
-										'event_id': order.event.pk,
-										'house_name': order.event.house.name,
-										'house_id': order.event.house.pk
-										},
-                                    statement_descriptor=self.get_charge_descriptor(event),
-						)
+			transaction.amount = cart.total
+			transaction.arqam_amount = cart.arqam_charge
+			transaction.stripe_amount = cart.stripe_charge
+			transaction.house_amount = cart.total_no_fee
 
-				print("Charge goes here")
-				print(charge)
-				print("Charge goes here")
+			transaction.payment_id = charge['id']
+			transaction.last_four = charge.source['last4']
+			transaction.brand = charge.source['brand']
+			transaction.network_status = charge.outcome['network_status']
+			transaction.risk_level = charge.outcome['risk_level']
+			transaction.seller_message = charge.outcome['seller_message']
+			transaction.outcome_type = charge.outcome['type']
+			transaction.email = data['email']
+			transaction.name = data['name']
+			transaction.address_line_1 = charge.source['address_line1']
+			transaction.address_state = charge.source['address_state']
+			transaction.address_postal_code = charge.source['address_zip']
+			transaction.address_city = charge.source['address_city']
+			transaction.address_country = charge.source['address_country']
+			transaction.save()
 
-				transaction.amount = cart.total
-				transaction.arqam_amount = cart.arqam_charge
-				transaction.stripe_amount = cart.stripe_charge
-				transaction.house_amount = cart.total_no_fee
+			cart.processed = True
+			cart.update_tickets_available()
+			cart.save()
+			del request.session['cart']
+			request.session.modified = True
 
-				transaction.payment_id = charge['id']
-				transaction.last_four = charge.source['last4']
-				transaction.brand = charge.source['brand']
-				transaction.network_status = charge.outcome['network_status']
-				transaction.reason = charge.outcome['reason']
-				transaction.risk_level = charge.outcome['risk_level']
-				transaction.seller_message = charge.outcome['seller_message']
-				transaction.outcome_type = charge.outcome['type']
-				transaction.email = data['email']
-				transaction.name = charge.source['name']
-				transaction.address_line_1 = charge.source['address_line1']
-				transaction.address_state = charge.source['address_state']
-				transaction.address_postal_code = charge.source['address_zip']
-				transaction.address_city = charge.source['address_city']
-				transaction.address_country = charge.source['address_country']
-				transaction.save()
+			print("Cart Processed")
+			print(cart.processed)
 
-				cart.processed = True
-				cart.update_tickets_available()
-				cart.save()
-				del request.session['cart']
-				request.session.modified = True
+			self.send_confirmation_email(event, data['email'], order)
+			self.send_owner_confirmation_email(event, order)
+			messages.success(request, 'Check your email for tickets and further instructions.')
+			return HttpResponseRedirect(self.get_success_url())
 
-				print("Cart Processed")
-				print(cart.processed)
-
-				self.send_confirmation_email(event, data['email'], order)
-				self.send_owner_confirmation_email(event, order)
-				messages.success(request, 'Check your email for tickets and further instructions.')
-				return HttpResponseRedirect(self.get_success_url())
-
-			except stripe.error.CardError as e:
-				print(e)
-
-				transaction.payment_id = e.error.charge
-				transaction.failure_code = e.error.code
-				transaction.failure_message = e.error.message
-				transaction.outcome_type = e.error.type
-				transaction.network_status = e.http_status
-				transaction.reason = e.error.param
-				transaction.email = order.email
-
-				order.failed = True
-				transaction.failed = True
-				transaction.code_fail_reason = e.error.message
-				order.save()
-				transaction.save()
-				cart.processed = False
-				cart.save()
-				del request.session['cart']
-				request.session.modified = True
-				messages.error(request, "%s Please try again." % (e.error.message))
-				return HttpResponseRedirect(self.get_success_url())
-
-			except Exception as e:
-				print(e)
-				order.failed = True
-				transaction.failed = True
-				transaction.code_fail_reason = "Order Failed Due to Exception: %s" % (e)
-				order.save()
-				transaction.save()
-				cart.processed = False
-				cart.save()
-				del request.session['cart']
-				request.session.modified = True
-				messages.error(request, 'There was an error in proccessing your payment card. Please try again with a different payment card.')
-				return HttpResponseRedirect(self.get_success_url())
-
-
+		# If there is no payment to be made
 		else:
 
 			transaction.amount = 0.00
@@ -466,6 +512,7 @@ class EventCheckoutView(FormView):
 			transaction.house_amount = 0.00
 
 			transaction.email = data['email']
+			transaction.name = data["name"]
 
 			cart.processed = True
 			cart.update_tickets_available()
@@ -478,6 +525,8 @@ class EventCheckoutView(FormView):
 
 
 		return render(request, self.template_name, self.get_context_data(data))
+
+
 
 	def send_confirmation_email(self, event, email, order):
 
@@ -528,8 +577,21 @@ class EventCheckoutView(FormView):
 		email.send()
 		return "Done"
 
-	def get_charge_description(self, event, order):
-		return ("Order #: %s for Event: %s (Event ID: %s)." % (order.id, event.title, event.id))
+	def send_error_email(self, event, error, data):
+		# Compose Email
+		subject = 'Checkout Error %s' % (event.title)
+		context = {}
+		context["event"] = event
+		text_content = "There was an error while someone was trying to checkout for event '%s' with event id %s. Error: %s. Data: %s" % (event.title, event.pk, error, data)
+		from_email = 'Chekout Error <info@arqamhouse.com>'
+		to = ["errors@arqamhouse.com"]
+		email = EmailMultiAlternatives(subject=subject, body=text_content,
+		                               from_email=from_email, to=to)
+		email.send()
+		return "Done"
+
+	def get_charge_description(self, event, cart):
+		return ("Cart #: %s for Event: %s (Event ID: %s)." % (cart.id, event.title, event.id))
 
 
 	def get_charge_descriptor(self, event):
@@ -714,17 +776,17 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		if "Archive" in data:
 			self.object.active = False
 			self.object.save()
-			messages.warning(request, 'Archived Event')
+			messages.success(request, """Successfully archived '%s'. You can re-open the event over <a href="%s">here</a>.""" % (self.object.title, self.object.get_update_view()))
 
 		elif "Remove" in data:
 			self.object.image = None
 			self.object.save()
-			messages.warning(request, 'Event Image Removed')
+			messages.warning(request, 'Event image successfully removed')
 
 		elif "Re-Open" in data:
 			self.object.active = True
 			self.object.save()
-			messages.info(request, 'Event Re-Opened')
+			messages.success(request,  """Successfully re-opend '%s'. You can archive the event over <a href="%s">here</a>.""" % (self.object.title, self.object.get_update_view()))
 
 		elif "Delete" in data:
 			self.object.active = False

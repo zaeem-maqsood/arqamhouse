@@ -184,6 +184,7 @@ color: #7396b0;
 							</div>
 						</div>
 
+						<form method="POST">{% csrf_token %}
 						<div class="row text-center d-none d-sm-none d-md-flex" style="padding-top:30px;">
 							<div class="col-md-4">
 								<a href="{{ event.get_update_view }}" class="btn btn-block btn-outline-hover-primary btn-elevate dashboard-links"><i
@@ -193,11 +194,20 @@ color: #7396b0;
 								<a href="{{ event.get_landing_view }}" class="btn btn-block btn-outline-hover-primary btn-elevate dashboard-links"><i
 										class="la la-external-link"></i> View Event</a>
 							</div>
+							
 							<div class="col-md-4">
-								<a href="{{ event.get_landing_view }}" class="btn btn-block btn-outline-hover-primary btn-elevate dashboard-links"><i
-										class="la la-pause"></i> Pause Sales</a>
+								{% if event.ticket_sales %}
+								<button type="submit" name="stop_sales" value="true" class="btn btn-block btn-outline-hover-primary btn-elevate dashboard-links"><i
+										class="la la-ban"></i> Stop Sales</button>
+								{% else %}
+								<button type="submit" name="stop_sales" value="false"
+									class="btn btn-block btn-hover-danger btn-elevate"><i class="la la-play"></i> Resume
+									Sales</button>
+								{% endif %}
 							</div>
+							
 						</div>
+						</form>
 
 
 						<!-- Display this only on mobile devices -->

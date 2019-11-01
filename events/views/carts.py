@@ -96,6 +96,9 @@ class AddTicketsToCartView(FormView):
 		discount_code = EventDiscount.objects.filter(event=event).exists()
 		context["discount_code"] = discount_code
 
+		house_users = HouseUser.objects.filter(house=event.house, profile__is_superuser=False)
+
+		context["house_users"] = house_users
 		context["owner"] = owner
 		context["form"] = form
 		context["event"] = event

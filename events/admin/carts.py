@@ -1,5 +1,5 @@
 from .base import *
-from events.models import EventCart, EventCartItem
+from events.models import EventCart, EventCartItem, ChargeError
 
 
 class EventCartAdmin(admin.ModelAdmin):
@@ -19,5 +19,6 @@ class EventCartItemAdmin(admin.ModelAdmin):
 
 
 # Register your models here.
+admin.site.register(ChargeError)
 admin.site.register(EventCart, EventCartAdmin)
 admin.site.register(EventCartItem, EventCartItemAdmin)

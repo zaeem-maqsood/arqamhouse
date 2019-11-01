@@ -8,6 +8,74 @@ from core.constants import days, months, years, provinces
 from cities_light.models import City, Region, Country
 
 
+class HouseVerificationForm(forms.ModelForm):
+
+	class Meta:
+		model = House
+		fields = [
+			"region",
+			"city",
+			"address",
+			"postal_code",
+		]
+
+		widgets = {
+                    "name": forms.TextInput(
+                        attrs={
+                            "class": "form-control m-input",
+                     							"placeholder": "i.e. Arqam House",
+                            "required": True
+                        }
+                    ),
+					"region": forms.Select(
+                        attrs={
+                            "required": True,
+                            "class": "form-control m-input",
+                        }
+                    ),
+					"city": forms.Select(
+                        attrs={
+                            "required": True,
+                            "class": "form-control m-input",
+                        }
+                    ),
+					"address": forms.TextInput(
+                        attrs={
+							"id": "autocomplete",
+                            "required": True,
+                            "class": "form-control m-input",
+                        }
+                    ),
+					"postal_code": forms.TextInput(
+                        attrs={
+                            "required": True,
+                            "class": "form-control m-input",
+                        }
+                    ),
+                }
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self.fields['city'].empty_label = None
+		self.fields['region'].empty_label = None
+
+		self.fields['city'].queryset = City.objects.all()
+		self.fields['region'].queryset = Region.objects.all()
+
+		if self.instance.pk:
+			self.fields['region'].queryset = Region.objects.filter(country=self.instance.country)
+			self.fields['city'].queryset = City.objects.filter(region=self.instance.region)
+
+			self.fields["region"].label_from_instance = lambda obj: "%s" % obj.name
+			self.fields["city"].label_from_instance = lambda obj: "%s" % obj.name
+
+	def clean(self, *args, **kwargs):
+
+		cleaned_data = super(HouseVerificationForm, self).clean(*args, **kwargs)
+		return cleaned_data
+
+
 
 class AddUserToHouse(forms.Form):
 

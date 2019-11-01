@@ -189,7 +189,7 @@ function initMap() {
 				<div class="row" style="padding-top:10px;padding-bottom: 10px;">
 					<div class="col-md-6">
 						<p style="margin-bottom: 4px;">Address</p>
-						<input name="address" id="autocomplete" class="form-control m-input" {% if attendee_common_questions.notes_required %}required{% endif %} value="{{ attendee.address }}">
+						<input name="address" id="autocomplete" class="form-control m-input" {% if attendee_common_questions.notes_required %}required{% endif %} value="{% if attendee.address %}{{ attendee.address }}{% endif %}">
 					</div>
 				</div>
 				{% endif %}

@@ -29,19 +29,11 @@ function FocusOnInput()
     
 }
 
-function GetProducts()
+function GetProducts(object)
 {
 
-	var search = document.getElementById("product-search").value;
+	var search = object.value;
 	console.log(search)
-	var filter = document.getElementById("order_type").value;
-	console.log(filter)
-	if (search == undefined) {
-		search = '';
-	}
-	if (filter == undefined) {
-		filter = '';
-	}
 	
     var token = '{{csrf_token}}';
 
@@ -51,7 +43,6 @@ function GetProducts()
         url: '{{ request.path }}',
         data: {
           'search': search,
-		  'filter':filter
         },
         
         success: function (data) {
@@ -101,16 +92,9 @@ jQuery(document).ready(function() {
 				</div>
 
 				<div class="row" style="padding-bottom:30px;">
-					<div class="col-8">
-						<input type="search" placeholder="Search for an order" id="product-search" class="form-control m-input" onkeyup="GetProducts()">
+					<div class="col-12">
+						<input type="search" placeholder="Search for an order" id="product-search" class="form-control m-input" onkeyup="GetProducts(this)">
 						<br>
-					</div>
-					<div class="col-4">
-						<select class="form-control" id="order_type" onchange="GetProducts()">
-							<option value="successful">Successful</option>
-							<option value="failed">Failed</option>
-							<option value="all">All</option>
-						</select>
 					</div>
 				</div>
 				

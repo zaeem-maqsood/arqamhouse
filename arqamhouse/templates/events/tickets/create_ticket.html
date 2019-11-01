@@ -3,7 +3,11 @@
 {% load static %}
 
 {% block title %}
-{{ button_text }} | {{ House.name }}
+{% if button_text == "Update Ticket" %}
+{{ button_text }} | {{ ticket.title }}
+{% else %}
+{{ button_text }} | {{ event.title }}
+{% endif %}
 {% endblock title %}
 
 {% block styles %}

@@ -53,6 +53,7 @@ class Event(TimestampedModel):
 	venue_name = models.CharField(max_length=200, null=True, blank=True)
 	description = models.TextField(blank=True, null=True)
 	image = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
+	ticket_sales = models.BooleanField(default=True)
 	public = models.BooleanField(default=True)
 	active = models.BooleanField(default=True)
 	deleted = models.BooleanField(default=False)

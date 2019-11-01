@@ -19,9 +19,9 @@ roles = (
 
 
 house_types = (
-			('individual', 'Individual'),
-			('company', 'Company'),
-			('nonprofit', 'Nonprofit'),
+			('Individual', 'Individual'),
+			('Business', 'Business'),
+			('Nonprofit', 'Nonprofit'),
 		)
 
 
@@ -42,7 +42,7 @@ class House(TimestampedModel):
 	city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=True)
 	address = models.CharField(max_length=200, null=True, blank=True)
 	postal_code = models.CharField(max_length=6, null=True, blank=True)
-	house_type = models.CharField(max_length=150, choices=house_types, default='individual')
+	house_type = models.CharField(max_length=150, choices=house_types, blank=True, null=True)
 	ip_address = models.CharField(max_length=200, null=True, blank=True)
 	verified = models.BooleanField(default=False)
 

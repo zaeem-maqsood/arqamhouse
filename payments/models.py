@@ -57,14 +57,14 @@ class Transaction(models.Model):
 
 	house_payment = models.BooleanField(default=False)
 	payment_id = models.CharField(max_length=150, null=True, blank=True)
-	failed = models.BooleanField(default=False)
-	code_fail_reason = models.CharField(max_length=250, null=True, blank=True)
-	failure_code = models.CharField(max_length=150, null=True, blank=True)
-	failure_message = models.CharField(max_length=150, null=True, blank=True)
+	failed = models.BooleanField(default=False)  #Remove this
+	code_fail_reason = models.CharField(max_length=250, null=True, blank=True) #Remove this
+	failure_code = models.CharField(max_length=150, null=True, blank=True) #Remove this
+	failure_message = models.CharField(max_length=150, null=True, blank=True) #Remove this
 	last_four = models.CharField(max_length=10, null=True, blank=True)
 	brand = models.CharField(max_length=100, null=True, blank=True)
 	network_status = models.CharField(max_length=150, null=True, blank=True)
-	reason = models.CharField(max_length=150, null=True, blank=True)
+	reason = models.CharField(max_length=150, null=True, blank=True) #Remove this
 	risk_level = models.CharField(max_length=150, null=True, blank=True)
 	seller_message = models.CharField(max_length=150, null=True, blank=True)
 	outcome_type = models.CharField(max_length=150, null=True, blank=True)

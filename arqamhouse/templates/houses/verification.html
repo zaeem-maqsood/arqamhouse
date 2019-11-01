@@ -13,6 +13,15 @@ Verification | {{ house.name }}
 
 {% block scripts %}
 
+<script>
+
+function initMap() {
+        var input = document.getElementById('autocomplete');
+        var autocomplete = new google.maps.places.Autocomplete(input);
+
+    }
+</script>
+
 <script type="text/javascript">
     function changeHouse(object) {
 
@@ -41,6 +50,9 @@ Verification | {{ house.name }}
 
     }
 </script>
+
+<script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnTiJMXoPzVLoo-ztKaRyCrjAocA0K3pQ&libraries=places&callback=initMap"></script>
 
 {% endblock scripts %}
 
@@ -77,6 +89,7 @@ Verification | {{ house.name }}
                         </div>
                     </div>
 
+                    {% if not house.house_type %}
                     <div class="row">
                         <div class="col-md-4" style="padding: 30px;">
                             <h1><i class="la la-user"></i></h1>
@@ -95,6 +108,41 @@ Verification | {{ house.name }}
                             <h5>Nonprofit House</h5>
                             <p>You will be using Arqam House as a nonprofit with charitable status. Arqam House will facilitate in the creation of tax deductible receipts for your attendees.</p>
                             <button type="submit" name="house_type" value="Nonprofit" class="btn btn-primary btn-block">Choose</button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-6">
+                            <h5>Address</h5>
+                            {{ form.address }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-6">
+                            <h5>Region</h5>
+                            {{ form.region }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-6">
+                            <h5>City</h5>
+                            {{ form.city }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-6">
+                            <h5>Postal Code</h5>
+                            {{ form.postal_code }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-6">
+                            <button type="submit" name="general" value="true" class="btn btn-primary btn-block">Next</button>
                         </div>
                     </div>
 

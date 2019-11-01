@@ -80,6 +80,20 @@ class EventCart(models.Model):
 		self.save()
 
 
+class ChargeError(models.Model):
+	event_cart = models.ForeignKey(EventCart, on_delete=models.CASCADE, blank=False, null=False)
+	payment_id = models.CharField(max_length=150, null=True, blank=True)
+	failure_code = models.CharField(max_length=150, null=True, blank=True)
+	failure_message = models.CharField(max_length=150, null=True, blank=True)
+	outcome_type = models.CharField(max_length=150, null=True, blank=True)
+	network_status = models.CharField(max_length=150, null=True, blank=True)
+	reason = models.CharField(max_length=150, null=True, blank=True)
+	name = models.CharField(max_length=250, null=True, blank=True)
+	email = models.EmailField(max_length=300, blank=False, null=False)
+
+	def __str__(self):
+		return self.event_cart.event.title
+
 
 
 class EventCartItem(models.Model):

@@ -9,6 +9,7 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from events.forms import EventEmailConfirmationForm
 from weasyprint import HTML, CSS
 
+from events.tasks import send_test_email
 
 class EventConfirmationEmailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, UpdateView):
 	model = EventEmailConfirmation
@@ -72,7 +73,9 @@ class EventConfirmationEmailView(HouseAccountMixin, EventSecurityMixin, UserPass
 		self.object = form.save()
 
 		if 'send-test' in data:
-			self.send_test_email(event)
+			task = send_test_email.delay(event.id, self.object.message, request.user.email)
+			print(task.id)
+			# self.send_test_email(event)
 			messages.success(request, 'Test email sent to %s' % (request.user.email))
 		else:
 			messages.success(request, 'Confirmation Email Updated')
