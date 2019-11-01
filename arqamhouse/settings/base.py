@@ -14,7 +14,7 @@ import django_heroku
 import dj_database_url
 import dotenv
 import os
-from celery.schedules import crontab
+# from celery.schedules import crontab
 from arqamhouse.aws.conf import *
 
 
