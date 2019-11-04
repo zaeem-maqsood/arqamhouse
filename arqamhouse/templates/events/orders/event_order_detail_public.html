@@ -139,30 +139,23 @@ function myFunction() {
                                             <p style="margin:0 auto;">{{ attendee.name }}</p>
                                         </td>
 
-                                        {% if order.event_cart.pay %}
-                                            {% if attendee.active %}
+                                        
 
-                                                {% if attendee.ticket.free %}
-                                                <td style="vertical-align: inherit;">
-                                                    <p style="margin:0 auto;color:#2584C7;">Free Ticket</p>
-                                                </td>
-                                                {% elif attendee.ticket.donation %}
-                                                <td style="vertical-align: inherit;">
-                                                    <p style="margin:0 auto;color:#2584C7;">Donation Ticket</p>
-                                                </td>
-                                                {% else %}
-                                                <td style="vertical-align: inherit;">
-                                                    <p style="margin:0 auto;color:#2584C7;">Paid Ticket</p>
-                                                </td>
-                                                {% endif %}
-
-                                            {% else %}
-                                            <td style="vertical-align: inherit;">
-                                                <p style="margin:0 auto;color:#FF4500;">Refunded</p>
-                                            </td>
-                                            {% endif %}
-
+                                        {% if attendee.ticket.free %}
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;color:#2584C7;">Free Ticket</p>
+                                        </td>
+                                        {% elif attendee.ticket.donation %}
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;color:#2584C7;">Donation Ticket</p>
+                                        </td>
+                                        {% else %}
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;color:#2584C7;">Paid Ticket</p>
+                                        </td>
                                         {% endif %}
+
+                                       
 
                                     </tr>
                                     {% endfor %}
