@@ -524,8 +524,8 @@ class EventCheckoutView(FormView):
 			del request.session['cart']
 			request.session.modified = True
 			self.send_confirmation_email(event, data['email'], order)
-			messages.success(request, 'Check your email for tickets and further instructions.')
-			return HttpResponseRedirect(self.get_success_url())
+			messages.success(request, "Congratulations! You're all set.")
+			return HttpResponseRedirect(self.get_successful_order_url(order))
 
 
 		return render(request, self.template_name, self.get_context_data(data))
