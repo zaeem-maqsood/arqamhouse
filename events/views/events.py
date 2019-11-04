@@ -141,6 +141,10 @@ class EventCheckoutView(FormView):
 		view_name = "events:landing"
 		return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
 
+	def get_successful_order_url(self, order):
+		view_name = "order_detail_public"
+		return reverse(view_name, kwargs={"public_id": order.public_id})
+
 	def get_event(self, slug):
 		try:
 			event = Event.objects.get(slug=slug)
@@ -153,7 +157,7 @@ class EventCheckoutView(FormView):
 		if cart_id:
 			cart = EventCart.objects.get(id=cart_id)
 		else:
-			raise Http404
+			return None
 		return cart
 
 
@@ -500,8 +504,8 @@ class EventCheckoutView(FormView):
 
 			self.send_confirmation_email(event, data['email'], order)
 			self.send_owner_confirmation_email(event, order)
-			messages.success(request, 'Check your email for tickets and further instructions.')
-			return HttpResponseRedirect(self.get_success_url())
+			messages.success(request, "Congratulations! You're all set.")
+			return HttpResponseRedirect(self.get_successful_order_url(order))
 
 		# If there is no payment to be made
 		else:

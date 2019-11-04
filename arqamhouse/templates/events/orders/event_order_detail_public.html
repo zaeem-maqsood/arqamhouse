@@ -25,6 +25,19 @@ Order #{{ order.number }} | {{ order.event.title }}
 
 
 {% block scripts %}
+<script>
+function myFunction() {
+    /* Get the text field */
+    var copyText = document.getElementById("order_link");
+
+    /* Select the text field */
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+    /* Copy the text inside the text field */
+    document.execCommand("copy");
+}
+</script>
 
 {% endblock scripts %}
 
@@ -34,60 +47,77 @@ Order #{{ order.number }} | {{ order.event.title }}
 <section class="switchable feature-large" style="padding-top: 2rem;">
     <div class="container">
 
-
+        {% autoescape off %}
+        {% if messages %}
+        <div class="row justify-content-center" style="padding:20px;padding-bottom: 0px;">
+            <div class="col-md-12 col-lg-9 col-sm-12">
+                {% for message in messages %}
+                <div class="alert bg--{{ message.tags }}">
+                    <div class="alert__body">
+                        <span>{{ message|safe }}</span>
+                    </div>
+                    <div class="alert__close">&times;</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endautoescape %}
         
-        <div class="row justify-content-around" style="padding:40px;padding-bottom: 0px;">
+        <div class="row justify-content-around" style="padding:40px;padding-bottom: 0px;padding-top:10px;">
             <div class="col-lg-9 col-md-12 col-12" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 40px;border-radius: 15px;">
+
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-md-3">
+                        <p style="color: #2584C7;display: inline-block;line-height: 3;">Your order URL | <i class="fa fa-clipboard" onclick="myFunction()"></i></p>
+                    </div>
+                    <div class="col-md-9" style="margin-top: 5px;">
+                        <input pattern="[a-zA-Z ]*" style="font-size: 13px;" maxlength="100" class="validate-required pull-right" type="text"
+                            name="order_link" id="order_link" value="https://www.arqamhouse.com/orders/{{ order.public_id }}" readonly>
+                    </div>
+                </div>
+
+                <form method="GET">
+                    <div class="row" style="padding-bottom: 50px;">
+                        <div class="col-12">
+                            {% if not order.failed %}
+                            <button type="submit" name="view_tickets" value="true" class="btn btn--primary pull-right">Tickets
+                                PDF</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+
                 
                 <div class="row" style="padding-bottom: 30px;">
                     <div class="col-md-12">
                         <h4 style="color: #2584C7;font-weight: 500;">Order Details</h4>
-                        <p style="margin-bottom:0px;">Order # {{ order.number }}</p>
-                        <p style="margin-bottom:0px;">Order placed on {{ order.created_at }}</p>
-                        <p style="font-weight:500;">
-                            {% if order.failed %}
-                            <span style="color:#FF4500;"> Order Failed</span>
-                            {% elif order.partial_refund %}
-                            <span style="color:#FFBE00;"> This order has been partially refunded</span>
-                            {% elif order.refunded %}
-                            <span style="color:#FF4500;"> This order has been refunded</span>
-                            {% else %}
-                            <span style="color:#2584C7;">Successful Order {% if order.house_created %}- Created by House{% endif %}</span>
-                            {% endif %}
-                        </p>
+                        <div class="row">
+                            <div class="col-md-6" style="padding-bottom: 10px;">
+                                <p style="margin-bottom:0px;">Event | <a href="{{ order.event.get_landing_view }}">{{ order.event.title }}</a></p>
+                                <p style="margin-bottom:0px;">Order placed on {{ order.created_at }}</p>
+                                <p style="font-weight:500;">
+                                    {% if order.partial_refund %}
+                                    <span style="color:#FFBE00;"> This order has been partially refunded</span>
+                                    {% elif order.refunded %}
+                                    <span style="color:#FF4500;"> This order has been refunded</span>
+                                    {% else %}
+                                    <span style="color:#2584C7;">Successful Order {% if order.house_created %}- Created by House{% endif %}</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p style="margin-bottom:0px;"><span style="color:#2584C7;">Order # </span> | {{ order.number }}</p>
+                                <p style="margin-bottom: 0px;"><span style="color:#2584C7;">Name</span> | {{ order.name|title }}</p>
+                                <p style=""><span style="color:#2584C7;">Email</span> | {{ order.email }}</p>
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
+
                 
-                <div class="row" style="padding-bottom: 10px;">
-                    <div class="col-md-4">
-                        <p><span style="font-weight:700;">Name</span> | {{ order.name|title }}</p>
-                    </div>
-                    <div class="col-md-8">
-                        <p><span style="font-weight:700;">Email</span> | {{ order.email }}</p>
-                    </div>
-                </div>
-                
-                <div class="row" style="padding-bottom: 10px;">
-                    <div class="col-md-4">
-                        <p><span style="font-weight:700;">Payment Card</span> |
-                            {{ order.transaction.brand }}</p>
-                    </div>
-                    <div class="col-md-4">
-                        <p><span style="font-weight:700;">Last Four Digits</span> |
-                            {% if order.transaction.last_four %}{{ order.transaction.last_four }}{% else %}No Payment{% endif %}</p>
-                    </div>
-                    <div class="col-md-4">
-                        <p><span style="font-weight:700;">Outcome</span> |
-                            {% if order.transaction.outcome_type %}{{ order.transaction.outcome_type|title }}{% else %}No
-                            Payment{% endif %}</p>
-                    </div>
-                </div>
-
-
-
-                {% if order.failed %}
-                {% else %}
-                <div class="row" style="padding-top: 40px;">
+                <div class="row" style="padding-top: 20px;">
                     <div class="col-12">
                         <h4 style="color: #2584C7">Attendees</h4>
                     </div>
@@ -96,49 +126,51 @@ Order #{{ order.number }} | {{ order.event.title }}
                 
                 <div class="row text-center">
                     <div class="col-12">
-                        <table class="table table-hover" width="100%">
-                            <tbody>
-                                {% for attendee in attendees %}
-                                <tr>
-                                    <td style="vertical-align: inherit;">
-                                        <p style="margin:0 auto;">{{ forloop.counter }}</p>
-                                    </td>
-                                    <td style="vertical-align: inherit;">
-                                        <p style="margin:0 auto;">{{ attendee.ticket }}</p>
-                                    </td>
-                                    <td style="vertical-align: inherit;">
-                                        <p style="margin:0 auto;">{{ attendee.name }}</p>
-                                    </td>
+                        <div class="table-responsive">
+                            <table class="table table-hover" width="100%">
+                                <tbody>
+                                    {% for attendee in attendees %}
+                                    <tr>
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;">{{ forloop.counter }}</p>
+                                        </td>
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;">{{ attendee.ticket }}</p>
+                                        </td>
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;">{{ attendee.name }}</p>
+                                        </td>
 
-                                    {% if order.event_cart.pay %}
-                                        {% if attendee.active %}
+                                        {% if order.event_cart.pay %}
+                                            {% if attendee.active %}
 
-                                            {% if attendee.ticket.free %}
-                                            <td style="vertical-align: inherit;">
-                                                <p style="margin:0 auto;color:#2584C7;">Free Ticket</p>
-                                            </td>
-                                            {% elif attendee.ticket.donation %}
-                                            <td style="vertical-align: inherit;">
-                                                <p style="margin:0 auto;color:#2584C7;">Donation Ticket</p>
-                                            </td>
+                                                {% if attendee.ticket.free %}
+                                                <td style="vertical-align: inherit;">
+                                                    <p style="margin:0 auto;color:#2584C7;">Free Ticket</p>
+                                                </td>
+                                                {% elif attendee.ticket.donation %}
+                                                <td style="vertical-align: inherit;">
+                                                    <p style="margin:0 auto;color:#2584C7;">Donation Ticket</p>
+                                                </td>
+                                                {% else %}
+                                                <td style="vertical-align: inherit;">
+                                                    <p style="margin:0 auto;color:#2584C7;">Paid Ticket</p>
+                                                </td>
+                                                {% endif %}
+
                                             {% else %}
                                             <td style="vertical-align: inherit;">
-                                                <p style="margin:0 auto;color:#2584C7;">Paid Ticket</p>
+                                                <p style="margin:0 auto;color:#FF4500;">Refunded</p>
                                             </td>
                                             {% endif %}
 
-                                        {% else %}
-                                        <td style="vertical-align: inherit;">
-                                            <p style="margin:0 auto;color:#FF4500;">Refunded</p>
-                                        </td>
                                         {% endif %}
 
-                                    {% endif %}
-
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 
@@ -236,19 +268,6 @@ Order #{{ order.number }} | {{ order.event.title }}
                         </div>
                     </div>
                 </div>
-
-                <form method="GET">
-                <div class="row" style="padding-top: 50px;">
-                    <div class="col-12">
-                        {% if not order.failed %}
-                        <button type="submit" name="view_tickets" value="true" class="btn btn--primary pull-right">Ticket Confirmation
-                            PDF</button>
-                        {% endif %}
-                    </div>
-                </div>
-                </form>
-                {% endif %}
-
 
             </div>
         </div>
