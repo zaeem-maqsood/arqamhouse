@@ -29,7 +29,7 @@ from .mixins import HouseAccountMixin, HouseLandingMixin
 from django.contrib.auth.models import User
 from profiles.models import Profile
 from .models import House, HouseUser
-from .forms import AddUserToHouse, HouseUpdateForm, HouseChangeForm, HouseForm, HouseVerificationForm
+from .forms import AddUserToHouse, HouseUpdateForm, HouseChangeForm, HouseForm, HouseVerificationForm, HouseDirectorForm
 
 from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
 from profiles.models import Profile
@@ -41,7 +41,14 @@ class HouseVerificationView(HouseAccountMixin, FormView):
 	template_name = "houses/verification.html"
 
 	def get_success_url(self):
-		view_name = "houses:verify"
+		house = self.get_house()
+
+		if house.address_entered:
+			view_name = "houses:update"
+		elif house.house_type:
+			view_name = "houses:verify"
+		else:
+			view_name = "houses:verify"
 		return reverse(view_name)
 
 	def get(self, request, *args, **kwargs):
@@ -53,9 +60,15 @@ class HouseVerificationView(HouseAccountMixin, FormView):
 		profile = self.request.user
 		current_house_user = HouseUser.objects.get(profile=profile, house=house)
 
-		form = HouseVerificationForm(instance=house)
+		if house.address_entered:
+			form = HouseDirectorForm()
+			context["form"] = form
+		elif house.house_type:
+			form = HouseVerificationForm(instance=house)
+			context["form"] = form
+		else:
+			form = None
 
-		context["form"] = form
 		context["current_house_user"] = current_house_user
 		context["profile"] = profile
 		context["house"] = house
@@ -72,15 +85,29 @@ class HouseVerificationView(HouseAccountMixin, FormView):
 			messages.info(request, '%s House Chosen' % (data["house_type"]))
 			return HttpResponseRedirect(self.get_success_url())
 
-		form = HouseVerificationForm(instance=house, data=data)
-
-		if form.is_valid():
-			return self.form_valid(form, request)
+		if house.address_entered:
+			form = HouseDirectorForm(request.POST, request.FILES)
+			print("Its coming here")
+		elif house.house_type:
+			form = HouseVerificationForm(instance=house, data=data)
 		else:
-			return self.form_invalid(form)
+			form = None
+
+		if form:
+			if form.is_valid():
+				return self.form_valid(form, request)
+			else:
+				return self.form_invalid(form)
 
 	def form_valid(self, form, request):
-		self.object = form.save()
+		house = self.get_house()
+
+		if house.address_entered:
+			form.instance.house = house
+			self.object = form.save()
+		else:
+			self.object = form.save()
+		
 		valid_data = super(HouseVerificationView, self).form_valid(form)
 		return valid_data
 

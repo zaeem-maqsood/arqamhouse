@@ -22,33 +22,25 @@ function initMap() {
     }
 </script>
 
-<script type="text/javascript">
-    function changeHouse(object) {
+<script>
+    $("#id_region").change(function () {
 
-        console.log(object.value)
-        var house_user = object.value;
-        var token = '{{csrf_token}}';
+        var url = $("#houseVerificationForm").attr("data-cities-url");  // get the url of the `load_cities` view
 
-        $.ajax({
-            type: "POST",
-            headers: { "X-CSRFToken": token },
-            url: '{{ request.path }}',
+        var regionId = $(this).val();  // get the selected country ID from the HTML input
+
+        $.ajax({                       // initialize an AJAX request
+            url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
             data: {
-                'house_user': house_user,
+                'region': regionId       // add the country id to the GET parameters
             },
-
-            success: function (data) {
-                console.log("HELLOO");
-                location.reload();
-
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                alert(errorThrown);
-                //some stuff on failure
-            },
+            success: function (data) {   // `data` is the return of the `load_cities` view function
+                console.log(data)
+                $("#id_city").html(data);  // replace the contents of the city input with the data that came from the server
+            }
         });
 
-    }
+    });
 </script>
 
 <script type="text/javascript"
@@ -72,9 +64,9 @@ function initMap() {
         <div class="kt-portlet kt-portlet--mobile" style="padding:10px;">
             <div class="kt-portlet__body">
 
-                <form method="POST" id="houseForm" action="">{% csrf_token %}
+                <form method="POST" enctype="multipart/form-data" id="houseVerificationForm" action="" data-cities-url="{% url 'profiles:ajax_load_cities' %}">{% csrf_token %}
 
-                    <div class="row" style="padding-bottom:30px;">
+                    <div class="row" style="padding-bottom:10px;">
                         <div class="col-12">
                             <h4 style="margin-bottom:0px;">Verification <i style="color: #4399d5;" class="fa fa-check-circle" data-container="body"
                                                         data-toggle="kt-tooltip" data-placement="top" title=""
@@ -82,12 +74,45 @@ function initMap() {
                         </div>
                     </div>
 
-                    <div class="row" style="padding-bottom:30px;">
+                    {% if not house.house_type %}
+                    <div class="row" style="padding-bottom:50px;">
                         <div class="col-12">
                             <p style="margin-bottom:0px;">Verification in Arqam House is required to enable larger payouts, collect sales tax, or issue tax-deductible receipts if
                             you’re a non-profit.</p>
                         </div>
                     </div>
+                    {% endif %}
+
+                    {% if house.house_type and not house.address_entered %}
+                    <div class="row" style="padding-bottom:50px;">
+                        <div class="col-12">
+                            {% if house.house_type == "Individual" %}
+                            <p style="margin-bottom:0px;">Please enter your address below.</p>
+                            {% elif house.house_type == "Business" %}
+                            <p style="margin-bottom:0px;">Please enter your business address below.</p>
+                            {% else %}
+                            <p style="margin-bottom:0px;">Please enter your non-profit's address below.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if house.address_entered %}
+                    <div class="row" style="padding-bottom:50px;">
+                        <div class="col-12">
+                            {% if house.house_type == "Individual" %}
+                            <p style="margin-bottom:0px;">Please confirm your identity.</p>
+                            {% elif house.house_type == "Business" %}
+                            <p style="margin-bottom:0px;font-weight: 500;"> Please confirm the identity of a Beneficial Owner or Director.</p>
+                            
+                            {% else %}
+                            <p style="margin-bottom:0px;">Please enter your non-profit's address below.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+
 
                     {% if not house.house_type %}
                     <div class="row">
@@ -112,39 +137,141 @@ function initMap() {
                     </div>
                     {% endif %}
 
-                    <div class="row" style="padding-bottom: 30px;">
-                        <div class="col-md-6">
-                            <h5>Address</h5>
-                            {{ form.address }}
+                    {% if house.house_type and not house.address_entered %}
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <h5>Address</h5>
+                                    {{ form.address }}
+                                </div>
+                            </div>
+                            
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <h5>Region</h5>
+                                    {{ form.region }}
+                                </div>
+                            </div>
+                            
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <h5>City</h5>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+                            
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <h5>Postal Code</h5>
+                                    {{ form.postal_code }}
+                                </div>
+                            </div>
+                            
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <button type="submit" name="general" value="true" class="btn btn-primary btn-block">Next</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    {% endif %}
 
-                    <div class="row" style="padding-bottom: 30px;">
-                        <div class="col-md-6">
-                            <h5>Region</h5>
-                            {{ form.region }}
-                        </div>
-                    </div>
 
-                    <div class="row" style="padding-bottom: 30px;">
-                        <div class="col-md-6">
-                            <h5>City</h5>
-                            {{ form.city }}
-                        </div>
-                    </div>
+                    {% if house.address_entered %}
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
 
-                    <div class="row" style="padding-bottom: 30px;">
-                        <div class="col-md-6">
-                            <h5>Postal Code</h5>
-                            {{ form.postal_code }}
-                        </div>
-                    </div>
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <div class="accordion" id="accordionExample4">
+                                        <div class="card">
+                                            <div class="card-header" id="headingTwo1">
+                                                <div class="card-title collapsed" data-toggle="collapse" data-target="#collapseTwo4" aria-expanded="false"
+                                                    aria-controls="collapseTwo4">
+                                                    <i class="la la-plus"></i>Who is a Beneficial Owner or Director?
+                                                </div>
+                                            </div>
+                                            <div id="collapseTwo4" class="collapse" aria-labelledby="headingTwo1" data-parent="#accordionExample4">
+                                                <div class="card-body">
+                                    
+                                                    <p style="margin-bottom:0px;">
+                                                        Individuals who own 25% or more of your company, and/or
+                                                        <br>
+                                                        Individuals who exercise significant control over your company.
+                                                        <br>
+                                                        Individuals considered to “exercise significant control” over your company are those responsible for
+                                                        managing and
+                                                        directing the business and may include executive officers or senior managers, such as CEO, CFO, COO,
+                                                        Managing Member, General Partner, President, Vice President, or Treasurer.
+                                                        <br>
+                                                        <br>
+                                                        Directors typically are individuals who are members of the governing board of your company.
+                                                    </p>
+                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div class="row" style="padding-bottom: 30px;">
-                        <div class="col-md-6">
-                            <button type="submit" name="general" value="true" class="btn btn-primary btn-block">Next</button>
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <h5>Date of Birth</h5>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            {{ form.dob_year }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            {{ form.dob_month }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            {{ form.dob_day }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <h5>Name</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {{ form.first_name }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form.last_name }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <h5>Drivers Licence Front</h5>
+                                    {{ form.front_id }}
+                                </div>
+                            </div>
+                    
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <h5>Drivers Licence Back</h5>
+                                    {{ form.back_id }}
+                                </div>
+                            </div>
+                    
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <button type="submit" name="general" value="true" class="btn btn-primary btn-block">{% if house.address_entered %}Finish{% else %}Next{% endif %}</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    {% endif %}
+
+
+                    
 
                 </form>
 

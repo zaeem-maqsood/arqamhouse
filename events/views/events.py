@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from django.utils import timezone
-from django.utils.timezone import datetime, timedelta
+from django.utils.timezone import datetime, timedelta, get_current_timezone
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -717,6 +717,9 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		context["house"] = house
 		context["event"] = self.object
 		context["time"] = timezone.now()
+
+		print("TEsting")
+		print(get_current_timezone())
 		
 		if self.object.active == False:
 			context["inactive_event_tab"] = True
@@ -749,9 +752,9 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		else:
 			initial = {}
 			if self.object.start:
-				initial["start"] = self.object.start.strftime("%m/%d/%Y %I:%M %p")
+				initial["start"] = timezone.localtime(self.object.start).strftime("%m/%d/%Y %I:%M %p")
 			if self.object.end:
-				initial["end"] = self.object.end.strftime("%m/%d/%Y %I:%M %p")
+				initial["end"] = timezone.localtime(self.object.end).strftime("%m/%d/%Y %I:%M %p")
 			form = EventForm(instance=self.object, initial=initial)
 			
 			return self.render_to_response(self.get_context_data(form=form))

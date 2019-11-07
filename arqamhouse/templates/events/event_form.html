@@ -1,5 +1,5 @@
 {% extends "backend/base.html" %}
-
+{% load tz %}
 {% load static %}
 
 {% block title %}
@@ -255,6 +255,7 @@ function endDateTime(object) {
 						</div>
 						{% endif %}
 
+						
 						<div class="row" style="padding-bottom: 30px;">
 							<div class="col-md-6">
 								<p style="font-weight: 600;margin-bottom:0px;{% if form.start.errors %}color:red;{% endif %}">Start</p>

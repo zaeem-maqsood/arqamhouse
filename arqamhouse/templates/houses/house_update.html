@@ -58,83 +58,100 @@ function changeHouse(object) {
     }
 </style>
 <div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
-    <div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+    <div class="col-lg-8 offset-lg-2 col-md-12 col-12">
         <div class="kt-portlet kt-portlet--mobile" style="padding:30px;">
             <div class="kt-portlet__body">
 
                     <div class="row" style="padding-bottom:30px;">
                         <div class="col-10 offset-1">
 
-                            <form method="POST" action="">{% csrf_token %}
-
-                            <div class="row" style="padding-bottom:10px;">
+                            <div class="row" style="padding-bottom: 30px;">
                                 <div class="col-12">
-                                    <h4>Hello {{ profile.name }},</h4>
+                                    <h5 style="font-weight: 200;">Hello <b>{{ profile.name }}</b>, you're currently in your <b>'{{ house.name }}'</b> house.</h5>
                                 </div>
                             </div>
 
                             <div class="row" style="padding-bottom:30px;">
                                 <div class="col-12">
+                                    <h4>Change Houses</h4>
                                     <p>You can change houses by selecting a house from the drop down menu</p>
                                     {{ house_change_form.house_select }}
                                 </div>
                             </div>
 
                             <div class="row">
-                                <div class="col-md-6" style="padding-bottom:30px;">
-                                    <a href="{% url 'houses:create' %}" class="btn btn-primary btn-block">Create a new house</a>
-                                </div>
-                                <div class="col-md-6" style="padding-bottom:30px;">
-                                    <a href="{% url 'houses:manage' %}" class="btn btn-primary btn-block">House Users</a>
+                                <div class="col-md-12" style="padding-bottom:30px;">
+                                    <a href="{% url 'houses:create' %}" class="btn btn-primary">Create a new house</a>
                                 </div>
                             </div>
 
-                            
-                            <div class="row" style="padding-bottom:10px;padding-top:30px;">
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-10 offset-1">
+                    
+                            <div class="row" style="padding-bottom:30px;">
                                 <div class="col-12">
-                                    <h5>Update house settings</h5>
+                                    <h4>Payout Methods</h4>
+                                    <p>Add or remove payout methods.
+                                    </p>
+                                    <a href="{% url 'payments:payout_settings_list' %}" class="btn btn-primary">Payout Methods</a>
                                 </div>
                             </div>
+                    
+                        </div>
+                    </div>
 
-                            {% if form.errors %}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    {% for error in form.errors %}
-                                    <div class="alert m-alert--outline alert-danger" role="alert">
-                                        {{ error }}
-                                    </div>
-                                    {% endfor %}
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-10 offset-1">
+                    
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-12">
+                                    <h4>House Members</h4>
+                                    <p>Add or remove people from your house.
+                                    </p>
+                                    <a href="{% url 'houses:manage' %}" class="btn btn-primary">House Users</a>
+                                </div>
+                            </div>
+                    
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-10 offset-1">
+
+                            {% if house.verification_pending or house.verified %}
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-12">
+                                    <h4>House Details</h4>
+                                    <p style="margin-bottom: 5px;">House Type | <b>{{ house.house_type }}</b></p>
+                                    <p style="margin-bottom: 5px;">Verification | <b>{% if house.verified %}Verified{% else %}Verification Pending{% endif %}</b></p>
+                                    <p style="margin-bottom: 5px;">Country | <b>{{ house.country }}</b></p>
+                                    <p style="margin-bottom: 5px;">Region | <b>{{ house.region.name }}</b></p>
+                                    <p style="margin-bottom: 5px;">City | <b>{{ house.city.name }}</b></p>
+                                    <p style="margin-bottom: 5px;">Address | <b>{{ house.address }}</b></p>
+                                    <p style="margin-bottom: 5px;">Postal Code | <b>{{ house.postal_code }}</b></p>
+                                    <a href="{% url 'houses:verify' %}" class="btn btn-primary">Change Details</a>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-12">
+                                    <h4>House Verification</h4>
+                                    <p>Verification in Arqam House is required to enable larger payouts, collect sales tax, or issue tax-deductible receipts if
+                                    you’re a non-profit.</p>
+                                    {% if house.address_entered %}
+                                    <a href="{% url 'houses:verify' %}" class="btn btn-primary">Verify House</a>
+                                    {% endif %}
                                 </div>
                             </div>
                             {% endif %}
 
-                            <div class="row" style="padding-bottom:30px;">
-                                <div class="col-12">
-                                    <p style="margin-bottom:0px;">Name</p>
-                                    {{ form.name }}
-                                </div>
-                            </div>
 
-                            <div class="row" style="padding-bottom:30px;">
-                                <div class="col-12">
-                                    <p style="margin-bottom:0px;">Region</p>
-                                    {{ form.region }}
-                                </div>
-                            </div>
-
-                            <div class="row" style="padding-bottom:30px;">
-                                <div class="col-12">
-                                    <p style="margin-bottom:0px;">City</p>
-                                    {{ form.city }}
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-primary btn-block">Update House</button>
-                                </div>
-                            </div>
-                            </form>
                         </div>
                     </div>
 

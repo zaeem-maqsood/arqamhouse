@@ -3,9 +3,83 @@ import re
 
 from django import forms
 
-from .models import House
+from .models import House, HouseDirector
 from core.constants import days, months, years, provinces
 from cities_light.models import City, Region, Country
+
+
+
+class HouseDirectorForm(forms.ModelForm):
+	
+	class Meta:
+		model = HouseDirector
+		fields = [
+			"dob_year",
+			"dob_month",
+			"dob_day",
+			"first_name",
+			"last_name",
+			"front_id",
+			"back_id",
+		]
+
+		widgets = {
+                    "dob_year": forms.NumberInput(
+                        attrs={
+                            "class": "form-control m-input",
+							"placeholder": "1989",
+                            "required": True,
+							"max": "2010",
+							"min": "1950",
+                        }
+                    ),
+					"dob_month": forms.NumberInput(
+                        attrs={
+                            "required": True,
+							"placeholder": "10",
+                            "class": "form-control m-input",
+							"min": "1",
+							"max": "12"
+                        }
+                    ),
+					"dob_day": forms.NumberInput(
+                        attrs={
+                            "required": True,
+							"placeholder": "15",
+                            "class": "form-control m-input",
+							"min": "1",
+							"max": "31"
+                        }
+                    ),
+					"first_name": forms.TextInput(
+                        attrs={
+                            "required": True,
+							"placeholder": "First Name",
+                            "class": "form-control m-input",
+                        }
+                    ),
+					"last_name": forms.TextInput(
+                        attrs={
+                            "required": True,
+							"placeholder": "Last Name",
+                            "class": "form-control m-input",
+                        }
+                    ),
+					"front_id": forms.FileInput(
+                        attrs={
+							"required": True,
+							"class": "form-control m-input",
+                        }
+                    ),
+					"back_id": forms.FileInput(
+                        attrs={
+							"required": True,
+							"class": "form-control m-input",
+                        }
+                    ),
+                }
+
+	
 
 
 class HouseVerificationForm(forms.ModelForm):
