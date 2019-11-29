@@ -1,10 +1,11 @@
 from .base import *
 
 from events.views import (EventCreateView, EventUpdateView, PastEventsView, EventCheckoutView, EventDashboardView,
-                          AddTicketsToCartView, ChannelsView, ChannelsRoomView)
+                          AddTicketsToCartView, ChannelsView, ChannelsRoomView, TestingQRCodeView)
 
 
 urlpatterns += [
+
 
     path('create', EventCreateView.as_view(), name='create'),
     path('past', PastEventsView.as_view(), name='past'),
@@ -15,6 +16,7 @@ urlpatterns += [
     path('<slug:slug>/questions/', include('questions.urls')),
 
 
+    path('testing/qr-code', TestingQRCodeView.as_view(), name='qr_code'),
     path('testing/chat', ChannelsView.as_view(), name='channels_test'),
     path('testing/chat/<str:room_name>/', ChannelsRoomView.as_view(), name='channels_test_room'),
 ]

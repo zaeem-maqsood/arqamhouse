@@ -34,6 +34,14 @@ from payments.models import Transaction
 
 
 # Create your views here.
+class TestingQRCodeView(HouseAccountMixin, View):
+	template_name = "events/qr_code.html"
+
+
+	def get(self, request, *args, **kwargs):
+		
+		context = {}
+		return render(request, self.template_name, context)
 
 
 

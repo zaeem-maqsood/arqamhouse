@@ -1,0 +1,88 @@
+{% extends "backend/base.html" %}
+{% load tz %}
+{% load static %}
+
+{% block title %}
+Orders | {{ event.title }}
+{% endblock title %}
+
+{% block page_title %}
+Orders
+{% endblock page_title %}
+
+{% block styles %}
+
+{% endblock styles %}
+
+
+{% block scripts %}
+<script src="https://rawgit.com/sitepoint-editors/jsqrcode/master/src/qr_packed.js">
+</script>
+<script>
+
+    function openDialog() {
+            document.getElementById('qr_upload').click();
+        }
+
+    function openQRCamera(node) {
+        var reader = new FileReader();
+        reader.onload = function () {
+            node.value = "";
+            qrcode.callback = function (res) {
+                if (res instanceof Error) {
+                    alert("No QR code found. Please make sure the QR code is within the camera's frame and try again.");
+                } else {
+                    // node.parentNode.previousElementSibling.value = res;
+                    document.getElementById("output_text").value = res
+                }
+            };
+            qrcode.decode(reader.result);
+        };
+        reader.readAsDataURL(node.files[0]);
+    }
+</script>
+{% endblock scripts %}
+
+
+{% block content %}
+<style>
+body, input {font-size:14pt}
+input, label {vertical-align:middle}
+.qrcode-text {padding-right:1.7em; margin-right:0}
+.qrcode-text-btn {display:inline-block; background:url(//dab1nmslvvntp.cloudfront.net/wp-content/uploads/2017/07/1499401426qr_icon.svg) 50% 50% no-repeat; height:1em; width:1.7em; margin-left:-1.7em; cursor:pointer}
+.qrcode-text-btn > input[type=file] {position:absolute; overflow:hidden; width:1px; height:1px; opacity:0}
+</style>
+
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+		<div class="kt-portlet kt-portlet--mobile" style="padding:20px;">
+			<div class="kt-portlet__body">
+
+                
+                <input type=text size=16 placeholder="Tracking Code" class=qrcode-text id="output_text">
+                
+                <input type=file accept="image/*" id="qr_upload" capture=environment hidden onchange="openQRCamera(this);" tabindex=-1>
+
+                <button type="button" class="btn btn-primary" onclick="openDialog()"><i class="la la-qrcode"></i></button>
+                        
+    
+			</div>
+		</div>
+	</div>
+
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
