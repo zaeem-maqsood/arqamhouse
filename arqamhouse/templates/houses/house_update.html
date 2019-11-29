@@ -144,7 +144,7 @@ function changeHouse(object) {
                                     <h4>House Verification</h4>
                                     <p>Verification in Arqam House is required to enable larger payouts, collect sales tax, or issue tax-deductible receipts if
                                     you’re a non-profit.</p>
-                                    {% if house.address_entered %}
+                                    {% if not house.verification_pending  %}
                                     <a href="{% url 'houses:verify' %}" class="btn btn-primary">Verify House</a>
                                     {% endif %}
                                 </div>

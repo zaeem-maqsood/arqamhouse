@@ -1,0 +1,192 @@
+{% load tz %}
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>{{ month }} {{ year }} Statement for {{ house.name }}</title>
+</head>
+
+<body>
+  
+  <h1 style="font-weight: 400;font-size:2em;">{{ month }} {{ year }}</h1>
+  <p style="font-size: 1em;margin-top:0px;">Statement for {{ house.name }}</p>
+
+
+  <div style="padding-top:10px;"></div>
+  <h2 style="font-weight: 400;font-size: 1.5em;color:#4599d5;">Payments</h2>
+  <table>
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Gross Amount</th>
+            <th>Fee</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if payments %}
+    {% for payment in payments %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>${{ payment.transaction.amount }}</td>
+        <td>-${{ payment.transaction.fee }}</td>
+        <td>${{ payment.transaction.house_amount }}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    <tr style="background-color: #c1e5ff;">
+        <td>{{ payments.count }}</td>
+        <td>${{ payment_gross_amount|floatformat:2 }}</td>
+        <td>{% if payment_total_fees != 0 %}-{% endif %}${{ payment_total_fees|floatformat:2 }}</td>
+        <td>${{ payment_total_amount|floatformat:2 }}</td>
+    </tr>
+    </tbody>
+  </table>
+
+
+
+<div style="padding-top:10px;"></div>
+<h2 style="font-weight: 400;font-size: 1.5em;color:#4599d5;">Added Funds</h2>
+<table>
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Gross Amount</th>
+            <th>Fee</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if house_payments %}
+        {% for house_payment in house_payments %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>${{ house_payment.house_payment.transaction.amount }}</td>
+            <td>{% if house_payment.house_payment.transaction.fee != 0 %}-{% endif %}${{ house_payment.house_payment.transaction.fee }}
+            </td>
+            <td>${{ house_payment.house_payment.transaction.house_amount }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        <tr style="background-color: #c1e5ff;">
+            <td style="font-size: 1.3em;">{{ house_payments.count }}</td>
+            <td style="font-size: 1.3em;">${{ house_payments_gross_amount|floatformat:2 }}</td>
+            <td style="font-size: 1.3em;">
+                {% if house_payments_total_fees != 0 %}-{% endif %}${{ house_payments_total_fees|floatformat:2 }}</td>
+            <td style="font-size: 1.3em;">${{ house_payments_total_amount|floatformat:2 }}</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+<div style="padding-top:10px;"></div>
+<h2 style="font-weight: 400;font-size: 1.5em;color:#4599d5;">Refunds</h2>
+<table>
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Gross Amount</th>
+            <th>Fee</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if refunds %}
+        {% for refund in refunds %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{% if refund.refund.amount != 0 %}-{% endif %}${{ refund.refund.amount }}</td>
+            <td>${{ refund.refund.fee }}</td>
+            <td>{% if refund.refund.house_amount != 0 %}-{% endif %}${{ refund.refund.house_amount }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        <tr style="background-color: #c1e5ff;">
+            <td style="font-size: 1.3em;">{{ refunds.count }}</td>
+            <td style="font-size: 1.3em;">{% if refund_gross_amount != 0 %}-{% endif %}${{ refund_gross_amount|floatformat:2 }}</td>
+            <td style="font-size: 1.3em;">${{ refund_total_fees|floatformat:2 }}</td>
+            <td style="font-size: 1.3em;">{% if refund_house_amount != 0 %}-{% endif %}${{ refund_house_amount|floatformat:2 }}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+<div style="padding-top:10px;"></div>
+<h2 style="font-weight: 400;font-size: 1.5em;color:#4599d5;">Payouts</h2>
+<table>
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if payouts %}
+        {% for payout in payouts %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>${{ payout.payout.amount }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        <tr style="background-color: #c1e5ff;">
+            <td style="font-size: 1.3em;">{{ payouts.count }}</td>
+            <td style="font-size: 1.3em;">${{ payout_gross_amount|floatformat:2 }}</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<div style="padding-top:10px;"></div>
+<h2 style="font-weight: 400;font-size: 1.5em;color:#4599d5;">Balance Summary</h2>
+<table>
+    <tbody>
+        <tr>
+            <td>Gross Activity</td>
+            <td>${{ gross_activity|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <td>Total Fees</td>
+            <td>-${{ total_fees|floatformat:2 }}</td>
+        </tr>
+        <tr style="background-color: #c1e5ff;">
+            <td style="font-size: 1.3em;">Net Activity</td>
+            <td style="font-size: 1.3em;">${{ net_activity|floatformat:2 }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<br>
+<hr>
+<br>
+
+<table>
+    <tbody>
+        <tr>
+            <td>Start of Month Balance</td>
+            <td>${{ previous_month_last_house_balance|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <td>Net Activity</td>
+            <td>${{ net_activity|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <td>Total Payout</td>
+            <td>${{ payout_gross_amount|floatformat:2 }}</td>
+        </tr>
+        <tr style="background-color: #c1e5ff;">
+            <td style="font-size: 1.3em;">End of Month Balance</td>
+            <td style="font-size: 1.3em;">${{ end_of_month_balance|floatformat:2 }}</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+</body>
+
+</html>

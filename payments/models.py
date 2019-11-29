@@ -76,6 +76,10 @@ class Transaction(models.Model):
 	address_city = models.CharField(max_length=150, null=True, blank=True)
 	address_country = models.CharField(max_length=150, null=True, blank=True)
 
+	def fee(self):
+		fee = self.stripe_amount + self.arqam_amount
+		return fee
+
 
 	def __str__(self):
 		return (self.house.name)
@@ -93,6 +97,10 @@ class Refund(models.Model):
 
 	def __str__(self):
 		return (self.transaction.house.name)
+
+	def fee(self):
+		fee = self.amount - self.house_amount
+		return fee
 
 
 

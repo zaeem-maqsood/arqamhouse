@@ -52,9 +52,11 @@ class OrderListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, 
 			counter = 0
 			for search_term in search_terms:
 				if counter == 0:
-					orders = all_orders.filter(Q(name__icontains=search_term) | Q(transaction__amount__icontains=search_term))
+					orders = all_orders.filter(Q(name__icontains=search_term) | Q(
+						transaction__amount__icontains=search_term) | Q(email__icontains=search_term))
 				else:
-					orders = orders.filter(Q(name__icontains=search_term) | Q(transaction__amount__icontains=search_term))
+					orders = orders.filter(Q(name__icontains=search_term) | Q(
+						transaction__amount__icontains=search_term) | Q(email__icontains=search_term))
 				print(counter)
 				counter += 1
 		
@@ -255,7 +257,7 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 
 		# Creating http response
 		response = HttpResponse(content_type='application/pdf;')
-		response['Content-Disposition'] = 'inline; filename=list_people.pdf'
+		response['Content-Disposition'] = 'inline; filename=tickets.pdf'
 
 		pdf_file = HTML(string=pdf_content).write_pdf(response, stylesheets=[pdf_css])
 		return response

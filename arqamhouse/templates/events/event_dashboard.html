@@ -151,6 +151,97 @@ color: #7396b0;
 <div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
 	<div class="col-lg-12 col-md-12 col-12">
 
+		{% if not event.active %}
+		<div class="row">
+			<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+				<div class="alert alert-warning" role="alert" style="user-select: auto;background-color: #f9bf93;">
+					<div class="alert-text" style="user-select: auto;">'{{ event.title }}' is archived. You can edit this event <a href="{{ event.get_update_view }}">here</a></div>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+
+
+		<div class="row d-none d-sm-none d-md-flex">
+		
+			<div class="col-lg-2 offset-lg-1 col-md-4 col-6" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile" {% if not tickets %}style="background-color: #4599d5;" {% endif %}>
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" {% if not tickets %}style="color:white;" {% endif %}
+									href="{{ event.get_update_view }}">
+									<i class="la la-edit" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">Edit Event</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+			<div class="col-lg-2 col-md-4 col-6" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" href="{{ event.get_landing_view }}">
+									<i class="la la-external-link" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">View Event</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+			<div class="col-lg-2 col-md-4 col-6" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile" {% if not tickets %}style="background-color: #4599d5;" {% endif %}>
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" {% if not tickets %}style="color:white;" {% endif %}
+									href="{{ event.list_tickets_view }}">
+									<i class="la la-ticket" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">Tickets</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+			<div class="col-lg-2 col-md-4 col-6" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" href="{{ event.list_orders_view }}">
+									<i class="la la-list" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">Orders</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+			<div class="col-lg-2 col-md-4 col-6" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" href="{{ event.list_attendees_view }}">
+									<i class="la la-users" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">Attendees</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div class="row">
 			<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
 				<div class="kt-portlet kt-portlet--mobile" style="padding:10px;">
@@ -169,11 +260,7 @@ color: #7396b0;
 						<!-- Display this only on mobile devices -->
 						<div class="row text-center d-block d-md-none" style="padding-bottom:30px;">
 							<div class="col-12">
-								<h5>{{ event.title }} | <a class="dashboard-links" href="{{ event.get_update_view }}"><span style="font-size:0.8em;font-weight: 200;color:#4499d8;"
-										data-container="body" data-toggle="kt-tooltip" data-placement="top" title=""
-										data-original-title="Edit Event">Edit, </span></a> <a class="dashboard-links"
-									href="{{ event.get_landing_view }}"><span style="font-size:0.8em;font-weight: 200;color:#4499d8;" data-container="body"
-										data-toggle="kt-tooltip" data-placement="top" title="" data-original-title="View Event">View</span></a></h5>
+								<h5>{{ event.title }}</h5>
 							</div>
 						</div>
 						<!-- End here -->
@@ -183,32 +270,6 @@ color: #7396b0;
 								<canvas id="myChart2" width="400" height="200"></canvas>
 							</div>
 						</div>
-
-						<form method="POST">{% csrf_token %}
-						<div class="row text-center d-none d-sm-none d-md-flex" style="padding-top:30px;">
-							<div class="col-md-4">
-								<a href="{{ event.get_update_view }}" class="btn btn-block btn-outline-hover-primary btn-elevate dashboard-links"><i
-										class="la la-edit"></i> Edit Event</a>
-							</div>
-							<div class="col-md-4">
-								<a href="{{ event.get_landing_view }}" class="btn btn-block btn-outline-hover-primary btn-elevate dashboard-links"><i
-										class="la la-external-link"></i> View Event</a>
-							</div>
-							
-							<div class="col-md-4">
-								{% if event.ticket_sales %}
-								<button type="submit" name="stop_sales" value="true" class="btn btn-block btn-outline-hover-primary btn-elevate dashboard-links"><i
-										class="la la-ban"></i> Stop Sales</button>
-								{% else %}
-								<button type="submit" name="stop_sales" value="false"
-									class="btn btn-block btn-hover-danger btn-elevate"><i class="la la-play"></i> Resume
-									Sales</button>
-								{% endif %}
-							</div>
-							
-						</div>
-						</form>
-
 
 						<!-- Display this only on mobile devices -->
 						<div class="row text-center d-block d-sm-block d-md-none" style="padding-top:30px;">
@@ -225,14 +286,54 @@ color: #7396b0;
 
 		
 		
+
+
+
 		<div class="row">
-			<div class="col-lg-2 offset-lg-1 col-md-4 col-6" style="padding-top:10px;">
-				<div class="kt-portlet kt-portlet--mobile" {% if not tickets %}style="background-color: #4599d5;"{% endif %}>
+
+
+			<!-- HIDE THESE ON NON-MOBILE VIEWS -->
+			<div class="col-lg-2 offset-lg-1 col-md-4 col-6 d-md-none d-lg-non d-sm-flex d-flex" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile" {% if not tickets %}style="background-color: #4599d5;" {% endif %}>
 					<div class="kt-portlet__body">
 						<div class="row text-center">
 							<div class="col-12">
-								<a class="dashboard-links" {% if not tickets %}style="color:white;"{% endif %} href="{{ event.list_tickets_view }}">
-									<i class="la la-ticket" style="font-size:3em;"></i>
+								<a class="dashboard-links" {% if not tickets %}style="color:white;" {% endif %}
+									href="{{ event.list_tickets_view }}">
+									<i class="la la-edit" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">Edit Event</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-lg-2 col-md-4 col-6 d-md-none d-lg-non d-sm-flex d-flex" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile" {% if tickets %}{% if not questions %}style="background-color: #4599d5;"
+					{% endif %}{% endif %}>
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" {% if tickets %}{% if not questions %}style="color:white;"
+									{% endif %}{% endif %} href="{{ event.list_questions_view }}">
+									<i class="la la-external-link" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">View Event</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-lg-2 col-md-4 col-6 d-md-none d-lg-non d-sm-flex d-flex" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile" {% if not tickets %}style="background-color: #4599d5;" {% endif %}>
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" {% if not tickets %}style="color:white;" {% endif %}
+									href="{{ event.list_tickets_view }}">
+									<i class="la la-ticket" style="font-size:2.5em;"></i>
 									<p style="padding-top: 10px;">Tickets</p>
 								</a>
 							</div>
@@ -240,44 +341,14 @@ color: #7396b0;
 					</div>
 				</div>
 			</div>
-
-			<div class="col-lg-2 col-md-4 col-6" style="padding-top:10px;">
-				<div class="kt-portlet kt-portlet--mobile" {% if tickets %}{% if not questions %}style="background-color: #4599d5;"{% endif %}{% endif %}>
-					<div class="kt-portlet__body">
-						<div class="row text-center">
-							<div class="col-12">
-								<a class="dashboard-links" {% if tickets %}{% if not questions %}style="color:white;"{% endif %}{% endif %} href="{{ event.list_questions_view }}">
-									<i class="la la-question-circle" style="font-size:3em;"></i>
-									<p style="padding-top: 10px;">Q &amp; A</p>
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="col-lg-2 col-md-4 col-6" style="padding-top:10px;">
-				<div class="kt-portlet kt-portlet--mobile" {% if tickets %}{% if not email.message %}style="background-color: #4599d5;"{% endif %}{% endif %}>
-					<div class="kt-portlet__body">
-						<div class="row text-center">
-							<div class="col-12">
-								<a class="dashboard-links" {% if tickets %}{% if not email.message  %}style="color:white;"{% endif %}{% endif %} href="{{ event.get_email_confirmation_view }}">
-									<i class="la la-envelope" style="font-size:3em;"></i>
-									<p style="padding-top: 10px;">Email</p>
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="col-lg-2 col-md-4 col-6" style="padding-top:10px;">
+			
+			<div class="col-lg-2 col-md-4 col-6 d-md-none d-lg-non d-sm-flex d-flex" style="padding-top:10px;">
 				<div class="kt-portlet kt-portlet--mobile">
 					<div class="kt-portlet__body">
 						<div class="row text-center">
 							<div class="col-12">
 								<a class="dashboard-links" href="{{ event.list_orders_view }}">
-									<i class="la la-list" style="font-size:3em;"></i>
+									<i class="la la-list" style="font-size:2.5em;"></i>
 									<p style="padding-top: 10px;">Orders</p>
 								</a>
 							</div>
@@ -285,14 +356,14 @@ color: #7396b0;
 					</div>
 				</div>
 			</div>
-
-			<div class="col-lg-2 col-md-4 col-6" style="padding-top:10px;">
+			
+			<div class="col-lg-2 col-md-4 col-6 d-md-none d-lg-non d-sm-flex d-flex" style="padding-top:10px;">
 				<div class="kt-portlet kt-portlet--mobile">
 					<div class="kt-portlet__body">
 						<div class="row text-center">
 							<div class="col-12">
 								<a class="dashboard-links" href="{{ event.list_attendees_view }}">
-									<i class="la la-users" style="font-size:3em;"></i>
+									<i class="la la-users" style="font-size:2.5em;"></i>
 									<p style="padding-top: 10px;">Attendees</p>
 								</a>
 							</div>
@@ -300,9 +371,101 @@ color: #7396b0;
 					</div>
 				</div>
 			</div>
-
+			<!-- HIDE THESE ON NON-MOBILE VIEWS -->
 
 			
+			<div class="col-lg-2 offset-lg-1 col-md-4 col-6" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile" {% if not event.ticket_sales %}style="background-color: #fb7a7a;" {% endif %}>
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<form method="POST">{% csrf_token %}
+								{% if event.ticket_sales %}
+								<i class="la la-ban" style="font-size:2.5em;color: #7396b0;"></i>
+								<button type="submit" name="stop_sales" value="true"
+									class="btn btn-block btn-elevate dashboard-links">Stop
+									Sales</button>
+								{% else %}
+								<i class="la la-play" style="font-size:2.5em;color: white;"></i>
+								<button type="submit" name="stop_sales" value="false" class="btn btn-block btn-elevate" style="color: white;">Resume</button>
+								{% endif %}
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			
+			<div class="col-lg-2 col-md-4 col-6" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile"
+					{% if tickets %}{% if not email.message %}style="background-color: #4599d5;" {% endif %}{% endif %}>
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" {% if tickets %}{% if not email.message  %}style="color:white;"
+									{% endif %}{% endif %} href="{{ event.list_questions_view }}">
+									<i class="la la-question-circle" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">Questions</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-2 col-md-4 col-6" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" href="{{ event.list_answers_view }}">
+									<i class="la la-clipboard" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">Answers</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+			<div class="col-lg-2 col-md-4 col-6" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile"
+					{% if tickets %}{% if not email.message %}style="background-color: #4599d5;" {% endif %}{% endif %}>
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" {% if tickets %}{% if not email.message  %}style="color:white;"
+									{% endif %}{% endif %} href="{{ event.get_email_confirmation_view }}">
+									<i class="la la-envelope" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">Email</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+		
+			<div class="col-lg-2 col-md-4 col-6" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" href="{% url 'payments:payout' %}">
+									<i class="la la-money" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">Payout</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+
+			
+		
+		
 		</div>
 
 	</div>

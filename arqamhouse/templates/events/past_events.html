@@ -56,7 +56,7 @@ Past Events
 					<tbody id="dynamic">
 						{% for event in events %}
 						<tr>
-							<td><a href="{{ event.get_update_view }}">{{ event.title }}</a></td>
+							<td><a href="{{ event.get_event_dashboard }}">{{ event.title }}</a></td>
 							<td>{{ event.end }}</td>
 							<td>{% get_tickets_sold event %}</td>
 							<td>${% get_revenue_earned event %}</td>

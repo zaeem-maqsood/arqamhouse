@@ -5,6 +5,17 @@ import os
 CELERY_BROKER_URL = os.environ['REDIS_URL']
 CELERY_RESULT_BACKEND = os.environ['REDIS_URL']
 
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+        },
+        'symmetric_encryption_keys': [SECRET_KEY],
+    },
+}
+
 DEBUG = False
 
 ALLOWED_HOSTS = ['arqam.herokuapp.com', 'arqamhouse.com', 'www.arqamhouse.com' ]

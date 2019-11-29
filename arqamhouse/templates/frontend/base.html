@@ -5,6 +5,10 @@
 
         <title>{% block title %}{% endblock title %}</title>
 
+        {% block page_description %}
+        <meta name="description" content="Arqam House | Powerful tools made simple.">
+        {% endblock page_description %}
+
         {% include "frontend/header.html" %}
 
         {% block styles %}

@@ -32,6 +32,9 @@ coverage = "*"
 selenium = "*"
 django-froala-editor = "*"
 django-hosts = "*"
+channels = "*"
+channels-redis = "*"
+uvicorn = "*"
 
 [requires]
 python_version = "3.7"

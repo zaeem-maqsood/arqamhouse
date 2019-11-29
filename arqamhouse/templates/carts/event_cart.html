@@ -4,8 +4,12 @@
 {% load static %}
 
 {% block title %}
-Choose Tickets | {{ event.title }}
+Choose Tickets | {{ event.title|safe }}
 {% endblock title %}
+
+{% block page_description %}
+<meta name="description" content="{{ event.description|safe|striptags }}">
+{% endblock page_description %}
 
 {% block styles %}
 <style>

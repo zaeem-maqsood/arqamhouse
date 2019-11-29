@@ -290,7 +290,16 @@ class EventCheckoutView(FormView):
 		# =================================== SECOND CHECK (if payment required) =====================---============
 		# Only get the Stripe Token if payment enabled
 		if cart.pay:
-			stripe_token = data["stripeToken"]
+
+			# We need to do a sanity check to make sure that the stripe token is in the data
+			try:
+				stripe_token = data["stripeToken"]
+			except Exception as e:
+				print(e)
+				errors["payment"] = "Your payment was not processed. A network error prevented payment processing, please try again later."
+				self.send_error_email(event, e, data)
+				return self.render_to_response(self.get_context_data(data=data, errors=errors))
+
 
 
 			# =========================================== Check if the charge succeeds or not ====================================================================
@@ -699,6 +708,10 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		view_name = "events:landing"
 		return reverse(view_name, kwargs={"slug": self.object.slug})
 
+	def get_edit_url(self):
+		view_name = "events:update"
+		return reverse(view_name, kwargs={"slug": self.object.slug})
+
 	def get_success_delete_url(self):
 		view_name = "events:past"
 		return reverse(view_name)
@@ -768,7 +781,29 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		if "Undo Delete" in data:
 			self.object.deleted = False
 			self.object.save()
-			return HttpResponseRedirect(self.get_success_url())
+			messages.warning(request, 'Event recovered Successfully')
+			return HttpResponseRedirect(self.get_edit_url())
+
+		if "Archive" in data:
+			self.object.active = False
+			self.object.save()
+			messages.success(request, """Successfully archived '%s' """ %
+			                 (self.object.title))
+			return HttpResponseRedirect(self.get_edit_url())
+
+		if "Re-Open" in data:
+			self.object.active = True
+			self.object.save()
+			messages.success(request,  """Successfully unarchived '%s' """ %
+			                 (self.object.title))
+			return HttpResponseRedirect(self.get_edit_url())
+
+		if "Delete" in data:
+			self.object.active = False
+			self.object.deleted = True
+			self.object.save()
+			messages.warning(request, 'Event Deleted Successfully')
+			return HttpResponseRedirect(self.get_success_delete_url())
 
 		form = self.get_form()
 		if form.is_valid():
@@ -780,27 +815,10 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
 		data = request.POST
 		self.object = form.save()
 
-		if "Archive" in data:
-			self.object.active = False
-			self.object.save()
-			messages.success(request, """Successfully archived '%s'. You can re-open the event over <a href="%s">here</a>.""" % (self.object.title, self.object.get_update_view()))
-
-		elif "Remove" in data:
+		if "Remove" in data:
 			self.object.image = None
 			self.object.save()
 			messages.warning(request, 'Event image successfully removed')
-
-		elif "Re-Open" in data:
-			self.object.active = True
-			self.object.save()
-			messages.success(request,  """Successfully re-opend '%s'. You can archive the event over <a href="%s">here</a>.""" % (self.object.title, self.object.get_update_view()))
-
-		elif "Delete" in data:
-			self.object.active = False
-			self.object.deleted = True
-			self.object.save()
-			messages.warning(request, 'Event Deleted Successfully')
-			return HttpResponseRedirect(self.get_success_delete_url())
 
 		else:
 			messages.success(request, 'Event Updated Successfully!')

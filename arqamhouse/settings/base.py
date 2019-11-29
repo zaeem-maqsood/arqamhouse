@@ -42,10 +42,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third Party App
     'django_cleanup.apps.CleanupConfig',
     'django_hosts',
     'storages',
     'cities_light',
+    'channels',
+
+    # First Party Apps
     'houses',
     'profiles',
     'payments',
@@ -92,6 +97,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'arqamhouse.wsgi.application'
+
+ASGI_APPLICATION = "arqamhouse.routing.application"
+
 
 
 ADMINS = [('Zaeem Maqsood', 'errors@arqamhouse.com')]
