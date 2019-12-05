@@ -130,10 +130,6 @@ class Event(TimestampedModel):
 		view_name = "events:create_donation_ticket"
 		return reverse(view_name, kwargs={"slug": self.slug, "type":"donation"})
 
-	def choose_tickets_view(self):
-		view_name = "events:choose_tickets"
-		return reverse(view_name, kwargs={"slug": self.slug})
-
 	def list_tickets_view(self):
 		view_name = "events:list_tickets"
 		return reverse(view_name, kwargs={"slug": self.slug})
@@ -182,22 +178,6 @@ def event_post_save_reciever(sender, instance, *args, **kwargs):
 		EventEmailConfirmation.objects.create(event=instance)
 
 post_save.connect(event_post_save_reciever, sender=Event)
-
-
-
-
-# Checkin Model -------------------------
-# Check attendee app for corresponding 'CheckinAttendee' model
-
-# class Checkin(models.Model):
-# 	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=False, null=False)
-# 	title = models.CharField(max_length=120, null=True, blank=False)
-# 	auto_add_new_attendees = models.BooleanField(default=True)
-# 	password_protected = models.BooleanField(default=True)
-# 	password = models.CharField(max_length=120, null=True, blank=False)
-
-# 	def __str__(self):
-# 		return ("%s" % self.event.title)
 
 
 

@@ -26,7 +26,8 @@
 
 
 jQuery(document).ready(function($) {
-    calculateBuyerTicketCostAndOrganizerTicketValue()
+    calculateBuyerTicketCostAndOrganizerTicketValue();
+	refundPolicy();
 });
 
 
@@ -89,13 +90,41 @@ function calculateBuyerTicketCostAndOrganizerTicketValue() {
 
 
 $('#id_pass_fee').change(function() {
-	calculateBuyerTicketCostAndOrganizerTicketValue()
+	calculateBuyerTicketCostAndOrganizerTicketValue();
 });
 
 
 $('#id_price').bind('input', function() {
-	calculateBuyerTicketCostAndOrganizerTicketValue()
+	calculateBuyerTicketCostAndOrganizerTicketValue();
 });
+
+
+
+function refundPolicy() {
+
+	option = document.getElementById('id_refund_policy').value;
+	console.log(option)
+	paragraph = document.getElementById('policy_info');
+	title = document.getElementById('policy_title');
+
+	if (option == "7-days") {
+		paragraph.innerHTML = "A 7-day refund policy allows your attendees to request a refund from you 7 days before the start of your event (if your event has a start time). Otherwise they may request a refund at anytime. More info <a href='#'> here.</a>";
+		title.innerHTML = "7-Days Policy"
+	}
+	else if (option == "30-days") {
+		paragraph.innerHTML = "A 30-day refund policy allows your attendees to request a refund from you 30 days before the start of your event (if your event has a start time). Otherwise they may request a refund at anytime. More info <a href='#'> here.</a>";
+		title.innerHTML = "30-Days Policy"
+	}	
+	else if (option == "no refunds") {
+		paragraph.innerHTML = "A 'no refund' policy tells your attendees that sales for this ticket are final. More info <a href='#'> here.</a>";
+		title.innerHTML = "No Refund Policy"
+	}
+
+	else {
+		paragraph.innerHTML = "A standard refund policy allows your attendees to request a refund from you 24 hours before the start of your event (if your event has a start time). Otherwise they may request a refund at anytime. More info <a href='#'> here.</a>";
+		title.innerHTML = "Standard Policy"
+	}
+}
 
 
 
@@ -276,11 +305,18 @@ $('#id_price').bind('input', function() {
 												</div>
 											</div>
 
-											<div class="row" style="padding-bottom: 10px;padding-top:30px;">
+											<div class="row" style="padding-bottom: 20px;padding-top:30px;">
+												{% if paid_ticket %}
 												<div class="col-lg-4 col-md-12">
+													<p style="margin-bottom:0px;">
+														Refund Policy</p>
+													{{ form.refund_policy }}
+												</div>
+												{% endif %}
+												<div class="col-lg-4 col-md-12 text-center">
 													<p style="margin-bottom:0px;"><i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body"
 															data-toggle="kt-tooltip" data-placement="top" title=""
-															data-original-title="Express tickets are super easy for attendees to checkout with. However, you will recieve no information from the attendee not even their name!"></i>
+															data-original-title="Express tickets are super easy for attendees to checkout with. However, you will not recieve information from attendees."></i>
 														Express Ticket</p>
 													<span class="kt-switch">
 														<label>
@@ -289,10 +325,10 @@ $('#id_price').bind('input', function() {
 														</label>
 													</span>
 												</div>
-												<div class="col-lg-4 col-md-12">
+												<div class="col-lg-4 col-md-12 text-center">
 													<p style="margin-bottom:0px;"><i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle"
 															data-container="body" data-toggle="kt-tooltip" data-placement="top" title=""
-															data-original-title="Express tickets are super easy for attendees to checkout with. However, you will recieve no information from the attendee not even their name!"></i>
+															data-original-title="Tickets will automatically be marked as sold out when you sell out. You may also manually mark tickets as sold out."></i>
 														Sold Out</p>
 													<span class="kt-switch">
 														<label>
@@ -303,6 +339,16 @@ $('#id_price').bind('input', function() {
 												</div>
 											</div>
 
+											{% if paid_ticket %}
+											<div class="row" style="padding-bottom: 10px;">
+												<div class="col-lg-12 col-md-12">
+													<h5 style="font-size: 1em;" id="policy_title">Standard Policy</h5>
+													<p id="policy_info">A standard refund policy allows your attendees to request a refund from you 24 hours before the start of your event (if your event has a start time).
+														Otherwise they may request a refund at anytime. More info <a href="#">here.</a>
+													</p>
+												</div>
+											</div>
+											{% endif %}
 										</div>
 									</div>
 								</div>

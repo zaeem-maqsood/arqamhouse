@@ -507,6 +507,39 @@ function initMap() {
 
                     {% if cart.pay %}
 
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+
+                            <label for="card-element" style="font-weight: 600;font-size: 1.4em;color: #4a90e2;margin-bottom: 15px;">Payment <i
+                                    style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
+                                    data-tooltip="Payments are processed through our trusted partner stripe.com. "></i></label>
+
+                            <ul class="accordion accordion-1">
+                                <li class="">
+                                    <div class="accordion__title" style="border-color: #4990e2;">
+                                        <span class="h5">Refund Policy - By continuing you agree to these policies</span>
+                                    </div>
+                                    <div class="accordion__content">
+                                        {% for cart_item in cart_items %}
+                                            <h5 style="display:block;margin-bottom:0px;"><span style="font-weight:200;">Ticket</span> | {{ cart_item.ticket }}</h5>
+                                            <p>
+                                                {% if cart_item.ticket.refund_policy == "standard" %}
+                                                    You may request <b>{{ event.house.name }}</b> for a refund <b>24 hours</b> before the start of this event. 
+                                                {% elif cart_item.ticket.refund_policy == "7-days" %}
+                                                    You may request <b>{{ event.house.name }}</b> for a refund <b>7 days</b> before the start of this event.
+                                                {% elif cart_item.ticket.refund_policy == "30-days" %}
+                                                    You may request <b>{{ event.house.name }}</b> for a refund <b>30 days</b> before the start of this event.
+                                                {% else %}
+                                                    <b>You may not request a refund for this ticket. Ticket sales are final.</b>
+                                                {% endif %}
+                                            </p>
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                     {% if errors.payment %}
                     <div class="row" style="padding-bottom: 20px;">
                         <div class="col-md-12">
@@ -520,9 +553,6 @@ function initMap() {
 
                     <div class="row justify-content-center" style="padding-bottom:50px;">
                         <div class="col-md-12">
-                            <label for="card-element" style="font-weight: 600;font-size: 1.4em;color: #4a90e2;margin-bottom: 15px;">Payment <i
-                                    style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
-                                    data-tooltip="Payments are processed through our trusted partner stripe.com. "></i></label>
 
                             
                             <div id="card-element">

@@ -237,11 +237,15 @@ class HouseUpdateForm(forms.ModelForm):
 class HouseForm(forms.ModelForm):
 
 	agree = forms.BooleanField(widget=forms.CheckboxInput)
+	email = forms.EmailField(required=True, widget=forms.EmailInput(
+		attrs={"required": True, "class": "validate-required", "placeholder": "Support Email", "autocomplete": "off"}))
 
 	class Meta:
 		model = House
 		fields = [
 			"name",
+			"email",
+			"address",
 			"region",
 			"city"
 		]
@@ -266,6 +270,14 @@ class HouseForm(forms.ModelForm):
 					attrs={
 						"required" : True,
 						"class":"validate-required",
+					}
+				),
+			"address": forms.TextInput(
+					attrs={
+						"autocomplete": "off",
+						"class": "validate-required",
+						"placeholder":"123 Main Street",
+						"id":"autocomplete",
 					}
 				),
 			}

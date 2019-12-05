@@ -95,7 +95,7 @@ class PaidTicketForm(FreeTicketForm):
 	class Meta:
 		model = Ticket
 		fields = [
-			"title", "description", "price", "pass_fee", "min_amount", "max_amount", "amount_available", "express", "sold_out"
+			"title", "description", "price", "pass_fee", "min_amount", "max_amount", "amount_available", "express", "sold_out", "refund_policy"
 		]
 
 		widgets = {
@@ -130,6 +130,14 @@ class PaidTicketForm(FreeTicketForm):
 
 				"pass_fee": forms.CheckboxInput(
 						attrs={
+						}
+					),
+
+				"refund_policy": forms.Select(
+						attrs={
+							"required": True,
+							"onchange": "refundPolicy()",
+							"class": "form-control m-input",
 						}
 					),
 

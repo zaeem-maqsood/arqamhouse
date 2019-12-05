@@ -12,6 +12,13 @@ from events.models import Event
 # We charge customers a base fee of 30 cents and a percentage of 4% of the ticket price
 # PER TICKET. 
 
+refund_policies = (
+			('standard', 'Standard'),
+			('7-days', '7-days'),
+			('30-days', '30-days'),
+			('no refunds', 'No Refunds')
+		)
+
 
 # Ticket Model ---------------------------------------------------
 class Ticket(models.Model):
@@ -41,6 +48,7 @@ class Ticket(models.Model):
 	amount_available = models.PositiveSmallIntegerField(blank=True, null=True, default=500)
 	amount_sold = models.PositiveSmallIntegerField(blank=True, null=False, default=0)
 	deleted = models.BooleanField(default=False)
+	refund_policy = models.CharField(max_length=150, choices=refund_policies, default='standard')
 
 	def __str__(self):
 		return self.title

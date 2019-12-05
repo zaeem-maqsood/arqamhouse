@@ -8,26 +8,34 @@ from django.urls import reverse
 # Create your models here.
 
 
-class BankTransfer(models.Model):
-	transit = models.CharField(max_length=5, blank=False, null=False)
-	institution = models.CharField(max_length=3, null=False, blank=False)
-	account = models.CharField(max_length=12, null=False, blank=False)
+def validate_file_extension(value):
+    import os
+    from django.core.exceptions import ValidationError
+    ext = os.path.splitext(value.name)[1]  # [0] returns path+filename
+    valid_extensions = ['.pdf', '.doc', '.docx', '.jpg', '.png', '.xlsx', '.xls']
+    if not ext.lower() in valid_extensions:
+        raise ValidationError(u'Unsupported file extension.')
 
-	def __str__(self):
-		return (self.institution)
 
-	def get_edit_url(self):
-		view_name = "payments:update_bank"
-		return reverse(view_name, kwargs={"bank_transfer_id": self.pk})
+def official_document_location(instance, filename):
+	return "bank_direct_deposit_forms/%s/%s/%s" % (instance.house.slug, instance.name, filename)
 
 
 class PayoutSetting(models.Model):
 	name = models.CharField(max_length=150, null=False, blank=False)
 	house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
-	bank_transfer = models.ForeignKey(BankTransfer, on_delete=models.CASCADE, blank=True, null=True)
+	transit = models.CharField(max_length=5, blank=False, null=False)
+	institution = models.CharField(max_length=3, null=False, blank=False)
+	account = models.CharField(max_length=12, null=False, blank=False)
+	official_document = models.FileField(upload_to=official_document_location, blank=True, null=True, validators=[validate_file_extension])
 
 	def __str__(self):
 		return (self.name)
+
+	
+	def get_edit_url(self):
+		view_name = "payments:update_bank"
+		return reverse(view_name, kwargs={"bank_transfer_id": self.pk})
 
 
 
@@ -57,14 +65,9 @@ class Transaction(models.Model):
 
 	house_payment = models.BooleanField(default=False)
 	payment_id = models.CharField(max_length=150, null=True, blank=True)
-	failed = models.BooleanField(default=False)  #Remove this
-	code_fail_reason = models.CharField(max_length=250, null=True, blank=True) #Remove this
-	failure_code = models.CharField(max_length=150, null=True, blank=True) #Remove this
-	failure_message = models.CharField(max_length=150, null=True, blank=True) #Remove this
 	last_four = models.CharField(max_length=10, null=True, blank=True)
 	brand = models.CharField(max_length=100, null=True, blank=True)
 	network_status = models.CharField(max_length=150, null=True, blank=True)
-	reason = models.CharField(max_length=150, null=True, blank=True) #Remove this
 	risk_level = models.CharField(max_length=150, null=True, blank=True)
 	seller_message = models.CharField(max_length=150, null=True, blank=True)
 	outcome_type = models.CharField(max_length=150, null=True, blank=True)

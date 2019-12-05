@@ -1,19 +1,12 @@
 from django.contrib import admin
 
-from .models import Transaction, Refund, Payout, HousePayment, HouseBalance, HouseBalanceLog, PayoutSetting, BankTransfer
+from .models import Transaction, Refund, Payout, HousePayment, HouseBalance, HouseBalanceLog, PayoutSetting
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('house', 'created_at', 'amount', 'failed')
-    list_filter = ('failed', 'house')
+    list_display = ('house', 'created_at', 'amount')
+    list_filter = ('house',)
     search_fields = ('house__name', 'payment_id')
-
-
-class BankTransferAdmin(admin.ModelAdmin):
-    list_display = ('transit', 'institution', 'account')
-    list_filter = ('institution',)
-    search_fields = ('account',)
-
 
 class HouseBalanceLogAdmin(admin.ModelAdmin):
     list_display = ('house_balance', 'balance', 'created_at')
@@ -31,7 +24,7 @@ class HousePaymentAdmin(admin.ModelAdmin):
 
 
 class PayoutSettingAdmin(admin.ModelAdmin):
-    list_display = ('name', 'house', 'bank_transfer')
+    list_display = ('name', 'house', 'transit', 'institution', 'account')
     list_filter = ('house', )
     search_fields = ('name',)
 
@@ -56,4 +49,3 @@ admin.site.register(HousePayment, HousePaymentAdmin)
 admin.site.register(HouseBalance, HouseBalanceAdmin)
 admin.site.register(HouseBalanceLog, HouseBalanceLogAdmin)
 admin.site.register(PayoutSetting, PayoutSettingAdmin)
-admin.site.register(BankTransfer, BankTransferAdmin)

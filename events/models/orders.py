@@ -97,4 +97,5 @@ class EventOrder(models.Model):
 		return reverse(view_name, kwargs={"slug": self.event.slug, "public_id": self.public_id})
 
 
+
 	

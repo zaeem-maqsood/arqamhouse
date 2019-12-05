@@ -176,7 +176,7 @@
                                                                             <span
                                                                                 style="font-size: 18px; user-select: auto;"><span
                                                                                     style="user-select: auto;">Hello {{ house.name }}, we have recieved your payout request
-                                                                                    in the amount of ${{ payout_amount }}. We have begun processing it and the funds should be deposited within a couple
+                                                                                    in the amount of ${{ payout_amount }}. We have begun processing it and the funds should be deposited within a couple of
                                                                                     days.</span></span>
                                                                         </div>
 
@@ -184,52 +184,7 @@
                                                                 </tr>
                                                             </table>
 
-                                                            <table class="module" role="module" data-type="spacer"
-                                                                border="0" cellpadding="0" cellspacing="0" width="100%"
-                                                                style="table-layout: fixed;">
-                                                                <tr>
-                                                                    <td style="padding:0px 0px 10px 0px;"
-                                                                        role="module-content" bgcolor="">
-                                                                    </td>
-                                                                </tr>
-                                                            </table>
-
-                                                            <table class="module" role="module" data-type="text"
-                                                                border="0" cellpadding="0" cellspacing="0" width="100%"
-                                                                style="table-layout: fixed;">
-                                                                <tr>
-                                                                    <td style="padding:18px 0px 18px 0px;line-height:22px;text-align:inherit;"
-                                                                        height="100%" valign="top" bgcolor="">
-                                                                        <div style="user-select: auto;"><strong>Please check the <a href="www.arqamhouse.com/payments/">payments</a> tab from your dashboard for updates.</strong></div>
-
-                                                                        <div style="user-select: auto;">&nbsp;</div>
-
-                                                                        <div style="user-select: auto;"><u
-                                                                                style="user-select: auto;">Payout
-                                                                                Details:</u></div>
-
-                                                                        <div style="user-select: auto;">Payout Name:
-                                                                            {{ payout.payout_setting.name }}</div>
-
-                                                                        <div style="user-select: auto;">Transfer Type:
-                                                                            {% if payout.payout_setting.bank_transfer %}
-                                                                            Bank Transfer {% endif %}</div>
-
-                                                                        {% if payout.payout_setting.bank_transfer %}
-                                                                        <div style="user-select: auto;">Account Number:
-                                                                            {{ payout.payout_setting.bank_transfer.account|make_list|slice:':3'|join:'' }}****
-                                                                        </div>
-                                                                        <div style="user-select: auto;">Transit Number:
-                                                                            {{ payout.payout_setting.bank_transfer.transit }}
-                                                                        </div>
-                                                                        <div style="user-select: auto;">Institution Number:
-                                                                            {{ payout.payout_setting.bank_transfer.institution }}
-                                                                        </div>
-                                                                        {% endif %}
-
-                                                                    </td>
-                                                                </tr>
-                                                            </table>
+                                                            
 
                                                             <table class="module" role="module" data-type="spacer"
                                                                 border="0" cellpadding="0" cellspacing="0" width="100%"

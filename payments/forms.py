@@ -1,45 +1,32 @@
 from django import forms
-from .models import PayoutSetting, BankTransfer
+from .models import PayoutSetting
 
 
 class AddBankTransferForm(forms.ModelForm):
 
     class Meta:
-        model = BankTransfer
+        model = PayoutSetting
         fields = [
-            "transit",
-            "institution",
-            "account",
+            "name", "official_document",
         ]
 
 
         widgets = {
-            "transit": forms.TextInput(
-                    attrs={
-                        "class":"form-control m-input",
-                        "onkeyup": "this.value = this.value.replace(/[^\d]/, '')",
-                        "placeholder": "12345",
-                        "required": True
-                    }
-                ),
-            "institution": forms.TextInput(
-                    attrs={
-                        "class":"form-control m-input",
-                        "placeholder":"001",
-                        "oninput": "this.value = this.value.replace(/[^\d]/, '')",
-                        "onkeyup": "GetBankImage(this)",
-                        "required": True
-                    }
-                ),
-            "account": forms.TextInput(
+            "name": forms.TextInput(
                 attrs={
+                    "required": True,
+                    "placeholder": "Account Name i.e. 'Events Account",
                     "class": "form-control m-input",
-                    "placeholder": "1234567",
-                    "oninput": "this.value = this.value.replace(/[^\d]/, '')",
-                    "required": True
                 }
             ),
-            }
+
+            "official_document": forms.FileInput(
+                attrs={
+                    "required": True,
+                    "class": "form-control m-input",
+                }
+            ),
+        }
 
 
 class AddFundsForm(forms.Form):
@@ -58,4 +45,4 @@ class PayoutForm(forms.Form):
         super(PayoutForm, self).__init__(*args, **kwargs)
         self.fields["amount"] =  forms.DecimalField(widget=forms.NumberInput(attrs={"class":"form-control m-input", "min" : "1.00", "max": "%s" % (total), "step": "0.01", "value": "0.00", "required": True, "onkeyup": "updateFeeAndTotal(this)", "autofocus": "True"}))
         self.fields["payout_setting"] = forms.ModelChoiceField(queryset=PayoutSetting.objects.filter(house=house), empty_label=None, widget=forms.Select(attrs={"class":"form-control m-input", "required": True}))
-        
+    

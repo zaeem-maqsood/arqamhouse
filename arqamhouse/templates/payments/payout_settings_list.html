@@ -39,34 +39,10 @@ Payment Settings | {{ house.name }}
                 {% if payout_settings %}
                 
                 {% for payout_setting in payout_settings %}
-                <div class="row" style="padding-bottom:10px;padding-top: 20px;">
-                    <div class="col-md-3">
-                        {% if payout_setting.bank_transfer.institution == '001' or payout_setting.bank_transfer.institution == '002' or payout_setting.bank_transfer.institution == '003' or payout_setting.bank_transfer.institution == '004' or payout_setting.bank_transfer.institution == '006' or payout_setting.bank_transfer.institution == '010' or payout_setting.bank_transfer.institution == '614' or payout_setting.bank_transfer.institution == '815' or payout_setting.bank_transfer.institution == '828' %}
-                            {% with template_name=payout_setting.bank_transfer.institution|stringformat:"s"|add:".html" %}
-                                {% include "payments/bank_images/"|add:template_name %}
-                            {% endwith %}
-                        {% endif %}
-                    </div>
-                </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <p style="font-size:1.2em;"><span style="font-weight: 400;">{{ payout_setting.name }} |</span> <a
-                                href="{{ payout_setting.bank_transfer.get_edit_url  }}">Edit</a></p>
-                    </div>
-                </div>
-                <div class="row" style="padding-bottom: 40px;">
-                    <div class="col-md-5">
-                        
-                        <p style="margin-bottom:0px;">Account Number</p>
-                        <p>{{ payout_setting.bank_transfer.account|make_list|slice:':3'|join:'' }}****</p>
-                    </div>
-                    <div class="col-md-3">
-                        <p style="margin-bottom:0px;">Transit Number</p>
-                        <p>{{ payout_setting.bank_transfer.transit }}</p>
-                    </div>
-                    <div class="col-md-3">
-                        <p style="margin-bottom:0px;">Institution Number</p>
-                        <p>{{ payout_setting.bank_transfer.institution }}</p>
+                        <h5 style="font-size:1.2em;"><span style="font-weight: 400;">{{ forloop.counter }}. {{ payout_setting.name }} |</span> <a
+                                href="{{ payout_setting.get_edit_url  }}">Edit</a></h5>
                     </div>
                 </div>
                 {% endfor %}

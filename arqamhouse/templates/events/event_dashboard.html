@@ -161,6 +161,20 @@ color: #7396b0;
 		</div>
 		{% endif %}
 
+		{% if refund_requests %}
+		<div class="row">
+			<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+				{% for refund_request in refund_requests %}
+				<div class="alert alert-warning" role="alert" style="user-select: auto;background-color: #f9bf93;">
+					<div class="alert-text" style="user-select: auto;">
+						<p>{{ refund_request.attendee.name }} has requested a refund. Click <a href="{{ refund_request.order.get_order_view }}">here</a> to process it or <a href="mailto:info@arqamhouse.com?Subject=Please%20Dismiss%20Refund%20For%20Order#:%20{{ refund_request.order.public_id }}&amp;body=-------------Do%20not%20delete%20this%20Information----------------%0AHouse:%20{{ house.slug }}%0AEvent:%20{{ event.slug }}%0A{% if refund_request.attendee %}Attendee:%20{{ refund_request.attendee.id }}{% endif %}%0ARequest%20Number:%20{{ refund_request.id }}%0A-------------Place%20your%20message%20below----------------">contact us.</a></p>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+		{% endif %}
+
 
 		<div class="row d-none d-sm-none d-md-flex">
 		

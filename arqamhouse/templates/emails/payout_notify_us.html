@@ -159,31 +159,7 @@
       </tr>
     </table>
   
-    <table class="module" role="module" data-type="text" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
-      <tr>
-        <td style="padding:18px 0px 18px 0px;line-height:22px;text-align:inherit;"
-            height="100%"
-            valign="top"
-            bgcolor="">
-            <div style="user-select: auto;"><strong>Please remember to mark the payout as processed.</strong></div>
-
-<div style="user-select: auto;">&nbsp;</div>
-
-<div style="user-select: auto;"><u style="user-select: auto;">Payout Details:</u></div>
-
-<div style="user-select: auto;">Payout Name: {{ payout.payout_setting.name }}</div>
-
-<div style="user-select: auto;">Transfer Type: {% if payout.payout_setting.bank_transfer %} Bank Transfer {% endif %}</div>
-
-{% if payout.payout_setting.bank_transfer %}
-<div style="user-select: auto;">Account Number: {{ payout.payout_setting.bank_transfer.account  }}</div>
-<div style="user-select: auto;">Transit Number: {{ payout.payout_setting.bank_transfer.transit  }}</div>
-<div style="user-select: auto;">Institution Number: {{ payout.payout_setting.bank_transfer.institution  }}</div>
-{% endif %}
-
-        </td>
-      </tr>
-    </table>
+    
   
     <table class="module"
            role="module"

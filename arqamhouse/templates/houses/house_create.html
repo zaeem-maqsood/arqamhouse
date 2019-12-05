@@ -109,27 +109,33 @@ $('#id_name').bind('input propertychange', function () {
                     </div>
                 	{% endif %}
 
-                    <div class="row" style="padding-bottom: 30px;">
+                    <div class="row" style="padding-bottom: 20px;">
                         <div class="col-md-8">
+                            <p style="text-align: left;margin-bottom: 0px;">House Name</p>
                             {{ form.name }}
                         </div>
                     </div>
 
+
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-8">
+                            <p style="text-align: left;margin-bottom: 0px;">Email</p>
+                            {{ form.email }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-md-8">
+                            <p style="text-align: left;margin-bottom: 0px;">Region</p>
+                            {{ form.region }}
+                        </div>
+                    </div>
+
+
                     <div class="row" style="padding-bottom: 30px;">
                         <div class="col-md-8">
-                            <ul class="accordion accordion-2">
-                                <li>
-                                    <div class="accordion__title">
-                                        <span class="h5">Change Location of House</span>
-                                    </div>
-                                    <div class="accordion__content">
-                                        {{ form.region }}
-                                        <br>
-                                        <br>
-                                        {{ form.city }}
-                                    </div>
-                                </li>
-                            </ul>
+                            <p style="text-align: left;margin-bottom: 0px;">City</p>
+                            {{ form.city }}
                         </div>
                     </div>
 

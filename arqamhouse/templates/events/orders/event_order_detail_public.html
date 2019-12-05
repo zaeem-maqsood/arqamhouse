@@ -1,7 +1,6 @@
 {% extends "frontend/base.html" %}
-{% load ticket_form_tags %}
 {% load static %}
-
+{% load tz %}
 {% block title %}
 Order #{{ order.number }} | {{ order.event.title }}
 {% endblock title %}
@@ -87,7 +86,7 @@ function myFunction() {
                 </form>
 
                 
-                <div class="row" style="padding-bottom: 30px;">
+                <div class="row" style="padding-bottom: 40px;">
                     <div class="col-md-12">
                         <h4 style="color: #2584C7;font-weight: 500;">Order Details</h4>
                         <div class="row">
@@ -113,67 +112,16 @@ function myFunction() {
                         
                     </div>
                 </div>
-
-                
-                <div class="row" style="padding-top: 20px;">
-                    <div class="col-12">
-                        <h4 style="color: #2584C7">Attendees</h4>
-                    </div>
-                </div>
-                
-                
-                <div class="row text-center">
-                    <div class="col-12">
-                        <div class="table-responsive">
-                            <table class="table table-hover" width="100%">
-                                <tbody>
-                                    {% for attendee in attendees %}
-                                    <tr>
-                                        <td style="vertical-align: inherit;">
-                                            <p style="margin:0 auto;">{{ forloop.counter }}</p>
-                                        </td>
-                                        <td style="vertical-align: inherit;">
-                                            <p style="margin:0 auto;">{{ attendee.ticket }}</p>
-                                        </td>
-                                        <td style="vertical-align: inherit;">
-                                            <p style="margin:0 auto;">{{ attendee.name }}</p>
-                                        </td>
-
-                                        
-
-                                        {% if attendee.ticket.free %}
-                                        <td style="vertical-align: inherit;">
-                                            <p style="margin:0 auto;color:#2584C7;">Free Ticket</p>
-                                        </td>
-                                        {% elif attendee.ticket.donation %}
-                                        <td style="vertical-align: inherit;">
-                                            <p style="margin:0 auto;color:#2584C7;">Donation Ticket</p>
-                                        </td>
-                                        {% else %}
-                                        <td style="vertical-align: inherit;">
-                                            <p style="margin:0 auto;color:#2584C7;">Paid Ticket</p>
-                                        </td>
-                                        {% endif %}
-
-                                       
-
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
                 
                 
                 
-                <div class="row" style="padding-top: 50px;">
+                <div class="row" style="padding-bottom: 10px;">
                     <div class="col-12">
                         <h4 style="color: #2584C7;">Order Breakdown</h4>
                     </div>
                 </div>
                 
-                <div class="row" style="padding-top:10px;">
+                <div class="row" style="padding-bottom:40px;">
                     <div class="col-md-12">
                         <div class="table-responsive">
                             <table class="table">
@@ -210,7 +158,7 @@ function myFunction() {
                                         {% for cart_item in event_cart_items %}
                                         <tr>
                                             <td style="color: grey;">{{ cart_item.ticket.title }}</td>
-                                            <td style="color: grey;">${{ cart_item.ticket_price }}</td>
+                                            <td style="color: grey;">${{ cart_item.ticket_buyer_price }}</td>
                                             <td style="color: grey;">{{ cart_item.quantity }}</td>
                                             <td style="color: #2584C7;">+${{ cart_item.cart_item_total }}</td>
                                         </tr>
@@ -257,6 +205,124 @@ function myFunction() {
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+
+
+
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-12">
+                        <h4 style="color: #2584C7">Attendees</h4>
+                    </div>
+                </div>
+
+                <div class="row text-center" style="padding-bottom:20px;">
+                    <div class="col-md-6">
+                        <p style="margin-bottom: 0px;">Event Start | <b>{{ event_start_time|localtime }}</b></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>Time Until Event | <b>{{ time_left_days }} day{% if time_left_days == 1 %}{% elif time_left_days == 0 %}{% else %}s{% endif %}, {{ time_left_hours }} hour{% if time_left_hours == 1 %}{% elif time_left_hours == 0 %}{% else %}s{% endif %}</b></p>
+                    </div>
+                </div>
+                
+                <form method="POST">{% csrf_token %}
+                <div class="row text-center">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-hover" width="100%">
+                                <tbody>
+                                    {% for attendee in attendees %}
+                                    <tr>
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;">{{ forloop.counter }}</p>
+                                        </td>
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;">{{ attendee.ticket }}</p>
+                                        </td>
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;">{{ attendee.name }}</p>
+                                        </td>
+                
+                
+                                        {% if attendee.ticket.free %}
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;color:#2584C7;">Free Ticket</p>
+                                        </td>
+                                        {% elif attendee.ticket.donation %}
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;color:#2584C7;">Donation Ticket</p>
+                                        </td>
+                                        {% else %}
+                                        <td style="vertical-align: inherit;">
+                                            <p style="margin:0 auto;color:#2584C7;">Paid Ticket</p>
+                                        </td>
+                                        {% endif %}
+
+
+                                        <td style="vertical-align: inherit;">
+                                            <b data-tooltip="Refund Policy">{{ attendee.ticket_refund_policy|title }}</b>
+                                        </td>
+                
+                                        {% if order.event_cart.pay %}
+                                            {% autoescape off %}
+                                            <td style="vertical-align: inherit;">
+                                                {{ attendee.get_refundable_or_not }}
+                                            </td>
+                                            {% endautoescape %}
+                                        {% endif %}
+                
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row text-center" style="padding-bottom:50px;">
+                    <div class="col-md-4">
+                        {% if order.event_cart.pay %}
+                            {% if active_attendees.count > 1 and not refund_requests and show_total_order_refund %}
+                            <button type="submit" name="Full Refund" id='Full Refund' value="full" class="btn btn--primary">Request Refund For
+                                Entire Order</button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                </form>
+
+
+
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-12">
+                        <h4 style="color: #2584C7;">Refund Policies</h4>
+                    </div>
+                </div>
+                
+                <div class="row" style="padding-bottom:50px;">
+                    <div class="col-md-12">
+                        <h5 style="display:block;margin-bottom:0px;"><span style="font-weight:200;">Policy </span> | Standard</h5>
+                        <p style="margin-bottom:0px;">You may request a refund for this ticket <b>24 hours</b> before the start of this event.</p>
+
+                        <hr>
+
+                        <h5 style="display:block;margin-bottom:0px;"><span style="font-weight:200;">Policy </span> | 7-day</h5>
+                        <p style="margin-bottom:0px;">You may request a refund for this ticket <b>7 days</b> before the start of this event.</p>
+
+                        <hr>
+
+                        <h5 style="display:block;margin-bottom:0px;"><span style="font-weight:200;">Policy </span> | 30-day</h5>
+                        <p style="margin-bottom:0px;">You may request a refund for this ticket <b>30 days</b> before the start of this event.</p>
+
+                        <hr>
+
+                        
+                        <h5 style="display:block;margin-bottom:0px;"><span style="font-weight:200;">Policy </span> | No Refunds</h5>
+                        <p style="margin-bottom:0px;">
+                        <b>You may not request a refund for this ticket. Ticket sales are final.</b>
+                        If you have concerns please <a href="mailto:info@arqamhouse.com?Subject=Refund%20For%20Order#:%20{{ order.public_id }}">contact us</a> for help.
+                        </p>
+
                     </div>
                 </div>
 

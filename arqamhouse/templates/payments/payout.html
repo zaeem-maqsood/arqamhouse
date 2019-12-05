@@ -13,6 +13,7 @@ Payout | {{ house.name }}
 
 
 {% block scripts %}
+{% if house_balance.balance > 0 and payout_settings %}
 <script>
 function updateFeeAndTotal() {
 
@@ -29,68 +30,117 @@ jQuery(document).ready(function($) {
     updateFeeAndTotal()
 });
 </script>
+{% endif %}
 {% endblock scripts %}
 
 
 {% block content %}
 
 <div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
-	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
-		<div class="kt-portlet kt-portlet--mobile">
-			<div class="kt-portlet__body">
-                <form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
+	<div class="col-lg-6 offset-lg-3 col-md-12 col-12">
 
-
-                <div class="row text-center" style="padding-bottom:30px;">
-                    <div class="{% if house_balance.balance > 0 %}col-lg-2{% else %}col-lg-12{% endif %} col-4" style="padding-top: 30px;">
-                        <p style="font-size: 1.6em;margin-bottom: 0rem;color: #FF7947;">${{ total }}</p>
-                        <p style="padding-top:20px;">Current Balance</p>
-                    </div>
-                    {% if house_balance.balance > 0 and payout_settings %}
-                    <div class="col-2 d-none d-sm-none d-md-none d-lg-block" style="padding-top: 30px;">
-                        <p style="font-size: 1.5em;">-</p>
-                    </div>
-                    <div class="col-lg-3 col-4" style="padding-top: 30px;">
-                        {{ form.amount }}
-                        <p style="margin-top:0.9rem;">Payout amount</p>
-                    </div>
-                    <div class="col-2 d-none d-sm-none d-md-none d-lg-block" style="padding-top: 30px;">
-                        <p style="font-size: 1.5em;">=</p>
-                    </div>
-                    <div class="col-lg-2 col-4" style="padding-top: 30px;">
-                        <p style="font-size: 1.6em;margin-bottom: 0rem;color: #FF7947;" id="total">$0.00</p>
-                        <p style="padding-top:20px;">New Balance</p>
-                    </div>
-                    {% endif %}
-                </div>
-
-                {% if house_balance.balance > 0 and payout_settings %}
-                <div class="row" style="padding-bottom:30px;padding-top: 30px;">
-                    <div class="col-md-12">
-                        {{ form.payout_setting }}
+        {% if refund_requests %}
+        <div class="row">
+            <div class="col-12">
+                {% for refund_request in refund_requests %}
+                <div class="alert alert-warning" role="alert" style="user-select: auto;background-color: #f9bf93;">
+                    <div class="alert-text" style="user-select: auto;">
+                        <p>{{ refund_request.attendee.name }} has requested a refund. Click <a
+                                href="{{ refund_request.order.get_order_view }}">here</a> to process it or <a
+                                href="mailto:info@arqamhouse.com?Subject=Please%20Dismiss%20Refund%20For%20Order#:%20{{ refund_request.order.public_id }}&amp;body=-------------Do%20not%20delete%20this%20Information----------------%0AHouse:%20{{ house.slug }}%0AEvent:%20{{ event.slug }}%0A{% if refund_request.attendee %}Attendee:%20{{ refund_request.attendee.id }}{% endif %}%0ARequest%20Number:%20{{ refund_request.id }}%0A-------------Place%20your%20message%20below----------------">contact
+                                us.</a></p>
                     </div>
                 </div>
-                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
 
-                {% if payout_settings %}   
-                    {% if house_balance.balance > 0 %}
-                    <div class="row" style="padding-bottom:30px;">
-                        <div class="col-md-12">
-                            <button id="customButton" type="submit" class="btn btn-primary" >Request Payout</button>
-                        </div>
-                    </div>
-                    {% endif %}
-                {% else %}
-                    <div class="row text-center" style="padding-bottom:30px;">
-                        <div class="col-md-12">
-                            <a href="{% url 'payments:add_bank' %}" class="btn btn-primary btn-block">Add Payout Method</a>
-                        </div>
-                    </div>
-                {% endif %}
+        <div class="row">
+            <div class="col-12">
+                <div class="kt-portlet kt-portlet--mobile">
+                    <div class="kt-portlet__body">
+                        <form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
 
-            </form>
-			</div>
-		</div>
+
+                        <div class="row text-center" style="padding-bottom:10px;">
+                            {% if house_balance.balance > 0 and payout_settings %}
+                            <div class="col-6" style="padding-top: 30px;">
+                                <h2 style="margin-bottom: 0rem;color: #FF7947;">${{ total }}</h2>
+                                <p>Current Balance</p>
+                            </div>
+                            <div class="col-6" style="padding-top: 30px;">
+                                <h2 style="margin-bottom: 0rem;color: #FF7947;" id="total">$0.00</h2>
+                                <p>New Balance</p>
+                            </div>
+                            {% else %}
+                            <div class="col-lg-12" style="padding-top: 30px;">
+                                <h2 style="margin-bottom: 0rem;color: #FF7947;">${{ total }}</h2>
+                                <p>Current Balance</p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row text-center" style="padding-bottom:30px;">
+                            <div class="col-lg-8 offset-lg-2 col-10 offset-1" style="padding-top: 30px;">
+                                {{ form.amount }}
+                                <p style="margin-top:0.9rem;">Payout amount</p>
+                                {% if form.amount.errors %}
+                                    <br>
+                                    {% for error in form.amount.errors %}
+                                    <div class="alert m-alert--outline alert-danger" role="alert">
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                        {% if refund_requests %}
+                        <div class="row text-center" style="padding-bottom:30px;">
+                            <div class="col-lg-8 offset-lg-2 col-10 offset-1">
+                                <p>Please process refunds before requesting a payout.</p>
+                            </div>
+                        </div>
+                        {% else %}
+                            {% if house_balance.balance > 0 and payout_settings %}
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-lg-8 offset-lg-2 col-10 offset-1">
+                                    {{ form.payout_setting }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if payout_settings %}   
+                                {% if house_balance.balance > 0 %}
+                                <div class="row" style="padding-bottom:30px;">
+                                    <div class="col-lg-8 offset-lg-2 col-10 offset-1">
+                                        <button id="customButton" type="submit" class="btn btn-block btn-primary">Request Payout</button>
+                                    </div>
+                                </div>
+                                <div class="row text-center" style="padding-bottom:30px;">
+                                    <div class="col-lg-8 offset-lg-2 col-10 offset-1">
+                                        <a href="{% url 'payments:add_funds' %}">Add Funds Instead?</a>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="row text-center" style="margin: 20px;">
+                                    <div class="col-md-12">
+                                        <a href="{% url 'payments:add_bank' %}" class="btn btn-primary btn-block">Add Payout Method</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
 	</div>
 </div>
 

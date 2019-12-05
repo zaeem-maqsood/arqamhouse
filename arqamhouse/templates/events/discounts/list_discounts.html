@@ -40,11 +40,12 @@ Questions
 				<div class="row">
 					<div class="col-12">
 						<h3>Discount Codes</h3>
+						{% if not discount_codes %}
+						<p>You don't have any discount codes yet!</p>
+						{% endif %}
 					</div>
 				</div>
 
-
-				
 				{% for discount_code in discount_codes %}
 				<div class="row" style="padding-top:30px;">
 					<div class="col-md-12">

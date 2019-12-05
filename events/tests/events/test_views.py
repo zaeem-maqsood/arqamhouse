@@ -3,12 +3,16 @@ import stripe
 
 from django.conf import settings
 from django.test import TestCase
+from django.test.client import RequestFactory
+
 from houses.models import House, HouseUser
-from payments.models import HouseBalance, HouseBalanceLog
-from events.models import (Event, EventEmailConfirmation, EventQuestion, Ticket, EventCart, EventCartItem, AttendeeCommonQuestions, Attendee)
+from payments.models import HouseBalance, HouseBalanceLog, Transaction
+from events.models import (Event, EventEmailConfirmation, EventQuestion, Ticket, EventCart, EventCartItem, AttendeeCommonQuestions, Attendee, EventOrder)
 from profiles.models import Profile
 from questions.models import Question, MultipleChoice
 from cities_light.models import City, Region, Country
+
+from events.views import EventDashboardView
 
 from django.urls import reverse
 
@@ -251,17 +255,52 @@ class PastEventsViewTest(TestCase):
 class EventDashboardViewTests(TestCase):
 
     def setUp(self):
+
+        self.factory = RequestFactory()
+
         # Set up house
         house = House.objects.create(name="Arqam House")
+
+        house_balance = HouseBalance.objects.create(house=house, balance=0.00)
+        house_balance_logs = HouseBalanceLog.objects.create(
+            house_balance=house_balance, balance=0.00, opening_balance=True)
 
         profile = Profile.objects.create_user(email='zaeem.maqsood@gmail.com', password="Ed81ae9600!", is_active=True)
         profile.house = house
         profile.save()
         house_user = HouseUser.objects.create(profile=profile, house=house, role='admin')
-        # Create an event
+
+        # Create an event - This will be a fresh event
         event = Event.objects.create(house=house, title="Arqam House Test Event", url="test-1", active=True)
 
+        # Create an event - This will be a fresh event
+        event2 = Event.objects.create(house=house, title="Arqam House Test Event 2", url="test-2", active=True)
+        ticket = Ticket.objects.create(
+            event=event2, title="Paid Ticket", paid=True, price=5.00, pass_fee=True)
+        cart = EventCart.objects.create(event=event2, pay=True)
+        cart_item = EventCartItem.objects.create(
+            event_cart=cart, ticket=ticket, quantity=2)
+        transaction = Transaction.objects.create(
+            house=house, amount=decimal.Decimal(5.00), house_amount=decimal.Decimal(4.50), stripe_amount=decimal.Decimal(0.44), arqam_amount=decimal.Decimal(0.05), payment_id="ch_1Fm3J0HblWxAI5SaAs4Ejs96",
+            last_four="4242", brand="Visa", network_status="approved_by_network", risk_level="normal", seller_message="Payment complete.", 
+            outcome_type="authorized", email="zaeem.maqsood@gmail.com", address_postal_code=10000)
+        event_order = EventOrder.objects.create(
+            name="Zaeem Maqsood", event=event2, event_cart=cart, email="zaeem.maqsood@gmail.com", transaction=transaction, number=1)
+        
+        # Log user in for testing
         self.client.login(email='zaeem.maqsood@gmail.com', password='Ed81ae9600!')
+
+    
+    def test_404_dashboard(self):
+        # Pass a view that does not exist
+        view = "/events/test-123/dashboard"
+
+        # Try Response
+        response = self.client.get(view)
+
+        # Make sure a 404 error is displayed
+        self.assertEqual(response.status_code, 404)
+
 
     
     def test_fresh_dashboard(self):
@@ -288,5 +327,33 @@ class EventDashboardViewTests(TestCase):
         # Test Total Sales
         total_sales = decimal.Decimal(0.00)
         self.assertEquals(response.context['total_sales'], decimal.Decimal(0.00))
+
+    
+    def test_dashboard(self):
+
+        event = Event.objects.get(slug="test-2")
+        view = event.get_event_dashboard()
+        response = self.client.get(event.get_event_dashboard())
+
+        # Test the response
+        self.assertEqual(response.status_code, 200)
+
+        # Test Total Sales
+        self.assertEquals(
+            response.context['total_sales'], decimal.Decimal(4.50))
+
+        # Test inactive_event_tab
+        self.assertEquals(response.context['event_tab'], True)
+
+        # Test stopping sales from the dashboard
+        data = {}
+        data["stop_sales"] = 'true'
+        response = self.client.post(reverse("events:dashboard", kwargs={
+                                    'slug': event.slug}), data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        event = Event.objects.get(slug="test-2")
+        self.assertEqual(event.ticket_sales, False)
+        
+
 
         

@@ -127,7 +127,7 @@ class DashboardView(HouseAccountMixin, DetailView):
 
 	def graph_data(self, house):
 		
-		transactions = Transaction.objects.filter(house=house, failed=False)
+		transactions = Transaction.objects.filter(house=house)
 		today = timezone.now()
 		days_earlier = today - timedelta(days=10)
 		day_label = []

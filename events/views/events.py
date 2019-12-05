@@ -27,7 +27,8 @@ from houses.models import HouseUser
 from questions.models import Question
 from events.mixins import EventMixin
 from events.models import (Event, AttendeeCommonQuestions, EventQuestion, Ticket, EventCart, ChargeError,
-								EventCartItem, Answer, OrderAnswer, EventOrder, Attendee, EventEmailConfirmation)
+								EventCartItem, Answer, OrderAnswer, EventOrder, Attendee, EventEmailConfirmation,
+								EventRefundRequest)
 from events.forms import EventForm, EventCheckoutForm
 from payments.models import Transaction
 
@@ -121,6 +122,7 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 		tickets = self.get_tickets(event)
 		questions = EventQuestion.objects.filter(event=event, question__deleted=False, question__approved=True)
 		email = EventEmailConfirmation.objects.get(event=event)
+		refund_requests = EventRefundRequest.objects.filter(order__event=event, processed=False, dismissed=False)
 
 		if event.active == False:
 			context["inactive_event_tab"] = True
@@ -128,10 +130,12 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 		else:
 			context["event_tab"] = True
 
+		context["refund_requests"] = refund_requests
 		context["email"] = email
 		context["questions"] = questions
 		context["tickets"] = tickets
 		context["total_sales"] = self.get_total_sales(event)
+		print(self.graph_data(event))
 		context["graph_data"] = self.graph_data(event)
 
 		context["dashboard_events"] = dashboard_events
@@ -428,12 +432,12 @@ class EventCheckoutView(FormView):
 					attendee_name = "%s-%s" % (order.name, int(quantity)+1)
 					if cart_item.donation_ticket:
 						attendee = Attendee.objects.create(
-							order=order, ticket=cart_item.ticket, name=attendee_name, email=email, gender=None,
+							order=order, ticket=cart_item.ticket, ticket_refund_policy=cart_item.ticket.refund_policy, name=attendee_name, email=email, gender=None,
 							ticket_buyer_price=cart_item.donation_buyer_amount, ticket_price=cart_item.donation_amount, ticket_fee=cart_item.donation_fee,
 							ticket_pass_fee=True)
 					else:
 						attendee = Attendee.objects.create(
-							order=order, ticket=cart_item.ticket, name=attendee_name, email=email, gender=None,
+							order=order, ticket=cart_item.ticket, ticket_refund_policy=cart_item.ticket.refund_policy, name=attendee_name, email=email, gender=None,
 							ticket_buyer_price=cart_item.ticket_buyer_price, ticket_price=cart_item.ticket_price, ticket_fee=cart_item.ticket_fee,
 							ticket_pass_fee=cart_item.pass_fee)
 					attendee.save()
@@ -468,12 +472,12 @@ class EventCheckoutView(FormView):
 
 					if cart_item.donation_ticket:
 						attendee = Attendee.objects.create(
-							order=order, ticket=cart_item.ticket, name=attendee_name, email=attendee_email, age=age, gender=gender, address=address,
+							order=order, ticket=cart_item.ticket, ticket_refund_policy=cart_item.ticket.refund_policy, name=attendee_name, email=attendee_email, age=age, gender=gender, address=address,
 							ticket_buyer_price=cart_item.donation_buyer_amount, ticket_price=cart_item.donation_amount, ticket_fee=cart_item.donation_fee,
 							ticket_pass_fee=True)
 					else:
 						attendee = Attendee.objects.create(
-							order=order, ticket=cart_item.ticket, name=attendee_name, email=attendee_email, age=age, gender=gender, address=address,
+							order=order, ticket=cart_item.ticket, ticket_refund_policy=cart_item.ticket.refund_policy, name=attendee_name, email=attendee_email, age=age, gender=gender, address=address,
 							ticket_buyer_price=cart_item.ticket_buyer_price, ticket_price=cart_item.ticket_price, ticket_fee=cart_item.ticket_fee,
 							ticket_pass_fee=cart_item.pass_fee)
 					attendee.save()
@@ -619,9 +623,10 @@ class EventCheckoutView(FormView):
 		event_title = ''.join(e for e in event.title if e.isalnum())
 		event_title = "AH* %s" % (event_title)
 		if len(event_title) > 20:
-			descriptor = "AH* %s" % (event.house.name)
-			if len(descriptor) > 20:
-				descriptor = 'Arqam House Inc.'
+			descriptor = event_title[:19]
+			# descriptor = "AH* %s" % (event.house.name)
+			# if len(descriptor) > 20:
+				# descriptor = 'Arqam House Inc.'
 		else:
 			descriptor = event_title
 		return descriptor

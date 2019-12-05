@@ -12,9 +12,9 @@
 <body>
 
     <h1 style="font-weight: 400;">Order Confirmation</h1>
-    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;">Order # | <span style="font-weight: 400;margin-bottom: 0px;">{{ order.number }}</span></p>
-    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;">Name | <span style="font-weight: 400;margin-bottom: 0px;">{{ order.name }}</span></p>
-    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;">Status |
+    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;margin-top:0px;">Order # | <span style="font-weight: 400;margin-bottom: 0px;">{{ order.number }}</span></p>
+    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;margin-top:0px;">Name | <span style="font-weight: 400;margin-bottom: 0px;">{{ order.name }}</span></p>
+    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;margin-top:0px;">Status |
         {% if order.failed %}
         <span style="color:#FF4500;font-weight: 400;"> Order Failed</span>
         {% elif order.partial_refund %}
@@ -25,10 +25,10 @@
         <span style="color:#2584C7;font-weight: 400;">Successful Order {% if order.house_created %}- Created by House{% endif %}</span>
         {% endif %}
     </p>
-    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;">Created at | <span
+    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;margin-top:0px;">Created at | <span
             style="font-weight: 400;">{{ order.created_at }}</span></p>
-    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;">Email | <span style="font-weight: 400;">{{ order.email }}</span></p>
-    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;">Event | <span style="font-weight: 400;">{{ order.event.title }}</span>
+    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;margin-top:0px;">Email | <span style="font-weight: 400;">{{ order.email }}</span></p>
+    <p style="font-size:0.9em;font-weight: 600;margin-bottom: 0px;margin-top:0px;">Event | <span style="font-weight: 400;">{{ order.event.title }}</span>
     </p>
 
     <dl id="informations">

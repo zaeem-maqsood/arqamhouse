@@ -109,14 +109,19 @@ Order #{{ order.number }} | {{ event.title }}
 						<table class="table table-bordered table-hover" width="100%">
 							<tbody>
 								{% for attendee in attendees %}
-								<tr>
+								<tr {% if attendee.get_request_for_refund_if_available %}style="background-color: #ffe4c4;"{% endif %}>
 									<td style="vertical-align: inherit;"><p style="margin:0 auto;">{{ forloop.counter }}</p></td>
 									<td style="vertical-align: inherit;"><p style="margin:0 auto;">{{ attendee.ticket }}</p></td>
 									<td style="vertical-align: inherit;"><a href="{{ attendee.get_attendee_view }}"><p style="margin:0 auto;">{{ attendee.name }}</p></a></td>
 									{% if order.event_cart.pay %}
 										{% if attendee.active %}
 											{% if attendee.ticket_price <= house_balance.balance %}
-												<td><button type="submit" id="Refund" name="Refund" value="{{ attendee.id }}" class="btn btn-warning btn-block">Refund</button></td>
+												<td>
+													<button type="submit" id="Refund" name="Refund" value="{{ attendee.id }}" class="btn btn-warning btn-block">Refund</button>
+													{% if attendee.get_request_for_refund_if_available %}
+													<p style="margin-top: 10px;margin-bottom: 5px;">Requested For Refund</p>
+													{% endif %}
+												</td>
 											{% else %}
 												{% if attendee.ticket.free %}
 												<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#FFBE00;">Free Ticket</p>

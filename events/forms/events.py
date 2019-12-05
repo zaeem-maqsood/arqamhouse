@@ -70,9 +70,9 @@ class EventCheckoutForm(forms.Form):
 
 class EventForm(forms.ModelForm):
 
-	start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"],  required=False, widget=forms.DateTimeInput(
+	start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"],  required=True, widget=forms.DateTimeInput(
 		attrs={"class": "form-control m-input", "placeholder": "Start", "autocomplete": "off", "onchange": "endDateTime(this)"}))
-	end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], required=False,  widget=forms.DateTimeInput(
+	end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], required=True,  widget=forms.DateTimeInput(
 		attrs={"class": "form-control m-input", "placeholder": "End", "autocomplete": "off"}))
 
 	description = forms.CharField(required=False, widget=FroalaEditor(options={'toolbarInline': False, 'attribution': False, 'tableStyles': 'table'}))

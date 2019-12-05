@@ -36,6 +36,7 @@ def temp_file_upload_location(instance, filename):
 
 class House(TimestampedModel):
 	name = models.CharField(max_length=120, null=True, blank=False)
+	email = models.EmailField(blank=True, null=True)
 	slug = models.SlugField(unique = False, blank=True)
 	country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=False, null=True)
 	region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=False, null=True)

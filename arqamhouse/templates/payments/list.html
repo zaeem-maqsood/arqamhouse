@@ -108,17 +108,17 @@ function Filter(object) {
 			<div class="kt-portlet__body">
 
 				<div class="row" style="padding-bottom: 30px;">
-					<div class="col-md-7" style="padding-bottom: 20px;">
+					<div class="col-md-7 col-6" style="padding-bottom: 20px;">
 						<h3 style="margin-bottom:0px;">
 							Payments
 						</h3>
 					</div>
-					<div class="col-md-5 ">
+					<div class="col-md-5 col-6">
 						<h3 class="pull-right" style="color: #91baa2;">${{ house_balance.balance }}</h3>
 					</div>
 				</div>
 
-				<div class="row">
+				<div class="row d-md-flex d-none">
 					<div class="col-md-3" style="padding-bottom: 20px;">
 						<input type="text" name="start" class="form-control m-input flatpickr-input active" placeholder="Start"
 							autocomplete="off" onchange="Filter()" id="id_start" style="user-select: auto;">

@@ -25,7 +25,8 @@ from django.db.models import Sum
 
 from houses.mixins import HouseAccountMixin
 from houses.models import HouseUser
-from .models import Payout, Transaction, Refund, HousePayment, HouseBalance, HouseBalanceLog, PayoutSetting, BankTransfer
+from .models import Payout, Transaction, Refund, HousePayment, HouseBalance, HouseBalanceLog, PayoutSetting
+from events.models import EventRefundRequest
 from .forms import AddFundsForm, PayoutForm, AddBankTransferForm
 
 
@@ -68,8 +69,8 @@ class InvoiceView(HouseAccountMixin, View):
 		if requested_year < 2019 or requested_year > current_year:
 			raise Http404
 
-		if requested_year == current_year and month_list.index(requested_month)+1 >= current_month:
-			raise Http404
+		# if requested_year == current_year and month_list.index(requested_month)+1 >= current_month:
+		# 	raise Http404
 
 		house = self.get_house()
 		house_balance = HouseBalance.objects.get(house=house)
@@ -213,7 +214,7 @@ class InvoiceMonthView(HouseAccountMixin, View):
 
 		months = []
 		current_year = timezone.now().year
-		current_month = timezone.now().month
+		current_month = timezone.localtime(timezone.now()).month
 		opening_balance_year = house_balance_log.created_at.year
 		opening_balance_month = house_balance_log.created_at.month
 
@@ -223,7 +224,8 @@ class InvoiceMonthView(HouseAccountMixin, View):
 		# Scenario for same year and month as opening balance
 		if current_year == opening_balance_year and current_month == opening_balance_month:
 			print("Did it come here")
-			return(HttpResponseRedirect(reverse('payments:invoice', kwargs={"year": current_year, "month": month_list[current_month]})))
+			print(current_month)
+			return(HttpResponseRedirect(reverse('payments:invoice', kwargs={"year": current_year, "month": month_list[current_month-1]})))
 			
 
 		# Scenario for current year 
@@ -297,20 +299,14 @@ class UpdateBankTransferView(HouseAccountMixin, CreateView):
 	def get(self, request, *args, **kwargs):
 		data = request.GET
 		print(data)
-		if 'institution_number' in data:
-				try:
-					return render(request, "payments/bank_images/%s.html" % (data["institution_number"]))
-				except Exception as e:
-					print(e)
-					return HttpResponse("")
 		bank_transfer_id = kwargs['bank_transfer_id']
-		self.object = BankTransfer.objects.get(id=bank_transfer_id)
+		self.object = PayoutSetting.objects.get(id=bank_transfer_id)
 		return render(request, self.template_name, self.get_context_data())
 
 	
 	def post(self, request, *args, **kwargs):
 		bank_transfer_id = kwargs['bank_transfer_id']
-		self.object = BankTransfer.objects.get(id=bank_transfer_id)
+		self.object = PayoutSetting.objects.get(id=bank_transfer_id)
 		data = request.POST
 		house = self.get_house()
 		form = self.get_form()
@@ -322,10 +318,6 @@ class UpdateBankTransferView(HouseAccountMixin, CreateView):
 	def form_valid(self, form, request, data):
 		house = self.get_house()
 		self.object = form.save()
-		payout_method_name = request.POST["payout_method_name"]
-		payout_setting = PayoutSetting.objects.get(house=house, bank_transfer=self.object)
-		payout_setting.name = payout_method_name
-		payout_setting.save()
 		messages.success(request, 'Bank Account Updated!')
 		valid_data = super(UpdateBankTransferView, self).form_valid(form)
 		return valid_data
@@ -334,7 +326,7 @@ class UpdateBankTransferView(HouseAccountMixin, CreateView):
 		context = {}
 		house = self.get_house()
 		form = self.get_form()
-		payout_setting = PayoutSetting.objects.get(house=house, bank_transfer=self.object)
+		payout_setting = PayoutSetting.objects.get(house=house)
 		context["form"] = form
 		context["payout_setting"] = payout_setting
 		context["dashboard_events"] = self.get_events()
@@ -361,13 +353,6 @@ class AddBankTransferView(HouseAccountMixin, CreateView):
 	def get(self, request, *args, **kwargs):
 
 		data = request.GET
-		print(data)
-		if 'institution_number' in data:
-				try:
-					return render(request, "payments/bank_images/%s.html" % (data["institution_number"]))
-				except Exception as e:
-					print(e)
-					return HttpResponse("")
 		self.object = None
 		return render(request, self.template_name, self.get_context_data())
 
@@ -383,9 +368,8 @@ class AddBankTransferView(HouseAccountMixin, CreateView):
 	
 	def form_valid(self, form, request):
 		house = self.get_house()
+		form.instance.house = house
 		self.object = form.save()
-		payout_method_name = request.POST["payout_method_name"]
-		payout_setting = PayoutSetting.objects.create(house=house, bank_transfer=self.object, name=payout_method_name)
 		messages.success(request, 'Payout Method Created!')
 		valid_data = super(AddBankTransferView, self).form_valid(form)
 		return valid_data
@@ -420,6 +404,7 @@ class PayoutSettingsListView(HouseAccountMixin, View):
 		context = {}
 		house = self.get_house()
 		payout_settings = self.get_payout_settings(house)
+
 		context["payout_settings"] = payout_settings
 		context["dashboard_events"] = self.get_events()
 		context["house"] = self.get_house()
@@ -437,11 +422,10 @@ class PayoutView(HouseAccountMixin, FormView):
 		return reverse(view_name)
 
 	def get(self, request, *args, **kwargs):
-
-		stripe.api_key = 'sk_live_4FvrAHAiKVjvUYouYDUAuT63'
-		balance = stripe.Balance.retrieve()
-		print(balance)
-		return render(request, self.template_name, self.get_context_data())
+		house = self.get_house()
+		house_balance = HouseBalance.objects.get(house=house)
+		form = PayoutForm(house_balance.balance, house)
+		return render(request, self.template_name, self.get_context_data(form=form))
 
 	
 	def post(self, request, *args, **kwargs):
@@ -469,14 +453,7 @@ class PayoutView(HouseAccountMixin, FormView):
 		return "Done"
 
 	def send_payout_email_them(self, payout):
-
-		house_users = HouseUser.objects.filter(house=payout.house)
-		print(house_users)
-		emails = []
-		for house_user in house_users:
-			emails.append(str(house_user.profile.email))
-			print("Email sent to %s" % (house_user.profile.email))
-		subject = 'New payout for %s' % (payout.house.name)
+		subject = 'Arqam House - Payout Confirmation'
 		context = {}
 		context["payout"] = payout
 		context["house"] = payout.house
@@ -484,15 +461,21 @@ class PayoutView(HouseAccountMixin, FormView):
 		html_message = render_to_string('emails/payout_notify_them.html', context)
 		plain_message = strip_tags(html_message)
 		from_email = 'Payout Information <info@arqamhouse.com>'
-		to = emails
-		mail.send_mail(subject, plain_message, from_email,
-		               to, html_message=html_message, fail_silently=False)
+		to = [payout.house.email]
+		mail.send_mail(subject, plain_message, from_email, to, html_message=html_message, fail_silently=True)
 		return "Done"
 
 	
 	def form_valid(self, form, request, house_balance):
 		house = self.get_house()
+		house_balance = HouseBalance.objects.get(house=house)
+		total = decimal.Decimal('{0:.2f}'.format(house_balance.balance))
 		amount = decimal.Decimal(form.cleaned_data["amount"])
+
+		if amount > total:
+			form.add_error("amount", "Please choose a number less than or equal to your total")
+			return self.form_invalid(form)
+
 		payout_setting = form.cleaned_data["payout_setting"]
 		payout = Payout.objects.create(house=house, amount=amount, payout_setting=payout_setting)
 		self.send_payout_email_us(payout)
@@ -503,7 +486,7 @@ class PayoutView(HouseAccountMixin, FormView):
 
 
 
-	def get_context_data(self, *args, **kwargs):
+	def get_context_data(self, form, *args, **kwargs):
 		context = {}
 		house = self.get_house()
 		house_balance = HouseBalance.objects.get(house=house)
@@ -511,7 +494,10 @@ class PayoutView(HouseAccountMixin, FormView):
 
 		total = '{0:.2f}'.format(house_balance.balance)
 
-		form = PayoutForm(house_balance.balance, house)
+		refund_requests = EventRefundRequest.objects.filter(
+			order__event__house=house, processed=False, dismissed=False)
+		context["refund_requests"] = refund_requests
+
 		context["form"] = form
 		context["payout_settings"] = payout_settings
 		context["house_balance"] = house_balance
