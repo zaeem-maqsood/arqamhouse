@@ -521,18 +521,20 @@ function initMap() {
                                     </div>
                                     <div class="accordion__content">
                                         {% for cart_item in cart_items %}
-                                            <h5 style="display:block;margin-bottom:0px;"><span style="font-weight:200;">Ticket</span> | {{ cart_item.ticket }}</h5>
-                                            <p>
-                                                {% if cart_item.ticket.refund_policy == "standard" %}
-                                                    You may request <b>{{ event.house.name }}</b> for a refund <b>24 hours</b> before the start of this event. 
-                                                {% elif cart_item.ticket.refund_policy == "7-days" %}
-                                                    You may request <b>{{ event.house.name }}</b> for a refund <b>7 days</b> before the start of this event.
-                                                {% elif cart_item.ticket.refund_policy == "30-days" %}
-                                                    You may request <b>{{ event.house.name }}</b> for a refund <b>30 days</b> before the start of this event.
-                                                {% else %}
-                                                    <b>You may not request a refund for this ticket. Ticket sales are final.</b>
-                                                {% endif %}
-                                            </p>
+                                            {% if not cart_item.ticket.free %}
+                                                <h5 style="display:block;margin-bottom:0px;"><span style="font-weight:200;">Ticket</span> | {{ cart_item.ticket }}</h5>
+                                                <p>
+                                                    {% if cart_item.ticket.refund_policy == "standard" %}
+                                                        You may request <b>{{ event.house.name }}</b> for a refund <b>24 hours</b> before the start of this event. 
+                                                    {% elif cart_item.ticket.refund_policy == "7-days" %}
+                                                        You may request <b>{{ event.house.name }}</b> for a refund <b>7 days</b> before the start of this event.
+                                                    {% elif cart_item.ticket.refund_policy == "30-days" %}
+                                                        You may request <b>{{ event.house.name }}</b> for a refund <b>30 days</b> before the start of this event.
+                                                    {% else %}
+                                                        <b>You may not request a refund for this ticket. Ticket sales are final.</b>
+                                                    {% endif %}
+                                                </p>
+                                            {% endif %}
                                         {% endfor %}
                                     </div>
                                 </li>
