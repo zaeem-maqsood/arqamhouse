@@ -570,6 +570,7 @@ class EventCheckoutView(FormView):
 		context["event"] = event
 		context["house_users"] = house_users
 		context["message"] = email_confirmation.message
+		context["order"] = order
 		html_content = render_to_string('emails/order_confirmation.html', context)
 		text_content = strip_tags(html_content)
 		from_email = 'Order Confirmation <info@arqamhouse.com>'

@@ -28,7 +28,7 @@ from .mixins import HouseAccountMixin, HouseLandingMixin
 
 from django.contrib.auth.models import User
 from profiles.models import Profile
-from .models import House, HouseUser
+from .models import House, HouseUser, HouseDirector
 from .forms import AddUserToHouse, HouseUpdateForm, HouseChangeForm, HouseForm, HouseVerificationForm, HouseDirectorForm
 
 from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
@@ -43,15 +43,21 @@ class HouseVerificationView(HouseAccountMixin, FormView):
 	def get_success_url(self):
 		house = self.get_house()
 
-		if house.address_entered:
+		if house.verification_pending:
 			view_name = "houses:update"
-		elif house.house_type:
-			view_name = "houses:verify"
 		else:
 			view_name = "houses:verify"
+
 		return reverse(view_name)
 
 	def get(self, request, *args, **kwargs):
+		house = self.get_house()
+		
+		try:
+			house_director = HouseDirector.objects.get(house=house)
+			return HttpResponseRedirect(self.get_success_url())
+		except:
+			pass
 		return self.render_to_response(self.get_context_data())
 
 	def get_context_data(self, *args, **kwargs):
@@ -79,17 +85,23 @@ class HouseVerificationView(HouseAccountMixin, FormView):
 		data = request.POST
 		print(data)
 		house = self.get_house()
+
+		# Step 1 - User chooses entity type
 		if 'house_type' in data:
 			house.house_type = data["house_type"]
 			house.save()
 			messages.info(request, '%s House Chosen' % (data["house_type"]))
 			return HttpResponseRedirect(self.get_success_url())
 
+		# If we have the house type and address
 		if house.address_entered:
 			form = HouseDirectorForm(request.POST, request.FILES)
-			print("Its coming here")
+
+		# If we only have the house type and need the address
 		elif house.house_type:
 			form = HouseVerificationForm(instance=house, data=data)
+
+		# If we don't have the house type yet
 		else:
 			form = None
 
@@ -102,11 +114,17 @@ class HouseVerificationView(HouseAccountMixin, FormView):
 	def form_valid(self, form, request):
 		house = self.get_house()
 
+		# If we are validating the director form
 		if house.address_entered:
 			form.instance.house = house
+			house.verification_pending = True
+			house.save()
 			self.object = form.save()
+			
+		# If we are adding the house address
 		else:
 			self.object = form.save()
+			messages.info(request, 'Address Entered')
 		
 		valid_data = super(HouseVerificationView, self).form_valid(form)
 		return valid_data

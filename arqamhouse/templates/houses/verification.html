@@ -60,7 +60,7 @@ function initMap() {
     }
 </style>
 <div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
-    <div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+    <div class=" {% if not house.house_type %}col-lg-10 offset-lg-1{% else %}col-lg-6 offset-lg-3{% endif %} col-md-12 col-12">
         <div class="kt-portlet kt-portlet--mobile" style="padding:10px;">
             <div class="kt-portlet__body">
 
@@ -139,7 +139,7 @@ function initMap() {
 
                     {% if house.house_type and not house.address_entered %}
                     <div class="row">
-                        <div class="col-md-6 offset-md-3">
+                        <div class="col-12">
                             <div class="row" style="padding-bottom: 30px;">
                                 <div class="col-md-12">
                                     <h5>Address</h5>
@@ -148,28 +148,28 @@ function initMap() {
                             </div>
                             
                             <div class="row" style="padding-bottom: 30px;">
-                                <div class="col-md-12">
+                                <div class="col-12">
                                     <h5>Region</h5>
                                     {{ form.region }}
                                 </div>
                             </div>
                             
                             <div class="row" style="padding-bottom: 30px;">
-                                <div class="col-md-12">
+                                <div class="col-12">
                                     <h5>City</h5>
                                     {{ form.city }}
                                 </div>
                             </div>
                             
                             <div class="row" style="padding-bottom: 30px;">
-                                <div class="col-md-12">
+                                <div class="col-12">
                                     <h5>Postal Code</h5>
                                     {{ form.postal_code }}
                                 </div>
                             </div>
                             
                             <div class="row" style="padding-bottom: 30px;">
-                                <div class="col-md-12">
+                                <div class="col-12">
                                     <button type="submit" name="general" value="true" class="btn btn-primary btn-block">Next</button>
                                 </div>
                             </div>
@@ -180,7 +180,7 @@ function initMap() {
 
                     {% if house.address_entered %}
                     <div class="row">
-                        <div class="col-md-6 offset-md-3">
+                        <div class="col-12">
 
                             <div class="row" style="padding-bottom: 30px;">
                                 <div class="col-md-12">

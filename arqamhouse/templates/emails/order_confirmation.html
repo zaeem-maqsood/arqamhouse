@@ -360,9 +360,9 @@
             bgcolor="">
             <div style="user-select: auto;"><u style="user-select: auto;"><strong style="user-select: auto;"><span style="color: rgb(105, 105, 105);">Contact the organizer</span></strong></u></div>
 
-            {% for house_user in house_users %}
-            <div style="user-select: auto;"><u style="user-select: auto;">​</u><a href="mailto:{{ house_user.profile.email }}?subject=Support%20for%20{{ event.title }}&amp;body=Please%20enter%20your%20message%20here" style="user-select: auto;">{{ house_user.profile.email }}</a></div>
-            {% endfor %}
+            
+            <div style="user-select: auto;"><u style="user-select: auto;">​</u><a href="mailto:{{ event.house.email }}?subject=Support%20for%20{{ event.title }}&amp;body=Please%20enter%20your%20message%20here" style="user-select: auto;">{{ event.house.email }}</a></div>
+            
         </td>
       </tr>
     </table>

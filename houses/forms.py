@@ -27,7 +27,7 @@ class HouseDirectorForm(forms.ModelForm):
                     "dob_year": forms.NumberInput(
                         attrs={
                             "class": "form-control m-input",
-							"placeholder": "1989",
+							"placeholder": "Year",
                             "required": True,
 							"max": "2010",
 							"min": "1950",
@@ -36,7 +36,7 @@ class HouseDirectorForm(forms.ModelForm):
 					"dob_month": forms.NumberInput(
                         attrs={
                             "required": True,
-							"placeholder": "10",
+							"placeholder": "Month",
                             "class": "form-control m-input",
 							"min": "1",
 							"max": "12"
@@ -45,7 +45,7 @@ class HouseDirectorForm(forms.ModelForm):
 					"dob_day": forms.NumberInput(
                         attrs={
                             "required": True,
-							"placeholder": "15",
+							"placeholder": "Day",
                             "class": "form-control m-input",
 							"min": "1",
 							"max": "31"

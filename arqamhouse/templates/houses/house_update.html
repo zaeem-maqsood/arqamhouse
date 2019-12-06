@@ -95,7 +95,7 @@ function changeHouse(object) {
                             <div class="row" style="padding-bottom:30px;">
                                 <div class="col-12">
                                     <h4>Payout Methods</h4>
-                                    <p>Add or remove payout methods.
+                                    <p>Add payout methods.
                                     </p>
                                     <a href="{% url 'payments:payout_settings_list' %}" class="btn btn-primary">Payout Methods</a>
                                 </div>
@@ -127,15 +127,12 @@ function changeHouse(object) {
                             {% if house.verification_pending or house.verified %}
                             <div class="row" style="padding-bottom:30px;">
                                 <div class="col-12">
-                                    <h4>House Details</h4>
-                                    <p style="margin-bottom: 5px;">House Type | <b>{{ house.house_type }}</b></p>
-                                    <p style="margin-bottom: 5px;">Verification | <b>{% if house.verified %}Verified{% else %}Verification Pending{% endif %}</b></p>
-                                    <p style="margin-bottom: 5px;">Country | <b>{{ house.country }}</b></p>
-                                    <p style="margin-bottom: 5px;">Region | <b>{{ house.region.name }}</b></p>
-                                    <p style="margin-bottom: 5px;">City | <b>{{ house.city.name }}</b></p>
-                                    <p style="margin-bottom: 5px;">Address | <b>{{ house.address }}</b></p>
-                                    <p style="margin-bottom: 5px;">Postal Code | <b>{{ house.postal_code }}</b></p>
-                                    <a href="{% url 'houses:verify' %}" class="btn btn-primary">Change Details</a>
+                                    <h4>House {% if not house.verified %}Verification Pending{% else %}Verified <i style="color: #4399d5;" class="fa fa-check-circle"></i>{% endif %}</h4>
+                                    {% if not house.verified %}
+                                    <p>House details are currently being processed. We will contact you at <b>{{ house.email }}</b> for any updates.</p>
+                                    {% else %}
+                                    <p>Congratulations! {{ house.name }} is verified.</p>
+                                    {% endif %}
                                 </div>
                             </div>
                             {% else %}
