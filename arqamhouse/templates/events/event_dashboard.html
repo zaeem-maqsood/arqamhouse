@@ -313,7 +313,7 @@ color: #7396b0;
 						<div class="row text-center">
 							<div class="col-12">
 								<a class="dashboard-links" {% if not tickets %}style="color:white;" {% endif %}
-									href="{{ event.list_tickets_view }}">
+									href="{{ event.get_update_view }}">
 									<i class="la la-edit" style="font-size:2.5em;"></i>
 									<p style="padding-top: 10px;">Edit Event</p>
 								</a>
@@ -324,13 +324,11 @@ color: #7396b0;
 			</div>
 			
 			<div class="col-lg-2 col-md-4 col-6 d-md-none d-lg-non d-sm-flex d-flex" style="padding-top:10px;">
-				<div class="kt-portlet kt-portlet--mobile" {% if tickets %}{% if not questions %}style="background-color: #4599d5;"
-					{% endif %}{% endif %}>
+				<div class="kt-portlet kt-portlet--mobile">
 					<div class="kt-portlet__body">
 						<div class="row text-center">
 							<div class="col-12">
-								<a class="dashboard-links" {% if tickets %}{% if not questions %}style="color:white;"
-									{% endif %}{% endif %} href="{{ event.list_questions_view }}">
+								<a class="dashboard-links" href="{{ event.get_landing_view }}">
 									<i class="la la-external-link" style="font-size:2.5em;"></i>
 									<p style="padding-top: 10px;">View Event</p>
 								</a>

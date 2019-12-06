@@ -192,12 +192,12 @@ function initMap() {
 
 {% block content %}
 <section style="padding-top: 5rem;padding-bottom:0px;">
-    <div class="container">
+    <div class="container" style="padding-right: 5px;padding-left: 5px;">
 
         <form id="checkoutForm" method="POST" {% if not cart.pay %}onSubmit="document.getElementById('customButton').disabled = true;"{% endif %} >{% csrf_token %}
 
             <div class="row justify-content-center" style="padding-bottom: 50px;">
-                <div class="col-md-8 col-10" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 50px;border-radius: 15px;">
+                <div class="col-md-8 col-10" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 30px;border-radius: 15px;">
 
                     <div class="row justify-content-center" style="padding-bottom: 50px;">
                         <div class="col-md-12">
@@ -223,17 +223,17 @@ function initMap() {
                             {% if cart.pay %}
                                 {% for cart_item in cart_items %}
                                 <div class="row" style="padding-top: 20px;">
-                                    <div class="col-md-5 col-12">
+                                    <div class="col-md-5 col-12" style="padding-bottom: 10px;">
                                         <p style="font-size: 1.1em;"> {{ cart_item.ticket.title }}</p>
                                     </div>
-                                    <div class="col-md-3 col-4">
+                                    <div class="col-md-3 col-5">
                                         {% if cart_item.donation_ticket %}
-                                        <p style="font-size: 1.1em;">${{ cart_item.donation_amount }} <span style="font-size: 0.7em;">+ ${{ cart_item.cart_item_fee }}</span></p>
+                                        <p style="font-size: 1.1em;line-height: 1;padding-top: 5px;">${{ cart_item.donation_amount }} <span style="font-size: 0.7em;">+ ${{ cart_item.cart_item_fee }}</span></p>
                                         {% else %}
                                         <p style="font-size: 1.1em;">${{ cart_item.ticket.buyer_price }}</p>
                                         {% endif %}
                                     </div>
-                                    <div class="col-md-2 col-4">
+                                    <div class="col-md-2 col-3">
                                         <p style="font-size: 1.1em;font-weight:800;">x {{ cart_item.quantity }}</p>
                                     </div>
                                     <div class="col-md-2 col-4">
@@ -517,7 +517,7 @@ function initMap() {
                             <ul class="accordion accordion-1">
                                 <li class="">
                                     <div class="accordion__title" style="border-color: #4990e2;">
-                                        <span class="h5">Refund Policy - By continuing you agree to these policies</span>
+                                        <span class="h5">Refund Policy</span>
                                     </div>
                                     <div class="accordion__content">
                                         {% for cart_item in cart_items %}
