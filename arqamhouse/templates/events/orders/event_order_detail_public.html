@@ -281,12 +281,13 @@ function myFunction() {
                 </form>
 
 
-
+                {% if order.event_cart.pay %}
                 <div class="row" style="padding-bottom: 10px;">
                     <div class="col-12">
                         <h4 style="color: #2584C7;">Refund Policies</h4>
                     </div>
                 </div>
+                {% endif %}
                 
                 <div class="row" style="padding-bottom:50px;">
                     <div class="col-md-12">
