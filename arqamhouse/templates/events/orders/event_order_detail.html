@@ -84,6 +84,7 @@ Order #{{ order.number }} | {{ event.title }}
 					</div>
 				</div>
 
+				{% if order.event_cart.pay %}
 				<div class="row">
 					<div class="col-md-4">
 						<p><span style="font-weight:500;">Payment Card</span> | {% include "events/orders/brands.html" with order=order.transaction %}</p>
@@ -95,6 +96,7 @@ Order #{{ order.number }} | {{ event.title }}
 						<p><span style="font-weight:500;">Outcome</span> | {% if order.transaction.outcome_type %}{{ order.transaction.outcome_type|title }}{% else %}No Payment{% endif %}</p>
 					</div>
 				</div>
+				{% endif %}
 
 				
 				<div class="row" style="padding-top: 40px;">
@@ -115,7 +117,7 @@ Order #{{ order.number }} | {{ event.title }}
 									<td style="vertical-align: inherit;"><a href="{{ attendee.get_attendee_view }}"><p style="margin:0 auto;">{{ attendee.name }}</p></a></td>
 									{% if order.event_cart.pay %}
 										{% if attendee.active %}
-											{% if attendee.ticket_price <= house_balance.balance %}
+											{% if attendee.ticket_price <= house_balance.gross_balance %}
 												<td>
 													<button type="submit" id="Refund" name="Refund" value="{{ attendee.id }}" class="btn btn-warning btn-block">Refund</button>
 													{% if attendee.get_request_for_refund_if_available %}

@@ -192,7 +192,7 @@ function initMap() {
 
 {% block content %}
 <section style="padding-top: 5rem;padding-bottom:0px;">
-    <div class="container" style="padding-right: 5px;padding-left: 5px;">
+    <div class="container" style="padding-right: 0px;padding-left: 0px;">
 
         <form id="checkoutForm" method="POST" {% if not cart.pay %}onSubmit="document.getElementById('customButton').disabled = true;"{% endif %} >{% csrf_token %}
 
@@ -250,6 +250,7 @@ function initMap() {
                                         {% endif %}
                                     </div>
                                 </div>
+                                <hr style="margin-top: 5px;margin-bottom:5px;">
                                 {% endfor %}
                             {% else %}
                                 {% for cart_item in cart_items %}

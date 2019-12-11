@@ -416,7 +416,7 @@ class HouseCreateView(CreateView):
 		# Create House Balance and initial House Balance Log with $0.00 opening balance
 		house_balance = HouseBalance.objects.create(house=self.object, balance=0.00)
 		house_balance.save()
-		house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, balance=0.00, opening_balance=True)
+		house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, balance=0.00, opening_balance=True, gross_balance=0.00)
 		house_balance_log.save()
 
 		valid_data = super(HouseCreateView, self).form_valid(form)

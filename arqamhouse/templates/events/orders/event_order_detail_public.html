@@ -66,21 +66,10 @@ function myFunction() {
         <div class="row justify-content-around" style="padding:20px;padding-bottom: 0px;padding-top:10px;">
             <div class="col-lg-9 col-md-12 col-12" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 20px;border-radius: 15px;">
 
-                <div class="row" style="padding-bottom: 15px;">
-                    <div class="col-md-3">
-                        <p style="color: #2584C7;display: inline-block;line-height: 3;">Your order URL | <i class="fa fa-clipboard" onclick="myFunction()"></i></p>
-                    </div>
-                    <div class="col-md-9" style="margin-top: 5px;">
-                        <input pattern="[a-zA-Z ]*" style="font-size: 13px;" maxlength="100" class="validate-required pull-right" type="text"
-                            name="order_link" id="order_link" value="https://www.arqamhouse.com/orders/{{ order.public_id }}" readonly>
-                    </div>
-                </div>
-
-                <form method="GET">
-                    <div class="row" style="padding-bottom: 50px;">
+                <form method="GET" style="padding-bottom: 30px;">
+                    <div class="row">
                         <div class="col-12">
-                            <button type="submit" name="view_tickets" value="true" class="btn btn--primary pull-right">Tickets
-                                PDF</button>
+                            <button type="submit" name="view_tickets" value="true" class="btn btn--primary pull-right">View Tickets</button>
                         </div>
                     </div>
                 </form>
@@ -104,9 +93,9 @@ function myFunction() {
                                 </p>
                             </div>
                             <div class="col-md-6">
-                                <p style="margin-bottom:0px;"><span style="color:#2584C7;">Order # </span> | {{ order.number }}</p>
-                                <p style="margin-bottom: 0px;"><span style="color:#2584C7;">Name</span> | {{ order.name|title }}</p>
-                                <p style=""><span style="color:#2584C7;">Email</span> | {{ order.email }}</p>
+                                <p style="margin-bottom:0px;"><span style="color:#2584C7;">Order # | </span> {{ order.number }}</p>
+                                <p style="margin-bottom: 0px;"><span style="color:#2584C7;">Name | </span>{{ order.name|title }}</p>
+                                <p style=""><span style="color:#2584C7;">Email | </span> {{ order.email }}</p>
                             </div>
                         </div>
                         
@@ -217,10 +206,10 @@ function myFunction() {
                 </div>
 
                 <div class="row text-center" style="padding-bottom:20px;">
-                    <div class="col-md-6">
+                    <div class="col-md-6" style="margin-top: 5px;">
                         <p style="margin-bottom: 0px;">Event Start | <b>{{ event_start_time|localtime }}</b></p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" style="margin-top: 5px;">
                         <p>Time Until Event | <b>{{ time_left_days }} day{% if time_left_days == 1 %}{% elif time_left_days == 0 %}{% else %}s{% endif %}, {{ time_left_hours }} hour{% if time_left_hours == 1 %}{% elif time_left_hours == 0 %}{% else %}s{% endif %}</b></p>
                     </div>
                 </div>
@@ -301,28 +290,37 @@ function myFunction() {
                 
                 <div class="row" style="padding-bottom:50px;">
                     <div class="col-md-12">
-                        <h5 style="display:block;margin-bottom:0px;"><span style="font-weight:200;">Policy </span> | Standard</h5>
-                        <p style="margin-bottom:0px;">You may request a refund for this ticket <b>24 hours</b> before the start of this event.</p>
-
-                        <hr>
-
-                        <h5 style="display:block;margin-bottom:0px;"><span style="font-weight:200;">Policy </span> | 7-day</h5>
-                        <p style="margin-bottom:0px;">You may request a refund for this ticket <b>7 days</b> before the start of this event.</p>
-
-                        <hr>
-
-                        <h5 style="display:block;margin-bottom:0px;"><span style="font-weight:200;">Policy </span> | 30-day</h5>
-                        <p style="margin-bottom:0px;">You may request a refund for this ticket <b>30 days</b> before the start of this event.</p>
-
-                        <hr>
-
-                        
-                        <h5 style="display:block;margin-bottom:0px;"><span style="font-weight:200;">Policy </span> | No Refunds</h5>
-                        <p style="margin-bottom:0px;">
-                        <b>You may not request a refund for this ticket. Ticket sales are final.</b>
-                        If you have concerns please <a href="mailto:info@arqamhouse.com?Subject=Refund%20For%20Order#:%20{{ order.public_id }}">contact us</a> for help.
+                        {% for cart_item in event_cart_items %}
+                        {% if not cart_item.ticket.free %}
+                        <h5 style="display:block;margin-bottom:0px;"><span style="font-weight:200;">Ticket</span> | {{ cart_item.ticket }}</h5>
+                        <p>
+                            {% if cart_item.ticket.refund_policy == "standard" %}
+                            You may request <b>{{ event.house.name }}</b> for a refund <b>24 hours</b> before the start of this event.
+                            {% elif cart_item.ticket.refund_policy == "7-days" %}
+                            You may request <b>{{ event.house.name }}</b> for a refund <b>7 days</b> before the start of this event.
+                            {% elif cart_item.ticket.refund_policy == "30-days" %}
+                            You may request <b>{{ event.house.name }}</b> for a refund <b>30 days</b> before the start of this event.
+                            {% else %}
+                            <b>You may not request a refund for this ticket. Ticket sales are final.</b>
+                            If you have concerns please <a href="mailto:info@arqamhouse.com?Subject=Refund%20For%20Order#:%20{{ order.public_id }}">contact us</a> for help.
+                            {% endif %}
                         </p>
+                        {% endif %}
+                        {% endfor %}
 
+                    </div>
+                </div>
+
+
+                <div class="row" style="padding-bottom: 15px;">
+                    <div class="col-md-3">
+                        <p style="color: #2584C7;display: inline-block;line-height: 3;">Your order URL | <i class="fa fa-clipboard"
+                                onclick="myFunction()"></i></p>
+                    </div>
+                    <div class="col-md-9" style="margin-top: 5px;">
+                        <input pattern="[a-zA-Z ]*" style="font-size: 13px;" maxlength="100" class="validate-required pull-right"
+                            type="text" name="order_link" id="order_link"
+                            value="https://www.arqamhouse.com/orders/{{ order.public_id }}" readonly>
                     </div>
                 </div>
 

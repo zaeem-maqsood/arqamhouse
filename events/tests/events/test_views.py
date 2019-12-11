@@ -25,8 +25,8 @@ class EventCheckoutViewTest(TestCase):
         region = Region.objects.create(country=country, name="Ontario")
         city = City.objects.create(country=country, region=region, name="Ajax")
         house = House.objects.create(name="Arqam House")
-        house_balance = HouseBalance.objects.create(house=house, balance=0.00)
-        house_balance_logs = HouseBalanceLog.objects.create(house_balance=house_balance, balance=0.00, opening_balance=True)
+        house_balance = HouseBalance.objects.create(house=house, balance=0.00, gross_balance=0.00)
+        house_balance_logs = HouseBalanceLog.objects.create(house_balance=house_balance, balance=0.00, opening_balance=True, gross_balance=0.00)
         profile = Profile.objects.create_user(email='zaeem.maqsood@gmail.com', password="Ed81ae9600!", is_active=True)
         profile.house = house
         profile.save()
@@ -261,9 +261,9 @@ class EventDashboardViewTests(TestCase):
         # Set up house
         house = House.objects.create(name="Arqam House")
 
-        house_balance = HouseBalance.objects.create(house=house, balance=0.00)
+        house_balance = HouseBalance.objects.create(house=house, balance=0.00, gross_balance=0.00)
         house_balance_logs = HouseBalanceLog.objects.create(
-            house_balance=house_balance, balance=0.00, opening_balance=True)
+            house_balance=house_balance, balance=0.00, opening_balance=True, gross_balance=0.00)
 
         profile = Profile.objects.create_user(email='zaeem.maqsood@gmail.com', password="Ed81ae9600!", is_active=True)
         profile.house = house

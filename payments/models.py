@@ -119,6 +119,7 @@ class HousePayment(models.Model):
 class HouseBalance(models.Model):
 	house = models.OneToOneField(House, on_delete=models.CASCADE)
 	balance = models.DecimalField(blank=True, null=True, max_digits=8, decimal_places=2)
+	gross_balance = models.DecimalField(blank=True, null=True, max_digits=8, decimal_places=2, default=0.00)
 
 	def __str__(self):
 		return (self.house.name)
@@ -127,6 +128,7 @@ class HouseBalance(models.Model):
 class HouseBalanceLog(models.Model):
 	house_balance = models.ForeignKey(HouseBalance, on_delete=models.CASCADE, blank=True, null=True)
 	balance = models.DecimalField(blank=True, null=True, max_digits=8, decimal_places=2)
+	gross_balance = models.DecimalField(blank=True, null=True, max_digits=8, decimal_places=2, default=0.00)
 	opening_balance = models.BooleanField(default=False)
 	transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, blank=True, null=True)
 	refund = models.ForeignKey(Refund, on_delete=models.CASCADE, blank=True, null=True)
@@ -148,22 +150,25 @@ def house_balance_update(object_type, instance, *args, **kwargs):
 		if not instance.house_payment:
 			house_balance = HouseBalance.objects.get(house=instance.house)
 			house_balance.balance += instance.house_amount
+			house_balance.gross_balance += instance.amount
 			house_balance.save()
-			house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, transaction=instance, balance=house_balance.balance)
+			house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, transaction=instance, balance=house_balance.balance, gross_balance=house_balance.gross_balance)
 			house_balance_log.save()
 
 	if object_type == 'refund':
 		house_balance = HouseBalance.objects.get(house=instance.transaction.house)
 		house_balance.balance -= decimal.Decimal(instance.house_amount)
+		house_balance.gross_balance -= decimal.Decimal(instance.amount)
 		house_balance.save()
-		house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, refund=instance, balance=house_balance.balance)
+		house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, refund=instance, balance=house_balance.balance, gross_balance=house_balance.gross_balance)
 		house_balance_log.save()
 
 	if object_type == 'payout':
 		house_balance = HouseBalance.objects.get(house=instance.house)
 		house_balance.balance -= instance.amount
+		house_balance.gross_balance -= instance.amount
 		house_balance.save()
-		house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, payout=instance, balance=house_balance.balance)
+		house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, payout=instance, balance=house_balance.balance, gross_balance=house_balance.gross_balance)
 		house_balance_log.save()
 		instance.freeze = True
 		instance.save()
@@ -171,8 +176,9 @@ def house_balance_update(object_type, instance, *args, **kwargs):
 	if object_type == 'house_payment':
 		house_balance = HouseBalance.objects.get(house=instance.transaction.house)
 		house_balance.balance += instance.transaction.house_amount
+		house_balance.gross_balance += instance.transaction.amount
 		house_balance.save()
-		house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, house_payment=instance, balance=house_balance.balance)
+		house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, house_payment=instance, balance=house_balance.balance, gross_balance=house_balance.gross_balance)
 		house_balance_log.save()
 
 

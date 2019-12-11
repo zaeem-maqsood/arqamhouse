@@ -206,10 +206,7 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
         event = self.get_event(slug)
         order = self.get_order(order_id)
         house = self.get_house()
-        house_users = HouseUser.objects.filter(house=event.house, profile__is_superuser=False)
-
-        print("house users")
-        print(house_users)
+        
 
         house_balance = HouseBalance.objects.get(house=house)
         attendees = Attendee.objects.filter(order=order)
@@ -312,7 +309,10 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
             attendee_to_be_refunded = attendees.get(id=attendee_to_be_refunded_id)
             ticket = attendee_to_be_refunded.ticket
             amount = int(attendee_to_be_refunded.ticket_buyer_price * 100)
-            house_amount = int(attendee_to_be_refunded.ticket_price * 100)
+            if attendee_to_be_refunded.ticket_pass_fee:
+                house_amount = int(attendee_to_be_refunded.ticket_price * 100)
+            else:
+                house_amount = int((attendee_to_be_refunded.ticket_price - attendee_to_be_refunded.ticket_fee) * 100)
 
             if attendees.filter(active=True).count() == 1:
                 partial_refund = False
@@ -368,10 +368,14 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
             for attendee in attendees:
                 if attendee.active:
                     amount = int(attendee.ticket_buyer_price * 100)
-                    house_amount = int(attendee.ticket_price * 100)
+
+                    if attendee.ticket_pass_fee:
+                        house_amount = int(attendee.ticket_price * 100)
+                    else:
+                        house_amount = int((attendee.ticket_price - attendee.ticket_fee) * 100)
+
                     event_order_refund = EventOrderRefund.objects.create(order=order, attendee=attendee)
-                    refund = Refund.objects.create(
-                        transaction=order.transaction, amount=(amount/100), house_amount=(house_amount/100))
+                    refund = Refund.objects.create(transaction=order.transaction, amount=(amount/100), house_amount=(house_amount/100))
 
                     event_order_refund.refund = refund
                     event_order_refund.save()
