@@ -228,7 +228,7 @@ function initMap() {
                                     </div>
                                     <div class="col-md-3 col-5">
                                         {% if cart_item.donation_ticket %}
-                                        <p style="font-size: 1.1em;line-height: 1;padding-top: 5px;">${{ cart_item.donation_amount }} <span style="font-size: 0.7em;">+ ${{ cart_item.cart_item_fee }}</span></p>
+                                        <p style="font-size: 1.1em;line-height: 1;padding-top: 5px;" data-tooltip="Payment processing fee of ${{ cart_item.cart_item_fee }} applied.">${{ cart_item.donation_amount }} <span style="font-size: 0.7em;">+ ${{ cart_item.cart_item_fee }}</span></p>
                                         {% else %}
                                         <p style="font-size: 1.1em;">${{ cart_item.ticket.buyer_price }}</p>
                                         {% endif %}
