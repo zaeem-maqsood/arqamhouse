@@ -1,0 +1,79 @@
+{% extends "backend/base.html" %}
+{% load static %}
+{% block title %}
+Manage | {{ house.name }}
+{% endblock title %}
+
+
+{% block css_vendors %}
+
+{% endblock css_vendors %}
+
+{% block vendors %}
+{% endblock vendors %}
+
+{% block scripts %}
+
+{% endblock scripts %}
+
+
+{% block page_crumbs %}
+
+{% endblock page_crumbs %}
+
+{% block content %}
+<style>
+    .dashboard-links {
+        color: #7396b0;
+    }
+
+    #id_phone_1 {
+        display: inline-block;
+        width: 80%;
+    }
+
+    #id_phone_0 {
+        display: inline-block;
+        width: 20%;
+    }
+</style>
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+    <div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+        <div class="kt-portlet kt-portlet--mobile" style="padding:10px;">
+            <div class="kt-portlet__body">
+
+                <div class="row" style="padding-bottom:30px;">
+                    <div class="col-8 offset-2">
+
+                        <form method="POST" id="houseForm" action="">{% csrf_token %}
+                            
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-12">
+                                    <p style="margin-bottom:0px;">Support Email</p>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-12">
+                                    <p style="margin-bottom:0px;">Support Phone Number</p>
+                                    {{ form.phone }}
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-block">Add Account</button>
+                                </div>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -6,7 +6,6 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-django = "*"
 boto3 = "*"
 celery = "*"
 dj-database-url = "*"
@@ -35,6 +34,9 @@ django-hosts = "*"
 channels = "*"
 channels-redis = "*"
 uvicorn = "*"
+django-phonenumber-field = "*"
+phonenumbers = "*"
+django = "==2.2"
 
 [requires]
 python_version = "3.7"

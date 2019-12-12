@@ -29,11 +29,61 @@ from .mixins import HouseAccountMixin, HouseLandingMixin
 from django.contrib.auth.models import User
 from profiles.models import Profile
 from .models import House, HouseUser, HouseDirector
-from .forms import AddUserToHouse, HouseUpdateForm, HouseChangeForm, HouseForm, HouseVerificationForm, HouseDirectorForm
+from .forms import AddUserToHouse, HouseSupportInfoForm, HouseChangeForm, HouseForm, HouseVerificationForm, HouseDirectorForm
 
 from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
 from profiles.models import Profile
 from payments.models import HouseBalance, HouseBalanceLog, Transaction, PayoutSetting
+
+
+
+
+
+class HouseSupportInfoView(HouseAccountMixin, FormView):
+	model = House
+	template_name = "houses/support_info.html"
+
+	def get_success_url(self):
+		view_name = "houses:update"
+		return reverse(view_name)
+
+	def get(self, request, *args, **kwargs):
+		return self.render_to_response(self.get_context_data())
+
+	def get_context_data(self, *args, **kwargs):
+		context = {}
+		house = self.get_house()
+		form = HouseSupportInfoForm()
+
+		context["form"] = form
+		context["house"] = house
+		context["dashboard_events"] = self.get_events()
+		return context
+
+	def post(self, request, *args, **kwargs):
+		data = request.POST
+		house = self.get_house()
+
+		form = HouseSupportInfoForm(request.POST)
+		if form.is_valid():
+			return self.form_valid(form, request)
+		else:
+			return self.form_invalid(form)
+
+
+	def form_valid(self, form, request):
+		house = self.get_house()
+
+		valid_data = super(HouseSupportInfoView, self).form_valid(form)
+		return valid_data
+
+	def form_invalid(self, form):
+		print(form.errors)
+		return self.render_to_response(self.get_context_data(form=form))
+
+
+
+
 
 
 class HouseVerificationView(HouseAccountMixin, FormView):
@@ -315,11 +365,9 @@ class HouseUpdateView(HouseAccountMixin, FormView):
 		current_house_user = HouseUser.objects.get(profile=profile, house=house)
 		print(house_users)
 		house_change_form = HouseChangeForm(house_users=house_users, initial={"house_select": current_house_user})
-		form = HouseUpdateForm(instance=house)
 
 		context["dashboard_events"] = self.get_events()
 		context["house_change_form"] = house_change_form
-		context["form"] = form
 		context["profile"] = profile
 		context["house"] = house
 

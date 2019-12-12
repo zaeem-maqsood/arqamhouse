@@ -7,6 +7,8 @@ from .models import House, HouseDirector
 from core.constants import days, months, years, provinces
 from cities_light.models import City, Region, Country
 
+from phonenumber_field.widgets import PhoneNumberPrefixWidget
+
 
 
 class HouseDirectorForm(forms.ModelForm):
@@ -168,70 +170,31 @@ class HouseChangeForm(forms.Form):
 
 
 
-class HouseUpdateForm(forms.ModelForm):
+class HouseSupportInfoForm(forms.ModelForm):
 
 
 	class Meta:
 		model = House
 		fields = [
-			"name",
-			"region",
-			"city"
+			"email",
+			"phone",
 		]
 
 		widgets = {
-                    "name": forms.TextInput(
+                    "email": forms.EmailInput(
                         attrs={
                             "class": "form-control m-input",
-							"placeholder": "i.e. Arqam House",
+							"placeholder": "example@arqamhouse.com",
                             "required": True
                         }
                     ),
-					"region": forms.Select(
-                        attrs={
-                            "required": True,
-                            "class": "form-control m-input",
-                        }
-                    ),
-					"city": forms.Select(
+					"phone": PhoneNumberPrefixWidget(
                         attrs={
                             "required": True,
                             "class": "form-control m-input",
                         }
                     ),
                 }
-
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-
-		self.fields['city'].empty_label = None
-		self.fields['region'].empty_label = None
-
-		self.fields['city'].queryset = City.objects.all()
-		self.fields['region'].queryset = Region.objects.all()
-
-		if self.instance.pk:
-			self.fields['region'].queryset = Region.objects.filter(country=self.instance.country)
-			self.fields['city'].queryset = City.objects.filter(region=self.instance.region)
-
-			self.fields["region"].label_from_instance = lambda obj: "%s" % obj.name
-			self.fields["city"].label_from_instance = lambda obj: "%s" % obj.name
-
-
-
-	def clean(self, *args, **kwargs):
-		
-		cleaned_data = super(HouseUpdateForm, self).clean(*args, **kwargs)
-		name = self.cleaned_data.get("name")
-
-		if len(name) <= 3:
-			raise forms.ValidationError(
-				"Please Enter A Name With More Than 2 Characters")
-
-		checker_string = name.replace(" ", "")
-		if not checker_string.isalnum():
-			raise forms.ValidationError("No Special Characters Please")
-		return cleaned_data
 
 
 class HouseForm(forms.ModelForm):

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'storages',
     'cities_light',
     'channels',
+    'phonenumber_field',
 
     # First Party Apps
     'houses',

@@ -7,6 +7,7 @@ from core.models import TimestampedModel
 from django.contrib.auth.models import User
 from django.urls import reverse
 
+from phonenumber_field.modelfields import PhoneNumberField
 from cities_light.models import City, Region, Country
 from arqamhouse.aws.utils import PrivateMediaStorage
 
@@ -37,6 +38,7 @@ def temp_file_upload_location(instance, filename):
 class House(TimestampedModel):
 	name = models.CharField(max_length=120, null=True, blank=False)
 	email = models.EmailField(blank=True, null=True)
+	phone = PhoneNumberField(blank=True, null=True)
 	slug = models.SlugField(unique = False, blank=True)
 	country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=False, null=True)
 	region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=False, null=True)

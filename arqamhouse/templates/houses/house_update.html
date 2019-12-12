@@ -67,7 +67,8 @@ function changeHouse(object) {
 
                             <div class="row" style="padding-bottom: 30px;">
                                 <div class="col-12">
-                                    <h5 style="font-weight: 200;">Hello <b>{{ profile.name }}</b>, you're currently in your <b>'{{ house.name }}'</b> house.</h5>
+                                    <h5 style="font-weight: 200;">Hello <span style="font-weight: 500;">{{ profile.name }}</span>,</h5> 
+                                    <h5 style="font-weight: 200;">you're currently in your <span style="font-weight: 500;">{{ house.name }}</span> house.</h5>
                                 </div>
                             </div>
 
@@ -85,6 +86,22 @@ function changeHouse(object) {
                                 </div>
                             </div>
 
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-10 offset-1">
+                    
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-12">
+                                    <h4>Support Settings</h4>
+                                    <p>Edit support email and phone number.
+                                    </p>
+                                    <a href="{% url 'payments:payout_settings_list' %}" class="btn btn-primary">Support Settings</a>
+                                </div>
+                            </div>
+                    
                         </div>
                     </div>
 
