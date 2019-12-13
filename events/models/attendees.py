@@ -95,11 +95,27 @@ class Attendee(TimestampedModel):
 	
 	def get_request_for_refund_if_available(self):
 		from events.models import EventRefundRequest
+
+		if not self.active:
+			return False
+
+		if self.ticket.free:
+			return False
+
+		
 		try:
 			refund_request = EventRefundRequest.objects.get(attendee=self, dismissed=False, processed=False)
 			return True
 		except:
 			return False
+
+		try: 
+			refund_request = EventRefundRequest.objects.get(order=self.order, dismissed=False)
+			return True
+		except:
+			return False
+
+		
 
 
 	def get_refundable_or_not(self):
@@ -114,51 +130,59 @@ class Attendee(TimestampedModel):
 		if self.ticket.free:
 			return "Free Ticket"
 
+
 		if policy == 'no refunds':
 			return "Refund Not Available"    
 
-		else:
+		
+		try:
+			refund_request = EventRefundRequest.objects.get(attendee=self, dismissed=False)
+			return "Refund Request Sent!"
+		except:
 
-			try:
-				refund_request = EventRefundRequest.objects.get(attendee=self, dismissed=False)
-				return "Refund Request Sent!"
-			except:
+			current_time = timezone.localtime(timezone.now())
+			event_start_time = timezone.localtime(event.start)
 
-				current_time = timezone.localtime(timezone.now())
-				event_start_time = timezone.localtime(event.start)
+			if current_time > event_start_time:
+				print("Event is done son")
+				return "Refund Not Available"
+			
+			else:
 
-				if current_time > event_start_time:
-					print("Event is done son")
-					return "Refund Not Available"
-				
+				time_left = event_start_time - current_time
+				time_left_days = time_left.days
+				time_left_hours = time_left.seconds//3600
+
+				# 30-day policy
+				if policy == '30-days':
+					if time_left_days < 30:
+						return "Refund Not Available"
+					else:
+						return """<button type="submit" name="Refund" id='Refund' value="%s" class="btn btn--primary">Request Refund</button>""" % (self.id)
+
+				elif policy == '7-days':
+					if time_left_days < 7:
+						return "Refund Not Available"
+					else:
+						return """<button type="submit" name="Refund" id='Refund' value="%s" class="btn btn--primary">Request Refund</button>""" % (self.id)
+
 				else:
-
-					time_left = event_start_time - current_time
-					time_left_days = time_left.days
-					time_left_hours = time_left.seconds//3600
-
-					# 30-day policy
-					if policy == '30-days':
-						if time_left_days < 30:
-							return "Refund Not Available"
-						else:
-							return """<button type="submit" name="Refund" id='Refund' value="%s" class="btn btn--primary">Request Refund</button>""" % (self.id)
-
-					elif policy == '7-days':
-						if time_left_days < 7:
-							return "Refund Not Available"
-						else:
-							return """<button type="submit" name="Refund" id='Refund' value="%s" class="btn btn--primary">Request Refund</button>""" % (self.id)
+					if time_left_days > 1:
+						return """<button type="submit" name="Refund" id='Refund' value="%s" class="btn btn--primary">Request Refund</button>""" % (self.id)
 
 					else:
-						if time_left_days > 1:
+						if time_left_hours <= 24:
 							return """<button type="submit" name="Refund" id='Refund' value="%s" class="btn btn--primary">Request Refund</button>""" % (self.id)
-
 						else:
-							if time_left_hours <= 24:
-								return """<button type="submit" name="Refund" id='Refund' value="%s" class="btn btn--primary">Request Refund</button>""" % (self.id)
-							else:
-								return "Return Not Available"
+							return "Return Not Available"
+
+		
+		try:
+			refund_request = EventRefundRequest.objects.get(order=self.order, dismissed=False)
+			return "Refund Request Sent!"
+		except:
+			pass
+
 
 
 	def get_attendee_view(self):

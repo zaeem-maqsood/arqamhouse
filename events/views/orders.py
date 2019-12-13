@@ -117,6 +117,7 @@ class OrderPublicDetailView(DetailView):
         event = order.event
         print(data)
         if 'Refund' in data:
+            print("single refund")
             attendee = Attendee.objects.get(id=data["Refund"])
             request_refund = EventRefundRequest.objects.create(order=order, attendee=attendee)
             messages.success(request, "Refund Request Sent! Please wait a couple of days for your refund to be processed.")
@@ -156,7 +157,9 @@ class OrderPublicDetailView(DetailView):
         time_left_days = time_left.days
         time_left_hours = time_left.seconds//3600
 
-        refund_requests = EventRefundRequest.objects.filter(order=order)
+        refund_requests = EventRefundRequest.objects.filter(order=order, dismissed=False, processed=False)
+        print("Refund Requests")
+        print(refund_requests)
         context["refund_requests"] = refund_requests
 
         context["event_start_time"] = event_start_time
@@ -220,6 +223,9 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
                 total_payout = 0.00
             total_payout = '{0:.2f}'.format(total_payout)
             context["total_payout"] = total_payout
+
+        refund_requests = EventRefundRequest.objects.filter(order=order)
+        context["refund_requests"] = refund_requests
 
         context["house_balance"] = house_balance
         context["event_cart_items"] = order.event_cart.eventcartitem_set.all
@@ -314,7 +320,7 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
             else:
                 house_amount = int((attendee_to_be_refunded.ticket_price - attendee_to_be_refunded.ticket_fee) * 100)
 
-            if attendees.filter(active=True).count() == 1:
+            if attendees.filter(active=True, ticket__paid=True).count() == 1:
                 partial_refund = False
                 full_refund = True
             else:
@@ -327,7 +333,7 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
                     amount/100), house_amount=(house_amount/100), partial_refund=partial_refund)
 
                 try:
-                    event_refund_request = EventRefundRequest.objects.get(order=order, attendee=attendee_to_be_refunded)
+                    event_refund_request = EventRefundRequest.objects.get(order=order, attendee=attendee_to_be_refunded, dismissed=False)
                     event_refund_request.processed = True
                     event_refund_request.save()
                 except:
@@ -359,14 +365,14 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
         if 'Full Refund' in data:
 
             try:
-                event_refund_request = EventRefundRequest.objects.get(order=order)
+                event_refund_request = EventRefundRequest.objects.get(order=order, dismissed=False)
                 event_refund_request.processed = True
                 event_refund_request.save()
             except:
                 pass
 
             for attendee in attendees:
-                if attendee.active:
+                if attendee.active and not attendee.ticket.free:
                     amount = int(attendee.ticket_buyer_price * 100)
 
                     if attendee.ticket_pass_fee:
