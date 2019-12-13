@@ -111,6 +111,9 @@ class Attendee(TimestampedModel):
 		if not self.active:
 			return "Refunded"
 
+		if self.ticket.free:
+			return "Free Ticket"
+
 		if policy == 'no refunds':
 			return "Refund Not Available"    
 
