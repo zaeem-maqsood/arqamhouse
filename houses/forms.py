@@ -7,7 +7,7 @@ from .models import House, HouseDirector
 from core.constants import days, months, years, provinces
 from cities_light.models import City, Region, Country
 
-from phonenumber_field.widgets import PhoneNumberPrefixWidget
+from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget, PhoneNumberPrefixWidget
 
 
 

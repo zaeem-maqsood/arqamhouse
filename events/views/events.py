@@ -584,10 +584,6 @@ class EventCheckoutView(FormView):
 
 	def send_owner_confirmation_email(self, event, order):
 
-		house_users = HouseUser.objects.filter(house=event.house, profile__is_superuser=False)
-		to_emails = []
-		for house_user in house_users:
-			to_emails.append(house_user.profile.email)
 		# Compose Email
 		subject = 'New Order For %s' % (event.title)
 		context = {}
@@ -596,7 +592,7 @@ class EventCheckoutView(FormView):
 		html_content = render_to_string('emails/owner_order_confirmation.html', context)
 		text_content = strip_tags(html_content)
 		from_email = 'New Order <info@arqamhouse.com>'
-		to = to_emails
+		to = [event.house.email]
 		email = EmailMultiAlternatives(subject=subject, body=text_content,
 		                               from_email=from_email, to=to)
 		email.attach_alternative(html_content, "text/html")

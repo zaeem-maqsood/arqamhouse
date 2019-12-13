@@ -13,7 +13,21 @@ Manage | {{ house.name }}
 {% endblock vendors %}
 
 {% block scripts %}
+<script>
 
+    jQuery(document).ready(function ($) {
+    var textToFind = 'Canada +1';
+
+    var dd = document.getElementById('id_phone_0');
+    for (var i = 0; i < dd.options.length; i++) {
+        if (dd.options[i].text === textToFind) {
+            dd.selectedIndex = i;
+            break;
+        }
+    }
+    });
+
+</script>
 {% endblock scripts %}
 
 
@@ -29,12 +43,13 @@ Manage | {{ house.name }}
 
     #id_phone_1 {
         display: inline-block;
-        width: 80%;
+        width: 78%;
     }
 
     #id_phone_0 {
         display: inline-block;
         width: 20%;
+        margin-right: 2%;
     }
 </style>
 <div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">

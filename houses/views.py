@@ -53,7 +53,7 @@ class HouseSupportInfoView(HouseAccountMixin, FormView):
 	def get_context_data(self, *args, **kwargs):
 		context = {}
 		house = self.get_house()
-		form = HouseSupportInfoForm()
+		form = HouseSupportInfoForm(instance=house)
 
 		context["form"] = form
 		context["house"] = house
@@ -64,7 +64,7 @@ class HouseSupportInfoView(HouseAccountMixin, FormView):
 		data = request.POST
 		house = self.get_house()
 
-		form = HouseSupportInfoForm(request.POST)
+		form = HouseSupportInfoForm(instance=house, data=request.POST)
 		if form.is_valid():
 			return self.form_valid(form, request)
 		else:
@@ -73,7 +73,7 @@ class HouseSupportInfoView(HouseAccountMixin, FormView):
 
 	def form_valid(self, form, request):
 		house = self.get_house()
-
+		self.object = form.save()
 		valid_data = super(HouseSupportInfoView, self).form_valid(form)
 		return valid_data
 

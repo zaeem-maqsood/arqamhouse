@@ -1,6 +1,8 @@
 {% for attendee in attendees %}
 <tr>
-    <td>{{ attendee.name }}</td>
+    <td><a href="{{ attendee.get_attendee_view }}">{{ attendee.name }}</a></td>
     <td>{{ attendee.ticket.title }}</td>
+    <td>{% if attendee.active %}<span style="color: #2584C7;">No</span>{% else %}<span
+            style="color: #FF4500;">Yes</span>{% endif %}</td>
 </tr>
 {% endfor %}
