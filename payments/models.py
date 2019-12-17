@@ -166,7 +166,9 @@ def house_balance_update(object_type, instance, *args, **kwargs):
 	if object_type == 'payout':
 		house_balance = HouseBalance.objects.get(house=instance.house)
 		house_balance.balance -= instance.amount
-		house_balance.gross_balance -= instance.amount
+		# house_balance.gross_balance -= instance.amount
+		# Make the gross payment reset to the house balance after a payout
+		house_balance.gross_balance = house_balance.balance
 		house_balance.save()
 		house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, payout=instance, balance=house_balance.balance, gross_balance=house_balance.gross_balance)
 		house_balance_log.save()

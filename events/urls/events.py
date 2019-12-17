@@ -1,7 +1,7 @@
 from .base import *
 
 from events.views import (EventCreateView, EventUpdateView, PastEventsView, EventCheckoutView, EventDashboardView,
-                          AddTicketsToCartView, ChannelsView, ChannelsRoomView, TestingQRCodeView)
+                          AddTicketsToCartView, ChannelsView, ChannelsRoomView)
 
 
 urlpatterns += [
@@ -15,8 +15,6 @@ urlpatterns += [
     path('<slug:slug>/checkout', EventCheckoutView.as_view(), name='checkout'),
     path('<slug:slug>/questions/', include('questions.urls')),
 
-
-    path('testing/qr-code', TestingQRCodeView.as_view(), name='qr_code'),
     path('testing/chat', ChannelsView.as_view(), name='channels_test'),
     path('testing/chat/<str:room_name>/', ChannelsRoomView.as_view(), name='channels_test_room'),
 ]

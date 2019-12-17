@@ -26,6 +26,8 @@ from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpRespons
 
 from .mixins import HouseAccountMixin, HouseLandingMixin
 
+from core.mixins import LoginRequiredMixin
+
 from django.contrib.auth.models import User
 from profiles.models import Profile
 from .models import House, HouseUser, HouseDirector
@@ -412,10 +414,7 @@ class HouseUpdateView(HouseAccountMixin, FormView):
 		return self.render_to_response(self.get_context_data(form=form))
 
 
-
-
-
-class HouseCreateView(CreateView):
+class HouseCreateView(LoginRequiredMixin, CreateView):
 	model = House
 	template_name = "houses/house_create.html"
 

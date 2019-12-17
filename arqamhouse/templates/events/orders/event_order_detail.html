@@ -134,7 +134,12 @@ Order #{{ order.number }} | {{ event.title }}
 												<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#FFBE00;">Free Ticket</p>
 												</td>
 												{% else %}
-												<td style="vertical-align: inherit;"><p style="margin:0 auto;color:#FFBE00;">Refund Not Available</p></td>
+												<td style="vertical-align: inherit;">
+													<p style="margin:0 auto;color:#ff0000;">Insufficient Funds - <a href="{% url 'payments:add_funds' %}">Add Funds</a></p>
+													{% if attendee.get_request_for_refund_if_available %}
+													<p style="margin-top: 10px;margin-bottom: 5px;">Requested For Refund</p>
+													{% endif %}
+												</td>
 												{% endif %}
 											{% endif %}
 										{% else %}

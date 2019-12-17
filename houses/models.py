@@ -83,9 +83,6 @@ class House(TimestampedModel):
 		view_name = "houses:dashboard"
 		return reverse(view_name)
 
-	def get_absolute_url(self):
-		view_name = "houses:detail"
-		return reverse(view_name, kwargs={"slug": self.slug})
 
 
 def house_pre_save_reciever(sender, instance, *args, **kwargs):

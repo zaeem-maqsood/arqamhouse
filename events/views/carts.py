@@ -121,7 +121,7 @@ class AddTicketsToCartView(FormView):
 			cart.discount_code = None
 			discount_code = form.cleaned_data["discount_code"]
 			try:
-				event_discount = EventDiscount.objects.get(code=discount_code, deleted=False, finished=False)
+				event_discount = EventDiscount.objects.get(event=event, code=discount_code, deleted=False, finished=False)
 				cart.discount_code = event_discount
 				cart.invalid_discount_code = False
 			except Exception as e:

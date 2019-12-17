@@ -81,6 +81,7 @@ jQuery(document).ready(function($) {
                             {% endif %}
                         </div>
 
+                        {% if payout_settings and house_balance.balance > 0 %}
                         <div class="row text-center" style="padding-bottom:30px;">
                             <div class="col-lg-8 offset-lg-2 col-10 offset-1" style="padding-top: 30px;">
                                 {{ form.amount }}
@@ -95,6 +96,7 @@ jQuery(document).ready(function($) {
                                 {% endif %}
                             </div>
                         </div>
+                        {% endif %}
 
 
                         {% if refund_requests %}
