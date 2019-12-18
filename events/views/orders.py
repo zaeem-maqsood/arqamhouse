@@ -320,7 +320,11 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
             else:
                 house_amount = int((attendee_to_be_refunded.ticket_price - attendee_to_be_refunded.ticket_fee) * 100)
 
-            if attendees.filter(active=True, ticket__paid=True).count() == 1:
+            print("This is how mnay attendees there are")
+            print(attendees.filter(active=True, ticket__paid=True).count())
+            print(attendees.filter(active=True, ticket__donation=True).count())
+            print("This is how mnay attendees there are")
+            if attendees.filter(active=True, ticket__paid=True).count() == 1 or attendees.filter(active=True, ticket__donation=True).count() == 1:
                 partial_refund = False
                 full_refund = True
             else:
