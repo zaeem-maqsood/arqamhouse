@@ -4,11 +4,21 @@
 {% load static %}
 
 {% block title %}
-Choose Tickets | {{ event.title|safe }}
+{{ event.title|safe }}
 {% endblock title %}
 
 {% block page_description %}
 <meta name="description" content="{{ event.description|safe|striptags }}">
+
+{% if event.image %}
+<meta property="og:image" content="{{ event.image.url }}">
+{% else %}
+<meta property="og:image" content="{% static 'images/logo.png' %}">
+{% endif %}
+
+<meta property="og:url" content="{{ request.path }}">
+<meta name="twitter:card" content="{{ event.slug }}">
+
 {% endblock page_description %}
 
 {% block styles %}
