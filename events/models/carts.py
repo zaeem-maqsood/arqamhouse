@@ -262,6 +262,9 @@ def event_cart_item_pre_save_reciever(sender, instance, *args, **kwargs):
 	elif instance.ticket.donation:
 		instance.donation_ticket = True
 
+		if instance.donation_amount == None:
+			instance.donation_amount = decimal.Decimal(10.00)
+
 		# Donation tickets don't have a tiket.fee parameter that we can use
 		# so we have to calculate it now
 		price_to_calculate = decimal.Decimal(instance.donation_amount)
