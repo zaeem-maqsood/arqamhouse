@@ -118,9 +118,11 @@ class ListCheckInView(HouseAccountMixin, View):
         checkins = Checkin.objects.filter(event=event, deleted=False)
         if checkins.count() > 1:
             context["checkins"] = checkins
-        else:
+        elif checkins.count() == 1:
             checkin = checkins.first()
             return HttpResponseRedirect(checkin.get_checkin_view())
+        else:
+            return HttpResponseRedirect(event.create_checkin_view())
         
         context["event"] = event
         context["event_tab"] = True
