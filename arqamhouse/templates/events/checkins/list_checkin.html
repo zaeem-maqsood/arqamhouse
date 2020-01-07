@@ -89,28 +89,60 @@ function openQRCamera(node) {
 		<div class="kt-portlet kt-portlet--mobile" style="padding:20px;">
 			<div class="kt-portlet__body">
 
-                <form method="POST" id="checkinForm" action="">{% csrf_token %}
+                {% if checkins %}
+
+                    {% for checkin in checkins %}
+                    <div class="row">
+                        <div class="col-9 col-lg-6" style="padding-bottom: 30px;">
+                            <a href="{{ checkin.get_checkin_view }}" class="btn btn-primary">{{ checkin.name }}</a>
+                        </div>
+                        <div class="col-3 col-lg-3" style="padding-bottom: 30px;">
+                            <h5 style="padding-top: 10px;">{{ checkin.attendee_set.all.count }}/{{ checkin.get_attendee_amount }}</h5>
+                        </div>
+                        <div class="col-lg-3 d-md-inline d-sm-none d-none" style="padding-bottom: 30px;">
+                            <h5 style="padding-top: 10px;">{% if checkin.exclusive %}Exclusive{% else %}Non-Exclusive{% endif %} Check-In</h5>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                {% else %}
+
                 <div class="row" style="padding-bottom: 30px;">
-                    <div class="col-md-9">
-                        <input type=text size=16 placeholder="Order ID" class="qrcode-text form-control m-input" id="output_text">
+                    <div class="col-md-12">
+                        <h5>Start checking in attendees in right away.</h5>
+                    </div>
+                </div>
+
+                <form method="POST" id="checkinForm" action="">{% csrf_token %}
+                <div class="row">
+                    <div class="col-md-9" style="padding-bottom: 30px;">
+                        <input type=text size=16 placeholder="Order/Attendee ID" class="qrcode-text form-control m-input" id="output_text">
                         <input type=file accept="image/*" id="qr_upload" capture=environment hidden onchange="openQRCamera(this);" tabindex=-1>
                     </div>
-                    <div class="col-md-3">
-                        <button type="button" class="btn btn-primary btn-block" onclick="openDialog();"><i class="la la-qrcode"></i></button>
+                    <div class="col-md-3" style="padding-bottom: 30px;">
+                        <button type="button" class="btn btn-info btn-block" onclick="openDialog();"><i class="la la-qrcode"></i></button>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <button type="button" id="checkin" class="btn btn-primary btn-block" onclick="checkinOrder(this);">Checkin</button>
+                        <button type="button" id="checkin" class="btn btn-primary btn-block" onclick="checkinOrder(this);">Check-In Attendee</button>
                     </div>
                 </div>
                 </form>
+
+                <div class="row" style="padding-top: 30px;">
+                    <div class="col-md-12">
+                        <h5>Create a custom check-in.</h5>
+                        <a href="{{ event.create_checkin_view }}" class="btn btn-primary">Create Check-In</a>
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-md-12">
                         <div id="dynamic"></div>
                     </div>
                 </div>
+                {% endif %}
                 
 			</div>
 		</div>

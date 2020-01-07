@@ -99,24 +99,26 @@ color: #7396b0;
 					</div>
 				</div>
 					
-				<table class="table table-bordered table-hover">
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Ticket</th>
-							<th>Refunded</th>
-						</tr>
-					</thead>
-					<tbody id="dynamic">
-						{% for attendee in attendees %}
-						<tr>
-							<td><a href="{{ attendee.get_attendee_view }}">{{ attendee.name }}</a></td>
-							<td>{{ attendee.ticket.title }}</td>
-							<td>{% if attendee.active %}<span style="color: #2584C7;">No</span>{% else %}<span style="color: #FF4500;">Yes</span>{% endif %}</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>	
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Ticket</th>
+								<th>Refunded</th>
+							</tr>
+						</thead>
+						<tbody id="dynamic">
+							{% for attendee in attendees %}
+							<tr>
+								<td><a href="{{ attendee.get_attendee_view }}">{{ attendee.name }}</a></td>
+								<td>{{ attendee.ticket.title }}</td>
+								<td>{% if attendee.active %}<span style="color: #2584C7;">No</span>{% else %}<span style="color: #FF4500;">Yes</span>{% endif %}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>	
+				</div>
 
 				
 			</div>

@@ -5,8 +5,7 @@ from django.utils.crypto import get_random_string
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from .events import Event
-from .carts import EventCart
+from events.models import Event, EventCart, Checkin
 from payments.models import Transaction
 
 
@@ -42,18 +41,12 @@ class EventOrder(models.Model):
 
 
 	def set_order_number(self):
-		print("Testing order numbers")
 		event_orders = EventOrder.objects.filter(event=self.event)
-		print(event_orders)
 		orders_exist = event_orders.exists()
-		print(orders_exist)
 		if orders_exist:
-			print("Yes exits")
 			latest_order = event_orders.order_by("-created_at")[0]
-			print(latest_order)
 			self.number = latest_order.number + 1
 		else:
-			print("No exists")
 			self.number = 1		
 
 

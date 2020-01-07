@@ -13,6 +13,7 @@ Report Error
 {% endblock top_page_scripts %}
 
 {% block scripts %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -26,11 +27,7 @@ Report Error
                         <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
                     </div>
                 </div>
-
-                <h3>Thanks for helping out!</h3>
                 <p>Arqam House is constantly trying to improve. Please provide us with information on any concerns you may be experiencing on our site.</p>
-                <p>If you are writing about a technical issue that you have come across please try to be as thorough as possible.</p>
-                <p>We don't ask for your contact information, however you may provide it in the message if you would like us to follow-up with you.</p>
 
                 <div class="row" style="padding-bottom:15px;padding-top:30px;">
                     <div class="col-md-12">
@@ -54,6 +51,14 @@ Report Error
                             </div>
                         </div>
                     </div>
+
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                {{ form.email }}
+                            </div>
+                        </div>
+                    </div>
                 
                     <div class="row" style="padding-bottom: 20px;">
                         <div class="col-md-12">
@@ -62,6 +67,8 @@ Report Error
                             </div>
                         </div>
                     </div>
+
+                    <div style="padding-bottom: 30px;" class="g-recaptcha" data-sitekey="6LexQcoUAAAAANF6ZK4NbVleE8COp2X0XByx9Y5-"></div>
                 
                     <div class="row">
                         <div class="col-md-12">

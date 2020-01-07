@@ -166,6 +166,14 @@ class Event(TimestampedModel):
 		view_name = "events:attendee_list"
 		return reverse(view_name, kwargs={"slug": self.slug})
 
+	def checkin_view(self):
+		view_name = "events:checkins"
+		return reverse(view_name, kwargs={"slug": self.slug})
+
+	def create_checkin_view(self):
+		view_name = "events:create_checkin"
+		return reverse(view_name, kwargs={"slug": self.slug})
+
 
 def event_post_save_reciever(sender, instance, *args, **kwargs):
 

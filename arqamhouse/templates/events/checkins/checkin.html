@@ -1,0 +1,277 @@
+{% extends "backend/base.html" %}
+{% load tz %}
+{% load checkin_template_tags %}
+{% load static %}
+
+{% load static %}
+
+{% block title %}
+
+Orders | {{ event.title }}
+{% endblock title %}
+
+{% block page_title %}
+Orders
+{% endblock page_title %}
+
+{% block styles %}
+<style>
+@media only screen and (max-width: 600px) {
+  #checkin_attendee {
+      font-size: 12px;
+      padding: 5px;
+      min-width: 100px;
+  }
+
+  #checkin_amount_heading {
+      float: left;
+  }
+}
+</style>
+
+{% endblock styles %}
+
+
+{% block scripts %}
+<script src="{% static 'js/qr-code.js' %}">
+</script>
+
+
+<script type="text/javascript">
+
+function checkinOrderOrAttendeeBarcode(object) {
+
+    order_id = document.getElementById("output_text").value;
+    console.log(order_id)
+    var token = '{{csrf_token}}';
+
+    $.ajax({
+        type: "POST",
+        headers: { "X-CSRFToken": token },
+        url: '{{ request.path }}',
+        data: {
+            'barcode': true,
+            'attendee_id': order_id,
+        },
+
+        success: function (data) {
+
+            console.log(data)
+            if (data == 'error') {
+                document.getElementById("success_message").style.display = 'block';
+                document.getElementById("display_message").innerHTML = "Error scanning code, please try again or manually check in attendee below."
+                document.getElementById("alert_color").style.color = "#bb0a0a";
+                document.getElementById("alert_color").style.border = "1px solid" + "#bb0a0a";
+                document.getElementById("display_message").style.color = "#bb0a0a";
+            }
+
+            else {
+                document.getElementById("success_message").style.display = 'block';
+                document.getElementById("display_message").innerHTML = data["message"];
+                document.getElementById("dynamic").innerHTML = data["html"];
+                document.getElementById("checkin_amount").innerHTML = data["amount"]
+                document.getElementById("alert_color").style.color = data["color"];
+                document.getElementById("alert_color").style.border = "1px solid" + data["color"];
+                document.getElementById("display_message").style.color = data["color"];
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert(errorThrown);
+            //some stuff on failure
+        },
+    });
+
+}
+
+
+
+
+function checkinAttendee(object) {
+
+    attendee_id = object.value;
+    console.log(attendee_id)
+    var token = '{{csrf_token}}';
+
+    $.ajax({
+        type: "POST",
+        headers: { "X-CSRFToken": token },
+        url: '{{ request.path }}',
+        data: {
+            'manual_attendee': true,
+            'attendee_id': attendee_id,
+        },
+
+        success: function (data) {
+
+            if (data == 'error') {
+                document.getElementById("display_message").innerHTML = "Error scanning code, please try again or manually check attendee in below."
+                document.getElementById("alert_color").style.color = "#bb0a0a";
+                document.getElementById("alert_color").style.border = "1px solid" + "#bb0a0a";
+                document.getElementById("display_message").style.color = "#bb0a0a";
+            }
+
+            else {
+                document.getElementById("success_message").style.display = 'block';
+                document.getElementById("display_message").innerHTML = data["message"];
+                document.getElementById("dynamic").innerHTML = data["html"];
+                document.getElementById("checkin_amount").innerHTML = data["amount"]
+                document.getElementById("alert_color").style.color = data["color"];
+                document.getElementById("alert_color").style.border = "1px solid" + data["color"];
+                document.getElementById("display_message").style.color = data["color"];
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert(errorThrown);
+            //some stuff on failure
+        },
+    });
+
+}
+
+</script>
+
+
+<script>
+
+function openDialog() {
+        document.getElementById('qr_upload').click();
+    }
+
+function openQRCamera(node) {
+    var reader = new FileReader();
+    reader.onload = function () {
+        node.value = "";
+        qrcode.callback = function (res) {
+            if (res instanceof Error) {
+                alert("No QR code found. Please make sure the QR code is within the camera's frame and try again.");
+            } else {
+                // node.parentNode.previousElementSibling.value = res;
+                document.getElementById("output_text").value = res
+                document.getElementById("checkin").click()
+            }
+        };
+        qrcode.decode(reader.result);
+    };
+    reader.readAsDataURL(node.files[0]);
+}
+
+
+function GetAttendees(object) {
+
+    console.log(object.value)
+    var search = object.value;
+    var token = '{{csrf_token}}';
+
+    $.ajax({
+        type: "POST",
+        headers: { "X-CSRFToken": token },
+        url: '{{ request.path }}',
+        data: {
+            'search': search,
+        },
+
+        success: function (data) {
+            console.log("HELLOO")
+            document.getElementById("dynamic").innerHTML = data;
+
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert(errorThrown);
+            //some stuff on failure
+        },
+    });
+
+}
+</script>
+
+
+{% endblock scripts %}
+
+
+{% block content %}
+
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-10 offset-lg-1 col-md-12 col-12" style="padding: 0px;">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+                <form method="POST" id="checkinForm" action="">{% csrf_token %}
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-lg-6 col-sm-12">
+                        <h4>{{ checkin.name }} <a href="{{ event.create_checkin_view }}" style="font-weight: 400;font-size: 15px;">| New</a> <a href="{{ checkin.get_checkin_update_view }}" style="font-weight: 400;font-size: 15px;">| Edit</a></h4>
+                    </div>
+                    <div class="col-lg-6 col-sm-12">
+                        <p class="pull-right" id="checkin_amount_heading"><span id="checkin_amount">{{ amount }}</span>/{{ attendees.count }} attendees checked-in</p>
+                    </div>
+                </div>
+
+                <div class="row" style="display: none;" id="success_message">
+                    <div class="col-lg-12 col-md-12">
+                        <div class="alert alert-outline-success fade show" role="alert" style="user-select: auto;padding: 10px;" id="alert_color">
+                            <div class="alert-text" style="user-select: auto;" id="display_message"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-9" style="padding-bottom: 30px;">
+                        <input type=text size=16 placeholder="Attendee ID" class="qrcode-text form-control m-input" id="output_text">
+                        <input type=file accept="image/*" id="qr_upload" capture=environment hidden onchange="openQRCamera(this);" tabindex=-1>
+                    </div>
+                    <div class="col-md-3 col-3 d-md-none d-sm-flex" style="padding-bottom: 30px;">
+                        <button type="button" class="btn btn-info btn-block" onclick="openDialog();"><i class="la la-qrcode"></i></button>
+                    </div>
+                </div>
+                <div class="row" style="padding-bottom: 60px;">
+                    <div class="col-md-12">
+                        <button type="button" id="checkin" class="btn btn-primary btn-block" onclick="checkinOrderOrAttendeeBarcode(this);">Check-In</button>
+                    </div>
+                </div>
+                
+
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-12">
+                        <input type="search" placeholder="Search For An Attendee" id="attendee-search" class="form-control m-input"
+                            onkeyup="GetAttendees(this)">
+                        <br>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tbody id="dynamic">
+                            {% for attendee in attendees %}
+                            <tr>
+                                <td><a href="{{ attendee.get_attendee_view }}">{{ attendee.name }}</a></td>
+                                <td><button onclick="checkinAttendee(this);" type="button" id="checkin_attendee" name="manual" value="{{ attendee.unique_id }}" class="btn btn-outline-{% check_if_checked_in_color checkin attendee %} btn-block">{% check_if_checked_in checkin attendee %}</button></td>
+                                <td>{{ attendee.order.id }}</td>
+                                <td>{{ attendee.ticket.title }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                </form>
+                
+			</div>
+		</div>
+	</div>
+
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -230,7 +230,8 @@ class InvoiceMonthView(HouseAccountMixin, View):
 
 		# Scenario for current year 
 		elif requested_year == current_year:
-			for x in range(current_month-1):
+			print("is it here?")
+			for x in range(current_month):
 				months.append(month_list[x])
 
 		# Scenario for previous year 
@@ -265,17 +266,16 @@ class InvoiceYearView(HouseAccountMixin, View):
 		current_year = timezone.now().year
 		opening_balance_year = house_balance_log.created_at.year
 
-		year_range = current_year - opening_balance_year
-		if year_range == 0:
+		years_opened = current_year - opening_balance_year
+
+		if current_year == opening_balance_year:
 			# Navigate to months no need to show years
 			return(HttpResponseRedirect(reverse('payments:invoice_month', kwargs={"year": current_year})))
 
 		else:
-			for x in range(year_range + 1):
-				year = current_year + x
-				years.append(year)
-
-		print(years)
+			for x in range(0, years_opened + 1):
+				print(x)
+				years.append(opening_balance_year + x)
 
 		context["house"] = self.get_house()
 		context["dashboard_events"] = self.get_events()

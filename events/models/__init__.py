@@ -4,6 +4,7 @@ from .tickets import *
 from .discounts import *
 from .carts import *
 from .questions import *
+from .checkins import *
 from .orders import *
 from .attendees import *
 from .answers import *

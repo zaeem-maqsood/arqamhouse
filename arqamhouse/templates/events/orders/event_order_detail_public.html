@@ -237,7 +237,7 @@ function myFunction() {
                                     {% for attendee in attendees %}
                                     <tr>
                                         <td style="vertical-align: inherit;">
-                                            <p style="margin:0 auto;">{{ forloop.counter }}</p>
+                                            <p style="margin:0 auto;">{{ attendee.unique_id }}</p>
                                         </td>
                                         <td style="vertical-align: inherit;">
                                             <p style="margin:0 auto;">{{ attendee.ticket }}</p>

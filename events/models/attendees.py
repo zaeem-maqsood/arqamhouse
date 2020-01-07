@@ -1,9 +1,14 @@
 from .base import *
+import qrcode
+from io import BytesIO, StringIO
+from django.utils.crypto import get_random_string
+from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 import googlemaps
 from core.models import TimestampedModel
 from houses.models import House
-from events.models import Event, Ticket, EventOrder, EventCartItem
+from events.models import Event, Ticket, EventOrder, EventCartItem, Checkin
 from core.constants import genders
 from cities_light.models import City, Region, Country
 from payments.models import Refund
@@ -15,6 +20,11 @@ refund_policies = (
 			('30-days', '30-days'),
 			('no refunds', 'No Refunds')
 		)
+
+
+def qrcode_location(instance, filename):
+	return "order_qrcodes/%s/attendee_qr_codes/%s/%s" % (instance.order.public_id, instance.code, filename)
+	
 
 class Attendee(TimestampedModel):
 
@@ -34,9 +44,37 @@ class Attendee(TimestampedModel):
 	region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True)
 	city = models.ForeignKey(City, on_delete=models.CASCADE, blank=True, null=True)
 	active = models.BooleanField(default=True)
+	unique_id = models.CharField(max_length=5, null=True, blank=True)
+	code = models.ImageField(upload_to=qrcode_location, max_length=500, blank=True, null=True)
+	checkins = models.ManyToManyField(Checkin, blank=True)
 
 	def __str__(self):
 		return self.name
+
+	def generate_unique_id(self):
+		while True:
+			unique_id = get_random_string(length=4)
+			try:
+				Attendee.objects.get(order__event=self.order.event, unique_id=unique_id)
+			except:
+				break
+		self.unique_id = unique_id
+
+	
+	def qrcode(self):
+		qr = qrcode.QRCode(
+			version=1,
+			error_correction=qrcode.constants.ERROR_CORRECT_L,
+			box_size=10,
+			border=4,
+		)
+		qr.add_data(self.unique_id)
+		qr.make(fit=True)
+		img = qr.make_image(fill_color="black", back_color="white")
+		string_io = BytesIO()
+		img.save(string_io, format='JPEG')
+		img_content = ContentFile(string_io.getvalue(), 'qrcode.jpeg')
+		self.code = img_content
 
 	def update_city_region_country(self):
 		api = settings.GOOGLE_MAPS_API
@@ -86,7 +124,12 @@ class Attendee(TimestampedModel):
 
 	def save(self, *args, **kwargs):
 		if not self.pk:
+			self.generate_unique_id()
 			self.update_city_region_country()
+			self.qrcode()
+
+		if not self.unique_id:
+			self.generate_unique_id()
 		
 		self.update_city_region_country()
 

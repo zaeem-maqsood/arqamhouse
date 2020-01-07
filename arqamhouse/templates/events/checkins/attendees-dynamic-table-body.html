@@ -1,0 +1,9 @@
+{% load checkin_template_tags %}
+{% for attendee in attendees %}
+<tr>
+    <td><a href="{{ attendee.get_attendee_view }}">{{ attendee.name }}</a></td>
+    <td><button onclick="checkinAttendee(this);" type="button" id="checkin_attendee" name="manual" value="{{ attendee.unique_id }}" class="btn btn-outline-{% check_if_checked_in_color checkin attendee %} btn-block">{% check_if_checked_in checkin attendee %}</button></td>
+    <td>{{ attendee.order.id }}</td>
+    <td>{{ attendee.ticket.title }}</td>
+</tr>
+{% endfor %}

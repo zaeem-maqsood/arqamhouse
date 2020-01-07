@@ -21,25 +21,27 @@
 
   <aside style="padding-top:30px;">
 
-    {% if order.event.start or order.event.end %}
+    {% if order.event.venue_name or order.event.venue_address %}
     <address id="from">
+      <span style="font-weight: 400;font-size:1.5em;color:#4599d5;">Where</span>
+      {% if order.event.venue_name %}
+      <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Venue | <span
+          style="font-weight: 400;">{{ order.event.venue_name }}</span></p>
+      {% endif %}
+      {% if order.event.venue_address %}
+      <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Address | <span
+          style="font-weight: 400;">{{ order.event.venue_address }}</span></p>
+      {% endif %}
+    </address>
+    {% endif %}
+
+    {% if order.event.start or order.event.end %}
+    <address id="to">
       <span style="font-weight: 400;font-size:1.5em;color:#4599d5;">When</span>
       <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Starts on | <span style="font-weight: 400;">{{ order.event.start|localtime|date:"N jS Y, f a" }}</span></p>
       {% endif %}
       {% if order.event.end %}
       <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Ends on | <span style="font-weight: 400;">{{ order.event.end|localtime|date:"N jS Y, f a" }}</span></p>
-    </address>
-    {% endif %}
-
-    {% if order.event.venue_name or order.event.venue_address %}
-    <address id="to">
-      <span style="font-weight: 400;font-size:1.5em;color:#4599d5;">Where</span>
-      {% if order.event.venue_name %}
-      <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Venue | <span style="font-weight: 400;">{{ order.event.venue_name }}</span></p>
-      {% endif %}
-      {% if order.event.venue_address %}
-      <p style="font-size: 0.8em;margin-bottom:0px;font-weight: 600;">Address | <span style="font-weight: 400;">{{ order.event.venue_address }}</span></p>
-      {% endif %}
     </address>
     {% endif %}
 
@@ -49,40 +51,58 @@
     <img src="{{ order.code.url }}" style="max-height: 100px;">
   </dl>
 
+<div style="padding-top:30px;"></div>
+<h2 style="font-weight: 400;font-size: 1.5em;color:#4599d5;">Tickets</h2>
+
+{% for attendee in order.attendee_set.all %}
   <div style="padding-top:30px;"></div>
-  <h2 style="font-weight: 400;font-size: 1.5em;color:#4599d5;">Summary</h2>
   <table>
     <thead>
+      <th>ID</th>
       <th>Attendee</th>
       <th>Ticket</th>
+      <th>Code</th>
       <th>Cost</th>
     </thead>
     <tbody>
-      {% for attendee in order.attendee_set.all %}
+      
       <tr>
+        <td>{{ attendee.unique_id }}</td>
         <td>{{ attendee.name }}</td>
         <td>{{ attendee.ticket.title }}</td>
+        <td><img src="{{ attendee.code.url }}" style="max-height:90px;max-width: 90px;padding:0px;margin:0px;"></td>
         <td>${{ attendee.ticket_buyer_price }}</td>
       </tr>
-      {% endfor %}
       
-      {% if order.event_cart.discount_code %}
-      <tr>
-        <td></td>
-        <td>Discount Code</td>
-        <td style="color: #ff7b1b;">{{ order.event_cart.discount_code.code }}</td>
-      </tr>
-      {% else %}
-      {% endif %}
-
-      <tr>
-        <td></td>
-        <td>Total</td>
-        <td>${{ order.event_cart.total }}</td>
-      </tr>
     </tbody>
   </table>
+  <div style="padding-top:50px;"></div>
+{% endfor %}
 
+<div style="padding-top:30px;"></div>
+<h2 style="font-weight: 400;font-size: 1.5em;color:#4599d5;">Summary</h2>
+<table>
+  <tbody>
+    {% if order.event_cart.discount_code %}
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>Discount Code</td>
+      <td style="color: #ff7b1b;">{{ order.event_cart.discount_code.code }}</td>
+    </tr>
+    {% else %}
+    {% endif %}
+
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>Total</td>
+      <td>${{ order.event_cart.total }}</td>
+    </tr>
+  </tbody>
+</table>
 
 </body>
 
