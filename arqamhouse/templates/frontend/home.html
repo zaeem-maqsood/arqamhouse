@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-Login | Arqam House
+Arqam House
 {% endblock title %}
 
 {% block footer %}
@@ -96,7 +96,7 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 {% endblock scripts %}
 
 {% block content %}
-<section class="text-center" style="padding-bottom: 20px;">
+<section class="text-center" style="padding-bottom: 50px;padding-top: 150px;">
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12 col-lg-12">
@@ -108,11 +108,30 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 				</div>
 
 				<div class="row" style="padding-bottom: 40px;">
-					<div class="col-md-12 col-10">
+					<div class="col-md-8 offset-md-2 col-10">
 						<h4 style="color: grey;">An event managment app that doesn't scare you.</h4>
-						<a href="{% url 'profiles:login' %}">Give it a try</a>
+						<div class="row">
+							<div class="col-md-4" style="padding-bottom: 30px;">
+								<a class="btn btn--primary btn-block" href="{% url 'profiles:login' %}">
+									<span class="btn__text">Sign In</span>
+								</a>
+							</div>
+							<div class="col-md-4" style="padding-bottom: 30px;">
+								<a class="btn btn-block" href="{% url 'profiles:create' %}">
+									<span class="btn__text">Sign Up</span>
+								</a>
+							</div>
+							<div class="col-md-4" style="padding-bottom: 30px;">
+								<a class="btn btn--primary btn-block" href="{% url 'profiles:login' %}">
+									<span class="btn__text">Find Order</span>
+								</a>
+							</div>
+						</div>
+						
 					</div>
 				</div>
+
+				<hr>
 
 			</div>
 		</div>
@@ -120,6 +139,116 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 	</div>
 	<!--end of container-->
 </section>
+
+<section class="text-center" style="padding-bottom: 120px;">
+	<div class="container">
+		<div class="row justify-content-center" style="padding-bottom: 40px;">
+			<div class="col-md-10 col-lg-8">
+				<img alt="Image" src="{% static 'images/homepage1.png' %}" />
+			</div>
+		</div>
+		<div class="row justify-content-center">
+			<div class="col-md-10 col-lg-8">
+				<h3 style="color:#4a90e2;">Powerful tools for everyone</h3>
+				<p>
+					Arqam House was created by people who understand the limitations smaller organizations face in trying to provide a seamless process to their customers.
+				</p>
+			</div>
+		</div>
+		<!--end of row-->
+	</div>
+	<!--end of container-->
+</section>
+
+
+<section>
+	<div class="container">
+		<div class="row text-center" style="padding-bottom: 20px;">
+			<div class="col-md-10 offset-md-1 col-10 offset-1">
+				<h3 style="color:#4a90e2;margin-bottom: 5px;">The lowest fee. Guaranteed.</h3>
+				<p style="color:grey;">See how much we charge. <b>Payment processing included.</b></p>
+				<p style="color:grey;">Free tickets are free.</p>
+			</div>
+		</div>
+		<div class="row text-center">
+			<div class="col-md-2 offset-md-5 col-sm-4 offset-sm-4 col-6 offset-3">
+				<input type="number" name="price" value="5.00" class="" min="1.00" max="2000.00" step="0.01" required=""
+					id="id_price">
+				<p>Ticket Price</p>
+			</div>
+		</div>
+		<div class="row text-center" style="padding-top:40px;padding-bottom: 30px;">
+			<div class="col-md-4 offset-md-2 col-6">
+				<h3 class="m--font-success" id="amount_received_div" style="margin-bottom: 0px;">$0.00</h3>
+				<p>Total Fee</p>
+			</div>
+			<div class="col-md-4 col-6">
+				<h3 class="m--font-info" id="new_price_div" style="margin-bottom: 0px;">$0.00</h3>
+				<p>New Ticket Price</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+<section class="text-center">
+	<div class="container">
+
+		<div class="row">
+			<div class="col-md-10 offset-md-1">
+
+				<div class="row">
+					<div class="col-md-5">
+						<img alt="Image" src="{% static 'images/homepage2.png' %}" />
+					</div>
+					<div class="col-md-7" style="padding-top: 50px;">
+						<h3 style="color:#4a90e2;">The power of simplicity</h3>
+						<p>
+							Our platform is super simple to use, no rocket science here!
+							Get started in just minutes. Army of one? No problem. Our intuitive platform makes it easy to start using with little to no training whatsoever.
+						</p>
+						<a href="#">Get Started &raquo;</a>
+						
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+	
+</section>
+
+
+
+<section class="text-center">
+	<div class="container">
+
+		<div class="row">
+			<div class="col-md-10 offset-md-1">
+
+				<div class="row">
+					<div class="col-md-7" style="padding-top: 50px;">
+						<h3 style="color:#4a90e2;">Mobile First Experience</h3>
+						<p>
+							No need to download 4 different apps on 7 different devices. Our web application is where everything lives.
+							Our mobile first design makes it seamless to navigate through on any device.
+						</p>
+						<a href="#">Get Started &raquo;</a>
+
+					</div>
+					<div class="col-md-5">
+						<img alt="Image" src="{% static 'images/homepage3.png' %}" />
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+
+</section>
+
 <section>
 	<div class="container">
 		<div class="row">
@@ -179,30 +308,5 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 </section>
 
 
-<section>
-	<div class="container">
-		<div class="row text-center">
-			<div class="col-md-10 offset-md-1 col-10 offset-1">
-				<h2 style="color:#4a90e2;">Pricing</h2>
-				<h4 style="color:grey;">Enter a ticket price and see how much it'll cost you</h4>
-			</div>
-		</div>
-		<div class="row text-center">
-			<div class="col-md-2 offset-md-5 col-sm-4 offset-sm-4 col-6 offset-3">
-				<input type="number" name="price" value="5.00" class="" min="1.00" max="2000.00" step="0.01" required="" id="id_price">
-				<p>Ticket Price</p>
-			</div>
-		</div>
-		<div class="row text-center" style="padding-top:40px;">
-			<div class="col-md-4 offset-md-2 col-6">
-				<h3 class="m--font-success" id="amount_received_div" style="margin-bottom: 0px;">$0.00</h3>
-				<p>Total Fee</p>
-			</div>
-			<div class="col-md-4 col-6">
-				<h3 class="m--font-info" id="new_price_div" style="margin-bottom: 0px;">$0.00</h3>
-				<p>New Ticket Price</p>
-			</div>
-		</div>
-	</div>
-</section>
+
 {% endblock content %}
