@@ -7,13 +7,23 @@ from django.core import mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
+from django.utils import timezone
+from datetime import timedelta
+
 from django.core.mail import send_mail, EmailMultiAlternatives
 from events.forms import EventEmailConfirmationForm
 from weasyprint import HTML, CSS
 
 @shared_task
-def hello():
-	print("Hello there!")
+def archive_past_events():
+	events = Event.objects.all()
+	current_time = timezone.now()
+	for event in events:
+		if not event.active:
+			end_time_plus_1_day = event.end + timedelta(hours=24)
+			if current_time >= end_time_plus_1_day:
+				event.active = True
+				event.save()
 
 
 @shared_task

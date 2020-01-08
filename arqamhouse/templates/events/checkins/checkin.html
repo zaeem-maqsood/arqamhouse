@@ -59,7 +59,7 @@ function checkinOrderOrAttendeeBarcode(object) {
             console.log(data)
             if (data == 'error') {
                 document.getElementById("success_message").style.display = 'block';
-                document.getElementById("display_message").innerHTML = "Error scanning code, please try again or manually check in attendee below."
+                document.getElementById("display_message").innerHTML = "Error scanning code. No attendee with that ID."
                 document.getElementById("alert_color").style.color = "#bb0a0a";
                 document.getElementById("alert_color").style.border = "1px solid" + "#bb0a0a";
                 document.getElementById("display_message").style.color = "#bb0a0a";

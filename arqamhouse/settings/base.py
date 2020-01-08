@@ -14,7 +14,7 @@ import django_heroku
 import dj_database_url
 import dotenv
 import os
-# from celery.schedules import crontab
+from celery.schedules import crontab
 from arqamhouse.aws.conf import *
 
 
@@ -122,12 +122,12 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 
 # System wide Cron jobs using Celery 
-# CELERY_BEAT_SCHEDULE = {
-#     'hello': {
-#         'task': 'events.tasks.hello',
-#         'schedule': crontab()  # execute every minute
-#     }
-# }
+CELERY_BEAT_SCHEDULE = {
+    'archive_past_events': {
+        'task': 'events.tasks.archive_past_events',
+        'schedule': crontab(hour="*/4")  # execute every 4 hours
+    }
+}
 
 
 # Sendgrid Email Backend
