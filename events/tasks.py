@@ -19,10 +19,10 @@ def archive_past_events():
 	events = Event.objects.all()
 	current_time = timezone.now()
 	for event in events:
-		if not event.active:
+		if event.active:
 			end_time_plus_1_day = event.end + timedelta(hours=24)
 			if current_time >= end_time_plus_1_day:
-				event.active = True
+				event.active = False
 				event.save()
 
 
