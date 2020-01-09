@@ -37,6 +37,7 @@ uvicorn = "*"
 django-phonenumber-field = "*"
 phonenumbers = "*"
 django = "==2.2"
+twilio = "*"
 
 [requires]
 python_version = "3.7"

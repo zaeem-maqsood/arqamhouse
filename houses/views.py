@@ -24,6 +24,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponsePermanentRedirect
 
+from twilio.rest import Client
+
 from .mixins import HouseAccountMixin, HouseLandingMixin
 
 from core.mixins import LoginRequiredMixin
@@ -172,11 +174,21 @@ class HouseVerificationView(HouseAccountMixin, FormView):
 			house.verification_pending = True
 			house.save()
 			self.object = form.save()
+
+			# Send Message To Admins
+			account_sid = settings.ACCOUNT_SID
+			auth_token = settings.AUTH_TOKEN
+			client = Client(account_sid, auth_token)
+			message = client.messages.create(
+						body="%s has requested a verification. Verification type: %s.\n- Arqam House" % (house.name, house.house_type),
+						from_='+16475571902',
+						to='+16472985582'
+					)
 			
 		# If we are adding the house address
 		else:
 			self.object = form.save()
-			messages.info(request, 'Address Entered')
+			messages.info(request, 'Tax Information Updated')
 		
 		valid_data = super(HouseVerificationView, self).form_valid(form)
 		return valid_data
@@ -444,6 +456,7 @@ class HouseCreateView(LoginRequiredMixin, CreateView):
 		else:
 			return self.form_invalid(form)
 
+
 	def form_valid(self, form, request):
 		
 		# Save the House
@@ -466,6 +479,8 @@ class HouseCreateView(LoginRequiredMixin, CreateView):
 		house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, balance=0.00, opening_balance=True, gross_balance=0.00)
 		house_balance_log.save()
 
+		self.send_text_message(self.object)
+
 		valid_data = super(HouseCreateView, self).form_valid(form)
 		return valid_data
 
@@ -474,6 +489,15 @@ class HouseCreateView(LoginRequiredMixin, CreateView):
 		return self.render_to_response(self.get_context_data(form=form))
 
 
+	def send_text_message(self, house):
+		account_sid = settings.ACCOUNT_SID
+		auth_token = settings.AUTH_TOKEN
+		client = Client(account_sid, auth_token)
+		message = client.messages.create(
+                    body="A New House Was Created!\nHouse Name: %s\n- Arqam House" % (house.name),
+                    from_='+16475571902',
+                    to='+16472985582'
+                )
 
 
 

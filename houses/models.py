@@ -47,6 +47,8 @@ class House(TimestampedModel):
 	business_number = models.CharField(max_length=200, null=True, blank=True)
 	postal_code = models.CharField(max_length=6, null=True, blank=True)
 	house_type = models.CharField(max_length=150, choices=house_types, blank=True, null=True)
+	legal_name = models.CharField(max_length=200, null=True, blank=True)
+	tax_id = models.PositiveIntegerField(null=True, blank=True)
 	ip_address = models.CharField(max_length=200, null=True, blank=True)
 	address_entered = models.BooleanField(default=False)
 	verification_pending = models.BooleanField(default=False)

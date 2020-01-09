@@ -20,6 +20,8 @@ from django.core import mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
+from twilio.rest import Client
+
 from weasyprint import HTML, CSS
 from django.db.models import Sum
 
@@ -465,6 +467,17 @@ class PayoutView(HouseAccountMixin, FormView):
 		mail.send_mail(subject, plain_message, from_email, to, html_message=html_message, fail_silently=True)
 		return "Done"
 
+	def send_text_message_us(self, payout):
+		account_sid = settings.ACCOUNT_SID
+		auth_token = settings.AUTH_TOKEN
+		client = Client(account_sid, auth_token)
+		message = client.messages.create(
+                    body="%s has requested a payout. Payout Amount: $%s. \n- Arqam House" % (
+                        payout.house.name, '{0:.2f}'.format(payout.amount)),
+                    from_='+16475571902',
+                    to='+16472985582'
+                )
+
 	
 	def form_valid(self, form, request, house_balance):
 		house = self.get_house()
@@ -480,6 +493,7 @@ class PayoutView(HouseAccountMixin, FormView):
 		payout = Payout.objects.create(house=house, amount=amount, payout_setting=payout_setting)
 		self.send_payout_email_us(payout)
 		self.send_payout_email_them(payout)
+		self.send_text_message_us(payout)
 		messages.success(request, 'Payout Requested!')
 		valid_data = super(PayoutView, self).form_valid(form)
 		return valid_data

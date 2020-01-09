@@ -83,16 +83,11 @@ function initMap() {
                     </div>
                     {% endif %}
 
+
                     {% if house.house_type and not house.address_entered %}
                     <div class="row" style="padding-bottom:50px;">
                         <div class="col-12">
-                            {% if house.house_type == "Individual" %}
-                            <p style="margin-bottom:0px;">Please enter your address below.</p>
-                            {% elif house.house_type == "Business" %}
-                            <p style="margin-bottom:0px;">Please enter your business address below.</p>
-                            {% else %}
-                            <p style="margin-bottom:0px;">Please enter your non-profit's address below.</p>
-                            {% endif %}
+                            <p style="margin-bottom:0px;">We need to collect this information so we can submit accurate tax reports..</p>
                         </div>
                     </div>
                     {% endif %}
@@ -140,6 +135,21 @@ function initMap() {
                     {% if house.house_type and not house.address_entered %}
                     <div class="row">
                         <div class="col-12">
+                            
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <h5>{% if house.house_type == "Individual" %}Legal Name{% else %}Legal Business Name{% endif %}</h5>
+                                    {{ form.legal_name }}
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <h5>{% if house.house_type == "Individual" %}Tax Identification Number{% else %}Corporation Number{% endif %}</h5>
+                                    {{ form.tax_id }}
+                                </div>
+                            </div>
+
                             <div class="row" style="padding-bottom: 30px;">
                                 <div class="col-md-12">
                                     <h5>Address</h5>

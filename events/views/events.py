@@ -22,6 +22,8 @@ from django.utils.html import strip_tags
 
 from django.core.validators import validate_email
 
+from twilio.rest import Client
+
 from houses.mixins import HouseAccountMixin
 from houses.models import HouseUser
 from questions.models import Question
@@ -689,12 +691,26 @@ class EventCreateView(HouseAccountMixin, CreateView):
 
 		messages.success(request, 'Your event is live! Click <a href="%s">here</a> to add tickets' %
 		                 (reverse('events:list_tickets', kwargs={'slug': self.object.slug})))
+
+		self.send_text_message(self.object)
+
 		valid_data = super(EventCreateView, self).form_valid(form)
 		return valid_data
 
 	def form_invalid(self, form):
 		print(form.errors)
 		return self.render_to_response(self.get_context_data(form=form))
+
+	
+	def send_text_message(self, event):
+		account_sid = settings.ACCOUNT_SID
+		auth_token = settings.AUTH_TOKEN
+		client = Client(account_sid, auth_token)
+		message = client.messages.create(
+                    body="A New Event Was Created!\nHouse Name: %s\nEvent Name: %s\nEvent URL: www.arqamhouse.com/events/%s\n- Arqam House" % (event.house.name, event.title, event.slug),
+                    from_='+16475571902',
+                    to='+16472985582'
+                )
 
 
 

@@ -125,7 +125,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {
     'archive_past_events': {
         'task': 'events.tasks.archive_past_events',
-        'schedule': crontab(hour="*/4")  # execute every 4 hours
+        'schedule': crontab(minute="*/1")  # execute every 4 hours
     }
 }
 
@@ -147,6 +147,11 @@ EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 # To err on the side of caution, this defaults to True, so emails sent in DEBUG mode will not be delivered,
  # unless this setting is explicitly set to False.
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+
+# Twilio Credentials
+ACCOUNT_SID = 'AC2e694b2462cf0c084a26c99445b0ae31'
+AUTH_TOKEN = 'f0ca4ed931e73f3ddefb62e3cb105f96'
 
 
 # Google Maps API

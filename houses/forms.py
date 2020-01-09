@@ -89,6 +89,8 @@ class HouseVerificationForm(forms.ModelForm):
 	class Meta:
 		model = House
 		fields = [
+			"tax_id",
+			"legal_name",
 			"region",
 			"city",
 			"address",
@@ -96,11 +98,21 @@ class HouseVerificationForm(forms.ModelForm):
 		]
 
 		widgets = {
-                    "name": forms.TextInput(
+                    "legal_name": forms.TextInput(
                         attrs={
                             "class": "form-control m-input",
-                     							"placeholder": "i.e. Arqam House",
+                     		"placeholder": "Arqam House Group Inc.",
                             "required": True
+                        }
+                    ),
+					"tax_id": forms.NumberInput(
+                        attrs={
+                            "required": True,
+							"placeholder": "1234567",
+                            "class": "form-control m-input",
+							"min": "1",
+							"max": "1234567",
+							"step": "1"
                         }
                     ),
 					"region": forms.Select(

@@ -114,7 +114,7 @@ jQuery(document).ready(function () {
                 {% if event_question.order_question %}
                 <div class="row">
                     <div class="col-12">
-                        <h5>Answers by Order</h5>
+                        <h5>Order Answers</h5>
                     </div>
                 </div>
 
@@ -155,7 +155,7 @@ jQuery(document).ready(function () {
 
                 <div class="row">
                     <div class="col-12">
-                        <h5>Answers by Attendee</h5>
+                        <h5>Attendee Answers</h5>
                     </div>
                 </div>
 
@@ -181,7 +181,7 @@ jQuery(document).ready(function () {
                                 <tbody id="dynamic">
                                     {% for attendee in attendees %}
                                     <tr>
-                                        <td><a href="{{ order.get_order_view }}">{{ attendee.name }}</a></td>
+                                        <td><a href="{{ attendee.order.get_order_view }}">{{ attendee.name }}</a></td>
                                         <td>{% get_answer_for_attendee attendee event_question %}</td>
                                         <td><a href="{{ attendee.get_attendee_view }}" class="btn btn-primary btn-block">Edit</a></td>
                                     </tr>
