@@ -122,12 +122,12 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 
 # System wide Cron jobs using Celery 
-CELERY_BEAT_SCHEDULE = {
-    'archive_past_events': {
-        'task': 'events.tasks.archive_past_events',
-        'schedule': crontab(minute="*/1")  # execute every 4 hours
-    }
-}
+# CELERY_BEAT_SCHEDULE = {
+#     'archive_past_events': {
+#         'task': 'events.tasks.archive_past_events',
+#         'schedule': crontab(minute="*/1")  # execute every 4 hours
+#     }
+# }
 
 
 # Sendgrid Email Backend
