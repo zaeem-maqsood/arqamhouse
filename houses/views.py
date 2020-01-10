@@ -217,7 +217,7 @@ class DashboardView(HouseAccountMixin, DetailView):
 
 		for x in range(10):
 			one_day_earlier = today - timedelta(days=x)
-			transactions_for_day = transactions.filter(created_at__day=one_day_earlier.day)
+			transactions_for_day = transactions.filter(created_at__day=one_day_earlier.day, created_at__month=one_day_earlier.month, created_at__year=one_day_earlier.year)
 
 			sales_sum = 0
 			for transaction in transactions_for_day:
