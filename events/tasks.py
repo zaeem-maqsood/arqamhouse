@@ -16,7 +16,8 @@ from weasyprint import HTML, CSS
 
 @shared_task
 def archive_past_events():
-	events = Event.objects.filter(active=True)
+	current_time = timezone.now()
+	events = Event.objects.filter(active=True, deleted=False)[:3]
 	current_time = timezone.now()
 	for event in events:
 		print("event name: %s" % (event.title))
