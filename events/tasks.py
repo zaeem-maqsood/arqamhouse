@@ -15,21 +15,18 @@ from events.forms import EventEmailConfirmationForm
 from weasyprint import HTML, CSS
 
 @shared_task
-def archive_past_events():
+def archive_past_events(event_id):
 	current_time = timezone.now()
-	events = Event.objects.filter(active=True, deleted=False)[:3]
+	events = Event.objects.get(id=event_id)
 	current_time = timezone.now()
-	for event in events:
-		print("event name: %s" % (event.title))
-		if event.active:
-			end_time_plus_1_day = event.end + timedelta(hours=24)
-			if current_time >= end_time_plus_1_day:
-				event.active = False
-				event.save()
-			else:
-				print("not greater than time")
-		else:
-			print("event is not active")
+	print("event name: %s" % (event.title))
+	
+	end_time_plus_1_day = event.end + timedelta(hours=24)
+	if current_time >= end_time_plus_1_day:
+		event.active = False
+		event.save()
+	else:
+		print("not greater than time")
 
 
 @shared_task

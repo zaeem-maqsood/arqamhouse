@@ -4,6 +4,8 @@ from events.models import Event, Ticket, EventCart, EventCartItem, EventDiscount
 from events.forms import TicketsToCartForm
 from houses.models import HouseUser
 
+from events.tasks import archive_past_events
+
 
 # Create your views here.
 class AddTicketsToCartView(FormView):
@@ -64,12 +66,22 @@ class AddTicketsToCartView(FormView):
 		else:
 			return self.form_invalid(form)
 
+	
+	def archive_event_checker(self, event):
+		if event.active:
+			task = archive_past_events.delay(event.id)
+		return "done"
+
+
 	def get(self, request, *args, **kwargs):
 		
 		context = {}
 		self.object = None
 		slug = kwargs['slug']
 		event = self.get_event(slug)
+		# Check if event should be archived or not
+		self.archive_event_checker(event)
+
 		tickets = self.get_tickets(event)
 
 		# if not tickets.filter(sold_out=False).exists():
