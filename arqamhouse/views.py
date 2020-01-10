@@ -48,7 +48,11 @@ class ReportErrorView(FormView):
 
 	def post(self, request, *args, **kwargs):
 		data = request.POST
+		print(data)
 		form = ReportErrorForm(data=data)
+		if data['g-recaptcha-response'] == '':
+			form.add_error(None, 'Please confirm you are human.')
+			return self.form_invalid(form)
 		if form.is_valid():
 			return self.form_valid(form, request)
 		else:

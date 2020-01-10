@@ -29,7 +29,8 @@ Report Error
                 </div>
                 <p>Arqam House is constantly trying to improve. Please provide us with information on any concerns you may be experiencing on our site.</p>
 
-                <div class="row" style="padding-bottom:15px;padding-top:30px;">
+                {% if messages %}
+                <div class="row" style="padding-bottom:30px;">
                     <div class="col-md-12">
                         {% for message in messages %}
                         <div class="alert bg--{{ message.tags }}">
@@ -41,6 +42,22 @@ Report Error
                         {% endfor %}
                     </div>
                 </div>
+                {% endif %}
+
+                {% if form.errors %}
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-md-12">
+                        {% for error in form.non_field_errors %}
+                        <div class="alert bg--error">
+                            <div class="alert__body">
+                                <span>{{ error }}</span>
+                            </div>
+                            <div class="alert__close"> × </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
 
                 <form class="boxed boxed--border" action="" method="POST">{% csrf_token %}
                 
