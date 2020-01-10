@@ -23,6 +23,7 @@ from django.utils.html import strip_tags
 from django.core.validators import validate_email
 
 from twilio.rest import Client
+from events.tasks import archive_past_events
 
 from houses.mixins import HouseAccountMixin
 from houses.models import HouseUser
@@ -103,12 +104,21 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 		view_name = "events:dashboard"
 		return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
 
+	def archive_event_checker(self, event):
+		if event.active:
+			task = archive_past_events.delay(event.id)
+		return "done"
+
 	def get(self, request, *args, **kwargs):
 
 		context = {}
 		slug = kwargs['slug']
 		house = self.get_house()
 		event = self.get_event(slug)
+
+		# Check if event should be archived or not
+		self.archive_event_checker(event)
+
 		dashboard_events = self.get_events()
 		tickets = self.get_tickets(event)
 		questions = EventQuestion.objects.filter(event=event, question__deleted=False, question__approved=True)

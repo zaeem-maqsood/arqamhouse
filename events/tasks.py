@@ -17,7 +17,7 @@ from weasyprint import HTML, CSS
 @shared_task
 def archive_past_events(event_id):
 	current_time = timezone.now()
-	events = Event.objects.get(id=event_id)
+	event = Event.objects.get(id=event_id)
 	current_time = timezone.now()
 	print("event name: %s" % (event.title))
 	
