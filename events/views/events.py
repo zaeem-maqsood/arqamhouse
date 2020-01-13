@@ -106,7 +106,10 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 
 	def archive_event_checker(self, event):
 		if event.active:
-			task = archive_past_events.delay(event.id)
+			try:
+				task = archive_past_events.delay(event.id)
+			except:
+				pass
 		return "done"
 
 	def get(self, request, *args, **kwargs):

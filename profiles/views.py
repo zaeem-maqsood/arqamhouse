@@ -244,17 +244,16 @@ class LoginView(FormView):
 			print(password)
 			profile = authenticate(request, username=None, email=email, password=password)
 			print(profile)
+			if profile == None:
+				form.add_error("email", "Invalid username/password combination")
+				return self.render_to_response(self.get_context_data(form=form))
+			else:
+				login(request, profile)
 		except Exception as e:
 			print(e)
 			form.add_error("email", "Invalid username/password combination")
 			return self.render_to_response(self.get_context_data(form=form))
 		
-		# Make sure user is authenticated, log them in or diplay 404 error
-		if profile is not None:
-			login(request, profile)
-		else:
-			form.add_error("email", "Please check your email to finish activating your account. If you need another email choose 'Recover Account'")
-			return self.render_to_response(self.get_context_data(form=form))
 
 		valid_data = super(LoginView, self).form_valid(form)
 		return valid_data

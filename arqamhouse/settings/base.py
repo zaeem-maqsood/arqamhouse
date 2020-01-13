@@ -207,8 +207,7 @@ PLATFORM_BASE_FEE = 0.30
 
 
 
-FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'code_beautifier', 'colors', 'draggable', 'emoticons', 'font_family', 'font_size', 'inline_style', 'link', 'lists', 'paragraph_format', 'paragraph_style', 'quick_insert', 'quote', 'table',
-                         'url')
+FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'colors', 'emoticons', 'font_family', 'link', 'lists', 'paragraph_format', 'paragraph_style',)
 
 
 FROALA_EDITOR_OPTIONS = {

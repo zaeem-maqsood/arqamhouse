@@ -69,7 +69,10 @@ class AddTicketsToCartView(FormView):
 	
 	def archive_event_checker(self, event):
 		if event.active:
-			task = archive_past_events.delay(event.id)
+			try:
+				task = archive_past_events.delay(event.id)
+			except:
+				pass
 		return "done"
 
 
@@ -79,6 +82,7 @@ class AddTicketsToCartView(FormView):
 		self.object = None
 		slug = kwargs['slug']
 		event = self.get_event(slug)
+
 		# Check if event should be archived or not
 		self.archive_event_checker(event)
 
