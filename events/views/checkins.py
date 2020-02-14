@@ -1,7 +1,5 @@
 from .base import *
 
-from events.forms import CheckinForm
-from events.models import Checkin, Ticket, Event, Attendee, EventOrder
 
 # Create your views here.
 class CheckInView(HouseAccountMixin, View):

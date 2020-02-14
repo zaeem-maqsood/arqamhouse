@@ -70,7 +70,7 @@ Create House
 
                 <div class="row d-none d-sm-none d-md-block" style="padding-bottom: 20px;">
                     <div class="col-md-12">
-                        <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+                        <a href="{% url 'home' %}"><img id="image-placeholder" src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
                         <p class="lead">
                             Make an account with us 
                         </p>
@@ -78,7 +78,7 @@ Create House
                 </div>
                 
 
-                <form action="" method="POST" id="profileForm" data-regions-url="{% url 'profiles:ajax_load_regions' %}" data-cities-url="{% url 'profiles:ajax_load_cities' %}">{% csrf_token %}
+                <form action="" method="POST" enctype="multipart/form-data" id="profileForm" data-regions-url="{% url 'profiles:ajax_load_regions' %}" data-cities-url="{% url 'profiles:ajax_load_cities' %}">{% csrf_token %}
                     
                     
                     {% if form.non_field_errors %}
@@ -150,6 +150,29 @@ Create House
                     <div class="row" style="padding-bottom: 20px;">
                         <div class="col-md-12">
                             {{ form.email }}
+                        </div>
+                    </div>
+
+                    {% if form.picture.errors %}
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-8">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.picture.errors%}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            <p style="text-align: left;margin-bottom: 0px;">Picture</p>
+                            {{ form.picture }}
                         </div>
                     </div>
 

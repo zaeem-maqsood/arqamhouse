@@ -1,0 +1,260 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+{% load tz %}
+
+{% block title %}
+{{ house.name }} | Home Page
+{% endblock title %}
+
+{% block styles %}
+<style>
+
+#homepage_links_p {
+    text-align: right;
+}
+
+#homepage_links_a {
+    float: right;
+}
+
+
+#homepage_updates {
+      margin: 20px
+  }
+
+
+#updates_host_and_start {
+      padding-top: 10px;
+  }
+
+#homepage_first {
+    border-right: 1px solid #c1c1c1;
+}
+
+
+
+@media only screen and (max-width: 1000px) {
+
+  #homepage_first {
+    border-right: 0px;
+  }       
+
+  #homepage_links_p {
+    text-align: center;
+  }
+
+  #homepage_links_a {
+    float: none;
+  }
+
+  #homepage_section {
+      padding-top: 10px;
+  }
+
+}
+
+
+
+
+@media only screen and (max-width: 600px) {
+
+  #homepage_first {
+    border-right: 0px;
+    padding-bottom: 30px;
+  }       
+
+  #homepage_links_p {
+    text-align: center;
+  }
+
+  #homepage_links_a {
+    float: none;
+  }
+
+  #homepage_section {
+      padding-top: 10px;
+  }
+
+  #homepage_updates {
+      margin: 0px
+  }
+
+  #updates_title {
+      font-size: 12px;
+  }
+
+  #updates_host {
+      font-size: 10px;
+  }
+
+  #updates_description {
+      font-size: 10px;
+  }
+
+  #updates_host_and_start {
+      margin: 0px;
+      padding-top: 0px;
+  }
+
+}
+
+</style>
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script>
+
+{% if user.is_authenticated %}
+{% if not owner %}
+
+
+function Subscribe() {
+
+    var token = '{{csrf_token}}';
+
+    $.ajax({
+        type:"POST",
+        headers: { "X-CSRFToken": token },
+        url: '{{ request.path }}',
+        data: {
+          'subscribe_trigger': true,
+        },
+        success: function (data) {
+            document.getElementById("subscriber_switch").innerHTML = data;
+        },
+        
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert(errorThrown);
+            //some stuff on failure
+        },
+    });
+    
+}
+
+
+{% endif %}
+{% endif %}
+
+
+
+</script>
+
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center" id="homepage_section">
+    <div class="container" style="padding-bottom: 60px;">
+        <div class="row" style="padding-bottom: 20px;padding-top: 30px;">
+            <div class="col-md-12 col-lg-10">
+
+
+                <div class="row" style="padding-bottom: 40px;">
+                    <div class="col-lg-3" id="homepage_first">
+                        
+                        <div class="row" style="padding-top:30px;">
+                            <div class="col-lg-12 col-md-6 col-8">
+                                {% if house.logo %}
+                                <img style="margin-bottom: 10px;max-height: 150px;" src="{{ house.logo.url }}">
+                                {% endif %}
+                                <h4 style="color: grey;margin-bottom: 10px;">{{ house.name }}</h4>
+                            </div>
+                        </div>
+
+                        <div class="row d-md-flex d-lg-none">
+                            <div class="col-md-12">
+                                <p><a href="#"><i class="fa fa-envelope"></i></a> | <a href="#"><i class="fa fa-phone"></i></a> | <a href="#"><i class="fa fa-archive"></i></a></p>
+                            </div>
+                        </div>
+
+                        <div class="row d-none d-sm-none d-md-none d-lg-flex" style="padding-top:30px;">
+                            <div class="col-md-12">
+                                <p id="homepage_links_p" style="margin-bottom: 0px;"><a style="text-decoration: none;" href="#">Email</a></p>
+                                <p id="homepage_links_p" style="margin-bottom: 0px;"><a style="text-decoration: none;" href="#">Phone</a></p>
+                                <p id="homepage_links_p" style="margin-bottom: 0px;"><a style="text-decoration: none;" href="#">Past Events</a></p>
+                            </div>
+                        </div>
+
+                        {% if owner %}
+                        <div class="row" style="padding-bottom:30px;">
+                            <div class="col-md-12">
+                                <a id="homepage_links_a" class="btn btn--sm btn--primary-2" href="{% url 'houses:dashboard' %}"
+                                    style="margin-top: 10px;">
+                                    <span class="btn__text">Dashboard</span>
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                            <div class="row" style="padding-bottom:30px;">
+                                <div class="col-md-12" id="subscriber_switch">
+                                    {% if not request.user.is_authenticated %}
+                                        <a id="homepage_links_a" class="btn btn--sm" style="margin-top: 10px;" href="{% url 'profiles:login' %}?next=/house/{{ house.slug }}">
+                                            <span class="btn__text" id="inner_button">
+                                                Subscribe</span>
+                                        </a>
+                                    {% else %}
+                                        {% if subscribed %}
+                                        <a id="homepage_links_a" class="btn btn--sm btn--primary-2" onclick="Subscribe();" style="margin-top: 10px;">
+                                            <span class="btn__text" id="inner_button"><i class="fa fa-check" style="color: white;font-size: 1em;"></i> Subscribed</span>
+                                        </a>
+                                        {% else %}
+                                        <a id="homepage_links_a" class="btn btn--sm" onclick="Subscribe();" style="margin-top: 10px;">
+                                            <span class="btn__text" id="inner_button">Subscribe</span>
+                                        </a>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+
+                    </div>
+                    <div class="col-lg-9">
+
+                        {% for event in events %}
+                        <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
+                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px;border-radius: 10px;" id="homepage_updates">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-4">
+                                    <a href="{{ event.get_landing_view }}">
+                                    <img style="padding: 10px;" {% if event.image %} src="{{ event.image.url }}" {% else %}
+                                        src="{% static 'images/event_flyer_placeholder.jpg' %}" {% endif %}>
+                                    </a>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-8">
+                                    <p class="lead" id="updates_title" style="margin-bottom: 0px; text-align: left;"><a style="text-decoration: none;"
+                                            href="{{ event.get_landing_view }}">{{ event.title }}</a></p>
+                                    <hr style="margin-top: 0px;margin-bottom:5px;">
+                                    <div class="row" id="updates_host_and_start">
+                                        <div class="col-12" style="text-align: left;">
+                                            <p id="updates_host">{{ event.start|localtime|date:"D N jS, f a" }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row" id="updates_host_and_start">
+                                        <div class="col-12">
+                                            {% if event.description %}
+                                            <p id="updates_description" style="text-align: left;line-height: normal;">{{ event.description|striptags|truncatechars:150 }}</p>
+                                            {% else %}
+                                            <p id="updates_description" style="text-align: left;">Learn more by heading over to the event page.</p">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endblock content %}

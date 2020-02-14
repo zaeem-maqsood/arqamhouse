@@ -1,8 +1,5 @@
 from .base import *
 
-from events.forms import DiscountForm
-from events.models import EventDiscount, Ticket
-
 class DiscountUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, CreateView):
 
     template_name = "events/discounts/discount_form.html"

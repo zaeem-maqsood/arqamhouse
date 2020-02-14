@@ -1,22 +1,7 @@
 from .base import *
-from django.conf import settings
-from django.shortcuts import render
-from django.views.generic.detail import DetailView
-from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, UpdateView, FormView
-from django.http import Http404, HttpResponseRedirect
-from django.urls import reverse
-from django.contrib import messages
-
-from houses.mixins import HouseAccountMixin
-
-from events.forms import FreeTicketForm, PaidTicketForm, DonationTicketForm
-from events.models import Event, Ticket
-
 
 
 # Create your views here.
-
 class TicketListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, ListView):
 	model = Ticket
 	template_name = "events/tickets/list_tickets.html"

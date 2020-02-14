@@ -53,6 +53,25 @@ ol li:not(:last-child) {
 </script>
 
 
+<script>
+
+function getLocation() {
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(showPosition);
+	} else {
+		alert("Geolocation is not supported by this browser.");
+	}
+}
+
+function showPosition(position) {
+	var lat = position.coords.latitude;
+	var lng = position.coords.longitude;
+	console.log(lat);
+	console.log(lng);
+}
+</script>
+
+
 {% if event.active and event.ticket_sales %}
 <script type="text/javascript">
 
@@ -64,6 +83,8 @@ ol li:not(:last-child) {
 
 $( document ).ready(function() {
     calculatePrice();
+	getLocation();
+
 });
 
 function calculatePrice() {
@@ -160,7 +181,7 @@ $('#id_{{ ticket.id }}').change(function() {
 
 		{% if owner %}
 		<div class="row justify-content-around" style="padding:40px;padding-bottom: 0px;">
-			<div class="col-lg-9 col-md-12 col-12" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 40px;border-radius: 15px;">
+			<div class="col-lg-9 col-md-12 col-12" style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 40px;border-radius: 15px;">
 				<div class="row">
 					<div class="col-md-6">
 						<a href="{{ event.get_update_view }}" class="btn btn--primary btn-block" style="color: white;">Edit Event</a>

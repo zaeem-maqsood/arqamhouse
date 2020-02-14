@@ -1,8 +1,5 @@
 from .base import *
 
-from events.models import Event, EventQuestion, AttendeeCommonQuestions
-from houses.mixins import HouseAccountMixin
-
 
 class QuestionsListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, View):
 

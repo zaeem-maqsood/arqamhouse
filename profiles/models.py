@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import ugettext_lazy as _
@@ -12,6 +13,17 @@ from cities_light.models import City, Region, Country
 from django.contrib.auth.models import User
 from core.models import TimestampedModel
 from houses.models import House
+from events.models import Event
+
+
+def validate_file_size(value):
+    print("The file size is %s" % (value.size))
+    filesize = value.size
+    if filesize > 5242880:
+        raise ValidationError(
+            "The maximum file size that can be uploaded is 5MB")
+    else:
+        return value
 
 
 class ProfileManager(BaseUserManager):
@@ -43,6 +55,9 @@ class ProfileManager(BaseUserManager):
 		return self.create_user(email, password, **extra_fields)
 
 
+def image_location(instance, filename):
+    return "profile_pictures/%s/%s" % (instance.email, filename)
+
 
 # Create your models here.
 class Profile(AbstractUser):
@@ -50,11 +65,14 @@ class Profile(AbstractUser):
 	username = None
 	email = models.EmailField(_('email address'), unique=True)
 	name = models.CharField(max_length=120, null=True, blank=False)
+	picture = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
 	slug = models.SlugField(unique = False, blank=True)
 	country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=False, null=True)
 	region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=False, null=True)
 	city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=True)
 	house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=True)
+	subscribed_houses = models.ManyToManyField(House, blank=True, related_name="subscribed_houses")
+	stripe_customer_id = models.CharField(max_length=200, null=True, blank=True)
 	objects = ProfileManager()
 	
 	USERNAME_FIELD = 'email'
@@ -75,9 +93,11 @@ class Profile(AbstractUser):
 
 		self.slug = slug_candidate
 
+
 	def save(self, *args, **kwargs):
 		if not self.pk:
 			self._generate_slug()
+
 		super().save(*args, **kwargs)
 
 	def get_update_url(self):

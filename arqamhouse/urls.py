@@ -35,6 +35,7 @@ urlpatterns = [
     path('events/', include('events.urls')),
     path('questions/', include('questions.urls')),
     path('payments/', include('payments.urls')),
+    path('subscribers/', include('subscribers.urls')),
     path('orders/<public_id>/', OrderPublicDetailView.as_view(), name='order_detail_public'),
     path('.well-known/apple-developer-merchantid-domain-association', ApplePayVerificationView.as_view(), name='apple_verification'),
 

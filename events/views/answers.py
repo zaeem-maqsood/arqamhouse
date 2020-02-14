@@ -1,5 +1,4 @@
 from .base import *
-from events.models import (AttendeeCommonQuestions, EventQuestion, OrderAnswer, Answer, Attendee, EventOrder)
 
 
 class AnalyticAnswersView(HouseAccountMixin, View):

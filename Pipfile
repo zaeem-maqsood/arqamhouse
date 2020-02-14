@@ -38,6 +38,8 @@ django-phonenumber-field = "*"
 phonenumbers = "*"
 django = "==2.2"
 twilio = "*"
+ics = "*"
+beautifulsoup4 = "*"
 
 [requires]
 python_version = "3.7"

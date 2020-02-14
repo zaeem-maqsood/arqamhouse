@@ -1,15 +1,5 @@
 from .base import *
 
-from django.core import mail
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
-
-from events.models import EventEmailConfirmation, EventOrder
-from django.core.mail import send_mail, EmailMultiAlternatives
-from events.forms import EventEmailConfirmationForm
-from weasyprint import HTML, CSS
-
-from events.tasks import send_test_email
 
 class EventConfirmationEmailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, UpdateView):
 	model = EventEmailConfirmation

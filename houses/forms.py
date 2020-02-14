@@ -220,6 +220,7 @@ class HouseForm(forms.ModelForm):
 		fields = [
 			"name",
 			"email",
+			"logo",
 			"address",
 			"region",
 			"city"
@@ -235,6 +236,14 @@ class HouseForm(forms.ModelForm):
 						"pattern": """[^()/><\][\\\x22,;|]+""",
 					}
 				),
+
+			"logo": forms.FileInput(
+					attrs={
+						"onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
+											"class": "form-control m-input dropzone",
+					}
+				),
+
 			"region": forms.Select(
 					attrs={
 						"required" : True,
@@ -286,6 +295,20 @@ class HouseForm(forms.ModelForm):
 			self.fields['region'].queryset = self.instance.country.region_set.order_by('name')
 			self.fields['city'].queryset = self.instance.country.city_set.order_by('name')
 
+	def clean_logo(self):
+		logo = self.cleaned_data.get('logo')
+		if logo:
+			image_extensions = ['.jpg', '.png', '.JPG', '.PNG', '.JPEG', '.jpeg']
+			error = True
+			for extension in image_extensions:
+				if logo.name.lower().endswith(extension) or logo.name != self.instance.slug:
+					error = False
+
+			if error:
+				raise forms.ValidationError('Only .jpg .png or .jpeg files are accepted.')
+			return logo
+		else:
+			return logo
 
 
 	def clean(self, *args, **kwargs):

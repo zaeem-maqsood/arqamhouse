@@ -1,6 +1,7 @@
 {% extends "frontend/base.html" %}
 
 {% load static %}
+{% load tz %}
 
 {% block title %}
 Profile Dashboard 
@@ -24,51 +25,111 @@ Profile Dashboard
     <div class="container" style="padding-bottom: 60px;">
         <div class="row" style="padding-bottom: 20px;padding-top: 30px;">
             <div class="col-md-12 col-lg-9">
-                
 
-                {% if profile.is_active %}
-                <div class="row" style="padding-bottom: 20px;">
-                    <div class="col-md-8">
-                        <img src="{% static 'images/logo.png' %}" style="max-height: 5em;" class="d-none d-sm-none d-md-inline">
-                        <p style="margin-bottom: 5px;">Hello {{ profile.name }},</p> 
-                        <p>Would you like to create a new house? If so please click the 'Create House' button below.</p>
-                        <p>If you would like to join another house ask the administrator to add your Arqam House email ({{ profile.email }}).</p>
+
+                <div class="row" style="padding-bottom: 40px;">
+                    <div class="col-md-12">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a href="#">
+                                    {% if profile.picture %}
+                                    <img src="{{ profile.picture.url }}" style="max-width: 150px;max-height: 150px;">
+                                    {% else %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100px" height="100px"
+                                        viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                            <rect x="0" y="0" width="24" height="24" />
+                                            <circle fill="#4a90e2" opacity="0.3" cx="12" cy="12" r="10" />
+                                            <path
+                                                d="M12,11 C10.8954305,11 10,10.1045695 10,9 C10,7.8954305 10.8954305,7 12,7 C13.1045695,7 14,7.8954305 14,9 C14,10.1045695 13.1045695,11 12,11 Z M7.00036205,16.4995035 C7.21569918,13.5165724 9.36772908,12 11.9907452,12 C14.6506758,12 16.8360465,13.4332455 16.9988413,16.5 C17.0053266,16.6221713 16.9988413,17 16.5815,17 L7.4041679,17 C7.26484009,17 6.98863236,16.6619875 7.00036205,16.4995035 Z"
+                                                fill="#000000" opacity="0.3" />
+                                        </g>
+                                    </svg>
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="row" style="padding-top: 30px;">
+                            <div class="col-md-12">
+                                <h4 style="margin-bottom: 5px;color: gray;">Hello, {{ profile.name }}</h4>
+                            </div>
+                        </div>
+                        
+                        <div class="row" style="padding-top: 30px;">
+                            <div class="col-md-4">
+                                <a class="btn btn--primary btn-block" href="{% url 'profiles:logout' %}">
+                                    <span class="btn__text">Log Out</span>
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a class="btn btn-block" {% if not profile.house %}href="{% url 'houses:create' %}" {% else %} href="{% url 'houses:dashboard' %}" {% endif %}>
+                                    <span class="btn__text">{% if not profile.house %}Create House{% else %}House Dashboard{% endif %}</span>
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a class="btn btn--primary btn-block" href="{% url 'profiles:orders' %}">
+                                    <span class="btn__text">Orders</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row" style="padding-bottom: 20px;">
-                    <div class="col-md-8">
-                        <ul class="accordion accordion-1 accordion--oneopen">
-                            <li>
-                                <div class="accordion__title">
-                                    <span class="h5">What is a House?</span>
-                                </div>
-                                <div class="accordion__content">
-                                    <p style="margin-bottom:0px;">A House can be your company/organization/group etc.</p>
-                                    <p>Your House is what identifies you to the rest of the world.</p>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
 
-                <div class="row" style="padding-bottom: 20px;">
-                    <div class="col-6">
-                        <a href="{% url 'houses:create' %}" class="btn btn--primary" style="color: white;">Create House</a>
-                    </div>
-                    <div class="col-6">
-                        <a href="{% url 'profiles:logout' %}" class="btn btn--info" >Logout</a>
-                    </div>
-                </div>
-
-                {% else %}
                 <div class="row" style="padding-bottom: 20px;">
                     <div class="col-md-12">
-                        <img src="{% static 'images/logo.png' %}" style="max-height: 6em;">
-                        <p style="margin-bottom: 5px;">Hello {{ profile.name }}. Please finish activating your account through the email we just sent you.</p>
+                        <hr>
                     </div>
                 </div>
-                {% endif %}
+
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+
+                        {% if events %}
+
+                        {% for event in events %}
+                        <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
+                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px; margin: 20px;border-radius: 12px;">
+                            <div class="row">
+                                <div class="col-3">
+                                    <img style="padding: 10px;" {% if event.image %} src="{{ event.image.url }}" {% else %} src="{% static 'images/event_flyer_placeholder.jpg' %}" {% endif %} >
+                                </div>
+                                <div class="col-9">
+                                    <p class="lead" style="margin-bottom: 0px; text-align: left;"><a style="text-decoration: none;" href="{{ event.get_landing_view }}">{{ event.title }}</a></p>
+                                    <hr style="margin-top: 0px;margin-bottom:5px;">
+                                    <div class="row" style="padding-bottom: 10px;">
+                                        <div class="col-6" style="text-align: left;">
+                                            <p><a href="{{ event.house.get_home_page_url }}" style="text-decoration: none;">{{ event.house.name }}</a></p>
+                                        </div>
+                                        <div class="col-6" style="text-align: right;">
+                                            {{ event.start|localtime|date:"D N jS, f a" }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            {% if event.description %}
+                                            <p style="text-align: left;">{{ event.description|striptags|safe|truncatechars:150 }}</p>
+                                            {% else %}
+                                            <p style="text-align: left;">Visit the event link to learn more about this event.</p">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        {% else %}
+                            <h3>No updates yet! subscribe to a house to get started.</h3>
+                            <!-- <img src="{% url 'profiles:dashboard' %}" style="width: 100px;height: 1px;background-color: SlateGray;"> -->
+                        {% endif %}
+                        
+                    </div>
+                </div>
+
 
             </div>
         </div>

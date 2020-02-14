@@ -85,14 +85,14 @@ $('#id_name').bind('input propertychange', function () {
 
                 <div class="row" style="padding-bottom: 30px;">
                     <div class="col-md-12">
-                        <img src="{% static 'images/logo.png' %}" style="max-height: 6em;">
+                        <img id="image-placeholder" src="{% static 'images/logo.png' %}" style="max-height: 6em;">
                         <p class="lead" style="font-weight: 300;">
                             House Name| <span style="font-weight: 600;" id="output">Arqam House</span>
                         </p>
                     </div>
                 </div>
 
-                <form action="" method="POST" id="profileForm" data-regions-url="{% url 'profiles:ajax_load_regions' %}" data-cities-url="{% url 'profiles:ajax_load_cities' %}">{% csrf_token %}
+                <form action="" enctype="multipart/form-data" method="POST" id="profileForm" data-regions-url="{% url 'profiles:ajax_load_regions' %}" data-cities-url="{% url 'profiles:ajax_load_cities' %}" onSubmit="document.getElementById('Create').disabled = true;">{% csrf_token %}
                 	
                 	{% if form.non_field_errors %}
                     <div class="row" style="padding-bottom: 20px;">
@@ -123,6 +123,30 @@ $('#id_name').bind('input propertychange', function () {
                             {{ form.email }}
                         </div>
                     </div>
+
+                    {% if form.logo.errors %}
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-8">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.logo.errors%}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-8">
+                            <p style="text-align: left;margin-bottom: 0px;">Logo</p>
+                            {{ form.logo }}
+                        </div>
+                    </div>
+
 
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-md-8">
@@ -403,7 +427,7 @@ $('#id_name').bind('input propertychange', function () {
 
                     <div class="row" style="padding-bottom: 30px;">
                         <div class="col-md-8">
-                            <button type="submit" class="btn btn--primary type--uppercase">Create House</button>
+                            <button type="submit" class="btn btn--primary type--uppercase" id="Create">Create House</button>
                         </div>
                     </div>
                     

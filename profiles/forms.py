@@ -19,6 +19,7 @@ class ProfileUpdateForm(forms.ModelForm):
 		model = Profile
 		fields = [
 			"name",
+			"picture",
 			"region",
 			"city"
 		]
@@ -31,6 +32,15 @@ class ProfileUpdateForm(forms.ModelForm):
 										"required": True
 					}
 				),
+
+				"picture": forms.FileInput(
+					attrs={
+						"onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
+						"class": "form-control m-input dropzone",
+					}
+				),
+
+
 				"region": forms.Select(
 					attrs={
 						"required": True,
@@ -59,6 +69,21 @@ class ProfileUpdateForm(forms.ModelForm):
 		self.fields["region"].label_from_instance = lambda obj: "%s" % obj.name
 		self.fields["city"].label_from_instance = lambda obj: "%s" % obj.name
 
+	def clean_picture(self):
+		picture = self.cleaned_data.get('picture')
+		if picture:
+			image_extensions = ['.jpg', '.png', '.JPG', '.PNG', '.JPEG', '.jpeg']
+			error = True
+			for extension in image_extensions:
+				if picture.name.lower().endswith(extension) or picture.name != self.instance.slug:
+					error = False
+
+			if error:
+				raise forms.ValidationError('Only .jpg .png or .jpeg files are accepted.')
+			return logo
+		else:
+			return logo
+
 	def clean(self, *args, **kwargs):
 		cleaned_data = super(ProfileUpdateForm, self).clean(*args, **kwargs)
 		name = self.cleaned_data.get("name")
@@ -82,6 +107,7 @@ class ProfileForm(UserCreationForm):
 		fields = [
 			"name",
 			"email",
+			"picture",
 			"region",
 			"city"
 		]
@@ -93,6 +119,12 @@ class ProfileForm(UserCreationForm):
 						"class":"validate-required",
 						"placeholder":"Name",
 						"required": True
+					}
+				),
+				"picture": forms.FileInput(
+					attrs={
+						"onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
+						"class": "form-control m-input",
 					}
 				),
 				"region": forms.Select(

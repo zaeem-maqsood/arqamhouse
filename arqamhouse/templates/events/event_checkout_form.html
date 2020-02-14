@@ -216,9 +216,10 @@ function initMap() {
                             {% endif %}
 
 
-                            <div class="row" style="padding-bottom: 20px;">
+                            <div class="row" style="padding-bottom: 10px;">
                                 <div class="col-md-12 col-lg-12">
-                                    <p style="font-weight: 600;font-size: 1.4em;color: #4a90e2;">Order Overview </p>
+                                    <p style="font-weight: 600;font-size: 1.4em;color: #4a90e2;margin-bottom: 0px;">Order Overview</p>
+                                    <p style="font-weight: 600;font-size: 1.1em;color: #265a97;margin-bottom: 0px;">{{ event.title }} </p>
                                 </div>
                             </div>
 
@@ -350,11 +351,14 @@ function initMap() {
                             <div class="row">
                                 <div class="col-md-6 col-lg-6" style="padding-top:20px;">
                                     <p style="margin-bottom: 0;"><i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i> Full Name</p>
-                                    <input pattern="[a-zA-Z ]*" title="No numbers please" maxlength="100" class="validate-required" type="text" name="name" id="name" size="30" required placeholder="Full Name" value="{{ data.name }}">
+                                    <input pattern="[a-zA-Z ]*" title="No numbers please" maxlength="100" class="validate-required" type="text" name="name" id="name" size="30" required placeholder="Full Name" {% if not cart.house_created and request.user.is_authenticated %}value="{{ request.user.name }}" readonly else %}value="{{ data.name }}"{% endif %}>
                                 </div>
                                 <div class="col-md-6 col-lg-6" style="padding-top:20px;">
                                     <p style="margin-bottom: 0;"><i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i> Email</p>
-                                    <input class="validate-required" maxlength="150" type="email" name="email" id="email" size="30" required placeholder="email@address.com" value="{{ data.email }}">
+                                    <input class="validate-required" maxlength="150" type="email" name="email" id="email" size="30" required placeholder="email@address.com" {% if not cart.house_created and request.user.is_authenticated %}value="{{ request.user.email }}" readonly {%else %}value="{{ data.email }}"{% endif %}>
+                                    {% if not cart.house_created and request.user.is_authenticated %}
+                                    <p style="font-size: 12px;margin-left: 10px;">Not {{ request.user.name }}? <a href="{% url 'profiles:logout' %}">Log Out</a></p>
+                                    {% endif %}
                                 </div>
                             </div>
                             {% for order_question in event|order_question %}
@@ -413,7 +417,7 @@ function initMap() {
                                     <div class="row" style="padding-bottom: 20px;">
                                         <div class="col-md-6 col-lg-6">
                                             <p style="margin-bottom: 0;"><i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i> Full Name</p>
-                                            <input pattern="[a-zA-Z ]*" title="No numbers please" class="validate-required" type="text" name="{{ quantity }}_{{ cart_item.ticket.id }}_name" value="{% get_attendee_name_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_name" size="30" required placeholder="Full Name">
+                                            <input pattern="[a-zA-Z ]*" title="No numbers please" class="validate-required" type="text" name="{{ quantity }}_{{ cart_item.ticket.id }}_name" {% if not cart.house_created and request.user.is_authenticated %}value="{{ request.user.name }}"{% else %}value="{% get_attendee_name_initial_value data quantity cart_item.ticket.id %}"{% endif %} id="{{ quantity }}_{{ cart_item.ticket.id }}_name" size="30" required placeholder="Full Name">
                                         </div>
                                         {% if attendee_common_questions.email %}
                                         <div class="col-md-6 col-lg-6">

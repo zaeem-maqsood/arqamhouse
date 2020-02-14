@@ -64,13 +64,13 @@ class Attendee(TimestampedModel):
 	def qrcode(self):
 		qr = qrcode.QRCode(
 			version=1,
-			error_correction=qrcode.constants.ERROR_CORRECT_L,
+			error_correction=qrcode.constants.ERROR_CORRECT_H,
 			box_size=10,
 			border=4,
 		)
 		qr.add_data(self.unique_id)
 		qr.make(fit=True)
-		img = qr.make_image(fill_color="black", back_color="white")
+		img = qr.make_image(fill_color="#4499d5", back_color="white")
 		string_io = BytesIO()
 		img.save(string_io, format='JPEG')
 		img_content = ContentFile(string_io.getvalue(), 'qrcode.jpeg')

@@ -24,6 +24,7 @@ from .models import Profile
 from .forms import ProfileForm, LoginForm, ProfileUpdateForm
 from .mixins import ProfileMixin
 from cities_light.models import City, Region, Country
+from events.models import Event, EventOrder
 
 
 
@@ -40,6 +41,19 @@ def load_regions(request):
 	return render(request, 'components/region_dropdown_list_options.html', {'regions': regions})
 
 
+class UserOrdersView(ProfileMixin, View):
+	template_name = "profiles/orders.html"
+
+	def get(self, request, *args, **kwargs):
+		context = {}
+		profile = request.user
+		orders = EventOrder.objects.filter(email=profile.email).order_by("-created_at")
+		print(orders)
+		context["orders"] = orders
+		context["profile"] = profile
+		return render(request, self.template_name, context)
+
+
 
 class UserDashboardView(ProfileMixin, View):
 	model = Profile
@@ -54,18 +68,17 @@ class UserDashboardView(ProfileMixin, View):
 			print("Did it come here")
 			return None
 
+	def get_updates(self, profile):
+		houses = profile.subscribed_houses.all()
+		events = Event.objects.filter(house__in=houses)
+		return events
 
 	def get(self, request, *args, **kwargs):
 		context = {}
 		profile = request.user
-		print(profile)
-		print(profile.house)
 		house = self.check_for_house(profile)
-		print(house)
-		if house:
-			view_name = "houses:dashboard"
-			return HttpResponseRedirect(reverse(view_name))
 		context["profile"] = profile
+		context["events"] = self.get_updates(profile)
 		return render(request, self.template_name, context)
 
 
@@ -196,33 +209,20 @@ class LoginView(FormView):
 
 	def get(self, request, *args, **kwargs):
 		# Make sure user already not logged in
-		try:
-			next_page = request.GET['next']
-			if next_page:
-				self.success_url = next_page
-		except:
-			self.success_url = 'profiles:dashboard'
-
-		print("Get Call")
 
 		user = self.request.user
 		if user.is_anonymous:
 			form = self.get_form()
 		else:
-			return redirect('profiles:dashboard')
+			if user.house:
+				return redirect('houses:dashboard')
+			else:
+				return redirect('profiles:dashboard')
 
 		return self.render_to_response(self.get_context_data(form))
 
 
 	def post(self, request, *args, **kwargs):
-
-		try:
-			next_page = request.GET['next']
-			if next_page:
-				self.success_url = next_page
-		except:
-			self.success_url = reverse('profiles:dashboard')
-
 		
 		form = self.get_form()
 		if form.is_valid():
@@ -239,16 +239,20 @@ class LoginView(FormView):
 
 		# Authenticate user with this email and password
 		try:
-			print("Came to Login")
-			print(email)
-			print(password)
 			profile = authenticate(request, username=None, email=email, password=password)
-			print(profile)
 			if profile == None:
 				form.add_error("email", "Invalid username/password combination")
 				return self.render_to_response(self.get_context_data(form=form))
 			else:
 				login(request, profile)
+				try:
+					next_page = request.GET['next']
+					self.success_url = next_page
+				except:
+					if profile.house:
+						print("It came here son")
+						self.success_url = reverse('houses:dashboard')
+
 		except Exception as e:
 			print(e)
 			form.add_error("email", "Invalid username/password combination")

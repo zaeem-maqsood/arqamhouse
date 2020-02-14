@@ -1,0 +1,82 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+{% load tz %}
+
+{% block title %}
+Profile Dashboard 
+{% endblock title %}
+
+{% block footer %}
+	{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center">
+    <div class="container" style="padding-bottom: 60px;">
+        <div class="row" style="padding-bottom: 20px;padding-top: 30px;">
+            <div class="col-md-12 col-lg-9">
+
+
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-md-12">
+                        <h2 style="text-align: left;margin-bottom: 0px;">Orders</h2>
+                    </div>
+                </div>
+
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <hr>
+                    </div>
+                </div>
+
+
+                <div class="row text-left" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+
+                        {% if orders %}
+
+                        <table class="border--round table--alternate-row">
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Tickets</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td><a href="{{ order.get_public_order_view }}">{{ order.event }}</a></td>
+                                    <td>{{ order.attendee_set.all.count }}</td>
+                                    <td>{{ order.created_at|localtime }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        {% else %}
+                            <p class="lead">No Orders yet! Go get some tickets and see them here.</p>
+                        {% endif %}
+                        
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endblock content %}

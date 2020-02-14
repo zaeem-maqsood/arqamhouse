@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from .views import (ProfileUpdateView, ProfileCreateView, LoginView, LogoutView,
-                    load_cities, load_regions, UserDashboardView, activate_account)
+                    load_cities, load_regions, UserDashboardView, activate_account, UserOrdersView)
 
 
 app_name="profiles"
@@ -16,6 +16,8 @@ urlpatterns = [
 	path('login', LoginView.as_view(), name='login'),
 	path('logout', LogoutView.as_view(), name='logout'),
 	path('new', ProfileCreateView.as_view(), name='create'),
+
+	path('orders', UserOrdersView.as_view(), name='orders'),
 	
 	# Update Profile view
 	path('update/', ProfileUpdateView.as_view(), name='update'),
