@@ -62,11 +62,8 @@ from events.forms import (EventForm, EventCheckoutForm, AttendeeForm, TicketsToC
 
 
 
-
-
-
 def archive_past_events(event):
-    if event.active:
+    if event.active and event.end:
         current_time = timezone.now()
         end_time_plus_1_day = event.end + timedelta(hours=24)
         if current_time >= end_time_plus_1_day:

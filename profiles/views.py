@@ -20,6 +20,7 @@ from django.utils.html import strip_tags
 from django.core import mail
 
 
+from subscribers.models import Subscriber
 from .models import Profile
 from .forms import ProfileForm, LoginForm, ProfileUpdateForm
 from .mixins import ProfileMixin
@@ -69,7 +70,11 @@ class UserDashboardView(ProfileMixin, View):
 			return None
 
 	def get_updates(self, profile):
-		houses = profile.subscribed_houses.all()
+		subscriptions = Subscriber.objects.select_related('house').filter(profile=profile)
+		print(subscriptions)
+		houses = []
+		for subscription in subscriptions:
+			houses.append(subscription.house)
 		events = Event.objects.filter(house__in=houses)
 		return events
 
@@ -199,8 +204,10 @@ class LogoutView(View):
 class LoginView(FormView):
 	template_name = 'profiles/login.html'
 	form_class = LoginForm
-	success_url = None
-
+	
+	def get_success_url(self):
+		view_name = "profiles:dashboard"
+		return reverse(view_name)
 
 	def get_context_data(self, form, *args, **kwargs):
 		context = {}

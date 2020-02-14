@@ -78,7 +78,11 @@ class HouseHomePageView(DetailView):
 
 
     def get_active_events(self, house):
-        events = Event.objects.all()
+        events = Event.objects.filter(house=house, deleted=False, active=True)
+        return events
+
+    def get_past_events(self, house):
+        events = Event.objects.filter(house=house, deleted=False, active=False)
         return events
 
 
@@ -87,6 +91,7 @@ class HouseHomePageView(DetailView):
         context = {}
         house = self.get_house(kwargs["slug"])
         active_events = self.get_active_events(house)
+        past_events = self.get_past_events(house)
         owner = self.check_if_user_is_owner(house)
         subscribed = self.check_if_user_is_subscribed(house)
         print(subscribed)
@@ -94,7 +99,8 @@ class HouseHomePageView(DetailView):
         context["subscribed"] = subscribed
         context["owner"] = owner
         context["house"] = house
-        context["events"] = active_events
+        context["active_events"] = active_events
+        context["past_events"] = past_events
 
         return render(request, self.template_name, context)
 
