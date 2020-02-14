@@ -82,6 +82,8 @@ class SubscriberDetailView(HouseAccountMixin, View):
         attendees = Attendee.objects.filter(order__in=orders).count()
         context["attendees"] = attendees
         context["orders"] = orders
+        context["house"] = house
+        context["dashboard_events"] = self.get_events()
         return render(request, self.template_name, context)
 
 
