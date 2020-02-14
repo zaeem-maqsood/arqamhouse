@@ -82,6 +82,8 @@ class SubscriberDetailView(HouseAccountMixin, View):
         attendees = Attendee.objects.filter(order__in=orders).count()
         context["attendees"] = attendees
         context["orders"] = orders
+        context["dashboard_events"] = self.get_events()
+        context["house"] = house
         return render(request, self.template_name, context)
 
 
@@ -92,37 +94,37 @@ class SubscriberListView(HouseAccountMixin, ListView):
     def get(self, request, *args, **kwargs):
 
         # RUN THIS IN THE CONSOLE ---------------------------------------------------------------------------------
-        # from django.utils.crypto import get_random_string
-        # from events.models import EventOrder
-        # from subscribers.models import Subscriber
-        # from profiles.models import Profile
+        from django.utils.crypto import get_random_string
+        from events.models import EventOrder
+        from subscribers.models import Subscriber
+        from profiles.models import Profile
 
-        # event_orders = EventOrder.objects.all()
-        # print(event_orders)
+        event_orders = EventOrder.objects.all()
+        print(event_orders)
         
-        # for order in event_orders:
-        #     passed_events = Event.objects.filter(house=order.event.house, active=False, deleted=False).count()
-        #     print(f"passed events {passed_events}")
-        #     try:
-        #         profile = Profile.objects.get(email=order.email)
-        #     except:
-        #         profile = Profile.objects.create(name=order.name, email=order.email, password=get_random_string(length=10))
+        for order in event_orders:
+            passed_events = Event.objects.filter(house=order.event.house, active=False, deleted=False).count()
+            print(f"passed events {passed_events}")
+            try:
+                profile = Profile.objects.get(email=order.email)
+            except:
+                profile = Profile.objects.create(name=order.name, email=order.email, password=get_random_string(length=10))
 
-        #     # Check if they are already subscribed
-        #     try:
-        #         subscriber = Subscriber.objects.get(profile=profile, house=order.event.house)
-        #     except:
-        #         subscriber = Subscriber.objects.create(profile=profile, house=order.event.house, events_total=passed_events)
+            # Check if they are already subscribed
+            try:
+                subscriber = Subscriber.objects.get(profile=profile, house=order.event.house)
+            except:
+                subscriber = Subscriber.objects.create(profile=profile, house=order.event.house, events_total=passed_events)
 
 
-        # subscribers = Subscriber.objects.all()
-        # for subscriber in subscribers:
-        #     events = Event.objects.filter(house=subscriber.house, active=False, deleted=False)
-        #     for event in events:
-        #         event_orders = EventOrder.objects.filter(event=event, email=subscriber.profile.email).exists
-        #         if event_orders:
-        #             subscriber.attendance_total = subscriber.attendance_total + 1
-        #             subscriber.save()
+        subscribers = Subscriber.objects.all()
+        for subscriber in subscribers:
+            events = Event.objects.filter(house=subscriber.house, active=False, deleted=False)
+            for event in events:
+                event_orders = EventOrder.objects.filter(event=event, email=subscriber.profile.email).exists
+                if event_orders:
+                    subscriber.attendance_total = subscriber.attendance_total + 1
+                    subscriber.save()
 
         # RUN THIS IN THE CONSOLE ---------------------------------------------------------------------------------
 

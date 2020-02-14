@@ -289,7 +289,31 @@ class EventCheckoutView(FormView):
         email = data['email']
 
 
-        # =================================== SECOND CHECK (if payment required) =====================---============
+        # ====================== Create Arqam House Profile and Subscribe them to the house ===========================
+        # Check if user exists in the system 
+        try:
+            profile = Profile.objects.get(email=data["email"])
+
+        # If the user doesn't exist at all then we need to create a customer
+        except:
+            profile = Profile.objects.create(name=data["name"], email=data["email"], password=get_random_string(length=10))
+
+
+        # Try for subscriber
+        # Either they are already a subscriber 
+        try:
+            subscriber = Subscriber.objects.get(profile=profile, house=event.house)
+            event_order = EventOrder.objects.filter(event=event, email=data["email"]).exists()
+            if not event_order:
+                subscriber.attendance_total = subscriber.attendance_total + 1
+                subscriber.save()
+        except Exception as e:
+            print(e)
+            subscriber = Subscriber.objects.create(profile=profile, house=event.house, events_total=1, attendance_total=1)
+
+
+
+        # =================================== SECOND CHECK (if payment required) =======================================
         # Only get the Stripe Token if payment enabled
         if cart.pay:
 
@@ -311,46 +335,13 @@ class EventCheckoutView(FormView):
             
             try:
 
-                # Check if user exists in the system 
-                try:
-                    profile = Profile.objects.get(email=data["email"])
-
-                    # If they do exist then check if they have a customer ID
-                    if profile.stripe_customer_id:
-                        customer = stripe.Customer.retrieve(profile.stripe_customer_id)
-                        create_customer = False
-
-                    # If they don't then we have to create a customer
-                    else:
-                        create_customer = True
-
-                # If the user doesn't exist at all then we need to create a customer
-                except:
-                    profile = Profile.objects.create(name=data["name"], email=data["email"], password=get_random_string(length=10))
-                    create_customer = True
-
-
-                # Try for subscriber
-                # Either they are already a subscriber 
-                try:
-                    subscriber = Subscriber.objects.get(profile=profile, house=event.house)
-                    event_order = EventOrder.objects.filter(event=event, email=data["email"]).exists()
-                    if not event_order:
-                        subscriber.attendance_total = subscriber.attendance_total + 1
-                        subscriber.save()
-                except Exception as e:
-                    print(e)
-                    subscriber = Subscriber.objects.create(profile=profile, house=event.house, events_total=1, attendance_total=1)
-
-
-                # Create the customer if we need to
-                if create_customer:
+                if profile.stripe_customer_id:
+                    customer = stripe.Customer.retrieve(profile.stripe_customer_id)
+                else:
                     customer = stripe.Customer.create(source=stripe_token, email=data['email'], name=data['name'])
-
-                
-                print(customer)
-                profile.stripe_customer_id = customer.id
-                profile.save()
+                    print(customer)
+                    profile.stripe_customer_id = customer.id
+                    profile.save()
 
                 # Charge the card
                 charge = stripe.Charge.create(
