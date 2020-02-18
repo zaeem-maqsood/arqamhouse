@@ -39,7 +39,7 @@ from .forms import AddUserToHouse, HouseSupportInfoForm, HouseChangeForm, HouseF
 from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
 from profiles.models import Profile
 from payments.models import HouseBalance, HouseBalanceLog, Transaction, PayoutSetting
-
+from subscribers.models import Subscriber
 
 
 
@@ -69,9 +69,17 @@ class HouseHomePageView(DetailView):
     def check_if_user_is_subscribed(self, house):
         user = self.request.user 
         if user.is_authenticated:
-            if house in user.subscribed_houses.all():
-                return True
-            else:
+            try:
+                subscriber = Subscriber.objects.get(profile=user)
+                print("subscriber")
+                print(subscriber)
+                print("subscriber")
+                if subscriber.unsubscribed:
+                    return False
+                else:
+                    return True
+            except Exception as e:
+                print(e)
                 return False
         else:
             return False
@@ -110,21 +118,45 @@ class HouseHomePageView(DetailView):
         house = self.get_house(kwargs["slug"])
         print(data)
 
+        # If user is subscribed - they can unsubscribe
+        # subscribed = false
+        # subscribe = true
         if 'subscribe_trigger' in data:
-            subscribed = self.check_if_user_is_subscribed(house)
-            if subscribed:
-                profile = request.user
-                profile.subscribed_houses.remove(house)
-                html = render_to_string('houses/subscribe.html')
-            else:
-                profile = request.user
-                profile.subscribed_houses.add(house)
+            value = data['subscribe_trigger']
+            print(value)
+
+            profile = request.user
+
+            if value == 'true':
+                print('The value is true')
+                try:
+                    subscriber = Subscriber.objects.get(profile=profile, house=house)
+                    subscriber.unsubscribed = False
+                    subscriber.save()
+                except:
+                    subscriber = Subscriber.objects.create(profile=profile, house=house, events_total=1, attendance_total=1)
+
                 html = render_to_string('houses/unsubscribe.html')
+
+            else:
+                print("The value is false")
+                try:
+                    subscriber = Subscriber.objects.get(profile=profile, house=house)
+                    subscriber.unsubscribed = True
+                    subscriber.save()
+                except:
+                    subscriber = Subscriber.objects.create(profile=profile, house=house, events_total=1, attendance_total=1, unsubscribed=True)
+                html = render_to_string('houses/subscribe.html')
+
             return HttpResponse(html)
 
+    
         else:
             view_name = "houses:home_page"
             return HttpResponseRedirect(reverse(view_name, kwargs={"slug": house.slug}))
+
+
+
 
 
 

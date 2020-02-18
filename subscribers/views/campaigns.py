@@ -2,7 +2,7 @@ from .base import *
 from subscribers.forms import GenericCampaignForm
 
 
-class CampaignTrackerView(HouseAccountMixin, View):
+class CampaignTrackerView(View):
 
 
     def get(self, request, *args, **kwargs):

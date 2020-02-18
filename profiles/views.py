@@ -206,8 +206,12 @@ class LoginView(FormView):
 	form_class = LoginForm
 	
 	def get_success_url(self):
-		view_name = "profiles:dashboard"
-		return reverse(view_name)
+
+		if 'next' in self.request.GET:
+			return self.request.GET['next']
+		else:
+			view_name = "profiles:dashboard"
+			return reverse(view_name)
 
 	def get_context_data(self, form, *args, **kwargs):
 		context = {}

@@ -57,7 +57,7 @@
 
 
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 750px) {
 
   #homepage_first {
     border-right: 0px;
@@ -112,8 +112,10 @@
 {% if not owner %}
 
 
-function Subscribe() {
+function Subscribe(boolean) {
 
+    console.log("IS it coming here")
+    console.log(boolean)
     var token = '{{csrf_token}}';
 
     $.ajax({
@@ -121,7 +123,7 @@ function Subscribe() {
         headers: { "X-CSRFToken": token },
         url: '{{ request.path }}',
         data: {
-          'subscribe_trigger': true,
+          'subscribe_trigger': boolean,
         },
         success: function (data) {
             document.getElementById("subscriber_switch").innerHTML = data;
@@ -166,7 +168,7 @@ function Subscribe() {
 
                         <div class="row d-md-flex d-lg-none">
                             <div class="col-md-12">
-                                <p><a href="#"><i class="fa fa-envelope"></i></a> | <a href="#"><i class="fa fa-phone"></i></a> | <a href="#"><i class="fa fa-archive"></i></a></p>
+                                <p><a href="mailto:{{ house.email }}?Subject=Hello"><i class="fa fa-envelope"></i></a> | <a href="tel:{{ house.phone }}"><i class="fa fa-phone"></i></a></p>
                             </div>
                         </div>
 
@@ -174,7 +176,7 @@ function Subscribe() {
                             <div class="col-md-12">
                                 <p id="homepage_links_p" style="margin-bottom: 0px;"><a style="text-decoration: none;" href="mailto:{{ house.email }}?Subject=Hello">Email</a></p>
                                 {% if house.phone %}
-                                <p id="homepage_links_p" style="margin-bottom: 0px;"><a style="text-decoration: none;" href="tel:{{ house.phone }}"">Phone</a></p>
+                                <p id="homepage_links_p" style="margin-bottom: 0px;"><a style="text-decoration: none;" href="tel:{{ house.phone }}">Phone</a></p>
                                 {% endif %}
                             </div>
                         </div>
@@ -198,11 +200,11 @@ function Subscribe() {
                                         </a>
                                     {% else %}
                                         {% if subscribed %}
-                                        <a id="homepage_links_a" class="btn btn--sm btn--primary-2" onclick="Subscribe();" style="margin-top: 10px;">
+                                        <a id="homepage_links_a" class="btn btn--sm btn--primary-2" onclick="Subscribe(false);" style="margin-top: 10px;">
                                             <span class="btn__text" id="inner_button"><i class="fa fa-check" style="color: white;font-size: 1em;"></i> Subscribed</span>
                                         </a>
                                         {% else %}
-                                        <a id="homepage_links_a" class="btn btn--sm" onclick="Subscribe();" style="margin-top: 10px;">
+                                        <a id="homepage_links_a" class="btn btn--sm" onclick="Subscribe(true);" style="margin-top: 10px;">
                                             <span class="btn__text" id="inner_button">Subscribe</span>
                                         </a>
                                         {% endif %}
@@ -216,6 +218,26 @@ function Subscribe() {
 
                     <div class="col-lg-9">
 
+                        {% if active_events or past_events %}
+                        {% else %}
+                        <div class="row" style="padding-bottom: 30px;">
+                            <div class="col-md-12">
+                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 50px; height: 50px;"
+                                    viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <rect x="0" y="0" width="24" height="24" />
+                                        <rect fill="#000000" x="3" y="2" width="15" height="5" rx="1" />
+                                        <rect fill="#000000" x="9" y="12" width="4" height="10" rx="1" />
+                                        <path
+                                            d="M12,12 L10,12 L10,11 C10,9.8954305 10.8954305,9 12,9 L19,9 L19,5.5 L18,5.5 L18,3.5 L19,3.5 C20.1045695,3.5 21,4.3954305 21,5.5 L21,9 C21,10.1045695 20.1045695,11 19,11 L12,11 L12,12 Z"
+                                            fill="#000000" fill-rule="nonzero" opacity="0.3" />
+                                    </g>
+                                </svg>
+                                <p class="lead" style="color:#b2b2b2;">We've got nothing yet but you can always subscribe so you can be alerted when we do!</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
                         {% if active_events %}
                         <div class="row" style="padding-bottom: 30px;">
                             <div class="col-md-12">
@@ -224,7 +246,7 @@ function Subscribe() {
                         </div>
                         {% for event in active_events %}
                         <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
-                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px;border-radius: 10px;" id="homepage_updates">
+                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px;border-radius: 10px;margin-bottom: 10px;" id="homepage_updates">
                             <div class="row">
                                 <div class="col-lg-3 col-md-3 col-4">
                                     <a href="{{ event.get_landing_view }}">
@@ -237,11 +259,6 @@ function Subscribe() {
                                             href="{{ event.get_landing_view }}">{{ event.title }}</a></p>
                                     <hr style="margin-top: 0px;margin-bottom:5px;">
                                     <div class="row" id="updates_host_and_start">
-                                        <div class="col-12" style="text-align: left;">
-                                            <p id="updates_host">{{ event.start|localtime|date:"D N jS, f a" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="row" id="updates_host_and_start">
                                         <div class="col-12">
                                             {% if event.description %}
                                             <p id="updates_description" style="text-align: left;line-height: normal;">{{ event.description|striptags|truncatechars:150 }}</p>
@@ -250,6 +267,16 @@ function Subscribe() {
                                             {% endif %}
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="row" style="padding:10px;padding-bottom: 0px;">
+                                <div class="col-lg-6 col-md-6 col-6">
+                                    <a id="updates_host" class="pull-left" style="text-decoration: none;font-weight: 400;margin-bottom: 0px;"
+                                        href="{{ event.house.get_home_page_url }}">{{ event.house.name }}</a>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-6">
+                                    <p id="updates_host" class="pull-right" style="margin-bottom: 0px;">
+                                        {{ event.start|localtime|date:"D N jS, f a" }}</p>
                                 </div>
                             </div>
                         </div>

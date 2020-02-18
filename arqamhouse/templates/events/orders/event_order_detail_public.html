@@ -18,6 +18,12 @@ Order #{{ order.number }} | {{ order.event.title }}
     .bg--secondary {
         background: #ffffff;
     }
+
+    @media only screen and (max-width: 600px) {
+        .view-tickets {
+            padding: 0px;
+        }
+    }
 </style>
 
 {% endblock styles %}
@@ -63,6 +69,17 @@ function myFunction() {
         {% endif %}
         {% endautoescape %}
 
+        {% if request.user.is_authenticated %}
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-md-12">
+                <a class="btn btn--primary btn-block" href="{% url 'profiles:orders' %}">
+                    <span class="btn__text"> Orders</span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+
         {% if refund_requests %}
         <div class="row justify-content-center" style="padding:20px;padding-bottom: 0px;">
             <div class="col-md-12 col-lg-9 col-sm-12" style="padding: 0;">
@@ -82,7 +99,7 @@ function myFunction() {
 
                 <form method="GET" style="padding-bottom: 30px;">
                     <div class="row">
-                        <div class="col-12">
+                        <div class="col-12 view-tickets">
                             <button type="submit" name="view_tickets" value="true" class="btn btn--primary pull-right">View Tickets</button>
                         </div>
                     </div>

@@ -12,6 +12,48 @@ Profile Dashboard
 {% endblock footer %}
 
 {% block styles %}
+<style>
+
+
+#homepage_updates {
+      margin: 20px
+  }
+
+
+#updates_host_and_start {
+      padding-top: 10px;
+  }
+
+
+
+
+@media only screen and (max-width: 750px) {
+
+
+  #homepage_updates {
+      margin: 0px
+  }
+
+  #updates_title {
+      font-size: 12px;
+  }
+
+  #updates_host {
+      font-size: 10px;
+  }
+
+  #updates_description {
+      font-size: 10px;
+  }
+
+  #updates_host_and_start {
+      margin: 0px;
+      padding-top: 0px;
+  }
+
+}
+
+</style>
 {% endblock styles %}
 
 {% block top_page_scripts %}
@@ -56,21 +98,27 @@ Profile Dashboard
                                 <h4 style="margin-bottom: 5px;color: gray;">Hello, {{ profile.name }}</h4>
                             </div>
                         </div>
+
+                        <div class="row d-sm-flex d-md-none d-lg-none">
+                            <div class="col-md-12">
+                                <p><a href="{% url 'profiles:logout' %}"><i class="fa fa-sign-out"></i></a> | <a {% if not profile.house %}href="{% url 'houses:create' %}" {% else %} href="{% url 'houses:dashboard' %}" {% endif %}><i class="fa fa-home"></i></a> | <a href="{% url 'profiles:orders' %}"><i class="fa fa-shopping-cart"></i></a></p>
+                            </div>
+                        </div>
                         
-                        <div class="row" style="padding-top: 30px;">
-                            <div class="col-md-4">
-                                <a class="btn btn--primary btn-block" href="{% url 'profiles:logout' %}">
-                                    <span class="btn__text">Log Out</span>
+                        <div class="row d-md-flex d-none" style="padding-top: 30px;">
+                            <div class="col-md-4" style="padding-bottom: 20px;">
+                                <a class="btn btn--primary btn-block btn--icon" href="{% url 'profiles:logout' %}">
+                                    <span class="btn__text"> <i class="fa fa-sign-out"></i> Log Out</span>
                                 </a>
                             </div>
-                            <div class="col-md-4">
-                                <a class="btn btn-block" {% if not profile.house %}href="{% url 'houses:create' %}" {% else %} href="{% url 'houses:dashboard' %}" {% endif %}>
-                                    <span class="btn__text">{% if not profile.house %}Create House{% else %}House Dashboard{% endif %}</span>
+                            <div class="col-md-4" style="padding-bottom: 20px;">
+                                <a class="btn btn-block btn--icon" {% if not profile.house %}href="{% url 'houses:create' %}" {% else %} href="{% url 'houses:dashboard' %}" {% endif %}>
+                                    <span class="btn__text"> <i class="fa fa-home"></i> {% if not profile.house %}Create House{% else %}House Dashboard{% endif %}</span>
                                 </a>
                             </div>
-                            <div class="col-md-4">
-                                <a class="btn btn--primary btn-block" href="{% url 'profiles:orders' %}">
-                                    <span class="btn__text">Orders</span>
+                            <div class="col-md-4" style="padding-bottom: 20px;">
+                                <a class="btn btn--primary btn-block btn--icon" href="{% url 'profiles:orders' %}">
+                                    <span class="btn__text"> <i class="fa fa-shopping-cart"></i> Orders</span>
                                 </a>
                             </div>
                         </div>
@@ -78,7 +126,7 @@ Profile Dashboard
                 </div>
 
 
-                <div class="row" style="padding-bottom: 20px;">
+                <div class="row d-md-flex d-none" style="padding-bottom: 20px;">
                     <div class="col-md-12">
                         <hr>
                     </div>
@@ -92,31 +140,37 @@ Profile Dashboard
 
                         {% for event in events %}
                         <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
-                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px; margin: 20px;border-radius: 12px;">
+                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px;border-radius: 10px;margin-bottom: 20px;" id="homepage_updates">
                             <div class="row">
-                                <div class="col-3">
-                                    <img style="padding: 10px;" {% if event.image %} src="{{ event.image.url }}" {% else %} src="{% static 'images/event_flyer_placeholder.jpg' %}" {% endif %} >
+                                <div class="col-lg-3 col-md-3 col-sm-4 col-4">
+                                    <a href="{{ event.get_landing_view }}">
+                                    <img style="padding: 10px;" {% if event.image %} src="{{ event.image.url }}" {% else %}
+                                        src="{% static 'images/event_flyer_placeholder.jpg' %}" {% endif %}>
+                                    </a>
                                 </div>
-                                <div class="col-9">
-                                    <p class="lead" style="margin-bottom: 0px; text-align: left;"><a style="text-decoration: none;" href="{{ event.get_landing_view }}">{{ event.title }}</a></p>
+                                <div class="col-lg-9 col-md-9 col-sm-8 col-8">
+                                    <p class="lead" id="updates_title" style="margin-bottom: 0px; text-align: left;">
+                                        <a style="text-decoration: none;" href="{{ event.get_landing_view }}">{{ event.title }}</a>
+                                    </p>
                                     <hr style="margin-top: 0px;margin-bottom:5px;">
-                                    <div class="row" style="padding-bottom: 10px;">
-                                        <div class="col-6" style="text-align: left;">
-                                            <p><a href="{{ event.house.get_home_page_url }}" style="text-decoration: none;">{{ event.house.name }}</a></p>
-                                        </div>
-                                        <div class="col-6" style="text-align: right;">
-                                            {{ event.start|localtime|date:"D N jS, f a" }}
-                                        </div>
-                                    </div>
-                                    <div class="row">
+                                    <div class="row" id="updates_host_and_start">
                                         <div class="col-12">
                                             {% if event.description %}
-                                            <p style="text-align: left;">{{ event.description|striptags|safe|truncatechars:150 }}</p>
+                                            <p id="updates_description" style="text-align: left;line-height: normal;">{{ event.description|striptags|truncatechars:150 }}</p>
                                             {% else %}
-                                            <p style="text-align: left;">Visit the event link to learn more about this event.</p">
+                                            <p id="updates_description" style="text-align: left;line-height: normal;">Learn more by heading over to the event page.</p">
                                             {% endif %}
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="row" style="padding:10px;padding-bottom: 0px;">
+                                <div class="col-lg-6 col-md-6 col-6">
+                                    <a id="updates_host" class="pull-left" style="text-decoration: none;font-weight: 400;margin-bottom: 0px;"
+                                        href="{{ event.house.get_home_page_url }}">{{ event.house.name }}</a>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-6">
+                                    <p id="updates_host" class="pull-right" style="margin-bottom: 0px;">{{ event.start|localtime|date:"D N jS, f a" }}</p>
                                 </div>
                             </div>
                         </div>
