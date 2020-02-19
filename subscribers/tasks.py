@@ -22,6 +22,7 @@ def send_campaign_emails(campaign_id):
     to = []
     campaign = Campaign.objects.get(id=campaign_id)
     subscribers = Subscriber.objects.filter(house=campaign.house)
+    
     for subscriber in subscribers:
         to = [subscriber.profile.email]
         print(to)

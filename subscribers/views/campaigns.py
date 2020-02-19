@@ -94,6 +94,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
             subscribers = Subscriber.objects.filter(house=house)
             subscribers = list(subscribers)
             self.object.subscribers_sent_to.add(*subscribers)
+            self.object.save()
             task = send_campaign_emails.delay(self.object.id)
             messages.info(request, 'Campaign sent!')
 
