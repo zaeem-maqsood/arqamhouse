@@ -3,6 +3,22 @@ from subscribers.forms import GenericCampaignForm
 from subscribers.tasks import send_campaign_emails
 
 
+class UnsubscribeFromEmailView(View):
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        data = request.GET
+        print("OMG IT CAME HERE")
+        print(data)
+        subscriber_id = data["subscriber_id"]
+        subscriber = Subscriber.objects.get(id=int(subscriber_id))
+        subscriber.unsubscribed = True
+        subscriber.save()
+        print("We got unsubscriber")
+        print(subscriber)
+        return HttpResponse("")
+
+
 class CampaignTrackerView(View):
 
 

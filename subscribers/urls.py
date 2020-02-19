@@ -20,7 +20,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from subscribers.views import (SubscriberListView, SubscriberDetailView, SubscriberCreateView,
-                               CampaignListView, CampaignUpdateView, CampaignTrackerView)
+                               CampaignListView, CampaignUpdateView, CampaignTrackerView, UnsubscribeFromEmailView)
 
 app_name = "subscribers"
 
@@ -33,6 +33,7 @@ urlpatterns = [
     path('campaigns/update/<int:pk>', CampaignUpdateView.as_view(), name='campaign_update'),
 
     path('campaigns/tracker', CampaignTrackerView.as_view(), name='campaign_tracker'),
+    path('campaigns/unsubscribe-from-email', UnsubscribeFromEmailView.as_view(), name='campaign_unsubscribe_from_email'),
 ]
 
 

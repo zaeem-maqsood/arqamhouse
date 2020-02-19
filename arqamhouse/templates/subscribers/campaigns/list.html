@@ -73,7 +73,7 @@ Subscribers | {{ house.name }}
                     </div>
                     {% if not campaign.draft %}
                     <div class="col-md-1 text-center">
-                        <p class="lead" style="margin-bottom: 0px;">{{ campaign.seen }}</p>
+                        <p class="lead" style="margin-bottom: 0px;">{{ campaign.subscribers_seen.all.count }}</p>
                         <p style="font-size: 10px;">Opens</p>
                     </div>
                     <div class="col-md-1 text-center">

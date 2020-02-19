@@ -39,18 +39,16 @@ class SubscriberCreateView(HouseAccountMixin, FormView):
         # First see if a profile exists with that email
         try:
             profile = Profile.objects.get(email=email)
-
-            # Check if they are already subscribed
-            try:
-                subscriber = Subscriber.objects.get(profile=profile, house=house)
-                form.add_error("email", "This subscriber is already added!")
-                return self.render_to_response(self.get_context_data(form=form, request=request))
-            except:
-                subscriber = Subscriber.objects.create(profile=profile, house=house, attendance_subtractor=passed_events)
-
         except:
             profile = Profile.objects.create(name=name, email=email, password=get_random_string(length=10))
-            subscriber = Subscriber.objects.create(profile=profile, house=house, attendance_subtractor=passed_events)
+
+        # Check if they are already subscribed
+        try:
+            subscriber = Subscriber.objects.get(profile=profile, house=house)
+            form.add_error("email", "This subscriber is already added!")
+            return self.render_to_response(self.get_context_data(form=form, request=request))
+        except:
+            subscriber = Subscriber.objects.create(profile=profile, house=house, events_total=1, attendance_total=1)
 
 
         print(email)

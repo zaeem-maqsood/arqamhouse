@@ -65,6 +65,16 @@ class Campaign(TimestampedModel):
     def __str__(self):
         return "%s" % (self.name)
 
+    def update_score(self):
+        self.total = self.subscribers_sent_to.all().count()
+        self.seen = self.subscribers_seen.all().count()
+        score = (self.seen/self.total) * 100
+        self.score = score
+
+    def save(self, *args, **kwargs):
+        self.update_score()
+        super().save(*args, **kwargs)
+
 
     def get_update_view(self):
         view_name = "subscribers:campaign_update"
