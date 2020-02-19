@@ -17,6 +17,8 @@ class CampaignTrackerView(View):
         subscriber = Subscriber.objects.get(id=int(subscriber_id))
         campaign.subscribers_seen.add(subscriber)
         campaign.save()
+        print("We got campaign")
+        print(campaign)
         return HttpResponse("")
 
 
