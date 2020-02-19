@@ -33,7 +33,7 @@ Subscribers | {{ house.name }}
 				<div class="row text-center" style="padding-bottom:40px;padding-top: 20px;">
 					<div class="col-lg-12" style="padding-bottom: 10px;">
                         {% if subscriber.profile.picture %}
-                        <img src="{{ subscriber.profile.picture.url }}" style="max-width: 100px;max-height: 100px;">
+                        <img src="{{ subscriber.profile.picture.url }}" style="max-width: 150px;max-height: 150px;border-radius: 100px;">
                         {% else %}
                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 100px;height: 100px;"
                             viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
@@ -47,10 +47,10 @@ Subscribers | {{ house.name }}
                         </svg>
                         {% endif %}
                     </div>
-                    <div class="col-lg-12" style="padding-bottom: 10px;">
-                        <h4 style="font-weight: 200;">{{ subscriber }}</h4>
-                        <p style="margin-bottom: 5px;">{{ subscriber.profile.email }}</p>
-                        <p>Subscriber Since {{ subscriber.created_at|date:"dS M Y" }}</p>
+                    <div class="col-lg-12" style="padding-bottom: 10px;padding-top: 10px;">
+                        <h3 style="font-weight: 200;">{{ subscriber }}</h3>
+                        <p style="margin-bottom: 5px;font-size: 13px;">{{ subscriber.profile.email }}</p>
+                        <p style="font-size: 13px;">Subscriber Since {{ subscriber.created_at|date:"dS M Y" }}</p>
 					</div>
 				</div>
 

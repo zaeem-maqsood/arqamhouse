@@ -12,6 +12,13 @@ Profile Dashboard
 {% endblock footer %}
 
 {% block styles %}
+<style>
+   @media only screen and (max-width: 750px) {
+       .small-tables {
+           font-size: 10px;
+       } 
+   } 
+</style>
 {% endblock styles %}
 
 {% block top_page_scripts %}
@@ -23,6 +30,8 @@ Profile Dashboard
 {% block content %}
 <section class="text-center">
     <div class="container" style="padding-bottom: 60px;">
+
+
         <div class="row" style="padding-bottom: 20px;">
             <div class="col-md-12 col-lg-9">
 
@@ -31,7 +40,7 @@ Profile Dashboard
                     <div class="col-md-12">
                         <a href="#">
                             {% if profile.picture %}
-                            <img src="{{ profile.picture.url }}" style="max-width: 150px;max-height: 150px;">
+                            <img src="{{ profile.picture.url }}" style="max-width: 150px;max-height: 150px;border-radius: 100px;">
                             {% else %}
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100px" height="100px"
                                 viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
@@ -48,7 +57,7 @@ Profile Dashboard
                     </div>
                 </div>
                         
-                <div class="row">
+                <div class="row" style="padding-top: 30px;">
                     <div class="col-md-12">
                         <h4 style="margin-bottom: 5px;color: gray;">{{ profile.name }}'s Orders</h4>
                     </div>
@@ -56,11 +65,11 @@ Profile Dashboard
 
                 <div class="row d-sm-flex d-md-none d-lg-none" style="padding-bottom: 30px;">
                     <div class="col-md-12">
-                        <p><a href="{% url 'profiles:logout' %}"><i class="fa fa-sign-out"></i></a> | <a {% if not profile.house %}href="{% url 'houses:create' %}" {% else %} href="{% url 'houses:dashboard' %}" {% endif %}><i class="fa fa-home"></i></a> | <a href="{% url 'profiles:orders' %}"><i class="fa fa-shopping-cart"></i></a></p>
+                        <p><a href="{% url 'profiles:logout' %}"><i class="fa fa-sign-out"></i></a> | <a {% if not profile.house %}href="{% url 'houses:create' %}" {% else %} href="{% url 'houses:dashboard' %}" {% endif %}><i class="fa fa-home"></i></a> | <a href="{% url 'profiles:dashboard' %}"><i class="fa fa-user"></i></a></p>
                     </div>
                 </div>
                         
-                <div class="row d-md-flex d-none" style="padding-bottom: 30px;">
+                <div class="row d-md-flex d-none" style="padding-top: 20px;padding-bottom: 10px;">
                     <div class="col-md-4" style="padding-bottom: 20px;">
                         <a class="btn btn--primary btn-block btn--icon" href="{% url 'profiles:logout' %}">
                             <span class="btn__text"> <i class="fa fa-sign-out"></i> Log Out</span>
@@ -72,8 +81,8 @@ Profile Dashboard
                         </a>
                     </div>
                     <div class="col-md-4" style="padding-bottom: 20px;">
-                        <a class="btn btn--primary btn-block btn--icon" href="{% url 'profiles:orders' %}">
-                            <span class="btn__text"> <i class="fa fa-shopping-cart"></i> Orders</span>
+                        <a class="btn btn--primary btn-block btn--icon" href="{% url 'profiles:dashboard' %}">
+                            <span class="btn__text"> <i class="fa fa-user"></i> Profile</span>
                         </a>
                     </div>
                 </div>
@@ -85,7 +94,7 @@ Profile Dashboard
 
                         {% if orders %}
 
-                        <table class="border--round table--alternate-row">
+                        <table class="border--round table--alternate-row text-center">
                             <thead>
                                 <tr>
                                     <th>Event</th>
@@ -96,9 +105,9 @@ Profile Dashboard
                             <tbody>
                                 {% for order in orders %}
                                 <tr>
-                                    <td><a href="{{ order.get_public_order_view }}">{{ order.event }}</a></td>
-                                    <td>{{ order.attendee_set.all.count }}</td>
-                                    <td>{{ order.created_at|localtime }}</td>
+                                    <td><a class="small-tables" href="{{ order.get_public_order_view }}">{{ order.event }}</a></td>
+                                    <td><p class="small-tables" >{{ order.attendee_set.all.count }}</p></td>
+                                    <td><p class="small-tables" >{{ order.created_at|localtime }}</p></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

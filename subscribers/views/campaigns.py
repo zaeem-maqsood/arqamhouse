@@ -1,5 +1,6 @@
 from .base import *
 from subscribers.forms import GenericCampaignForm
+from subscribers.tasks import send_campaign_emails
 
 
 class CampaignTrackerView(View):
@@ -10,8 +11,11 @@ class CampaignTrackerView(View):
         data = request.GET
         print("OMG IT CAME HERE")
         print(data)
-        campaign = Campaign.objects.get(id=1)
-        campaign.draft = True
+        campaign_id = data["campaign_id"]
+        subscriber_id = data["subscriber_id"]
+        campaign = Campaign.objects.get(id=int(campaign_id))
+        subscriber = Subscriber.objects.get(id=int(subscriber_id))
+        campaign.subscribers_seen.add(subscriber)
         campaign.save()
         return HttpResponse("")
 
@@ -62,16 +66,19 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         data = request.POST
         print(data)
         self.object = form.save()
+        house = self.get_house()
 
         if 'test' in data:
             self.send_test_email()
             messages.success(request, 'Test Email Sent!')
 
+        elif "nuke" in data:
+            subscribers = Subscriber.objects.filter(house=house)
+            subscribers = list(subscribers)
+            self.object.subscribers_sent_to.add(*subscribers)
+            task = send_campaign_emails.delay(self.object.id)
+            messages.info(request, 'Campaign sent!')
 
-        elif "Remove" in data:
-            self.object.image = None
-            self.object.save()
-            messages.warning(request, 'Event image successfully removed')
         else:
             messages.success(request, 'Campaign Updated Successfully!')
 
@@ -81,6 +88,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
     def form_invalid(self, form):
         print(form.errors)
         return self.render_to_response(self.get_context_data(form=form))
+
 
 
     def send_test_email(self):

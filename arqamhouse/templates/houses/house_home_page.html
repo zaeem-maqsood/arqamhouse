@@ -305,11 +305,6 @@ function Subscribe(boolean) {
                                             style="text-decoration: none;" href="{{ event.get_landing_view }}">{{ event.title }}</a></p>
                                     <hr style="margin-top: 0px;margin-bottom:5px;">
                                     <div class="row" id="updates_host_and_start">
-                                        <div class="col-12" style="text-align: left;">
-                                            <p id="updates_host">{{ event.start|localtime|date:"D N jS, f a" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="row" id="updates_host_and_start">
                                         <div class="col-12">
                                             {% if event.description %}
                                             <p id="updates_description" style="text-align: left;line-height: normal;">
@@ -320,6 +315,16 @@ function Subscribe(boolean) {
                                                 {% endif %}
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="row" style="padding:10px;padding-bottom: 0px;">
+                                <div class="col-lg-6 col-md-6 col-6">
+                                    <a id="updates_host" class="pull-left" style="text-decoration: none;font-weight: 400;margin-bottom: 0px;"
+                                        href="{{ event.house.get_home_page_url }}">{{ event.house.name }}</a>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-6">
+                                    <p id="updates_host" class="pull-right" style="margin-bottom: 0px;">
+                                        {{ event.start|localtime|date:"D N jS, f a" }}</p>
                                 </div>
                             </div>
                         </div>

@@ -306,6 +306,8 @@ class EventCheckoutView(FormView):
             event_order = EventOrder.objects.filter(event=event, email=data["email"]).exists()
             if not event_order:
                 subscriber.attendance_total = subscriber.attendance_total + 1
+                if subscriber.attendance_total > subscriber.events_total:
+                    subscriber.events_total += 1
                 subscriber.save()
         except Exception as e:
             print(e)
