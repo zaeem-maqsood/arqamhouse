@@ -17,29 +17,6 @@ Subscribers | {{ house.name }}
 <script type="text/javascript"
     src="https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/js/froala_editor.pkgd.min.js"></script>
 
-
-<script>
-
-
-function filtering() {
-
-    var tickets = []
-
-    {% for ticket in tickets %}
-        ticket_switch_{{ ticket.id }} = document.getElementById("ticket_switch_{{ ticket.id }}");
-        console.log(ticket_switch_{{ ticket.id }}.checked)
-        if (ticket_switch_{{ ticket.id }}.checked) {
-            tickets.push("{{ ticket.id }}")
-        }
-    {% endfor %}
-
-    console.log(tickets)
-
-}
-
-
-</script>
-
 {% endblock scripts %}
 
 
@@ -57,7 +34,7 @@ function filtering() {
 					</div>
 				</div>
 
-                <form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
+                <form method="POST" id="checkoutForm" enctype="multipart/form-data" onchange="update_content()">{% csrf_token %}
                     <div class="row" style="padding-bottom: 30px;">
                         <div class="col-md-8">
                             <p style="margin-bottom: 5px;">Name</p>
@@ -105,7 +82,7 @@ function filtering() {
                                             <h3>Last Chance</h3>
                                             <br>
                                             <p>We will deliver your campaign <strong>{{ campaign.name }}</strong> to all <strong>{{ subscribers.count }}</strong> of your subscribers.</p>
-                                            <p>Please make sure you have sent yourself a test email and everything looks good.</p>
+                                            <p>Please make sure you have sent yourself a test email and everything looks good. You will not be able to edit this campaign after you have sent it.</p>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

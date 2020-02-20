@@ -11,12 +11,18 @@ class UnsubscribeFromEmailView(View):
         print("OMG IT CAME HERE")
         print(data)
         subscriber_id = data["subscriber_id"]
-        subscriber = Subscriber.objects.get(id=int(subscriber_id))
-        subscriber.unsubscribed = True
-        subscriber.save()
-        print("We got unsubscriber")
-        print(subscriber)
-        return HttpResponse("")
+        try:
+            subscriber = Subscriber.objects.get(id=int(subscriber_id))
+            subscriber.unsubscribed = True
+            subscriber.save()
+            print("We got unsubscriber")
+            print(subscriber)
+            view_name = "houses:home_page"
+            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": subscriber.house.slug}))
+        except:
+            view_name = "home"
+            return HttpResponseRedirect(reverse(view_name))
+        
 
 
 class CampaignTrackerView(View):
@@ -29,10 +35,16 @@ class CampaignTrackerView(View):
         print(data)
         campaign_id = data["campaign_id"]
         subscriber_id = data["subscriber_id"]
-        campaign = Campaign.objects.get(id=int(campaign_id))
-        subscriber = Subscriber.objects.get(id=int(subscriber_id))
-        campaign.subscribers_seen.add(subscriber)
-        campaign.save()
+        try:
+            campaign = Campaign.objects.get(id=int(campaign_id))
+            try:
+                subscriber = Subscriber.objects.get(id=int(subscriber_id))
+                campaign.subscribers_seen.add(subscriber)
+                campaign.save()
+            except:
+                pass
+        except:
+            pass
         print("We got campaign")
         print(campaign)
         return HttpResponse("")
@@ -88,7 +100,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
 
         if 'test' in data:
             self.send_test_email()
-            messages.success(request, 'Test Email Sent!')
+            messages.success(request, f'Test Email Sent to {house.email}!')
 
         elif "nuke" in data:
             subscribers = Subscriber.objects.filter(house=house)
