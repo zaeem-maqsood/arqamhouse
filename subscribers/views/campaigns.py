@@ -50,6 +50,42 @@ class CampaignTrackerView(View):
         return HttpResponse("")
 
 
+class CampaignContentView(HouseAccountMixin, View):
+    template_name = "emails/test_campaign_email.html"
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        pk = kwargs["pk"]
+        house = self.get_house()
+        try:
+            campaign = Campaign.objects.get(id=pk)
+        except:
+            raise Http404
+        context["campaign"] = campaign
+        context["house"] = house
+        context["dashboard_events"] = self.get_events()
+        return render(request, self.template_name, context)
+
+
+class CampaignDetailView(HouseAccountMixin, View):
+    template_name = "subscribers/campaigns/detail.html"
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        pk = kwargs["pk"]
+        house = self.get_house()
+        try:
+            campaign = Campaign.objects.get(id=pk)
+        except:
+            raise Http404
+        context["campaign"] = campaign
+        context["house"] = house
+        context["dashboard_events"] = self.get_events()
+
+        return render(request, self.template_name, context)
+
+
+
 class CampaignUpdateView(HouseAccountMixin, UpdateView):
     model = Campaign
     form_class = GenericCampaignForm
@@ -71,6 +107,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         subscribers = Subscriber.objects.filter(house=house)
         form = self.get_form()
 
+        context["dashboard_events"] = self.get_events()
         context["subscribers"] = subscribers
         context["form"] = form
         context["campaign"] = self.object
@@ -106,9 +143,10 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
             subscribers = Subscriber.objects.filter(house=house)
             subscribers = list(subscribers)
             self.object.subscribers_sent_to.add(*subscribers)
+            self.object.draft = False
             self.object.save()
             task = send_campaign_emails.delay(self.object.id)
-            messages.info(request, 'Campaign sent!')
+            messages.success(request, 'Campaign sent!')
 
         else:
             messages.success(request, 'Campaign Updated Successfully!')
@@ -144,6 +182,59 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
 
 
 
+class CampaignCreateView(HouseAccountMixin, CreateView):
+    model = Campaign
+    form_class = GenericCampaignForm
+    template_name = "subscribers/campaigns/create.html"
+
+    def get_success_url(self):
+        view_name = "subscribers:campaign_list"
+        return reverse(view_name)
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+        house = self.get_house()
+
+        subscribers = Subscriber.objects.filter(house=house)
+        form = self.get_form()
+        context["dashboard_events"] = self.get_events()
+        context["form"] = form
+        context["house"] = house
+        return context
+
+    def get(self, request, *args, **kwargs):
+        self.object = None
+        return render(request, self.template_name, self.get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+
+        form = self.get_form()
+
+        if form.is_valid():
+            return self.form_valid(form, request)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form, request):
+        data = request.POST
+        house = self.get_house()
+        self.object = form.save(commit=False)
+        self.object.house = house
+        self.object.total = 0
+        self.object.score = 0
+        self.object.seen = 0
+        self.object.save()
+        messages.success(request, 'Campaign Created Successfully!')
+        valid_data = super(CampaignCreateView, self).form_valid(form)
+        return valid_data
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+
 class CampaignListView(HouseAccountMixin, ListView):
     model = Campaign
     template_name = "subscribers/campaigns/list.html"
@@ -154,7 +245,7 @@ class CampaignListView(HouseAccountMixin, ListView):
     def get_context_data(self, *args, **kwargs):
         context = {}
         house = self.get_house()
-        campaigns = Campaign.objects.filter(house=house).order_by("-updated_at")
+        campaigns = Campaign.objects.filter(house=house).order_by("-created_at")
 
         context["dashboard_events"] = self.get_events()
         context["campaigns"] = campaigns

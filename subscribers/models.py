@@ -76,8 +76,10 @@ class Campaign(TimestampedModel):
             self.score = score
 
     def save(self, *args, **kwargs):
-        self.update_total_and_seen()
-        self.update_score()
+
+        if self.pk:
+            self.update_total_and_seen()
+            self.update_score()
         super().save(*args, **kwargs)
 
 
@@ -85,3 +87,10 @@ class Campaign(TimestampedModel):
         view_name = "subscribers:campaign_update"
         return reverse(view_name, kwargs={"pk": self.id})
 
+    def get_detail_view(self):
+        view_name = "subscribers:campaign_detail"
+        return reverse(view_name, kwargs={"pk": self.id})
+
+    def get_detail_content_view(self):
+        view_name = "subscribers:campaign_detail_content"
+        return reverse(view_name, kwargs={"pk": self.id})

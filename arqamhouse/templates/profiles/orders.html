@@ -40,7 +40,7 @@ Profile Dashboard
                     <div class="col-md-12">
                         <a href="#">
                             {% if profile.picture %}
-                            <img src="{{ profile.picture.url }}" style="max-width: 150px;max-height: 150px;border-radius: 100px;">
+                            <img src="{{ profile.picture.thumbnail.url }}" style="max-width: 150px;max-height: 150px;border-radius: 100px;">
                             {% else %}
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100px" height="100px"
                                 viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">

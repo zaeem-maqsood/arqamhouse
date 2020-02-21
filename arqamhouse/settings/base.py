@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'cities_light',
     'channels',
     'phonenumber_field',
+    'stdimage',
 
     # First Party Apps
     'houses',

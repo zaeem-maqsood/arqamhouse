@@ -20,7 +20,8 @@ from django.contrib import admin
 from django.urls import path, include
 
 from subscribers.views import (SubscriberListView, SubscriberDetailView, SubscriberCreateView,
-                               CampaignListView, CampaignUpdateView, CampaignTrackerView, UnsubscribeFromEmailView)
+                               CampaignListView, CampaignUpdateView, CampaignTrackerView, UnsubscribeFromEmailView,
+                               CampaignCreateView, CampaignDetailView, CampaignContentView)
 
 app_name = "subscribers"
 
@@ -30,8 +31,11 @@ urlpatterns = [
     path('campaigns', CampaignListView.as_view(), name='campaign_list'),
     path('create', SubscriberCreateView.as_view(), name='create'),
     path('<slug:slug>', SubscriberDetailView.as_view(), name='detail'),
-    path('campaigns/update/<int:pk>', CampaignUpdateView.as_view(), name='campaign_update'),
 
+    path('campaigns/create', CampaignCreateView.as_view(), name='campaign_create'),
+    path('campaigns/update/<int:pk>', CampaignUpdateView.as_view(), name='campaign_update'),
+    path('campaigns/details/<int:pk>', CampaignDetailView.as_view(), name='campaign_detail'),
+    path('campaigns/detail/<int:pk>/content', CampaignContentView.as_view(), name='campaign_detail_content'),
     path('campaigns/tracker', CampaignTrackerView.as_view(), name='campaign_tracker'),
     path('campaigns/unsubscribe-from-email', UnsubscribeFromEmailView.as_view(), name='campaign_unsubscribe_from_email'),
 ]

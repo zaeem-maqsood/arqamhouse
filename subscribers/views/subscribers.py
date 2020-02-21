@@ -75,13 +75,22 @@ class SubscriberDetailView(HouseAccountMixin, View):
         slug = kwargs["slug"]
         house = self.get_house()
         subscriber = Subscriber.objects.get(profile__slug=slug, house=house)
-        context["subscriber"] = subscriber
-        orders = EventOrder.objects.filter(email=subscriber.profile.email, event__house=house).order_by("-created_at")
+        seen_campaigns = Campaign.objects.filter(subscribers_seen=subscriber).order_by("created_at")
+        print(seen_campaigns)
+        orders = EventOrder.objects.filter(email=subscriber.profile.email, event__house=house).order_by("created_at")
         attendees = Attendee.objects.filter(order__in=orders).count()
+
+        result_list = sorted(chain(seen_campaigns, orders), key=attrgetter('created_at'))
+        result_list.reverse()
+
+        context["result_list"] = result_list
+        context["seen_campaigns"] = seen_campaigns
+        context["subscriber"] = subscriber
         context["attendees"] = attendees
         context["orders"] = orders
         context["house"] = house
         context["dashboard_events"] = self.get_events()
+
         return render(request, self.template_name, context)
 
 
@@ -133,7 +142,7 @@ class SubscriberListView(HouseAccountMixin, ListView):
     def get_context_data(self, *args, **kwargs):
         context = {}
         house = self.get_house()
-        subscribers = Subscriber.objects.filter(house=house)
+        subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
 
         context["dashboard_events"] = self.get_events()
         context["subscribers"] = subscribers

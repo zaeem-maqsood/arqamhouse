@@ -7,7 +7,7 @@ class TimestampedModel(models.Model):
 	created_at = models.DateTimeField(default=timezone.now)
 
 	# A timestamp reprensenting when this object was last updated.
-	updated_at = models.DateTimeField(default=timezone.now)
+	updated_at = models.DateTimeField(auto_now=True)
 
 	class Meta:
 		abstract = True

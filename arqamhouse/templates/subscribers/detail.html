@@ -33,7 +33,7 @@ Subscribers | {{ house.name }}
 				<div class="row text-center" style="padding-bottom:40px;padding-top: 20px;">
 					<div class="col-lg-12" style="padding-bottom: 10px;">
                         {% if subscriber.profile.picture %}
-                        <img src="{{ subscriber.profile.picture.url }}" style="max-width: 150px;max-height: 150px;border-radius: 100px;">
+                        <img src="{{ subscriber.profile.picture.thumbnail.url }}" style="max-width: 150px;max-height: 150px;border-radius: 100px;">
                         {% else %}
                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 100px;height: 100px;"
                             viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
@@ -54,16 +54,16 @@ Subscribers | {{ house.name }}
 					</div>
 				</div>
 
+
                 <div class="row text-center" style="padding-bottom:40px;">
-                    <div class="col-lg-12" style="padding-bottom: 10px;">
+
+                    <div class="col-lg-3 col-sm-6 col-6" style="padding-bottom: 10px;">
                         <h2>{{ subscriber.attendance_score }}%</h2>
                         <p style="font-size: 0.8em;">Subscriber Activity Grade</p>
                     </div>
-                </div>
 
-                <div class="row text-center" style="padding-bottom:40px;">
-                    <div class="col-lg-4" style="padding-bottom: 10px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 50px;height: 50px;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                    <div class="col-lg-3 col-sm-6 col-6" style="padding-bottom: 10px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 30px;height: 30px;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
                             <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                                 <rect x="0" y="0" width="24" height="24"/>
                                 <path d="M8,3 L8,3.5 C8,4.32842712 8.67157288,5 9.5,5 L14.5,5 C15.3284271,5 16,4.32842712 16,3.5 L16,3 L18,3 C19.1045695,3 20,3.8954305 20,5 L20,21 C20,22.1045695 19.1045695,23 18,23 L6,23 C4.8954305,23 4,22.1045695 4,21 L4,5 C4,3.8954305 4.8954305,3 6,3 L8,3 Z" fill="#000000" opacity="0.3"/>
@@ -76,9 +76,9 @@ Subscribers | {{ house.name }}
                         <p style="padding-top: 10px;">Made {{ orders.count }} Order{% if orders.count != 1 %}s{% endif %}</p>
                     </div>
 
-                    <div class="col-lg-4" style="padding-bottom: 10px;">
+                    <div class="col-lg-3 col-sm-6 col-6" style="padding-bottom: 10px;">
 
-                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 50px;height: 50px;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 30px;height: 30px;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
                             <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                                 <rect x="0" y="0" width="24" height="24"/>
                                 <path d="M3,10.0500091 L3,8 C3,7.44771525 3.44771525,7 4,7 L9,7 L9,9 C9,9.55228475 9.44771525,10 10,10 C10.5522847,10 11,9.55228475 11,9 L11,7 L21,7 C21.5522847,7 22,7.44771525 22,8 L22,10.0500091 C20.8588798,10.2816442 20,11.290521 20,12.5 C20,13.709479 20.8588798,14.7183558 22,14.9499909 L22,17 C22,17.5522847 21.5522847,18 21,18 L11,18 L11,16 C11,15.4477153 10.5522847,15 10,15 C9.44771525,15 9,15.4477153 9,16 L9,18 L4,18 C3.44771525,18 3,17.5522847 3,17 L3,14.9499909 C4.14112016,14.7183558 5,13.709479 5,12.5 C5,11.290521 4.14112016,10.2816442 3,10.0500091 Z M10,11 C9.44771525,11 9,11.4477153 9,12 L9,13 C9,13.5522847 9.44771525,14 10,14 C10.5522847,14 11,13.5522847 11,13 L11,12 C11,11.4477153 10.5522847,11 10,11 Z" fill="#000000" opacity="0.3" transform="translate(12.500000, 12.500000) rotate(-45.000000) translate(-12.500000, -12.500000) "/>
@@ -88,19 +88,20 @@ Subscribers | {{ house.name }}
                         <p style="padding-top: 10px;">Purchased {{ attendees }} Ticket{% if attendees != 1 %}s{% endif %}</p>
                     </div>
 
-                    <div class="col-lg-4" style="padding-bottom: 10px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 50px;height: 50px;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                    <div class="col-lg-3 col-sm-6 col-6" style="padding-bottom: 10px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 30px;height: 30px;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
                             <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                                 <rect x="0" y="0" width="24" height="24"/>
                                 <path d="M6,2 L18,2 C18.5522847,2 19,2.44771525 19,3 L19,13 C19,13.5522847 18.5522847,14 18,14 L6,14 C5.44771525,14 5,13.5522847 5,13 L5,3 C5,2.44771525 5.44771525,2 6,2 Z M13.8,4 C13.1562,4 12.4033,4.72985286 12,5.2 C11.5967,4.72985286 10.8438,4 10.2,4 C9.0604,4 8.4,4.88887193 8.4,6.02016349 C8.4,7.27338783 9.6,8.6 12,10 C14.4,8.6 15.6,7.3 15.6,6.1 C15.6,4.96870845 14.9396,4 13.8,4 Z" fill="#000000" opacity="0.3"/>
                                 <path d="M3.79274528,6.57253826 L12,12.5 L20.2072547,6.57253826 C20.4311176,6.4108595 20.7436609,6.46126971 20.9053396,6.68513259 C20.9668779,6.77033951 21,6.87277228 21,6.97787787 L21,17 C21,18.1045695 20.1045695,19 19,19 L5,19 C3.8954305,19 3,18.1045695 3,17 L3,6.97787787 C3,6.70173549 3.22385763,6.47787787 3.5,6.47787787 C3.60510559,6.47787787 3.70753836,6.51099993 3.79274528,6.57253826 Z" fill="#000000"/>
                             </g>
                         </svg>
-                        <p style="padding-top: 10px;">Viewed 12 Campaigns</p>
+                        <p style="padding-top: 10px;">Viewed {{ seen_campaigns.count }} Campaign{% if seen_campaigns.count == 1 %}{% else %}s{% endif %}</p>
                     </div>
 
                 </div>
 
+                {% if result_list %}
                 <div class="row" style="padding-bottom:20px;">
 
                     <div class="col-lg-10 offset-lg-1" style="padding-bottom: 10px;">
@@ -110,34 +111,33 @@ Subscribers | {{ house.name }}
                         <!--Begin::Timeline 3 -->
                         <div class="kt-timeline-v2">
                             <div class="kt-timeline-v2__items  kt-padding-top-25 kt-padding-bottom-30">
-                                {% for order in orders %}
+                                {% for item in result_list %}
                                 <div class="kt-timeline-v2__item">
-                                    <span class="kt-timeline-v2__item-time">{{ order.created_at|localtime|date:"H:i" }}</span>
+                                    <span class="kt-timeline-v2__item-time">{{ item.created_at|localtime|date:"H:i" }}</span>
                                     <div class="kt-timeline-v2__item-cricle">
-                                        <i class="fa fa-genderless kt-font-info"></i>
+                                        {% if item.content %}
+                                            <i class="fa fa-genderless kt-font-info"></i>
+                                        {% else %}
+                                            <i class="fa fa-genderless kt-font-primary"></i>
+                                        {% endif %}
                                     </div>
+
                                     <div class="kt-timeline-v2__item-text kt-padding-top-5">
-                                        Recieved {{ order.attendee_set.all.count }} ticket{% if order.attendee_set.all.count > 1 %}s{% endif %} for <a href="{{ order.event.get_landing_view }}">{{ order.event.title }}</a> on {{ order.created_at|localtime }}
+                                    {% if item.content %}
+                                        Viewed <a href="#">{{ item.name }}</a> on {{ item.created_at|localtime }}
+                                    {% else %}
+                                        Recieved {{ item.attendee_set.all.count }} ticket{% if item.attendee_set.all.count > 1 %}s{% endif %} for <a href="{{ item.event.get_landing_view }}">{{ item.event.title }}</a> on {{ item.created_at|localtime }}
+                                    {% endif %}
                                     </div>
                                 </div>
                                 {% endfor %}
-                                <div class="kt-timeline-v2__item">
-                                    <span class="kt-timeline-v2__item-time">16:00</span>
-                                    <div class="kt-timeline-v2__item-cricle">
-                                        <i class="fa fa-genderless kt-font-brand"></i>
-                                    </div>
-                                    <div class="kt-timeline-v2__item-text kt-padding-top-5">
-                                        Lorem ipsum dolor sit amit,consectetur eiusmdd tempor<br>
-                                        incididunt ut labore et dolore magna elit enim at minim<br>
-                                        veniam quis nostrud
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     <!--End::Timeline 3 -->
                     </div>
 
                 </div>
+                {% endif %}
 
 				
 			</div>

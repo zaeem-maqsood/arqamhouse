@@ -42,13 +42,13 @@ Subscribers | {{ house.name }}
 						<h3>Campaigns <span style="font-size: 0.8em;font-weight: 200;">| {{ campaigns.count }}</span></h3>
 					</div>
 					<div class="col-lg-3 col-md-7">
-						<a href="{% url 'subscribers:create' %}" class="btn btn-primary pull-right btn-sm btn-block">Create Campaign</a>
+						<a href="{% url 'subscribers:campaign_create' %}" class="btn btn-primary pull-right btn-sm btn-block">Create Campaign</a>
 					</div>
 				</div>
 
                 {% for campaign in campaigns %}
-                <div class="row">
-                    <div class="col-md-1">
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-md-1 d-none">
                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                             style="width: 50px;height: 50px;background-color: #d3edff;border-radius: 200px;padding: 10px;" viewBox="0 0 24 24"
                             version="1.1" class="kt-svg-icon">
@@ -64,19 +64,19 @@ Subscribers | {{ house.name }}
                             </g>
                         </svg>
                     </div>
-                    <div class="col-md-7">
-                        <p class="lead" style="display: inline;"><a href="{{ campaign.get_update_view }}">{{ campaign.name }}</a></p>
+                    <div class="col-md-7 col-12">
+                        <p class="lead" style="display: inline;"><a {% if campaign.draft %}href="{{ campaign.get_update_view }}"{% else %}href="{{ campaign.get_detail_view }}"{% endif %}>{{ campaign.name }}</a></p>
                         <p>Last updated by you at <strong>{{ campaign.updated_at }}</strong></p>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-2 col-4">
                         <p class="lead" style="padding-top: 10px;">{% if campaign.draft %}<span style="background-color: #efeeea;border-radius: 200px;padding: 3px 9px;">Draft</span>{% else %}<span style="background-color: #d8eacc;border-radius: 200px;padding: 3px 9px;">Sent</span>{% endif %}</p>
                     </div>
                     {% if not campaign.draft %}
-                    <div class="col-md-1 text-center">
+                    <div class="col-md-1 col-4 text-center">
                         <p class="lead" style="margin-bottom: 0px;">{{ campaign.subscribers_seen.all.count }}</p>
                         <p style="font-size: 10px;">Opens</p>
                     </div>
-                    <div class="col-md-1 text-center">
+                    <div class="col-md-1 col-4 text-center">
                         <p class="lead" style="margin-bottom: 0px;">{{ campaign.score }}%</p>
                         <p style="font-size: 10px;">Score</p>
                     </div>

@@ -16,6 +16,9 @@ from weasyprint import HTML, CSS
 from django.utils.html import strip_tags
 from django.utils.crypto import get_random_string
 
+from itertools import chain
+from operator import attrgetter
+
 from houses.mixins import HouseAccountMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from events.mixins import EventSecurityMixin
