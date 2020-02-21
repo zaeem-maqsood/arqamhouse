@@ -71,28 +71,20 @@ class InvoiceView(HouseAccountMixin, View):
 		if requested_year < 2019 or requested_year > current_year:
 			raise Http404
 
-		# if requested_year == current_year and month_list.index(requested_month)+1 >= current_month:
-		# 	raise Http404
 
 		house = self.get_house()
 		house_balance = HouseBalance.objects.get(house=house)
-		house_balance_logs = HouseBalanceLog.objects.filter(
-			house_balance=house_balance)
-		house_balance_logs_month = house_balance_logs.filter(
-			created_at__month=month_list.index(requested_month)+1, created_at__year=requested_year)
+		house_balance_logs = HouseBalanceLog.objects.filter(house_balance=house_balance)
+		house_balance_logs_month = house_balance_logs.filter(created_at__month=month_list.index(requested_month)+1, created_at__year=requested_year)
 
 		# ----------------- Payments
 		payments = house_balance_logs_month.filter(transaction__isnull=False)
 		context["payments"] = payments
 		if payments:
-			payment_gross_amount = payments.aggregate(Sum('transaction__amount'))[
-                            "transaction__amount__sum"]
-			payment_total_amount = payments.aggregate(Sum('transaction__house_amount'))[
-                            "transaction__house_amount__sum"]
-			payment_stripe_fees = payments.aggregate(Sum('transaction__stripe_amount'))[
-                            "transaction__stripe_amount__sum"]
-			payment_arqam_fees = payments.aggregate(Sum('transaction__arqam_amount'))[
-                            "transaction__arqam_amount__sum"]
+			payment_gross_amount = payments.aggregate(Sum('transaction__amount'))["transaction__amount__sum"]
+			payment_total_amount = payments.aggregate(Sum('transaction__house_amount'))["transaction__house_amount__sum"]
+			payment_stripe_fees = payments.aggregate(Sum('transaction__stripe_amount'))["transaction__stripe_amount__sum"]
+			payment_arqam_fees = payments.aggregate(Sum('transaction__arqam_amount'))["transaction__arqam_amount__sum"]
 			payment_total_fees = payment_stripe_fees + payment_arqam_fees
 		else:
 			payment_gross_amount = 0
@@ -107,14 +99,10 @@ class InvoiceView(HouseAccountMixin, View):
 		house_payments = house_balance_logs_month.filter(house_payment__isnull=False)
 		context["house_payments"] = house_payments
 		if house_payments:
-			house_payments_gross_amount = house_payments.aggregate(Sum(
-				'house_payment__transaction__amount'))["house_payment__transaction__amount__sum"]
-			house_payments_total_amount = house_payments.aggregate(Sum('house_payment__transaction__house_amount'))[
-                            "house_payment__transaction__house_amount__sum"]
-			house_payments_stripe_fees = house_payments.aggregate(Sum('house_payment__transaction__stripe_amount'))[
-                            "house_payment__transaction__stripe_amount__sum"]
-			house_payments_arqam_fees = house_payments.aggregate(Sum('house_payment__transaction__arqam_amount'))[
-                            "house_payment__transaction__arqam_amount__sum"]
+			house_payments_gross_amount = house_payments.aggregate(Sum('house_payment__transaction__amount'))["house_payment__transaction__amount__sum"]
+			house_payments_total_amount = house_payments.aggregate(Sum('house_payment__transaction__house_amount'))["house_payment__transaction__house_amount__sum"]
+			house_payments_stripe_fees = house_payments.aggregate(Sum('house_payment__transaction__stripe_amount'))["house_payment__transaction__stripe_amount__sum"]
+			house_payments_arqam_fees = house_payments.aggregate(Sum('house_payment__transaction__arqam_amount'))["house_payment__transaction__arqam_amount__sum"]
 			house_payments_total_fees = house_payments_stripe_fees + house_payments_arqam_fees
 		else:
 			house_payments_gross_amount = 0
@@ -129,10 +117,8 @@ class InvoiceView(HouseAccountMixin, View):
 		refunds = house_balance_logs_month.filter(refund__isnull=False)
 		context["refunds"] = refunds
 		if refunds:
-			refund_gross_amount = refunds.aggregate(Sum('refund__amount'))[
-                            "refund__amount__sum"]
-			refund_house_amount = refunds.aggregate(Sum('refund__house_amount'))[
-                            "refund__house_amount__sum"]
+			refund_gross_amount = refunds.aggregate(Sum('refund__amount'))["refund__amount__sum"]
+			refund_house_amount = refunds.aggregate(Sum('refund__house_amount'))["refund__house_amount__sum"]
 			refund_total_fees = refund_gross_amount - refund_house_amount
 			context["refund_gross_amount"] = refund_gross_amount
 			context["refund_house_amount"] = refund_house_amount
@@ -150,33 +136,27 @@ class InvoiceView(HouseAccountMixin, View):
 		payouts = house_balance_logs_month.filter(payout__isnull=False)
 		context["payouts"] = payouts
 		if payouts:
-			payout_gross_amount = payouts.aggregate(Sum('payout__amount'))[
-                            "payout__amount__sum"]
+			payout_gross_amount = payouts.aggregate(Sum('payout__amount'))["payout__amount__sum"]
 		else:
 			payout_gross_amount = 0
 
 		context["payout_gross_amount"] = payout_gross_amount
 
+
 		# -------------------- Last Month Balance
 		try:
-			if requested_month == "January":
-				previous_month_last_house_balance = house_balance_logs.filter(
-					created_at__month=12, created_at__year__lt=requested_year).last()
-			else:
-				previous_month_last_house_balance = house_balance_logs.filter(
-					created_at__month__lt=month_list.index(requested_month)+1, created_at__year=requested_year).last()
+			current_time = datetime.datetime(int(requested_year), int(month_list.index(requested_month)+1), 1)
+			previous_month_last_house_balance = house_balance_logs.filter(created_at__lt=current_time).last()
 			previous_month_last_house_balance = previous_month_last_house_balance.balance
-		except:
+		except Exception as e:
+			print(e)
 			previous_month_last_house_balance = 0
 
-		gross_activity = payment_gross_amount + \
-			house_payments_gross_amount - refund_gross_amount
+		gross_activity = payment_gross_amount + house_payments_gross_amount - refund_gross_amount
 		total_fees = payment_total_fees + house_payments_total_fees - refund_total_fees
-		net_activity = payment_total_amount + \
-			house_payments_total_amount - refund_house_amount
+		net_activity = payment_total_amount + house_payments_total_amount - refund_house_amount
 		total_fees = payment_total_fees + house_payments_total_fees - refund_total_fees
-		end_of_month_balance = previous_month_last_house_balance + \
-			net_activity - payout_gross_amount
+		end_of_month_balance = previous_month_last_house_balance + net_activity - payout_gross_amount
 
 		context["previous_month_last_house_balance"] = previous_month_last_house_balance
 		context["gross_activity"] = gross_activity

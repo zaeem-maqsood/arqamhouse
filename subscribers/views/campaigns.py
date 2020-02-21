@@ -64,6 +64,7 @@ class CampaignContentView(HouseAccountMixin, View):
         context["campaign"] = campaign
         context["house"] = house
         context["dashboard_events"] = self.get_events()
+        context["campaigns_tab"] = True
         return render(request, self.template_name, context)
 
 
@@ -81,7 +82,7 @@ class CampaignDetailView(HouseAccountMixin, View):
         context["campaign"] = campaign
         context["house"] = house
         context["dashboard_events"] = self.get_events()
-
+        context["campaigns_tab"] = True
         return render(request, self.template_name, context)
 
 
@@ -108,6 +109,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         form = self.get_form()
 
         context["dashboard_events"] = self.get_events()
+        context["campaigns_tab"] = True
         context["subscribers"] = subscribers
         context["form"] = form
         context["campaign"] = self.object
@@ -198,6 +200,7 @@ class CampaignCreateView(HouseAccountMixin, CreateView):
         subscribers = Subscriber.objects.filter(house=house)
         form = self.get_form()
         context["dashboard_events"] = self.get_events()
+        context["campaigns_tab"] = True
         context["form"] = form
         context["house"] = house
         return context
@@ -248,6 +251,7 @@ class CampaignListView(HouseAccountMixin, ListView):
         campaigns = Campaign.objects.filter(house=house).order_by("-created_at")
 
         context["dashboard_events"] = self.get_events()
+        context["campaigns_tab"] = True
         context["campaigns"] = campaigns
         context["house"] = house
         return context
