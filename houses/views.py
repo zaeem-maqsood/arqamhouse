@@ -70,10 +70,7 @@ class HouseHomePageView(DetailView):
         user = self.request.user 
         if user.is_authenticated:
             try:
-                subscriber = Subscriber.objects.get(profile=user)
-                print("subscriber")
-                print(subscriber)
-                print("subscriber")
+                subscriber = Subscriber.objects.get(profile=user, house=house)
                 if subscriber.unsubscribed:
                     return False
                 else:
