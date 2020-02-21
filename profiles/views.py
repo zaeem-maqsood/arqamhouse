@@ -251,6 +251,13 @@ class LoginView(FormView):
 		email = form.cleaned_data.get("email")
 		password = form.cleaned_data.get("password")
 
+		# Added this bit of code because some users signed up with capital letters in their email
+		try:
+			profile_getter = Profile.objects.get(email__iexact=email)
+			email = profile_getter.email
+		except Exception as e:
+			print(e)
+
 		# Authenticate user with this email and password
 		try:
 			profile = authenticate(request, username=None, email=email, password=password)
