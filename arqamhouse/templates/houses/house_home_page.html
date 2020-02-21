@@ -248,17 +248,19 @@ function Subscribe(boolean) {
                         <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
                             style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px;border-radius: 10px;margin-bottom: 10px;" id="homepage_updates">
                             <div class="row">
+                                {% if event.image %}
                                 <div class="col-lg-3 col-md-3 col-4">
                                     <a href="{{ event.get_landing_view }}">
                                     <img style="padding: 10px;" {% if event.image %} src="{{ event.image.url }}" {% else %}
                                         src="{% static 'images/event_flyer_placeholder.jpg' %}" {% endif %}>
                                     </a>
                                 </div>
-                                <div class="col-lg-9 col-md-9 col-8">
-                                    <p class="lead" id="updates_title" style="margin-bottom: 0px; text-align: left;"><a style="text-decoration: none;"
+                                {% endif %}
+                                <div class="{% if event.image %}col-lg-9 col-md-9 col-sm-8 col-8{% else %}col-lg-12 col-md-12 col-sm-12 col-12{% endif %}">
+                                    <p class="lead" id="updates_title" style="margin-bottom: 0px; text-align: left;{% if not event.image %}padding-left:10px;{% endif %}"><a style="text-decoration: none;"
                                             href="{{ event.get_landing_view }}">{{ event.title }}</a></p>
                                     <hr style="margin-top: 0px;margin-bottom:5px;">
-                                    <div class="row" id="updates_host_and_start">
+                                    <div class="row" id="updates_host_and_start" style="padding-bottom: 10px;{% if not event.image %}padding: 10px 0 0 10px;{% endif %}">
                                         <div class="col-12">
                                             {% if event.description %}
                                             <p id="updates_description" style="text-align: left;line-height: normal;">{{ event.description|striptags|truncatechars:150 }}</p>
@@ -306,15 +308,14 @@ function Subscribe(boolean) {
                                     <p class="lead" id="updates_title" style="margin-bottom: 0px; text-align: left;{% if not event.image %}padding-left:10px;{% endif %}"><a
                                             style="text-decoration: none;" href="{{ event.get_landing_view }}">{{ event.title }}</a></p>
                                     <hr style="margin-top: 0px;margin-bottom:5px;">
-                                    <div class="row" id="updates_host_and_start">
+                                    <div class="row" id="updates_host_and_start" style="padding-bottom: 10px;{% if not event.image %}padding: 10px 0 0 10px;{% endif %}">
                                         <div class="col-12">
                                             {% if event.description %}
                                             <p id="updates_description" style="text-align: left;line-height: normal;">
                                                 {{ event.description|striptags|truncatechars:150 }}</p>
                                             {% else %}
-                                            <p id="updates_description" style="text-align: left;">Learn more by heading over to the event page.
-                                                </p">
-                                                {% endif %}
+                                            <p id="updates_description" style="text-align: left;">Learn more by heading over to the event page.</p>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
