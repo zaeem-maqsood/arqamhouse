@@ -154,6 +154,7 @@ class ProfileCreateView(CreateView):
 
 		# Save form
 		self.object = form.save(commit=False)
+		self.object.email = email.lower()
 		self.object.is_active = True #Change this to false and when we want email authntication again.
 		self.object.save()
 
@@ -250,7 +251,7 @@ class LoginView(FormView):
 
 		# Authenticate user with this email and password
 		try:
-			profile = authenticate(request, username=None, email__iexact=email, password=password)
+			profile = authenticate(request, username=None, email=email, password=password)
 			if profile == None:
 				form.add_error("email", "Invalid username/password combination")
 				return self.render_to_response(self.get_context_data(form=form))

@@ -24,7 +24,7 @@ class EventSendToSubscribersView(HouseAccountMixin, RedirectView):
                 subscriber.save()
 
             # Update all of the subscribers scores -----------------------
-            messages.success(self.request, 'Subscribers have been notified!')
+            messages.success(self.request, 'Subscribers have been notified!') 
         else:
             messages.warning(self.request, 'You cannot send out campaigns for inactive events')
         return super().get_redirect_url(*args, **kwargs)
