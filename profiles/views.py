@@ -143,6 +143,8 @@ class ProfileCreateView(CreateView):
 		region = form.cleaned_data.get("region")
 		city = form.cleaned_data.get("city")
 
+		email = email.lower()
+
 		# Create a user with this email and password
 		try:
 			profile = Profile.objects.get(email=email)
