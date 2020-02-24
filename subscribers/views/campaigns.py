@@ -138,6 +138,8 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         if 'test' in data:
             self.send_test_email()
             messages.success(request, f'Test Email Sent to {house.email}!')
+            view_name = "subscribers:campaign_update"
+            return HttpResponseRedirect(reverse(view_name, kwargs={"pk": self.object.id}))
 
         elif "nuke" in data:
             subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
@@ -150,6 +152,8 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
 
         else:
             messages.success(request, 'Campaign Updated Successfully!')
+            view_name = "subscribers:campaign_update"
+            return HttpResponseRedirect(reverse(view_name, kwargs={"pk": self.object.id}))
 
         valid_data = super(CampaignUpdateView, self).form_valid(form)
         return valid_data

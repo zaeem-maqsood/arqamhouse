@@ -155,8 +155,7 @@ class SubscriberListView(HouseAccountMixin, ListView):
         print(request.is_ajax())
 
         house = self.get_house()
-        subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
-        all_subscribers = Subscriber.objects.select_related('profile').filter(house=house).order_by('-created_at')
+        all_subscribers = Subscriber.objects.select_related('profile').filter(house=house, unsubscribed=False).order_by('-created_at')
         search_terms = data["search"].split()
 
         if data["search"] == '':
