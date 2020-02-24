@@ -45,14 +45,11 @@ class SubscriberCreateView(HouseAccountMixin, FormView):
         # Check if they are already subscribed
         try:
             subscriber = Subscriber.objects.get(profile=profile, house=house)
-            form.add_error("email", "This subscriber is already added!")
+            form.add_error("email", "This Subscriber has previously unsubscribed. They must manually subscribe themselves.")
             return self.render_to_response(self.get_context_data(form=form, request=request))
         except:
             subscriber = Subscriber.objects.create(profile=profile, house=house, events_total=1, attendance_total=1)
 
-
-        print(email)
-        print(name)
         messages.success(request, 'Subscriber added!')
 
         valid_data = super(SubscriberCreateView, self).form_valid(form)
@@ -158,7 +155,7 @@ class SubscriberListView(HouseAccountMixin, ListView):
         print(request.is_ajax())
 
         house = self.get_house()
-        subscribers = Subscriber.objects.filter(house=house)
+        subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
         all_subscribers = Subscriber.objects.select_related('profile').filter(house=house).order_by('-created_at')
         search_terms = data["search"].split()
 

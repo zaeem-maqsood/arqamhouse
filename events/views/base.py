@@ -44,6 +44,7 @@ from houses.mixins import HouseAccountMixin
 
 # Tasks
 from events.tasks import send_test_email
+from subscribers.tasks import send_campaign_emails
 
 # Models
 from houses.models import HouseUser
@@ -53,7 +54,7 @@ from events.models import (Event, AttendeeCommonQuestions, EventQuestion, Ticket
 from questions.models import Question
 from payments.models import Transaction, Refund, HouseBalance
 from profiles.models import Profile
-from subscribers.models import Subscriber
+from subscribers.models import Subscriber, Campaign
 
 # Forms
 from events.forms import (EventForm, EventCheckoutForm, AttendeeForm, TicketsToCartForm, CheckinForm, DiscountForm,
@@ -101,3 +102,50 @@ class ChannelsRoomView(View):
 
         context["room_name_json"] = mark_safe(json.dumps(room_name))
         return context
+
+
+
+CONTENT = """
+            <p style="text-align: center;">
+                <span style="font-size: 24px; font-weight:100; color:  grey;">[house_name] has a new event coming up!</span>
+            </p>
+            <p style="user-select: auto; text-align: center;">
+                <br style="user-select: auto;">
+            </p>
+            <p style="user-select: auto; text-align: center;">
+                <span style="font-size: 18px; user-select: auto; color: rgb(44, 130, 201);">[event_name]</span>
+            </p>
+            <p style="user-select: auto; text-align: center;">
+                <span style="font-size: 24px; user-select: auto;">
+                    <br style="user-select: auto;">
+                    <img src="[event_image]" style="width: 193px; display: inline-block; vertical-align: bottom; margin-right: 5px; margin-left: 5px; text-align: center; user-select: auto; max-width: calc(100% - 10px);">&nbsp;
+                </span>
+            </p>
+            <p style="user-select: auto; text-align: center;">
+                <br style="user-select: auto;">
+            </p>
+            <p style="user-select: auto; text-align: center;">
+                <a href="[event_url]" style="background-color: rgb(74, 144, 226); border: 0px solid rgb(74, 144, 226); border-radius: 6px; color: rgb(255, 255, 255); display: inline-block; font-size: 14px; font-weight: normal; letter-spacing: 0px; line-height: normal; padding: 12px 18px; text-align: center; text-decoration: none; width: 280px; user-select: auto;" target="_blank">View Event</a>
+            </p>
+
+            """
+
+
+NO_IMAGE_CONTENT = """
+            <p style="text-align: center;">
+                <span style="font-size: 24px; font-weight:100; color:  grey;">[house_name] has a new event coming up!</span>
+            </p>
+            <p style="user-select: auto; text-align: center;">
+                <br style="user-select: auto;">
+            </p>
+            <p style="user-select: auto; text-align: center;">
+                <span style="font-size: 18px; user-select: auto; color: rgb(44, 130, 201);">[event_name]</span>
+            </p>
+            <p style="user-select: auto; text-align: center;">
+                <br style="user-select: auto;">
+            </p>
+            <p style="user-select: auto; text-align: center;">
+                <a href="[event_url]" style="background-color: rgb(74, 144, 226); border: 0px solid rgb(74, 144, 226); border-radius: 6px; color: rgb(255, 255, 255); display: inline-block; font-size: 14px; font-weight: normal; letter-spacing: 0px; line-height: normal; padding: 12px 18px; text-align: center; text-decoration: none; width: 280px; user-select: auto;" target="_blank">View Event</a>
+            </p>
+
+            """

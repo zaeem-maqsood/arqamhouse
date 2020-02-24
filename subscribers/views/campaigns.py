@@ -45,8 +45,6 @@ class CampaignTrackerView(View):
                 pass
         except:
             pass
-        print("We got campaign")
-        print(campaign)
         return HttpResponse("")
 
 
@@ -142,7 +140,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
             messages.success(request, f'Test Email Sent to {house.email}!')
 
         elif "nuke" in data:
-            subscribers = Subscriber.objects.filter(house=house)
+            subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
             subscribers = list(subscribers)
             self.object.subscribers_sent_to.add(*subscribers)
             self.object.draft = False

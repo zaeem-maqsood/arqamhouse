@@ -70,7 +70,7 @@ class UserDashboardView(ProfileMixin, View):
 			return None
 
 	def get_updates(self, profile):
-		subscriptions = Subscriber.objects.select_related('house').filter(profile=profile)
+		subscriptions = Subscriber.objects.select_related('house').filter(profile=profile, unsubscribed=False)
 		print(subscriptions)
 		houses = []
 		for subscription in subscriptions:

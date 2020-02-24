@@ -23,6 +23,23 @@ class EventSendToSubscribersView(HouseAccountMixin, RedirectView):
                 subscriber.events_total += 1
                 subscriber.save()
 
+            if event.image: 
+                content = CONTENT
+                content = content.replace("[event_image]", event.image.url)
+            else:
+                content = NO_IMAGE_CONTENT
+                
+            content = content.replace("[house_name]", event.house.name)
+            content = content.replace("[event_name]", event.title)
+            content = content.replace("[event_url]", f"https://www.arqamhouse.com{event.get_landing_view()}")
+            print(content)
+
+            campaign = Campaign.objects.create(name=f"{event.title} Initial Campaign", house=event.house, total=subscribers.count(), subject=f"New Event By {event.house.name}",
+                                               draft=False, content=content)
+            campaign.subscribers_sent_to.add(*subscribers)
+
+            task = send_campaign_emails.delay(campaign.id)
+
             # Update all of the subscribers scores -----------------------
             messages.success(self.request, 'Subscribers have been notified!') 
         else:
