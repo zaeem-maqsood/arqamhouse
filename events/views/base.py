@@ -31,7 +31,7 @@ from django.db.models import Q
 from django.db.models import Sum
 from django.template.loader import render_to_string
 
-
+from urllib.parse import urlparse
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment
@@ -50,7 +50,7 @@ from subscribers.tasks import send_campaign_emails
 from houses.models import HouseUser
 from events.models import (Event, AttendeeCommonQuestions, EventQuestion, Ticket, EventCart, ChargeError,
                            EventCartItem, Answer, OrderAnswer, EventOrder, Attendee, EventEmailConfirmation,
-                           EventRefundRequest, EventDiscount, Checkin, EventOrderRefund, )
+                           EventRefundRequest, EventDiscount, Checkin, EventOrderRefund, EventRefererDomain)
 from questions.models import Question
 from payments.models import Transaction, Refund, HouseBalance
 from profiles.models import Profile

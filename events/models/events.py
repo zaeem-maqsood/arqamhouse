@@ -69,6 +69,7 @@ class Event(TimestampedModel):
     active = models.BooleanField(default=True)
     deleted = models.BooleanField(default=False)
     send_to_subscribers = models.BooleanField(default=False)
+    views = models.PositiveIntegerField(blank=True, null=True, default=0)
     objects = EventManager()
 
     def __str__(self):
@@ -204,8 +205,14 @@ post_save.connect(event_post_save_reciever, sender=Event)
 
 
 
+class EventRefererDomain(TimestampedModel):
 
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=False, null=False)
+    domain = models.CharField(max_length=300, null=True, blank=True)
+    count = models.PositiveIntegerField(blank=True, null=True, default=0)
 
+    def __str__(self):
+        return self.domain
 
 
 
