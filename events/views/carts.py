@@ -72,24 +72,19 @@ class AddTicketsToCartView(FormView):
         # Check if event should be archived or not
         archive_past_events(event)
 
-        # Add Views to event page
-        event.views += 1
-        event.save()
-
         
         if 'HTTP_REFERER' in request.META:
             url = request.META['HTTP_REFERER']
             parsed_uri = urlparse(url)
             print(dir(parsed_uri))
             result = '{uri.netloc}'.format(uri=parsed_uri)
-            try:
-                event_referer_domain = EventRefererDomain.objects.get(event=event, domain__icontains=result)
-                event_referer_domain.count += 1
-                event_referer_domain.save()
-            except:
-                event_referer_domain = EventRefererDomain.objects.create(event=event, domain=result, count=1)
-
-
+            if result != 'www.arqamhouse.com':
+                try:
+                    event_referer_domain = EventRefererDomain.objects.get(event=event, domain__icontains=result)
+                    event_referer_domain.count += 1
+                    event_referer_domain.save()
+                except:
+                    event_referer_domain = EventRefererDomain.objects.create(event=event, domain=result, count=1)
 
 
         # Get tickets
@@ -108,6 +103,11 @@ class AddTicketsToCartView(FormView):
             request.session.modified = True
 
         owner = self.check_if_user_is_owner(event)
+
+        if not owner:
+            # Add Views to event page
+            event.views += 1
+            event.save()
 
         discount_code = EventDiscount.objects.filter(event=event).exists()
         context["discount_code"] = discount_code

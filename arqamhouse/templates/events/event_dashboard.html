@@ -483,11 +483,46 @@ color: #7396b0;
 					</div>
 				</div>
 			</div>
-			
+		</div>
 
-			
-		
-		
+
+		<div class="row">
+			<div class="col-lg-4 offset-lg-1 col-md-5" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-6">
+								<a class="dashboard-links" href="{{ event.get_traffic_view }}">
+									<i class="la la-eye" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">Page Views</p>
+								</a>
+							</div>
+							<div class="col-6">
+								<a class="dashboard-links" href="{{ event.get_traffic_view }}"><h2 style="padding-top: 15px;font-size: 40px;">{{ event.views }}</h2></a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-6 col-md-7" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center align-items-center">
+							<div class="col-5">
+								<a class="dashboard-links" href="{{ event.get_traffic_view }}">
+									<i class="la la-car" style="font-size:2.5em;"></i>
+									<p style="padding-top: 10px;">Traffic Sources</p>
+								</a>
+							</div>
+							<div class="col-7">
+								<a class="dashboard-links" href="{{ event.get_traffic_view }}"><p class="lead">{{ event_referer_domain.domain }}</p></a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 		</div>
 
 	</div>

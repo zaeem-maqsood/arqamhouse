@@ -47,6 +47,36 @@ class EventSendToSubscribersView(HouseAccountMixin, RedirectView):
         return super().get_redirect_url(*args, **kwargs)
 
 
+class EventTrafficView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, View):
+
+    template_name = "events/traffic.html"
+
+    def get_event(self, slug):
+        try:
+            event = Event.objects.get(slug=slug)
+        except Exception as e:
+            print(e)
+            raise Http404
+        return event
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+        house = self.get_house()
+        event = self.get_event(self.kwargs['slug'])
+
+        event_referer_domains = EventRefererDomain.objects.filter(event=event)
+
+        context["event_referer_domains"] = event_referer_domains
+        context["event"] = event
+        context["house"] = house
+        context["event_tab"] = True
+        context["dashboard_events"] = self.get_events()
+        return context
+
+
 
 class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, DetailView):
     model = Event
@@ -122,6 +152,9 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         house = self.get_house()
         event = self.get_event(slug)
 
+        event_referer_domain = EventRefererDomain.objects.filter(event=event).order_by("-count").first()
+        context["event_referer_domain"] = event_referer_domain
+
         # Check if event should be archived or not
         archive_past_events(event)
 
@@ -142,7 +175,6 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         context["questions"] = questions
         context["tickets"] = tickets
         context["total_sales"] = self.get_total_sales(event)
-        print(self.graph_data(event))
         context["graph_data"] = self.graph_data(event)
 
         context["dashboard_events"] = dashboard_events

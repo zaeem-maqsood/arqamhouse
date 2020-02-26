@@ -1,0 +1,91 @@
+{% extends "backend/base.html" %}
+{% load tz %}
+{% load static %}
+
+{% block title %}
+Orders | {{ event.title }}
+{% endblock title %}
+
+{% block page_title %}
+Orders
+{% endblock page_title %}
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+
+{% endblock scripts %}
+
+
+
+{% block content %}
+<style>
+.dashboard-links {
+	color: #7396b0;
+}
+</style>
+
+<div class="row align-items-center h-100"style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+				<div class="row" style="padding-bottom: 10px;">
+					<div class="col-lg-12" style="padding-bottom: 10px;">
+						<h3 style="display: inline;">Event Traffic</h3>
+					</div>
+				</div>
+
+                <div class="row text-center">
+                    <div class="col-lg-12" style="padding-bottom: 10px;">
+                        <p class="lead">Total Views | <strong>{{ event.views }}</strong></p>
+                    </div>
+                </div>
+				
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>Source</th>
+								<th>Volume</th>
+							</tr>
+						</thead>
+						<tbody id="dynamic">
+							{% for event_referer_domain in event_referer_domains %}
+							<tr>
+								<td>{{ event_referer_domain.domain }}</td>
+								<td>{{ event_referer_domain.count }}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				
+			</div>
+					
+		</div>
+	</div>
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
