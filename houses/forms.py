@@ -3,11 +3,38 @@ import re
 
 from django import forms
 
-from .models import House, HouseDirector
+from .models import House, HouseDirector, HouseUser
 from core.constants import days, months, years, provinces
 from cities_light.models import City, Region, Country
 
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget, PhoneNumberPrefixWidget
+
+
+class HouseUserOptionsForm(forms.ModelForm):
+
+	class Meta:
+		model = HouseUser
+		fields = [
+			"order_confirmations",
+			"ticket_sales"
+		]
+
+
+		widgets = {
+			"order_confirmations": forms.CheckboxInput(
+				attrs={
+					"class": "form-control m-input",
+				}
+			),
+			"ticket_sales": forms.CheckboxInput(
+				attrs={
+					"class": "form-control m-input",
+				}
+			),
+		}
+
+
+
 
 
 
@@ -190,6 +217,8 @@ class HouseSupportInfoForm(forms.ModelForm):
 		fields = [
 			"email",
 			"phone",
+			"order_confirmations",
+			"ticket_sales"
 		]
 
 		widgets = {
@@ -206,6 +235,16 @@ class HouseSupportInfoForm(forms.ModelForm):
                             "class": "form-control m-input",
                         }
                     ),
+					"order_confirmations": forms.CheckboxInput(
+						attrs={
+							"class": "form-control m-input",
+						}
+					),
+					"ticket_sales": forms.CheckboxInput(
+						attrs={
+							"class": "form-control m-input",
+						}
+					),
                 }
 
 

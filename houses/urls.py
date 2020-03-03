@@ -21,7 +21,7 @@ from django.urls import path, include
 
 from .views import (HouseCreateView, HouseLandingView,
                     DashboardView, HouseUpdateView, AddUserToHouseView, HouseVerificationView, HouseSupportInfoView,
-                    HouseHomePageView)
+                    HouseHomePageView, HouseUserDetailView)
 
 
 app_name="houses"
@@ -43,6 +43,9 @@ urlpatterns = [
 
 	# Manage Users
 	path('manage', AddUserToHouseView.as_view(), name='manage'),
+
+    # Manage Individual Users
+	path('manage/<int:pk>', HouseUserDetailView.as_view(), name='manage_house_user'),
 
     # Verifiy House
 	path('verify', HouseVerificationView.as_view(), name='verify'),

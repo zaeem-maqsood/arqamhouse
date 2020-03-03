@@ -20,18 +20,19 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
 from houses.views import DashboardView, ConnectVerificationView, ChangeEntityTypeView
-from .views import HomePageView, ReportErrorView, ApplePayVerificationView
+from .views import HomePageView, ReportErrorView, ApplePayVerificationView, AboutUsView
 from events.views import OrderPublicDetailView
 
 urlpatterns = [
 
     path('', HomePageView.as_view(), name='home'),
+    path('about', AboutUsView.as_view(), name='about'),
     path('report', ReportErrorView.as_view(), name='report'),
     path('change-entity', ChangeEntityTypeView.as_view(), name='change_entity'),
     path('verification', ConnectVerificationView.as_view(), name='verification'),
     path('house/', include('houses.urls')),
     path('profile/', include('profiles.urls')),
-    path('admin/', admin.site.urls),
+    path('zaeem/', admin.site.urls),
     path('events/', include('events.urls')),
     path('questions/', include('questions.urls')),
     path('payments/', include('payments.urls')),

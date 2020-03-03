@@ -170,6 +170,21 @@ $('#id_{{ ticket.id }}').change(function() {
 {% else %}
 {% endif %}
 
+{% if owner %}
+<script>
+	function myFunction() {
+		/* Get the text field */
+		var copyText = document.getElementById("order_link");
+
+		/* Select the text field */
+		copyText.select();
+		copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+		/* Copy the text inside the text field */
+		document.execCommand("copy");
+	}
+</script>
+{% endif %}
 {% endblock scripts %}
 
 
@@ -182,12 +197,24 @@ $('#id_{{ ticket.id }}').change(function() {
 		{% if owner %}
 		<div class="row justify-content-around" style="padding:40px;padding-bottom: 0px;">
 			<div class="col-lg-9 col-md-12 col-12" style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 40px;border-radius: 15px;">
-				<div class="row">
+				<div class="row" style="padding-bottom: 30px;">
 					<div class="col-md-6">
 						<a href="{{ event.get_update_view }}" class="btn btn--primary btn-block" style="color: white;">Edit Event</a>
 					</div>
 					<div class="col-md-6">
 						<a href="{{ event.get_event_dashboard }}" class="btn btn--primary btn-block" style="color: white;">Dashboard</a>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-3">
+						<p style="color: #2584C7;display: inline-block;line-height: 3;">Event URL | <i class="fa fa-clipboard"
+								onclick="myFunction()"></i></p>
+					</div>
+					<div class="col-md-9" style="margin-top: 5px;">
+						<input pattern="[a-zA-Z ]*" style="font-size: 13px;" maxlength="100" class="validate-required pull-right"
+							type="text" name="order_link" id="order_link"
+							value="https://www.arqamhouse.com/events/{{ event.slug }}" readonly>
 					</div>
 				</div>
 			</div>

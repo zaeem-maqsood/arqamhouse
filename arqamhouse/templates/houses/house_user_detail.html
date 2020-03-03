@@ -6,76 +6,31 @@ Manage | {{ house.name }}
 
 
 {% block css_vendors %}
-
 {% endblock css_vendors %}
 
 {% block vendors %}
 {% endblock vendors %}
 
 {% block scripts %}
-<script>
-
-    jQuery(document).ready(function ($) {
-    var textToFind = 'Canada +1';
-
-    var dd = document.getElementById('id_phone_0');
-    for (var i = 0; i < dd.options.length; i++) {
-        if (dd.options[i].text === textToFind) {
-            dd.selectedIndex = i;
-            break;
-        }
-    }
-    });
-
-</script>
 {% endblock scripts %}
 
 
-{% block page_crumbs %}
-
-{% endblock page_crumbs %}
-
 {% block content %}
-<style>
-    .dashboard-links {
-        color: #7396b0;
-    }
-
-    #id_phone_1 {
-        display: inline-block;
-        width: 78%;
-    }
-
-    #id_phone_0 {
-        display: inline-block;
-        width: 20%;
-        margin-right: 2%;
-    }
-</style>
 <div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
-    <div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+    <div class="col-lg-8 offset-lg-2 col-md-12 col-12">
         <div class="kt-portlet kt-portlet--mobile" style="padding:10px;">
             <div class="kt-portlet__body">
 
-                <div class="row" style="padding-bottom:30px;">
-                    <div class="col-8 offset-2">
+                <form method="POST" accept=""> {% csrf_token %}
 
-                        <form method="POST" id="houseForm" action="">{% csrf_token %}
-                            
-                            <div class="row" style="padding-bottom:30px;">
-                                <div class="col-12">
-                                    <p style="margin-bottom:0px;">Support Email</p>
-                                    {{ form.email }}
-                                </div>
-                            </div>
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-12" style="padding-bottom: 10px;">
+                            <h5 style="display: inline;">{{ house_user.profile.name }} | <span style="font-size: 15px;font-weight: 300;">House User</span> </h5>
+                        </div>
+                    </div>
 
-                            <div class="row" style="padding-bottom:30px;">
-                                <div class="col-12">
-                                    <p style="margin-bottom:0px;">Support Phone Number</p>
-                                    {{ form.phone }}
-                                </div>
-                            </div>
-
+                    <div class="row" style="padding-bottom:30px;">
+                        <div class="col-12">
 
                             <div class="row" style="padding-bottom: 10px;">
                                 <div class="col-12">
@@ -94,7 +49,7 @@ Manage | {{ house.name }}
                                         </label>
                                     </span>
                                 </div>
-                            
+
                                 <div class="col-4">
                                     <p style="margin-bottom:0px;">Ticket Sales</p>
                                     <span class="kt-switch">
@@ -107,16 +62,19 @@ Manage | {{ house.name }}
                             </div>
 
 
-                            <div class="row" style="padding-bottom:30px;">
-                                <div class="col-12">
+                            <div class="row">
+                                <div class="col-md-6">
                                     <button type="submit" class="btn btn-primary btn-block">Update</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button href="#" id="{{ house_user.id }}" name="Remove" value="{{ house_user.id }}" class="btn btn-danger btn-block">Remove User</button>
                                 </div>
                             </div>
 
-                        </form>
-
+                        </div>
                     </div>
-                </div>
+
+                </form>
 
             </div>
         </div>

@@ -55,6 +55,8 @@ class House(TimestampedModel):
     name = models.CharField(max_length=120, null=True, blank=False)
     email = models.EmailField(blank=True, null=True)
     phone = PhoneNumberField(blank=True, null=True)
+    order_confirmations = models.BooleanField(default=True)
+    ticket_sales = models.BooleanField(default=True)
     slug = models.SlugField(unique = False, blank=True)
     logo = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=False, null=True)
@@ -128,9 +130,16 @@ class HouseUser(TimestampedModel):
     profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=False, null=False)
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
     role = models.CharField(max_length=150, choices=roles, default = 'admin')
+    order_confirmations = models.BooleanField(default=False)
+    ticket_sales = models.BooleanField(default=False)
 
     def __str__(self):
         return "%s - %s - %s" % (self.profile, self.house, self.role)
+
+
+    def house_user_detail_view(self):
+        view_name = "houses:manage_house_user"
+        return reverse(view_name, kwargs={"pk": self.id})
 
 
 def id_location(instance, filename):

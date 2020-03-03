@@ -6,7 +6,6 @@ Manage | {{ house.name }}
 
 
 {% block css_vendors %}
-
 {% endblock css_vendors %}
 
 {% block vendors %}
@@ -14,143 +13,8 @@ Manage | {{ house.name }}
 {% endblock vendors %}
 
 {% block scripts %}
-
-<script type="text/javascript">
-    function changeHouse(object) {
-
-        console.log(object.value)
-        var house_user = object.value;
-        var token = '{{csrf_token}}';
-
-        $.ajax({
-            type: "POST",
-            headers: { "X-CSRFToken": token },
-            url: '{{ request.path }}',
-            data: {
-                'house_user': house_user,
-            },
-
-            success: function (data) {
-                console.log("HELLOO");
-                location.reload();
-
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                alert(errorThrown);
-                //some stuff on failure
-            },
-        });
-
-    }
-</script>
-
-<script type="text/javascript">
-    var ctx2 = document.getElementById("myChart2");
-    var myChart2 = new Chart(ctx2, {
-        type: 'line',
-        aspectRatio: 2,
-        data: {
-            labels: {{ graph_data.day_label | safe }},
-    datasets: [{
-        label: 'Sales ($)',
-        data: {{ graph_data.sales_label | safe }},
-        backgroundColor: 'rgba(68, 153, 216, 0.2)',
-        borderColor: 'rgba(68, 153, 216, 1)',
-        borderWidth: 4,
-        lineTension: 0.1,
-        borderCapStyle: 'butt',
-        borderDashOffset: 3.0,
-        borderJoinStyle: 'miter',
-        pointBorderWidth: 6,
-        pointHoverRadius: 5,
-        pointHoverBorderWidth: 2,
-        pointRadius: 0.5,
-        pointHitRadius: 7,
-        xPadding: 25,
-
-	        }]
-	    },
-    options: {
-
-        legend: {
-            display: false,
-			},
-
-        tooltips: {
-            enabled: true,
-                mode: 'label',
-
-                    callbacks: {
-                label: function(item) {
-                    label = (Math.round(item.yLabel * 100) / 100).toFixed(2);
-                    label = label.toString();
-                    label = " $ " + label
-                    return label
-                },
-            },
-        },
-
-        layout: {
-            padding: {
-                left: 0,
-                    right: 0,
-                        top: 10,
-                            bottom: 0
-            }
-        },
-
-        animation: {
-            duration: 4000,
-	        },
-
-        maintainAspectRatio: false,
-
-            scales: {
-            yAxes: [{
-
-                gridLines: {
-                    drawBorder: false,
-                    display: false,
-                },
-
-                ticks: {
-                    display: false,
-                    beginAtZero: true,
-                    suggestedMin: 0,
-                    fontSize: 30,
-                },
-
-            }],
-
-                xAxes: [{
-
-                    gridLines: {
-                        display: false,
-                    },
-
-                    ticks: {
-                        fontSize: 13,
-                    },
-
-                    stepSize: 5,
-                    position: 'bottom',
-
-                }],
-
-	        },
-
-
-        responsive: true,
-	    }
-	});
-</script>
-
 {% endblock scripts %}
 
-
-{% block page_crumbs %}
-
-{% endblock page_crumbs %}
 
 {% block content %}
 <style>
@@ -159,12 +23,18 @@ Manage | {{ house.name }}
     }
 </style>
 <div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
-    <div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+    <div class="col-lg-8 offset-lg-2 col-md-12 col-12">
         <div class="kt-portlet kt-portlet--mobile" style="padding:10px;">
             <div class="kt-portlet__body">
 
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-12" style="padding-bottom: 10px;">
+                        <h3 style="display: inline;">House Users</h3>
+                    </div>
+                </div>
+
                 <div class="row" style="padding-bottom:30px;">
-                    <div class="col-8 offset-2">
+                    <div class="col-12">
 
                         <form method="POST" id="houseForm" action="">{% csrf_token %}
                             
@@ -188,24 +58,16 @@ Manage | {{ house.name }}
                                 </div>
                             </div>
 
-                            <div class="row" style="padding-bottom:30px;">
-                                <div class="col-8">
-                                    <p style="padding-top: 10px;margin-bottom: 0px;">{{ current_house_user.profile.name }}</p>
-                                    <p>{{ current_house_user.profile.email }}</p>
-                                </div>
-                                <div class="col-4">
-                                    <button class="btn btn-info btn-block" type="button">You</button>
-                                </div>
-                            </div>
 
                             {% for house_user in house_users %}
                             <div class="row" style="padding-bottom:30px;">
                                 <div class="col-8">
-                                    <p style="padding-top: 10px;margin-bottom: 0px;">{{ house_user.profile.name }}</p>
+                                    <p style="padding-top: 10px;margin-bottom: 0px;">{{ house_user.profile.name }} <strong>{% if house_user.profile == profile %} - (You){% endif %}</strong></p>
                                     <p>{{ house_user.profile.email }}</p>
                                 </div>
                                 <div class="col-4">
-                                    <button href="#" id="{{ house_user.id }}" name="Remove" value="{{ house_user.id }}" class="btn btn-danger btn-block">Remove</button>
+                                    <a href="{{ house_user.house_user_detail_view }}" class="btn btn-danger btn-block">Settings</a>
+                                    <!-- <button href="#" id="{{ house_user.id }}" name="Remove" value="{{ house_user.id }}" class="btn btn-danger btn-block">Remove</button> -->
                                 </div>
                             </div>
                             {% endfor %}

@@ -109,7 +109,11 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 
 				<div class="row" style="padding-bottom: 40px;">
 					<div class="col-md-8 offset-md-2 col-10">
-						<h4 style="color: grey;">An event managment app that doesn't scare you.</h4>
+						<div class="typed-headline">
+							<span class="h4 inline-block" style="color: grey;">We made Arqam House for</span>
+							<span class="h4 inline-block typed-text typed-text--cursor color--primary"
+								data-typed-strings="Student Associations.,Masjids., Non-Profit Organizations.,Youth Groups.,Small Businesses., Special Causes.,">Muslim Organizations</span>
+						</div>
 						<div class="row">
 							<div class="col-md-4" style="padding-bottom: 30px;">
 								<a class="btn btn--primary btn-block" href="{% url 'profiles:login' %}">
@@ -149,10 +153,13 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 		</div>
 		<div class="row justify-content-center">
 			<div class="col-md-10 col-lg-8">
-				<h3 style="color:#4a90e2;">Powerful tools for everyone</h3>
+				<h3 style="color:#4a90e2;">An event management app that doesn't scare you.</h3>
 				<p>
-					Arqam House was created by people who understand the limitations smaller organizations face in trying to provide a seamless process to their customers.
+					We've created an event management application thats super easy to use. Start creating events and selling tickets with the lowest fee anywhere. 
 				</p>
+				<a class="btn btn--primary" href="{% url 'profiles:create' %}">
+					<span class="btn__text">Get Started</span>
+				</a>
 			</div>
 		</div>
 		<!--end of row-->
@@ -207,7 +214,7 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 							Our platform is super simple to use, no rocket science here!
 							Get started in just minutes. Army of one? No problem. Our intuitive platform makes it easy to start using with little to no training whatsoever.
 						</p>
-						<a href="#">Get Started &raquo;</a>
+						<a href="{% url 'profiles:create' %}">Get Started &raquo;</a>
 						
 					</div>
 				</div>
@@ -234,7 +241,7 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 							No need to download 4 different apps on 7 different devices. Our web application is where everything lives.
 							Our mobile first design makes it seamless to navigate through on any device.
 						</p>
-						<a href="#">Get Started &raquo;</a>
+						<a href="{% url 'profiles:create' %}">Get Started &raquo;</a>
 
 					</div>
 					<div class="col-md-5">
@@ -260,7 +267,7 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 						<p style="min-height: 0px;">
 							Get the important details to your attendees as fast as possible. With our simple event pages and checkout experience attendees will have a fluid experience. 
 						</p>
-						<a href="{% url 'profiles:login' %}">Try it out</a>
+						<a href="{% url 'profiles:create' %}">Try it out</a>
 					</div>
 				</div>
 			</div>
@@ -272,7 +279,7 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 						<p style="min-height: 0px;">
 							Working with a team? You can add others to your house and allow them to help out. You may also create or join any number of houses, all from your single Arqam House account.  
 						</p>
-						<a href="{% url 'profiles:login' %}">Try it out</a>
+						<a href="{% url 'profiles:create' %}">Try it out</a>
 					</div>
 				</div>
 			</div>
@@ -285,7 +292,7 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 							Free tickets are free.
 							Paid tickets are 4% + $0.30. That <strong style="color: #4a90e2;">includes payment processing.</strong>
 						</p>
-						<a href="{% url 'profiles:login' %}">Try it out</a>
+						<a href="{% url 'profiles:create' %}">Try it out</a>
 					</div>
 				</div>
 			</div>
@@ -297,7 +304,7 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 						<p style="min-height: 0px;">
 							Arqam House is 'house' first. That means we don't use your event to promote other events.
 						</p>
-						<a href="{% url 'profiles:login' %}">Try it out</a>
+						<a href="{% url 'profiles:create' %}">Try it out</a>
 					</div>
 				</div>
 			</div>

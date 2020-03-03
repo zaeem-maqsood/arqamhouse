@@ -665,19 +665,30 @@ class EventCheckoutView(FormView):
 
     def send_owner_confirmation_email(self, event, order):
 
-        # Compose Email
-        subject = 'New Order For %s' % (event.title)
-        context = {}
-        context["event"] = event
-        context["order"] = order
-        html_content = render_to_string('emails/owner_order_confirmation.html', context)
-        text_content = strip_tags(html_content)
-        from_email = 'New Order <info@arqamhouse.com>'
-        to = [event.house.email]
-        email = EmailMultiAlternatives(subject=subject, body=text_content,
-                                       from_email=from_email, to=to)
-        email.attach_alternative(html_content, "text/html")
-        email.send()
+        to = []
+        if event.house.order_confirmations:
+            to.append(event.house.email)
+
+        house_users = HouseUser.objects.filter(house=event.house).exclude(profile__email=event.house.email)
+        for house_user in house_users:
+            if house_user.order_confirmations:
+                to.append(house_user.profile.email)
+
+        if to:
+            for x in to:
+                # Compose Email
+                subject = 'New Order For %s' % (event.title)
+                context = {}
+                context["event"] = event
+                context["order"] = order
+                html_content = render_to_string('emails/owner_order_confirmation.html', context)
+                text_content = strip_tags(html_content)
+                from_email = 'New Order <orders@arqamhouse.com>'
+                email = EmailMultiAlternatives(subject=subject, body=text_content,
+                                            from_email=from_email, to=[x])
+                email.attach_alternative(html_content, "text/html")
+                email.send()
+
         return "Done"
 
     def send_error_email(self, event, error, data):

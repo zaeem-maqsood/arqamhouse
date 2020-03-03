@@ -1,0 +1,112 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Arqam House
+{% endblock title %}
+
+{% block footer %}
+{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center" style="padding-bottom: 50px;padding-top: 150px;">
+    <div class="container">
+
+        <div class="row" style="padding-bottom: 20px;">
+            <div class="col-md-12">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+            </div>
+        </div>
+
+        <div class="row" style="padding-bottom: 20px;">
+            <div class="col-md-12 col-lg-12">
+
+                <div class="col-md-10 col-lg-8">
+                    <h3>We're always looking to colab!</h3>
+                    <p class="lead">
+                        If you are apart of a student organization, masjid, youth committee, non-profit or run your own business, contact us!
+                    </p>
+                </div>           
+
+            </div>
+        </div>
+
+
+        <div class="row" style="padding-bottom: 30px;">
+            <div class="col-md-12" style="padding-bottom: 30px;">
+                <a class="btn btn--primary" href="{% url 'report' %}">
+                    <span class="btn__text">Get in touch</span>
+                </a>
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature feature-8">
+                    <img alt="Image" src="{% static 'images/about/zaeem.jpg' %}" />
+                    <h5>Zaeem Maqsood</h5>
+                    <span>CEO &amp; Lead Engineer</span>
+                    <p>zaeem@arqamhouse.com</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature feature-8">
+                    <img alt="Image" src="{% static 'images/about/hassan.jpg' %}" />
+                    <h5>Hassan Khawaja</h5>
+                    <span>Developer</span>
+                    <p>hassan@arqamhouse.com</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature feature-8">
+                    <img alt="Image" src="{% static 'images/about/yazin.jpg' %}" />
+                    <h5>Yasean Steitieh</h5>
+                    <span>Developer &amp; Sales</span>
+                    <p>yasean@arqamhouse.com</p>
+                </div>
+            </div>
+            <!-- <div class="col-md-4">
+                <div class="feature feature-8">
+                    <img alt="Image" src="{% static 'images/about/saira.jpg' %}" />
+                    <h5>Saira Khan</h5>
+                    <span>Finance</span>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature feature-8">
+                    <img alt="Image" src="img/avatar-round-5.png" />
+                    <h5>Josie Web</h5>
+                    <span>Head of Development</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature feature-8">
+                    <img alt="Image" src="img/avatar-round-6.png" />
+                    <h5>Bryce Vaughn</h5>
+                    <span>Marketing Director</span>
+                </div>
+            </div> -->
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+
+
+
+
+{% endblock content %}
