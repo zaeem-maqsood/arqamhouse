@@ -355,12 +355,16 @@ class EventCheckoutView(FormView):
             event_order = EventOrder.objects.filter(event=event, email=data["email"]).exists()
             if not event_order:
                 subscriber.attendance_total = subscriber.attendance_total + 1
+                subscriber.events.add(event)
                 if subscriber.attendance_total > subscriber.events_total:
                     subscriber.events_total += 1
                 subscriber.save()
+
+        # Or we need to create a subscriber
         except Exception as e:
             print(e)
             subscriber = Subscriber.objects.create(profile=profile, house=event.house, events_total=1, attendance_total=1)
+            subscriber.events.add(event)
 
 
 

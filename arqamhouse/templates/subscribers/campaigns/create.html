@@ -30,7 +30,11 @@ Subscribers | {{ house.name }}
 
 				<div class="row" style="padding-bottom:40px;">
 					<div class="col-lg-12">
-						<h3>Create Campaign</h3>
+						<h3>Create {% if event %}Event{% endif %} Campaign</h3>
+                        {% if event %}
+                        <p style="margin-bottom: 0px;">This campaign will only be sent to subscribers who attended <a
+                                href="{{ event.get_landing_view }}">{{ event }}</a></p>
+                        {% endif %}
 					</div>
 				</div>
 
@@ -51,7 +55,7 @@ Subscribers | {{ house.name }}
 
                     {{ form.media }}
                     <div class="row" style="padding-bottom: 50px;">
-                        <div class="col-md-12">
+                        <div class="col-md-12" style="max-width: 640px;">
                             <p style="margin-bottom: 5px;">Content</p>
                             {{ form.content }}
                         </div>
@@ -59,10 +63,35 @@ Subscribers | {{ house.name }}
 
                     <div class="row" style="padding-bottom:40px;">
                         <div class="col-lg-12">
-                            <button type="submit" name="save" value='true' class="btn btn-primary btn-block">Create Campaign</button>
+                            <button type="submit" name="save" value='true' class="btn btn-primary btn-block">Create Draft</button>
                         </div>
                     </div>
                 </form>
+
+                <div class="row">
+                    <div class="col-6">
+                
+                        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample"
+                            aria-expanded="false" aria-controls="collapseExample">
+                            View {{ subscribers.count }} Subscribers
+                        </button>
+                
+                        <div class="collapse" id="collapseExample" style="padding-top: 30px;">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <tbody>
+                                        {% for subscriber in subscribers %}
+                                        <tr>
+                                            <td><a href="{{ subscriber.get_absolute_url }}">{{ subscriber.profile.name|title }}</a></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                
+                    </div>
+                </div>
 
 
 			</div>

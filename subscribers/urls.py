@@ -33,6 +33,7 @@ urlpatterns = [
     path('<slug:slug>', SubscriberDetailView.as_view(), name='detail'),
 
     path('campaigns/create', CampaignCreateView.as_view(), name='campaign_create'),
+    path('campaigns/create/<slug:slug>', CampaignCreateView.as_view(), name='campaign_create_event'),
     path('campaigns/update/<int:pk>', CampaignUpdateView.as_view(), name='campaign_update'),
     path('campaigns/details/<int:pk>', CampaignDetailView.as_view(), name='campaign_detail'),
     path('campaigns/detail/<int:pk>/content', CampaignContentView.as_view(), name='campaign_detail_content'),

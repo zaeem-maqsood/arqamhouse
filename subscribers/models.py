@@ -6,7 +6,7 @@ from django.urls import reverse
 from core.models import TimestampedModel
 from houses.models import House
 
-from events.models import EventOrder, Event
+from events.models import EventOrder, Event, Ticket
 
 # Create your models here.
 
@@ -22,9 +22,11 @@ class Subscriber(TimestampedModel):
     engagement = models.CharField(max_length=150, choices=engagement_types, blank=True, null=True)
     engagement_total = models.PositiveIntegerField(blank=True, null=True, default=0)
     engagement_score = models.PositiveIntegerField(blank=True, null=True, default=0)
+    # Subscriber score out of 100
     attendance_score = models.PositiveIntegerField(blank=True, null=True, default=0)
     attendance_total = models.PositiveIntegerField(blank=True, null=True, default=0)
     events_total = models.PositiveIntegerField(blank=True, null=True, default=0)
+    events = models.ManyToManyField(Event, blank=True)
     unsubscribed = models.BooleanField(default=False) 
     
 
@@ -49,6 +51,7 @@ class Subscriber(TimestampedModel):
 class Campaign(TimestampedModel):
     name = models.CharField(max_length=100, blank=True, null=True)
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=True, null=True)
     subscribers_sent_to = models.ManyToManyField(Subscriber, related_name="subscribers_sent_to", blank=True)
     subscribers_seen = models.ManyToManyField(Subscriber, related_name="subscribers_seen", blank=True)
     # Total number of people the campaign was sent to

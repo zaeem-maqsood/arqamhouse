@@ -106,6 +106,12 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         subscribers = Subscriber.objects.filter(house=house)
         form = self.get_form()
 
+        if self.object.event:
+            event = self.object.event
+            subscribers = Subscriber.objects.filter(house=house, unsubscribed=False, events=self.object.event)
+            context["subscribers"] = subscribers
+            context["event"] = event
+
         context["dashboard_events"] = self.get_events()
         context["campaigns_tab"] = True
         context["subscribers"] = subscribers
@@ -142,7 +148,11 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
             return HttpResponseRedirect(reverse(view_name, kwargs={"pk": self.object.id}))
 
         elif "nuke" in data:
-            subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
+
+            if self.object.event:
+                subscribers = Subscriber.objects.filter(house=house, unsubscribed=False, events=self.object.event)
+            else:
+                subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
             subscribers = list(subscribers)
             self.object.subscribers_sent_to.add(*subscribers)
             self.object.draft = False
@@ -195,9 +205,24 @@ class CampaignCreateView(HouseAccountMixin, CreateView):
         view_name = "subscribers:campaign_list"
         return reverse(view_name)
 
+    def get_event(self):
+        event_slug = self.kwargs['slug']
+        try:
+            event = Event.objects.get(slug=event_slug)
+            return event
+        except Exception as e:
+            print(e)
+            raise Http404
+
     def get_context_data(self, *args, **kwargs):
         context = {}
         house = self.get_house()
+
+        if 'slug' in self.kwargs:
+            event = self.get_event()
+            subscribers = Subscriber.objects.filter(house=house, unsubscribed=False, events=event)
+            context["subscribers"] = subscribers
+            context["event"] = event
 
         subscribers = Subscriber.objects.filter(house=house)
         form = self.get_form()
@@ -215,7 +240,6 @@ class CampaignCreateView(HouseAccountMixin, CreateView):
         data = request.POST
 
         form = self.get_form()
-
         if form.is_valid():
             return self.form_valid(form, request)
         else:
@@ -224,11 +248,21 @@ class CampaignCreateView(HouseAccountMixin, CreateView):
     def form_valid(self, form, request):
         data = request.POST
         house = self.get_house()
+
         self.object = form.save(commit=False)
+
         self.object.house = house
         self.object.total = 0
         self.object.score = 0
         self.object.seen = 0
+        self.object.save()
+
+        if 'slug' in self.kwargs:
+            print("There is a slug!")
+            print(self.kwargs["slug"])
+            event = self.get_event()
+            self.object.event = event
+
         self.object.save()
         messages.success(request, 'Campaign Created Successfully!')
         valid_data = super(CampaignCreateView, self).form_valid(form)

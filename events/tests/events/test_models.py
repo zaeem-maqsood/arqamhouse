@@ -40,7 +40,7 @@ class EventModelTestCase(TestCase):
     def test_get_email_confirmation_view(self):
         event = Event.objects.get(slug="test-1")
         view = event.get_email_confirmation_view()
-        self.assertEqual(view, '/events/test-1/email-confirmation')
+        self.assertEqual(view, '/events/test-1/emails/email-confirmation')
 
     def test_get_landing_view(self):
         event = Event.objects.get(slug="test-1")

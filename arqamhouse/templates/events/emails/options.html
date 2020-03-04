@@ -1,0 +1,79 @@
+{% extends "backend/base.html" %}
+{% load tz %}
+{% load static %}
+
+{% block title %}
+Orders | {{ event.title }}
+{% endblock title %}
+
+{% block page_title %}
+Orders
+{% endblock page_title %}
+
+{% block styles %}
+
+{% endblock styles %}
+
+
+{% block scripts %}
+<script>
+
+function ChangeText(object) {
+    text = object.value
+    // text = text.replace(/\s/g, '&nbsp;');
+    var stripped = text.replace(/<\/?[^>]+(>|$)/g, "");
+    $('#message').html(stripped);
+}
+
+</script>
+{% endblock scripts %}
+
+
+{% block content %}
+<style>
+.dashboard-links {
+	color: #7396b0;
+}
+</style>
+
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+		<div class="kt-portlet kt-portlet--mobile" style="padding:20px;">
+			<div class="kt-portlet__body">
+            
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-12">
+                        <h4>Email Attendees</h4>
+                        <p>Set up a confirmation email or send out a campaign email specific to the attendees of this event.</p>
+                    </div>
+                </div>
+
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-6">
+                        <a href="{{ event.get_email_confirmation_view }}" class="btn btn-block btn-primary">Confirmation Email</a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{{ event.get_create_event_campaign_view }}" class="btn btn-block btn-primary">Campaign Email</a>
+                    </div>
+                </div>
+
+			</div>
+		</div>
+	</div>
+
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

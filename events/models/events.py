@@ -118,6 +118,14 @@ class Event(TimestampedModel):
         view_name = "events:email_confirmation"
         return reverse(view_name, kwargs={"slug": self.slug})
 
+    def get_email_options_view(self):
+        view_name = "events:emails"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+    def get_create_event_campaign_view(self):
+        view_name = "subscribers:campaign_create_event"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
     def get_send_to_subscribers_view(self):
         view_name = "events:send_to_subscribers"
         return reverse(view_name, kwargs={"slug": self.slug})
