@@ -132,14 +132,18 @@ class SubscriberListView(HouseAccountMixin, ListView):
 
 
         # print("\nWe ran this\n")
-        # subscribers = Subscriber.objects.all()
-        # for subscriber in subscribers:
-        #     events = Event.objects.filter(house=subscriber.house)
-        #     for event in events:
-        #         event_orders = EventOrder.objects.filter(event=event, email=subscriber.profile.email).exists
-        #         if event_orders:
-        #             subscriber.events.add(event)
-        #             subscriber.save()
+        subscribers = Subscriber.objects.all()
+        for subscriber in subscribers:
+            subscriber.events.clear()
+
+            events = Event.objects.filter(house=subscriber.house)
+            for event in events:
+                event_orders = EventOrder.objects.filter(event=event, email=subscriber.profile.email)
+                print(event_orders.count())
+                if event_orders:
+                    print(event_orders.count())
+                    subscriber.events.add(event)
+                    subscriber.save()
 
 
         # RUN THIS IN THE CONSOLE ---------------------------------------------------------------------------------

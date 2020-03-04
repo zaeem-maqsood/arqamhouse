@@ -32,7 +32,7 @@ Subscribers | {{ house.name }}
 					<div class="col-lg-12">
 						<h3>Create {% if event %}Event{% endif %} Campaign</h3>
                         {% if event %}
-                        <p style="margin-bottom: 0px;">This campaign will only be sent to subscribers who attended <a
+                        <p style="margin-bottom: 0px;">This campaign will only be sent to subscribers who bought tickets for <a
                                 href="{{ event.get_landing_view }}">{{ event }}</a></p>
                         {% endif %}
 					</div>
