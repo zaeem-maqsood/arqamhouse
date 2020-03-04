@@ -103,7 +103,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         context = {}
         house = self.get_house()
 
-        subscribers = Subscriber.objects.filter(house=house)
+        subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
         form = self.get_form()
 
         if self.object.event:
