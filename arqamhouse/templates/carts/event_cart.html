@@ -254,7 +254,7 @@ $('#id_{{ ticket.id }}').change(function() {
 									{% else %}
 									<h2 style="margin-bottom:0px;font-weight: 400;color: #4498d4;">{{ event.title }}</h2>
 									{% endif %}
-									<p style="font-size: 0.8em;">Hosted by {{ event.house.name }} <i style="color: #4399d5;" class="fa fa-check-circle" data-tooltip="This event is hosted by a verified house." ></i></p>
+									<p style="font-size: 0.8em;">Hosted by <a href="{{ event.house.get_home_page_url }}" style="text-decoration: none;">{{ event.house.name }}</a> <i style="color: #4399d5;" class="fa fa-check-circle" data-tooltip="This event is hosted by a verified house." ></i></p>
 								</div>
 							</div>
 

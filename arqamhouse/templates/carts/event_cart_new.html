@@ -1,0 +1,656 @@
+{% extends "frontend/base.html" %}
+{% load tz %}
+{% load ticket_form_tags %}
+{% load static %}
+
+{% block title %}
+{{ event.title|safe }}
+{% endblock title %}
+
+{% block page_description %}
+<meta name="description" content="{{ event.description|safe|striptags }}">
+
+{% if event.image %}
+<meta property="og:image" content="{{ event.image.url }}">
+{% else %}
+<meta property="og:image" content="{% static 'images/logo.png' %}">
+{% endif %}
+
+<meta property="og:url" content="{{ request.path }}">
+<meta name="twitter:card" content="{{ event.slug }}">
+
+{% endblock page_description %}
+
+{% block styles %}
+<style>
+.boxed {
+    border-radius: 15px;
+}
+
+.boxed.boxed--lg {
+    padding: 15px;
+}
+
+.bg--secondary {
+    background: #ffffff;
+}
+
+ol li:not(:last-child) {
+    margin-bottom: 0px;
+}
+
+#event-image-container {
+    text-align: center;
+}
+
+#event-image {
+    max-width: 200px;
+    max-height: 250px;
+}
+
+#event-details {
+    text-align: center;
+    margin: 30px;
+}
+
+#event-details-no-image {
+    text-align: center;
+}
+</style>
+
+
+
+<style>
+
+    @media (min-width: 576px) {
+        #event-image-container {
+            text-align: center;
+        }
+
+        #event-image {
+            max-height: 250px;
+        }
+
+        #event-details {
+            text-align: center;
+            padding-top: 20px;
+            margin: 0px;
+        }
+     }
+
+
+    @media (min-width: 768px)  {
+
+        #event-image-container {
+            text-align: center;
+        }
+
+        #event-image {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        #event-details {
+            text-align: left;
+            margin: 0px;
+        }
+    }
+
+
+    @media (min-width: 992px) {
+
+        #event-image-container {
+            text-align: center;
+        }
+
+        #event-image {
+            max-height: 300px;
+        }
+
+        #event-details {
+            text-align: left;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        #event-image-container {
+            text-align: center;
+        }
+
+        #event-image {
+            max-height: 300px;
+        }
+
+        #event-details {
+            text-align: left;
+        }
+    }
+
+
+    
+
+    
+
+
+    
+
+
+</style>
+
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script>
+	$('table').addClass('table');
+	$('table').addClass('table-bordered');
+
+</script>
+
+
+<script>
+
+// function getLocation() {
+// 	if (navigator.geolocation) {
+// 		navigator.geolocation.getCurrentPosition(showPosition);
+// 	} else {
+// 		alert("Geolocation is not supported by this browser.");
+// 	}
+// }
+
+function showPosition(position) {
+	var lat = position.coords.latitude;
+	var lng = position.coords.longitude;
+	console.log(lat);
+	console.log(lng);
+}
+</script>
+
+
+{% if event.active and event.ticket_sales %}
+<script type="text/javascript">
+
+	// $(window).bind("pageshow", function () {
+	// 	var form = $('form');
+	// 	// let the browser natively reset defaults
+	// 	form[0].reset();
+	// });
+
+$( document ).ready(function() {
+    calculatePrice();
+	// getLocation();
+
+});
+
+function calculatePrice() {
+
+	var total = 0.00;
+	var donation_input_value = 0.00;
+
+	{% for ticket in tickets %}
+
+        {% if not ticket.sold_out %}
+		{% if ticket.donation %}
+
+			donation_input_value = document.getElementById('id_{{ ticket.id }}_donation').value;
+
+			console.log(donation_input_value)
+			
+			if (donation_input_value != '') {
+				donation_input_value = donation_input_value;
+			}
+			else {
+				donation_input_value = 0.00;
+			}
+
+			var e = document.getElementById("id_{{ ticket.id }}");
+		    total += parseFloat(donation_input_value) * parseFloat(e.options[e.selectedIndex].value);
+
+		    if (total != null) {
+				total = total
+			}
+			else {
+				total = 0.00;
+			}
+
+		    console.log(total)
+
+		{% else %}
+
+			var e = document.getElementById("id_{{ ticket.id }}");
+			total += parseFloat(e.options[e.selectedIndex].value) * parseFloat({{ ticket.buyer_price }});
+
+			console.log(total)
+
+		{% endif %}
+        {% endif %}
+
+		console.log(total);
+
+	{% endfor %}
+
+	if (isNaN(total)) {
+    	total = 0.00;
+    }
+	total = total.toFixed(2);
+
+	{% if owner %}
+	console.log(total)
+	if (total == 0.00) {
+		document.getElementById("checkout").disabled = true;
+	}
+	else {
+		document.getElementById("checkout").disabled = false;
+	}
+	{% endif %}
+
+	total = total.toString()
+    document.getElementById("new_price_div").innerHTML = "Order Total $" + total;
+
+}
+	
+{% for ticket in tickets %}
+
+	{% if ticket.donation %}
+		$('#id_{{ ticket.id }}_donation').change(function() {
+			calculatePrice()
+		});
+	{% endif %}
+ 
+$('#id_{{ ticket.id }}').change(function() {
+	calculatePrice()
+});
+
+{%  endfor %}
+	
+</script>
+{% else %}
+{% endif %}
+
+{% if owner %}
+<script>
+	function myFunction() {
+		/* Get the text field */
+		var copyText = document.getElementById("order_link");
+
+		/* Select the text field */
+		copyText.select();
+		copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+		/* Copy the text inside the text field */
+		document.execCommand("copy");
+	}
+</script>
+{% endif %}
+
+{% endblock scripts %}
+
+
+{% block content %}
+
+<section class="switchable feature-large" style="padding-top: 1rem;">
+    <div class="container" style="padding-right: 0px;padding-left: 0px;">
+
+		{% if messages %}
+		<div class="row justify-content-center" style="padding:30px;padding-bottom: 0px;">
+			<div class="col-md-12 col-lg-9 col-sm-12">
+				{% for message in messages %}
+				<div class="alert bg--{{ message.tags }}">
+					<div class="alert__body">
+						<span>{{ message|safe }}</span>
+					</div>
+					<div class="alert__close">&times;</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+		{% endif %}
+
+    	
+    	<form method="POST">{% csrf_token %}
+
+
+        <div class="row justify-content-around">
+            <div class="col-lg-9 col-md-12 col-sm-12">
+
+                {% if event.image %}
+                <div class="boxed boxed--border bg--secondary boxed--lg box-shadow" style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05); margin: 15px;">
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                            
+                            <div class="row text-center" style="padding-bottom: 40px;">
+                                <div class="col-md-12">
+                                    <h3 style="margin-bottom:0px;font-weight: 400;color: #4498d4;">{{ event.title }}</h3>
+                                    <p style="font-size: 0.8em;">Hosted by <a href="{{ event.house.get_home_page_url }}"
+                                            style="text-decoration: none;">{{ event.house.name }}</a> <i style="color: #4399d5;"
+                                            class="fa fa-check-circle" data-tooltip="This event is hosted by a verified house."></i>
+                                    </p>
+                                </div>
+                            </div>
+                                
+                            <div class="row">
+                                <div class="col-md-6 col-lg-6 col-sm-12" id="event-image-container">
+                                    {% if event.image %}
+                                    <img src="{{ event.image.url }}" id="event-image">
+                                    {% endif %}
+                                </div>
+
+
+                                <div class="col-md-6 col-lg-6 col-sm-12" style="padding-left: 10px;" id="event-details">
+                                    <div class="row" style="padding-bottom: 30px;">
+                                        <div class="col-md-12">
+                                    
+                                            <h4 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="far fa-clock"></i> When</h4>
+                                    
+                                            {% if event.start %}
+                                            <p style="margin-bottom: 0;font-weight:900;">Starts: <span style="font-weight:400;">
+                                                    {{ event.start|localtime|date:"N jS Y, f a" }}</span></p>
+                                            {% endif %}
+                                    
+                                            {% if event.end %}
+                                            <p style="margin-bottom: 0;font-weight:900;">Ends: <span style="font-weight:400;">
+                                                    {{ event.end|localtime|date:"N jS Y, f a" }}</span></p>
+                                            {% endif %}
+                                    
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row" style="padding-bottom: 30px;">
+                                        <div class="col-md-12">
+                                    
+                                            <h4 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="fas fa-map-marker-alt"></i> Where</h4>
+                                            {% if event.venue_name %}
+                                            <p style="margin-bottom: 0;font-weight:900;">Venue: <span style="font-weight:400;">
+                                                    {{ event.venue_name }}</span></p>
+                                            {% endif %}
+                                            {% if event.venue_address %}
+                                            <p style="margin-bottom: 0;font-weight:900;">Address: <a
+                                                    href="https://www.google.com/maps/place/{{ event.venue_address|urlencode }}" target="blank"
+                                                    style="font-weight:400;text-decoration: none;">{{ event.venue_address }}</a></p>
+                                            {% endif %}
+                                    
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+
+                <div class="boxed boxed--border bg--secondary boxed--lg box-shadow" style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05); padding: 0px 60px;padding-bottom: 30px;margin:15px;">
+                    <div class="row" style="padding-top: 30px;">
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                            
+                            <div class="row text-center" style="padding-bottom: 40px;">
+                                <div class="col-md-12">
+                                    <h3 style="margin-bottom:0px;font-weight: 400;color: #4498d4;">{{ event.title }}</h3>
+                                    <p style="font-size: 0.8em;">Hosted by <a href="{{ event.house.get_home_page_url }}"
+                                            style="text-decoration: none;">{{ event.house.name }}</a> <i style="color: #4399d5;"
+                                            class="fa fa-check-circle" data-tooltip="This event is hosted by a verified house."></i>
+                                    </p>
+                                </div>
+                            </div>
+                                
+                            <div class="row text-center" style="padding-bottom: 30px;">
+                                
+                                <div class="col-lg-12 col-md-12 col-sm-12" style="padding-bottom: 30px;">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                    
+                                            <h5 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="far fa-clock"></i> When</h5>
+                                    
+                                            {% if event.start %}
+                                            <p style="margin-bottom: 0;font-weight:900;">Starts: <span style="font-weight:400;">
+                                                    {{ event.start|localtime|date:"N jS Y, f a" }}</span></p>
+                                            {% endif %}
+                                    
+                                            {% if event.end %}
+                                            <p style="margin-bottom: 0;font-weight:900;">Ends: <span style="font-weight:400;">
+                                                    {{ event.end|localtime|date:"N jS Y, f a" }}</span></p>
+                                            {% endif %}
+                                    
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row text-center" style="padding-bottom: 30px;">
+                                <div class="col-lg-12 col-md-12 col-sm-12" style="padding-bottom: 20px;">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h5 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="fas fa-map-marker-alt"></i> Where</h5>
+                                            {% if event.venue_name %}
+                                            <p style="margin-bottom: 0;font-weight:900;">Venue: <span style="font-weight:400;">
+                                                    {{ event.venue_name }}</span></p>
+                                            {% endif %}
+                                            {% if event.venue_address %}
+                                            <p style="margin-bottom: 0;font-weight:900;">Address: <a
+                                                    href="https://www.google.com/maps/place/{{ event.venue_address|urlencode }}" target="blank"
+                                                    style="font-weight:400;text-decoration: none;">{{ event.venue_address }}</a></p>
+                                            {% endif %}
+                                    
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+
+                {% if event.active %}
+                <div class="boxed boxed--border bg--secondary boxed--lg box-shadow" style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 0px 60px;padding-bottom: 30px;margin:15px;">
+                    <div class="row" style="padding-top: 40px;">
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                            {% if tickets %}
+                            
+                                {% if event.ticket_sales %}
+                                {% for ticket in tickets %}
+                                <div class="row" style="padding-bottom:30px;">
+                                    <div class="col-md-8">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p style="font-size: 1.3em;margin-bottom: 0px;">{{ ticket }}</p>
+                                            </div>
+                                            <div class="col-md-6" style="margin-top:0px;">
+                                                <p style="font-size: 1.3em;margin-bottom: 0px;"><span
+                                                        style="color:#4399d5;">
+                                                
+                                                        {% if ticket.paid %}
+                                                        {% if ticket.pass_fee %}
+                                                        ${{ ticket.price }} <span style="font-size: 0.7em;">+ ${{ ticket.fee }} fee</span>
+                                                        {% else %}
+                                                        ${{ ticket.price }}
+                                                        {% endif %}
+                                                        {% endif %}
+                                                
+                                                        {% if ticket.free %}
+                                                        $0.00
+                                                        {% endif %}
+                                                
+                                                        {% if ticket.donation %}
+                                                        Donation
+                                                        {% endif %}
+                                                
+                                                </span></p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <p>{{ ticket.description }}</p>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="col-md-4" style="margin-top: 5px;">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                            {% if not ticket.sold_out %}
+                                                {% if ticket.donation %}
+                                                    <p style="margin-bottom: 0px;">Donation Amount</p>
+                                                    {% get_ticket_related_form_field_donation form ticket %}
+                                                {% endif %}
+                                                    <div class="input-select">
+                                                        {% get_ticket_related_form_field form ticket %}
+                                                    </div>
+                                                {% else %}
+                                                <h3 style="color: #e15656;font-weight: 500;margin-bottom: 0px;">Sold out</h3>
+                                            {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            
+                                {% if discount_code %}
+                                <div class="row" style="padding-bottom:50px;">
+                                    <div class="col-md-12">
+                                        <div class="row" >
+                                            <div class="col-md-8">
+                                                <p style="font-size: 1.3em;margin-bottom: 5px;">Discount Code</p>
+                                                <p>Discount codes are issued by <span style="color:#4399d5;">{{ event.house.name }}</span>.</p>
+                                            </div>
+                                            <div class="col-md-4" style="margin-top: 5px;">
+                                                {{ form.discount_code }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            
+                            
+                                <div class="row text-center" style="padding-bottom:30px;">
+                                    {% if owner %}
+                                    <div class="col-md-10 col-lg-12">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2 style="color: #4399d5;" class="m--font-info color--info" id="new_price_div">Order Total $0.00
+                                                </h2>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="padding-bottom:15px;">
+                                            <div class="col-sm-6" style="padding: 0 10px;">
+                                                <button type="submit" name="checkout" id='checkout' value="checkout"
+                                                    class="btn btn--primary">Collect
+                                                    Payment</button>
+                                            </div>
+                                            <div class="col-sm-6" style="margin-top: 0px;padding: 0 10px;">
+                                                <button type="submit" name="checkout-no-pay" id="checkout-no-pay" value="True"
+                                                    class="btn btn--primary-2" style="color:white;">Don't Collect</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-lg-12 col-md-12" style="padding:40px;">
+                                        <h4 style="color: #666666;margin-bottom: 30px;" class="m--font-info color--info" id="new_price_div">Order
+                                            Total
+                                            $0.00</h4>
+                                        <button type="submit" name="checkout" value="checkout" class="btn btn--primary">Checkout</button>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                {% if owner %}
+                                <div class="row text-center" style="padding-bottom:20px;padding-top:20px;">
+                                    <div class="col-md-12">
+                                        <p style="font-size: 1.3em;margin-bottom: 5px;">Ticket sales are currently stopped.</p>
+                                        <p>You can resume sales from the <a href="{{ event.get_event_dashboard }}">event dashboard.</a></p>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="row text-center" style="padding-bottom:20px;padding-top:20px;">
+                                    <div class="col-md-12">
+                                        <p style="font-size: 1.3em;margin-bottom: 5px;">Ticket sales are currently stopped.</p>
+                                        <p>Please contact the organizer to find out more information.</p>
+                                        <a
+                                            href="mailto:{% for house_user in house_users %}{{ house_user.profile.email }},{% endfor %}?subject=Tickets%20for%20{{ event.title }}&body=Hello {{ event.house.name }}, I was wondering when ticket sales would be resuming.">Send
+                                            {{ event.house.name }} an email</a>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                            
+                                {% else %}
+                            
+                                {% if owner %}
+                                <div class="row justify-content-center text-center" style="padding-top:40px;">
+                                    <div class="col-md-12 col-lg-12">
+                                        <a href="{{ event.list_tickets_view }}" class="btn btn--primary btn-block" style="color: white;">Add
+                                            Tickets</a>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="row justify-content-center text-center" style="padding-top:30px;">
+                                    <div class="col-md-12 col-lg-12">
+                                        <h5 style="color:#666666;">No tickets yet, check back later.</h5>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            
+                                {% endif %}  
+                        </div>   
+                    </div>
+                </div>
+                {% else %}
+                <div class="row" style="margin:10px;">
+                    <div class="col-md-12 col-lg-12 col-sm-12">
+                        <div class="alert bg--success">
+                            <div class="alert__body" style="float: none;">
+                                <span>This event is over. We hope you had a great time!</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                
+                <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
+                    style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 0px 30px;padding-bottom: 30px;margin:15px;">
+                    <div class="row" style="padding-top: 40px;">
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                            {% if event.description %}
+                                {{ event.description|safe }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        </form>
+
+    </div>
+</section>
+
+
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

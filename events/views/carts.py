@@ -3,7 +3,7 @@ from .base import *
 
 # Create your views here.
 class AddTicketsToCartView(FormView):
-    template_name = "carts/event_cart.html"
+    template_name = "carts/event_cart_new.html"
     form_class = TicketsToCartForm
 
     def get_success_url(self):
