@@ -333,7 +333,9 @@ $('#id_{{ ticket.id }}').change(function() {
                             <div class="row">
                                 <div class="col-md-6 col-lg-6 col-sm-12" id="event-image-container">
                                     {% if event.image %}
-                                    <img src="{{ event.image.url }}" id="event-image">
+                                    <img src="{{ event.image.url }}" id="event-image" {% if owner %}style="margin-bottom:5px;"{%endif%}>
+                                    {% endif %}
+                                    {% if owner %} <a href="{{ event.get_update_view }}" style="font-size: 0.8em;margin-right: 10px;display: block;"> Edit Image</a>
                                     {% endif %}
                                 </div>
 
@@ -342,7 +344,7 @@ $('#id_{{ ticket.id }}').change(function() {
                                     <div class="row" style="padding-bottom: 30px;">
                                         <div class="col-md-12">
                                     
-                                            <h4 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="far fa-clock"></i> When</h4>
+                                            <h4 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="far fa-clock"></i> When {% if owner %}- <a href="{{ event.get_update_view }}" style="font-size: 0.8em;"> Edit</a> {% endif %}</h4>
                                     
                                             {% if event.start %}
                                             <p style="margin-bottom: 0;font-weight:900;">Starts: <span style="font-weight:400;">
@@ -360,7 +362,7 @@ $('#id_{{ ticket.id }}').change(function() {
                                     <div class="row" style="padding-bottom: 30px;">
                                         <div class="col-md-12">
                                     
-                                            <h4 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="fas fa-map-marker-alt"></i> Where</h4>
+                                            <h4 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="fas fa-map-marker-alt"></i> Where {% if owner %}- <a href="{{ event.get_update_view }}" style="font-size: 0.8em;"> Edit</a> {% endif %}</h4>
                                             {% if event.venue_name %}
                                             <p style="margin-bottom: 0;font-weight:900;">Venue: <span style="font-weight:400;">
                                                     {{ event.venue_name }}</span></p>
@@ -371,6 +373,15 @@ $('#id_{{ ticket.id }}').change(function() {
                                                     style="font-weight:400;text-decoration: none;">{{ event.venue_address }}</a></p>
                                             {% endif %}
                                     
+                                        </div>
+                                    </div>
+
+                                    <div class="row justify-content-center">
+                                        <div class="col-md-12 col-sm-9" style="margin-top: 5px;margin-right: 10px;">
+                                            {% if owner %} <a href="{{ event.get_update_view }}" style="font-size: 0.8em;margin-right: 10px;"> Edit Event URL</a> {% endif %}
+                                            <input pattern="[a-zA-Z ]*" style="font-size: 13px;" maxlength="100" class="validate-required"
+                                                type="text" name="order_link" id="order_link" value="https://www.arqamhouse.com/events/{{ event.slug }}"
+                                                readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -450,7 +461,15 @@ $('#id_{{ ticket.id }}').change(function() {
                     <div class="row" style="padding-top: 40px;">
                         <div class="col-md-12 col-lg-12 col-sm-12">
                             {% if tickets %}
-                            
+
+                                {% if owner %}
+                                <div class="row" style="padding-bottom:20px;">
+                                    <div class="col-md-8">
+                                        <a href="{{ event.list_tickets_view  }}" style="margin-right: 10px;"> Edit Tickets</a>
+                                    </div>
+                                </div>
+                                {% endif %}
+
                                 {% if event.ticket_sales %}
                                 {% for ticket in tickets %}
                                 <div class="row" style="padding-bottom:30px;">
@@ -528,7 +547,7 @@ $('#id_{{ ticket.id }}').change(function() {
                             
                                 <div class="row text-center" style="padding-bottom:30px;">
                                     {% if owner %}
-                                    <div class="col-md-10 col-lg-12">
+                                    <div class="col-md-12 col-lg-12">
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <h2 style="color: #4399d5;" class="m--font-info color--info" id="new_price_div">Order Total $0.00
@@ -614,8 +633,18 @@ $('#id_{{ ticket.id }}').change(function() {
                 
                 <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
                     style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 0px 30px;padding-bottom: 30px;margin:15px;">
+
                     <div class="row" style="padding-top: 40px;">
                         <div class="col-md-12 col-lg-12 col-sm-12">
+
+                            {% if owner %}
+                            <div class="row" style="padding-bottom:20px;">
+                                <div class="col-md-8">
+                                    <a href="{{ event.get_update_view  }}" style="margin-right: 10px;"> Edit Description</a>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
                             {% if event.description %}
                                 {{ event.description|safe }}
                             {% endif %}
