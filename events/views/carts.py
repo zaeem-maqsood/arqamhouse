@@ -3,7 +3,7 @@ from .base import *
 
 # Create your views here.
 class AddTicketsToCartView(FormView):
-    template_name = "carts/event_cart_new.html"
+    template_name = "carts/event_landing_page.html"
     form_class = TicketsToCartForm
 
     def get_success_url(self):
@@ -89,6 +89,8 @@ class AddTicketsToCartView(FormView):
 
         # Get tickets
         tickets = self.get_tickets(event)
+        attendance_total = tickets.aggregate(Sum('amount_sold'))
+        context["attendance_total"] = attendance_total["amount_sold__sum"]
 
         # Get form
         form = TicketsToCartForm(event=event)
