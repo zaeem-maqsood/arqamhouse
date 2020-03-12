@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-{% if update_event %}Update{% else %}Create{% endif %} Event | {{ house.name }}
+{{ event.title }} | Image
 {% endblock title %}
 
 
@@ -15,18 +15,10 @@
 	}
 </style>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
-<link href="https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/css/froala_editor.pkgd.min.css" rel="stylesheet"
-	type="text/css" />
-
 {% endblock styles %}
 
 
 {% block scripts %}
-
-<script type="text/javascript"
-	src="https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/js/froala_editor.pkgd.min.js"></script>
 
 {% endblock scripts %}
 
@@ -41,16 +33,13 @@
 	color: #7396b0;
 }
 
-#map {
-        height: 100%;
-      }
 </style>
 
 
 {% if not event.deleted %}
 <form method="POST" enctype="multipart/form-data" autocomplete="off" onSubmit="document.getElementById('Create').disabled = true;">{% csrf_token %}
     <div class="row justify-content-center" style="padding: 3rem 0px 0px 0px;">
-        <div class="col-lg-8 col-md-12 col-12">
+        <div class="col-lg-6 col-md-12 col-12">
 
             <div class="kt-portlet kt-portlet--mobile" style="padding:20px;">
                 <div class="kt-portlet__body">
@@ -59,8 +48,8 @@
 
                     <div class="row" style="padding-bottom: 20px;">
                         <div class="col-md-12">
-                            <h4 style="margin-bottom: 0px;">Event Description</h4>
-                            <p>Tell people about your event here.</p>
+                            <h4 style="margin-bottom: 0px;">Event Image</h4>
+                            <p>Make your event stand out with an image.</p>
                         </div>
                     </div>
 
@@ -76,24 +65,41 @@
                     </div>
                     {% endif %}
 
-					{{ form.media }}
-					<div class="row" style="padding-bottom: 20px;">
-						<div class="col-md-12" style="max-width: 650px;">
-							{{ form.description }}
-							<br>
-							{% for error in form.description.errors %}
-							<div class="alert m-alert--outline alert-danger" role="alert">
-								{{ error }}
-							</div>
-							{% endfor %}
-						</div>
-					</div>
+                    
+                    <div class="row text-center" style="padding-bottom: 30px;">
+                        <div class="col-md-12">
+                            {% if form.instance.image %}
+                            <img id="image-placeholder" src="{{ form.instance.image.url }}" alt="Event Image" style="max-width: 300px;max-height: 300px;" />
+                            <br>
+                            <br>
+                            {% if form.instance.image %}<button type="submit" class="btn btn-outline-danger btn-block" name="Remove"
+                                value="Remove">Remove Image</button>{% endif %}
+                            {% else %}
+                            <img id="image-placeholder" src="{% static 'images/event_flyer_placeholder.jpg' %}" alt="Event Image"
+                                style="max-width: 300px;max-height: 300px;" />
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            {{ form.image }}
+                            <br>
+                            {% for error in form.image.errors %}
+                            <div class="alert m-alert--outline alert-danger" role="alert">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+                            <p class="text-center" style="padding-top: 20px;padding-bottom: 20px;">We suggest a standard 8.5" X 11" flyer
+                                but you can use any image you'd like.</p>
+                        
+                        </div>
+                    </div>
                     
 
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-md-12">
                             <button type="submit" name="Create" value="Create" id="Create"
-                                class="btn btn-primary btn-block">Update Description</button>
+                                class="btn btn-primary btn-block">Update Image</button>
                         </div>
                     </div>
                             
@@ -104,7 +110,7 @@
     </div>
 
     <div class="row justify-content-center" style="padding-bottom: 30px;">
-        <div class="col-lg-4 col-md-6 col-6" style="padding-top:10px;">
+        <div class="col-lg-3 col-md-6 col-6" style="padding-top:10px;">
             <div class="kt-portlet kt-portlet--mobile">
                 <div class="kt-portlet__body">
                     <div class="row text-center">
@@ -120,7 +126,7 @@
             </div>
         </div>
         
-        <div class="col-lg-4 col-md-6 col-6" style="padding-top:10px;">
+        <div class="col-lg-3 col-md-6 col-6" style="padding-top:10px;">
             <div class="kt-portlet kt-portlet--mobile">
                 <div class="kt-portlet__body">
                     <div class="row text-center">

@@ -68,6 +68,147 @@ class EventCheckoutForm(forms.Form):
 
 
 
+
+class EventMainForm(forms.ModelForm):
+	start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"],  required=True, widget=forms.DateTimeInput(
+		attrs={"class": "form-control m-input", "placeholder": "Start", "autocomplete": "off", "onchange": "endDateTime(this)"}))
+	end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], required=True,  widget=forms.DateTimeInput(
+		attrs={"class": "form-control m-input", "placeholder": "End", "autocomplete": "off"}))
+
+	class Meta:
+		model = Event
+		fields = [
+			"title", "start", "end"
+		]
+
+
+		widgets = {
+
+				"title": forms.TextInput(
+						attrs={
+							"class":"form-control m-input message",
+							"placeholder":"My Awesome Event",
+							"required": True,
+							"maxlength": '100',
+						}
+					),
+			}
+
+
+	def clean_end(self):
+		start = self.cleaned_data.get('start')
+		end = self.cleaned_data.get('end')
+
+		if start and end:
+			today = timezone.now()
+			if start and end and start >= end:
+				print("Did it even come here")
+				raise forms.ValidationError('The start date cannot be after the end date')
+			
+			if end <= today:
+				raise forms.ValidationError(
+					'Please change the end date of your event to be after today!')
+			
+			
+		return end
+
+
+class EventURLForm(forms.ModelForm):
+
+	class Meta:
+		model = Event
+		fields = [
+			"url",
+		]
+
+		widgets = {
+                    "url": forms.TextInput(
+						attrs={
+							"class":"form-control m-input",
+							"placeholder":"my-awesome-event",
+							"onkeyup": "ValidateURL(this);"
+						}
+					),
+                }
+
+
+class EventVenueForm(forms.ModelForm):
+
+	class Meta:
+		model = Event
+		fields = [
+			"venue_name", "venue_address",
+		]
+
+		widgets = {
+
+                    "venue_name": forms.TextInput(
+                        attrs={
+                            "class": "form-control m-input",
+							"placeholder": "Venue",
+                        }
+                    ),
+
+					"venue_address": forms.TextInput(
+                        attrs={
+                            "autocomplete": "off",
+                            "class": "form-control m-input",
+							"placeholder": "123 Main Street",
+							"id": "autocomplete",
+                        }
+                    ),
+                }
+
+	def clean(self, *args, **kwargs):
+		cleaned_data = super(EventVenueForm, self).clean(*args, **kwargs)
+		venue_name = self.cleaned_data.get('venue_name')
+		venue_address = self.cleaned_data.get('venue_address')
+
+		if venue_name and not venue_address:		
+			raise forms.ValidationError(f'Please enter the address for {venue_name}')
+
+		if venue_address and not venue_name:
+			raise forms.ValidationError('Please enter a name for this address')
+			
+		return cleaned_data
+
+
+
+
+class EventImageForm(forms.ModelForm):
+
+	class Meta:
+		model = Event
+		fields = [
+			"image",
+		]
+
+		widgets = {
+
+                    "image": forms.FileInput(
+                        attrs={
+                            "onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
+                            "class": "form-control m-input dropzone",
+                        }
+                    ),
+                }
+
+
+class EventDescriptionForm(forms.ModelForm):
+
+	description = forms.CharField(required=False, widget=FroalaEditor(options={'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True}))
+
+	class Meta:
+		model = Event
+		fields = [
+			"description",
+		]
+
+
+	
+
+
+
 class EventForm(forms.ModelForm):
 
 	start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"],  required=True, widget=forms.DateTimeInput(

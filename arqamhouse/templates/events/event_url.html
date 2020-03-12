@@ -25,8 +25,86 @@
 
 {% block scripts %}
 
-<script type="text/javascript"
-	src="https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/js/froala_editor.pkgd.min.js"></script>
+
+<script type="text/javascript">
+
+    
+    function ValidateURL(object) {
+
+        console.log(object.value)
+        var url = object.value;
+
+        $.ajax({
+            type: "GET",
+            url: '{{ request.path }}',
+            data: {
+                'url': url,
+            },
+
+            success: function (data) {
+                console.log(data)
+                if (data == 'not_taken') {
+                    document.getElementById("id_url").style.borderColor = "green";
+                    document.getElementById("url_message").innerHTML = "| Valid URL";
+                    document.getElementById("url_message").style.color = 'green';
+                }
+                else {
+                    document.getElementById("id_url").style.borderColor = "red";
+                    document.getElementById("url_message").innerHTML = "| URL already taken";
+                    document.getElementById("url_message").style.color = 'red';
+                }
+
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(errorThrown);
+                //some stuff on failure
+            },
+        });
+
+    }
+
+
+    $('#id_url').bind('input propertychange', function () {
+        value = $(this).val();
+        // Step 1
+        new_value = value.toLowerCase()
+        // Step 2
+        new_value = new_value.replace(/[^\w ]+/g, '-')
+        // Step 3
+        new_value = new_value.replace(/ +/g, '-')
+
+        $('#output').html(new_value);
+    });
+
+
+    function updateCountdown() {
+
+        value = '{{ event.slug }}';
+        console.log(value)
+        $('#output').html(value);
+    }
+    
+
+    function preFillURLData() {
+        document.getElementById('id_url').defaultValue = '{{ event.slug }}';
+    }
+
+
+    jQuery(document).ready(function ($) {
+
+        
+        updateCountdown();
+        preFillURLData()
+        
+        $('.message').change(updateCountdown);
+        $('.message').keyup(updateCountdown);
+
+    });
+    
+
+</script>
+
 
 {% endblock scripts %}
 
@@ -50,7 +128,7 @@
 {% if not event.deleted %}
 <form method="POST" enctype="multipart/form-data" autocomplete="off" onSubmit="document.getElementById('Create').disabled = true;">{% csrf_token %}
     <div class="row justify-content-center" style="padding: 3rem 0px 0px 0px;">
-        <div class="col-lg-8 col-md-12 col-12">
+        <div class="col-lg-6 col-md-12 col-12">
 
             <div class="kt-portlet kt-portlet--mobile" style="padding:20px;">
                 <div class="kt-portlet__body">
@@ -59,8 +137,8 @@
 
                     <div class="row" style="padding-bottom: 20px;">
                         <div class="col-md-12">
-                            <h4 style="margin-bottom: 0px;">Event Description</h4>
-                            <p>Tell people about your event here.</p>
+                            <h4 style="margin-bottom: 0px;">Event URL</h4>
+                            <p>Customize and share your event link.</p>
                         </div>
                     </div>
 
@@ -76,24 +154,26 @@
                     </div>
                     {% endif %}
 
-					{{ form.media }}
-					<div class="row" style="padding-bottom: 20px;">
-						<div class="col-md-12" style="max-width: 650px;">
-							{{ form.description }}
-							<br>
-							{% for error in form.description.errors %}
-							<div class="alert m-alert--outline alert-danger" role="alert">
-								{{ error }}
-							</div>
-							{% endfor %}
-						</div>
-					</div>
+                    <div class="row" style="padding-bottom: 40px;">
+                        <div class="col-md-12">
+                            <p style="font-weight: 600;margin-bottom:0px;{% if form.url.errors %}color:red;{% endif %}">Custom URL <span style="font-weight:200;" id='url_message'></span></p>
+                            {{ form.url }}
+                            {% for error in form.url.errors %}
+                                <div class="alert m-alert--outline alert-danger" role="alert">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                            <span class="m-nav__link-text" style="font-weight: 200;font-size: 0.7em;vertical-align: middle;">
+                                www.arqamhouse.com/events/<span
+                                    id="output" style="font-weight: 600">{{ event.slug }}</span></span>
+                        </div>
+                    </div>
                     
 
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-md-12">
                             <button type="submit" name="Create" value="Create" id="Create"
-                                class="btn btn-primary btn-block">Update Description</button>
+                                class="btn btn-primary btn-block">Update URL</button>
                         </div>
                     </div>
                             
@@ -104,7 +184,7 @@
     </div>
 
     <div class="row justify-content-center" style="padding-bottom: 30px;">
-        <div class="col-lg-4 col-md-6 col-6" style="padding-top:10px;">
+        <div class="col-lg-3 col-md-6 col-6" style="padding-top:10px;">
             <div class="kt-portlet kt-portlet--mobile">
                 <div class="kt-portlet__body">
                     <div class="row text-center">
@@ -120,7 +200,7 @@
             </div>
         </div>
         
-        <div class="col-lg-4 col-md-6 col-6" style="padding-top:10px;">
+        <div class="col-lg-3 col-md-6 col-6" style="padding-top:10px;">
             <div class="kt-portlet kt-portlet--mobile">
                 <div class="kt-portlet__body">
                     <div class="row text-center">

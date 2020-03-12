@@ -1,0 +1,219 @@
+{% extends "backend/base.html" %}
+{% load tz %}
+{% load static %}
+
+{% block title %}
+{% if update_event %}Update{% else %}Create{% endif %} Event | {{ house.name }}
+{% endblock title %}
+
+
+{% block styles %}
+<style type="text/css">
+	.row-padder {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+<link href="https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/css/froala_editor.pkgd.min.css" rel="stylesheet"
+	type="text/css" />
+
+{% endblock styles %}
+
+
+{% block scripts %}
+<!--begin::Page Resources --> 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script type="text/javascript"
+	src="https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/js/froala_editor.pkgd.min.js"></script>
+
+<script type="text/javascript">
+
+function updateCountdown() {
+
+    value = '{{ event.slug }}';
+	console.log(value)
+	$('#output').html(value);
+}
+
+
+
+flatpickr("#id_start", {
+	enableTime: true,
+	altFormat: "m/d/Y G:i K",
+	dateFormat: "m/d/Y G:i K",
+	minDate: "today",
+	maxDate: new Date().fp_incr(365),
+
+});
+
+
+flatpickr("#id_end", {
+	enableTime: true,
+	altFormat: "m/d/Y G:i K",
+	dateFormat: "m/d/Y G:i K",
+	minDate: "today",
+	maxDate: new Date().fp_incr(365),
+
+});
+
+
+function endDateTime(object) {
+
+	start_time = object.value;
+
+	end_date_time = document.getElementById("id_end");
+	end_date_time.disabled = false;
+
+	flatpickr("#id_end", {
+		enableTime: true,
+		altFormat: "F j, Y",
+		dateFormat: "m/d/Y G:i K",
+		minDate: start_time,
+		maxDate: new Date().fp_incr(365),
+
+	});
+}
+
+</script>
+
+{% endblock scripts %}
+
+
+
+{% block content %}
+<style>
+.dropzone {
+    min-height: 80px;
+}
+.dashboard-links {
+	color: #7396b0;
+}
+</style>
+
+
+{% if not event.deleted %}
+<form method="POST" enctype="multipart/form-data" autocomplete="off" onSubmit="document.getElementById('Create').disabled = true;">{% csrf_token %}
+    <div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+        <div class="col-lg-6 offset-lg-3 col-md-12 col-12">
+
+            <div class="kt-portlet kt-portlet--mobile" style="padding:20px;">
+                <div class="kt-portlet__body">
+                    
+                    
+                    <input type="hidden" name="token" id="token">
+
+                    {% if not update_event %}
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12">
+                            <h4>Let's start with the title and dates.</h4>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12">
+                            <h4>Your event title and dates.</h4>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% for error in form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                <strong>Oh snap!</strong> {{ error }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12">
+                            <p style="font-weight: 600;margin-bottom:0px;{% if form.title.errors %}color:red;{% endif %}">Title <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
+                            {{ form.title }}
+                            {% for error in form.title.errors %}
+                                <div class="alert m-alert--outline alert-danger" role="alert">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-md-12">
+                            <p style="font-weight: 600;margin-bottom:0px;{% if form.start.errors %}color:red;{% endif %}">Start <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
+                            {{ form.start }}
+                            <br>
+                            {% for error in form.start.errors %}
+                                <div class="alert m-alert--outline alert-danger" role="alert">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12">
+                            <p style="font-weight: 600;margin-bottom:0px;{% if form.end.errors %}color:red;{% endif %}">End <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
+                            {{ form.end }}
+                            <br>
+                            {% for error in form.end.errors %}
+                                <div class="alert m-alert--outline alert-danger" role="alert">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12">
+                            <button type="submit" name="Create" value="Create" id="Create"
+                                class="btn btn-primary btn-block">{% if update_event %}Update{% else %}Next{% endif %}</button>
+                        </div>
+                    </div>
+                            
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% else %}
+
+<form class="m-form m-form--fit m-form--label-align-right my-form" method="POST" enctype="multipart/form-data">{% csrf_token %}
+<div class="row">
+	<div class="col-md-12 text-center">
+		<br>
+		<br>
+		<i class="fas fa-house-damage" style="font-size: 20em;color: #adc1ce;"></i>
+		<br>
+		<br>
+		<h1 style="color: #adc1ce;">This event has been deleted.</h1>
+		<br>
+		<button type="submit" name="Undo Delete" value="Undo Delete" class="btn btn-danger btn-lg">Undo Delete</button>
+	</div>
+</div>
+</form>
+{% endif %}
+
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

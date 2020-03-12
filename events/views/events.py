@@ -141,6 +141,30 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
                 messages.success(request, 'Ticket sales have resumed.')
             event.save()
 
+        # Undoing a deletion of an event
+        if "Undo Delete" in data:
+            event.deleted = False
+            event.save()
+            messages.success(request, 'Event recovered Successfully')
+
+        if "Archive" in data:
+            event.active = False
+            event.save()
+            messages.info(request, """Successfully archived '%s' """ %
+                             (event.title))
+
+        if "Re-Open" in data:
+            event.active = True
+            event.save()
+            messages.success(request,  """Successfully unarchived '%s' """ %
+                             (event.title))
+
+        if "Delete" in data:
+            event.active = False
+            event.deleted = True
+            event.save()
+            messages.warning(request, 'Event Deleted Successfully')
+
         view_name = "events:dashboard"
         return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
 
@@ -756,12 +780,12 @@ class PastEventsView(HouseAccountMixin, UserPassesTestMixin, EventMixin, ListVie
 
 class EventCreateView(HouseAccountMixin, CreateView):
     model = Event
-    form_class = EventForm
-    template_name = "events/event_form.html"
+    form_class = EventMainForm
+    template_name = "events/event_main_form.html"
 
     def get_success_url(self):
         event = self.object
-        view_name = "events:landing"
+        view_name = "events:update_venue"
         return reverse(view_name, kwargs={'slug': event.slug})
 
     def get_context_data(self, form, *args, **kwargs):
@@ -794,8 +818,7 @@ class EventCreateView(HouseAccountMixin, CreateView):
         self.object.active = True
         self.object.save()
 
-        messages.success(request, 'Your event is live! Click <a href="%s">here</a> to add tickets' %
-                         (reverse('events:list_tickets', kwargs={'slug': self.object.slug})))
+        messages.success(request, 'Event Created!')
 
         if settings.DEBUG == False:
             self.send_text_message(self.object)
@@ -820,10 +843,12 @@ class EventCreateView(HouseAccountMixin, CreateView):
 
 
 
-class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, UpdateView):
+
+class EventDescriptionView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, UpdateView):
+
     model = Event
-    form_class = EventForm
-    template_name = "events/event_form.html"
+    form_class = EventDescriptionForm
+    template_name = "events/event_description.html"
 
     def get_success_url(self):
         view_name = "events:landing"
@@ -850,10 +875,331 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
         context["form"] = form
         context["house"] = house
         context["event"] = self.object
-        context["time"] = timezone.now()
+        
+        if self.object.active == False:
+            context["inactive_event_tab"] = True
+            context["events_tab"] = False
+        else:
+            context["events_tab"] = True
 
-        print("TEsting")
-        print(get_current_timezone())
+        context["update_event"] = True
+
+        if self.object.active:
+            context["event_tab"] = True
+        context["dashboard_events"] = self.get_events()
+        return context
+
+    def get(self, request, *args, **kwargs):
+        slug = kwargs['slug']
+        self.object = self.get_event(slug)
+        data = request.GET
+        form = EventDescriptionForm(instance=self.object)
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def post(self, request, *args, **kwargs):
+        slug = kwargs['slug']
+        self.object = self.get_event(slug)
+        data = request.POST
+
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form, request)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form, request):
+        data = request.POST
+        self.object = form.save()
+        valid_data = super(EventDescriptionView, self).form_valid(form)
+        return valid_data
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+
+class EventImageView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, UpdateView):
+
+    model = Event
+    form_class = EventImageForm
+    template_name = "events/event_image.html"
+
+    def get_success_url(self):
+
+        if not self.object.image:
+            view_name = "events:update_image"
+        elif self.object.description:
+            view_name = "events:landing"
+        elif not self.object.description:
+            view_name = "events:update_description"
+        else:
+            view_name = "events:landing"
+
+        return reverse(view_name, kwargs={"slug": self.object.slug})
+
+    def get_edit_url(self):
+        view_name = "events:update"
+        return reverse(view_name, kwargs={"slug": self.object.slug})
+
+    def get_success_delete_url(self):
+        view_name = "events:past"
+        return reverse(view_name)
+
+    def get_event(self, slug):
+        try:
+            event = Event.objects.get(slug=slug)
+            return event
+        except Exception as e:
+            raise Http404
+
+    def get_context_data(self, form, *args, **kwargs):
+        context = {}
+        house = self.get_house()
+        context["form"] = form
+        context["house"] = house
+        context["event"] = self.object
+        context["time"] = timezone.now()
+        
+        if self.object.active == False:
+            context["inactive_event_tab"] = True
+            context["events_tab"] = False
+        else:
+            context["events_tab"] = True
+
+        context["update_event"] = True
+
+        if self.object.active:
+            context["event_tab"] = True
+        context["dashboard_events"] = self.get_events()
+        return context
+
+    def get(self, request, *args, **kwargs):
+        slug = kwargs['slug']
+        self.object = self.get_event(slug)
+        data = request.GET
+        form = EventImageForm(instance=self.object)
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def post(self, request, *args, **kwargs):
+        slug = kwargs['slug']
+        self.object = self.get_event(slug)
+        data = request.POST
+
+        if "Remove" in data:
+            self.object.image = None
+            self.object.save()
+            messages.warning(request, 'Event image successfully removed')
+
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form, request)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form, request):
+        data = request.POST
+        self.object = form.save()
+        valid_data = super(EventImageView, self).form_valid(form)
+        return valid_data
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+
+
+class EventVenueView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, UpdateView):
+
+    model = Event
+    form_class = EventVenueForm
+    template_name = "events/event_venue.html"
+
+    def get_success_url(self):
+
+        if self.object.image and self.object.description:
+            view_name = "events:landing"
+        
+        elif not self.object.image and self.object.description:
+            view_name = "events:landing"
+
+        elif self.object.image and not self.object.description:
+            view_name = "events:landing"
+
+        elif not self.object.image and not self.object.description:
+            view_name = "events:update_image"
+
+        else:
+            view_name = "events:landing"
+
+        return reverse(view_name, kwargs={"slug": self.object.slug})
+
+
+    def get_event(self, slug):
+        try:
+            event = Event.objects.get(slug=slug)
+            return event
+        except Exception as e:
+            raise Http404
+
+    def get_context_data(self, form, *args, **kwargs):
+        context = {}
+        house = self.get_house()
+        context["form"] = form
+        context["house"] = house
+        context["event"] = self.object
+        
+        if self.object.active == False:
+            context["inactive_event_tab"] = True
+            context["events_tab"] = False
+        else:
+            context["events_tab"] = True
+
+        context["update_event"] = True
+
+        if self.object.active:
+            context["event_tab"] = True
+        context["dashboard_events"] = self.get_events()
+        return context
+
+    def get(self, request, *args, **kwargs):
+        slug = kwargs['slug']
+        self.object = self.get_event(slug)
+        data = request.GET
+        form = EventVenueForm(instance=self.object)
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def post(self, request, *args, **kwargs):
+        slug = kwargs['slug']
+        self.object = self.get_event(slug)
+        data = request.POST
+
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form, request)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form, request):
+        data = request.POST
+        self.object = form.save()
+        valid_data = super(EventVenueView, self).form_valid(form)
+        return valid_data
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+
+
+class EventURLView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, UpdateView):
+
+    model = Event
+    form_class = EventURLForm
+    template_name = "events/event_url.html"
+
+    def get_success_url(self):
+        if self.object.venue_name:
+            view_name = "events:landing"
+        else:
+            view_name = "events:update_url"
+        return reverse(view_name, kwargs={"slug": self.object.slug})
+
+
+    def get_event(self, slug):
+        try:
+            event = Event.objects.get(slug=slug)
+            return event
+        except Exception as e:
+            raise Http404
+
+    def get_context_data(self, form, *args, **kwargs):
+        context = {}
+        house = self.get_house()
+        context["form"] = form
+        context["house"] = house
+        context["event"] = self.object
+        
+        if self.object.active == False:
+            context["inactive_event_tab"] = True
+            context["events_tab"] = False
+        else:
+            context["events_tab"] = True
+
+        context["update_event"] = True
+
+        if self.object.active:
+            context["event_tab"] = True
+        context["dashboard_events"] = self.get_events()
+        return context
+
+    def get(self, request, *args, **kwargs):
+        slug = kwargs['slug']
+        self.object = self.get_event(slug)
+        data = request.GET
+
+        if 'url' in data:
+
+            url = data['url']
+            slugify_url = slugify(url)
+            
+            if Event.objects.filter(slug=slugify_url).exclude(slug=slug).exists():
+                return HttpResponse("taken")
+            else:
+                return HttpResponse("not_taken")
+        else:
+            form = EventURLForm(instance=self.object)
+            return self.render_to_response(self.get_context_data(form=form))
+
+    def post(self, request, *args, **kwargs):
+        slug = kwargs['slug']
+        self.object = self.get_event(slug)
+        data = request.POST
+
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form, request)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form, request):
+        data = request.POST
+        self.object = form.save()
+        valid_data = super(EventURLView, self).form_valid(form)
+        return valid_data
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+
+
+class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, UpdateView):
+    model = Event
+    form_class = EventMainForm
+    template_name = "events/event_main_form.html"
+
+    def get_success_url(self):
+        view_name = "events:landing"
+        return reverse(view_name, kwargs={"slug": self.object.slug})
+
+
+    def get_event(self, slug):
+        try:
+            event = Event.objects.get(slug=slug)
+            return event
+        except Exception as e:
+            raise Http404
+
+    def get_context_data(self, form, *args, **kwargs):
+        context = {}
+        house = self.get_house()
+        context["form"] = form
+        context["house"] = house
+        context["event"] = self.object
         
         if self.object.active == False:
             context["inactive_event_tab"] = True
@@ -889,7 +1235,7 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
                 initial["start"] = timezone.localtime(self.object.start).strftime("%m/%d/%Y %I:%M %p")
             if self.object.end:
                 initial["end"] = timezone.localtime(self.object.end).strftime("%m/%d/%Y %I:%M %p")
-            form = EventForm(instance=self.object, initial=initial)
+            form = EventMainForm(instance=self.object, initial=initial)
             
             return self.render_to_response(self.get_context_data(form=form))
 
@@ -897,34 +1243,6 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
         slug = kwargs['slug']
         self.object = self.get_event(slug)
         data = request.POST
-
-        # Undoing a deletion of an event
-        if "Undo Delete" in data:
-            self.object.deleted = False
-            self.object.save()
-            messages.warning(request, 'Event recovered Successfully')
-            return HttpResponseRedirect(self.get_edit_url())
-
-        if "Archive" in data:
-            self.object.active = False
-            self.object.save()
-            messages.success(request, """Successfully archived '%s' """ %
-                             (self.object.title))
-            return HttpResponseRedirect(self.get_edit_url())
-
-        if "Re-Open" in data:
-            self.object.active = True
-            self.object.save()
-            messages.success(request,  """Successfully unarchived '%s' """ %
-                             (self.object.title))
-            return HttpResponseRedirect(self.get_edit_url())
-
-        if "Delete" in data:
-            self.object.active = False
-            self.object.deleted = True
-            self.object.save()
-            messages.warning(request, 'Event Deleted Successfully')
-            return HttpResponseRedirect(self.get_success_delete_url())
 
         form = self.get_form()
         if form.is_valid():
@@ -935,14 +1253,7 @@ class EventUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
     def form_valid(self, form, request):
         data = request.POST
         self.object = form.save()
-
-        if "Remove" in data:
-            self.object.image = None
-            self.object.save()
-            messages.warning(request, 'Event image successfully removed')
-
-        else:
-            messages.success(request, 'Event Updated Successfully!')
+        messages.success(request, 'Event Updated Successfully!')
             
         valid_data = super(EventUpdateView, self).form_valid(form)
         return valid_data

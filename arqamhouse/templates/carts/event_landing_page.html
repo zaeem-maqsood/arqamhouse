@@ -41,9 +41,14 @@
         text-align: center;
     }
 
+    #event-image-sizing{
+        max-width: 300px;
+        max-height: 300px;
+    }
+
     /* Media Queries */
     @media (min-width: 576px) {
-        
+            
     }
 
 
@@ -63,6 +68,11 @@
 
         #text-align-left-on-mobile {
             text-align: right;
+        }
+
+        #event-image-sizing{
+            max-width: 250px;
+            max-height: 250px;
         }
 
         
@@ -264,12 +274,12 @@
 
                     <div class="row text-center" style="padding-bottom: 40px;padding-top: 30px;">
                         <div class="col-md-12">
-                            <h3 style="margin-bottom:0px;font-weight: 400;color: #4498d4;">{{ event.title }}</h3>
+                            <h3 style="margin-bottom:0px;font-weight: 400;color: #4498d4;">{{ event.title }}{% if owner %} - <a href="{{ event.get_update_view }}" style="font-size: 0.8em;font-weight: 500;color: indianred;"> Edit</a> {% endif %}</h3>
                             <p style="font-size: 0.8em;margin-bottom: 0px;">Hosted by <a href="{{ event.house.get_home_page_url }}"
                                     style="text-decoration: none;">{{ event.house.name }}</a> <i style="color: #4399d5;"
                                     class="fa fa-check-circle" data-tooltip="Trusted House"></i>
                             </p>
-                            <p><i style="color: #96caee;" class="fa fa-user" data-tooltip="Confirmed Attendees"></i> {{ attendance_total }}</p>
+                            <p><i style="color: #96caee;" class="fa fa-user" data-tooltip="Confirmed Attendees"></i>{% if attendance_total %}{{ attendance_total }}{% else %} 0{% endif %}</p>
                         </div>
                     </div>
 
@@ -277,14 +287,14 @@
                     <div class="row" style="padding-bottom: 30px;">
                         <div class="col-md-6" id="event-image" style="padding-bottom: 30px;">
                             {% if owner %}
-                            <a href="{{ event.get_update_view }}" style="font-size: 0.8em;margin-right: 10px;display: block;"> Edit Image</a>
+                            <a href="{{ event.get_update_image_view }}" style="font-size: 0.8em;margin-right: 10px;display: block;color: indianred;"> Edit Image</a>
                             {% endif %}
-                            <img src="{{ event.image.url }}" id="event-image" style="max-width: 300px;max-height: 300px;">
+                            <img src="{{ event.image.url }}" id="event-image-sizing">
                         </div>
                         <div class="col-md-6" id="event-image-details">
                             {% if owner %}<br>{% endif %}
                             <h4 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"> When {% if owner %}- <a
-                                    href="{{ event.get_update_view }}" style="font-size: 0.8em;font-weight: 500;"> Edit</a> {% endif %}</h4>
+                                    href="{{ event.get_update_view }}" style="font-size: 0.8em;font-weight: 500;color: indianred;"> Edit</a> {% endif %}</h4>
                             
                             {% if event.start %}
                             <p style="margin-bottom: 0;font-weight:900;">From: <span style="font-weight:400;">
@@ -297,16 +307,26 @@
                             {% endif %}
 
                             <br>
+
+                            {% if event.venue_name and event.venue_address %}
                             <h4 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"> Where
-                                {% if owner %}- <a href="{{ event.get_update_view }}" style="font-size: 0.8em;font-weight: 500;"> Edit</a> {% endif %}</h4>
-                            {% if event.venue_name %}
+                                {% if owner %}- <a href="{{ event.get_update_venue_view }}" style="font-size: 0.8em;font-weight: 500;color: indianred;"> Edit</a> {% endif %}</h4>
                             <p style="margin-bottom: 0;font-weight:900;">Venue: <span style="font-weight:400;">
                                     {{ event.venue_name }}</span></p>
-                            {% endif %}
-                            {% if event.venue_address %}
+                            
                             <p style="margin-bottom: 0;font-weight:900;font-size: 0.6em;">Address: <a
                                     href="https://www.google.com/maps/place/{{ event.venue_address|urlencode }}" target="blank"
                                     style="font-weight:400;text-decoration: none;">{{ event.venue_address }}</a></p>
+
+                            {% else %}
+
+                            {% if owner %}
+                            <h4 style="margin-bottom: 0px;">
+                                <a href="{{ event.get_update_venue_view }}" style="font-size: 0.8em;font-weight: 500;color: indianred;">
+                                    Add Venue? </a>
+                            </h4>
+                            {% endif %}
+
                             {% endif %}
 
                         </div>
@@ -314,10 +334,19 @@
                     {% else %}
                     <div class="row" style="padding-bottom: 30px;">
 
+                        {% if owner %}
+                        <div class="col-md-12 text-center">
+                            <h4 style="margin-bottom: 0px;margin-bottom: 20px;">
+                                <a href="{{ event.get_update_image_view }}" style="font-size: 0.8em;font-weight: 500;color: indianred;">
+                                    Add Image? </a>
+                            </h4>
+                        </div>
+                        {% endif %}
+
                         {% if event.venue_name and event.venue_address %}
                         <div class="col-md-6" id="text-align-left-on-mobile" style="padding-bottom: 30px;">
                             <h4 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="far fa-clock"></i> When {% if owner %}- <a
-                                    href="{{ event.get_update_view }}" style="font-size: 0.8em;font-weight: 500;"> Edit</a> {% endif %}</h4>
+                                    href="{{ event.get_update_view }}" style="font-size: 0.8em;font-weight: 500;color: indianred;"> Edit</a> {% endif %}</h4>
                             
                             <p style="margin-bottom: 0;font-weight:900;">From: <span style="font-weight:400;">
                                     {{ event.start|localtime|date:"N jS Y, f a" }}</span></p>
@@ -328,7 +357,7 @@
                         </div>
                         <div class="col-md-6" id="text-align-right-on-mobile">
                             <h4 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="fas fa-map-marker-alt"></i> Where
-                                {% if owner %}- <a href="{{ event.get_update_view }}" style="font-size: 0.8em;font-weight: 500;"> Edit</a> {% endif %}</h4>
+                                {% if owner %}- <a href="{{ event.get_update_venue_view }}" style="font-size: 0.8em;font-weight: 500;color: indianred;"> Edit</a> {% endif %}</h4>
                             {% if event.venue_name %}
                             <p style="margin-bottom: 0;font-weight:900;">Venue: <span style="font-weight:400;">
                                     {{ event.venue_name }}</span></p>
@@ -343,13 +372,20 @@
                         {% else %}
                         <div class="col-md-12 text-center">
                             <h4 style="margin-bottom: 5px;font-weight: 600;color: #4498d4;"><i class="far fa-clock"></i> When {% if owner %}- <a
-                                    href="{{ event.get_update_view }}" style="font-size: 0.8em;font-weight: 500;"> Edit</a> {% endif %}</h4>
+                                    href="{{ event.get_update_view }}" style="font-size: 0.8em;font-weight: 500;color: indianred;"> Edit</a> {% endif %}</h4>
                             
                             <p style="margin-bottom: 0;font-weight:900;">From: <span style="font-weight:400;">
                                     {{ event.start|localtime|date:"N jS Y, f a" }}</span></p>
                             
                             <p style="margin-bottom: 0;font-weight:900;">To: <span style="font-weight:400;">
                                     {{ event.end|localtime|date:"N jS Y, f a" }}</span></p>
+
+                            {% if owner %}
+                            <h4 style="margin-bottom: 0px;margin-top: 20px;">
+                            <a href="{{ event.get_update_venue_view }}" style="font-size: 0.8em;font-weight: 500;color: indianred;">
+                                Add Venue? </a>
+                            </h4>
+                            {% endif %}
                         </div>
                         {% endif %}
 
@@ -369,10 +405,20 @@
             <div class="row justify-content-center" style="padding-bottom: 30px;">
                 <div class="col-lg-8 col-md-10 col-10" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;border-radius: 15px;padding-top: 30px;padding-bottom: 30px;">
                     {{ event.description|safe }}
-                    {% if owner %}<a href="{{ event.get_update_view }}"> Edit Description</a>
+                    {% if owner %}
+                        <a href="{{ event.get_update_description_view }}" style="color: indianred;"> Edit Description</a>
                     {% endif %}
                 </div>
             </div>
+            {% else %}
+                {% if owner %}
+                    <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
+                        <div class="col-lg-8 col-md-10 col-10"
+                            style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;border-radius: 15px;padding-top: 30px;padding-bottom: 30px;">
+                            <a href="{{ event.get_update_description_view }}" style="color: indianred;"> Add Description?</a>
+                        </div>
+                    </div>
+                {% endif %}
             {% endif %}
 
             {% if event.active %}
@@ -520,7 +566,7 @@
 					{% else %}
 
 						{% if owner %}
-						<div class="row justify-content-center text-center" style="padding-top:40px;">
+						<div class="row justify-content-center text-center" style="padding-top:30px;padding-bottom: 30px;">
 							<div class="col-md-12 col-lg-12">
 								<a href="{{ event.list_tickets_view }}" class="btn btn--primary btn-block" style="color: white;">Add Tickets</a>
 							</div>
@@ -535,13 +581,16 @@
 
 					{% endif %}
 
+                    {% if tickets %}
                     {% if owner %}
                     <div class="row" style="padding-bottom:20px;">
                         <div class="col-md-8">
-                            <a href="{{ event.list_tickets_view  }}"> Edit Tickets</a>
+                            <a href="{{ event.list_tickets_view }}" style="color: indianred;"> Edit Tickets</a>
                         </div>
                     </div>
                     {% endif %}
+                    {% endif %}
+
                 </div>
             </div>
             {% else %}

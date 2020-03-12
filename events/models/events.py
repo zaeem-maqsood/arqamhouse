@@ -138,6 +138,22 @@ class Event(TimestampedModel):
         view_name = "events:update"
         return reverse(view_name, kwargs={"slug": self.slug})
 
+    def get_update_url_view(self):
+        view_name = "events:update_url"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+    def get_update_description_view(self):
+        view_name = "events:update_description"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+    def get_update_image_view(self):
+        view_name = "events:update_image"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+    def get_update_venue_view(self):
+        view_name = "events:update_venue"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
     def get_event_dashboard(self):
         view_name = "events:dashboard"
         return reverse(view_name, kwargs={"slug": self.slug})

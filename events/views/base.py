@@ -58,7 +58,8 @@ from subscribers.models import Subscriber, Campaign
 
 # Forms
 from events.forms import (EventForm, EventCheckoutForm, AttendeeForm, TicketsToCartForm, CheckinForm, DiscountForm,
-                          EventEmailConfirmationForm, FreeTicketForm, PaidTicketForm, DonationTicketForm)
+                          EventEmailConfirmationForm, FreeTicketForm, PaidTicketForm, DonationTicketForm, EventMainForm,
+                          EventVenueForm, EventImageForm, EventDescriptionForm, EventURLForm)
 
 
 
