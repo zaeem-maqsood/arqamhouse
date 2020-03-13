@@ -35,6 +35,7 @@ Subscribers | {{ house.name }}
                         {% if event %}
                         <p style="margin-bottom: 0px;">This campaign will only be sent to subscribers who attended <a href="{{ event.get_landing_view }}">{{ event }}</a></p>
                         {% endif %}
+                        <p>This campaign will be sent to <span style="color: #4599d5;">{{ subscribers.count }}</span> subscribers.</p>
 					</div>
 				</div>
 
@@ -58,6 +59,13 @@ Subscribers | {{ house.name }}
                         <div class="col-md-12" style="max-width: 640px;">
                             <p style="margin-bottom: 5px;">Content</p>
                             {{ form.content }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 50px;">
+                        <div class="col-md-12" style="max-width: 640px;">
+                            <p style="margin-bottom: 5px;">Test Email</p>
+                            {{ form.test_email }}
                         </div>
                     </div>
 
@@ -101,7 +109,7 @@ Subscribers | {{ house.name }}
 
 
                     
-                    <div class="row">
+                    <div class="row" id="subscribers">
                         <div class="col-6">
 
                             <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample"

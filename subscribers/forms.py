@@ -18,6 +18,9 @@ class GenericCampaignForm(forms.ModelForm):
 	content = forms.CharField(required=False, widget=FroalaEditor(options={
 	                          'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True, 'useClasses': False, 'charCounterMax': 700 }))
 
+	
+	test_email = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"class": "form-control m-input", "placeholder": "email@domain.com"}), required=False)
+
 	class Meta:
 		model = Campaign
 		fields = [

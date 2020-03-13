@@ -142,10 +142,19 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         house = self.get_house()
 
         if 'test' in data:
-            self.send_test_email()
-            messages.success(request, f'Test Email Sent to {house.email}!')
-            view_name = "subscribers:campaign_update"
-            return HttpResponseRedirect(reverse(view_name, kwargs={"pk": self.object.id}))
+            print(form.cleaned_data)
+            if form.cleaned_data.get('test_email') != '':
+                test_email = form.cleaned_data.get('test_email')
+                self.send_test_email(test_email)
+                messages.success(request, f'Test Email Sent to {test_email}!')
+                view_name = "subscribers:campaign_update"
+                return HttpResponseRedirect(reverse(view_name, kwargs={"pk": self.object.id}))
+            else:
+                self.send_test_email(house.email)
+                messages.success(request, f'Test Email Sent to {house.email}!')
+                view_name = "subscribers:campaign_update"
+                return HttpResponseRedirect(reverse(view_name, kwargs={"pk": self.object.id}))
+            
 
         elif "nuke" in data:
 
@@ -174,7 +183,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
 
 
 
-    def send_test_email(self):
+    def send_test_email(self, to_email):
 
         campaign = self.get_campaign()
 
@@ -187,7 +196,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         text_content = strip_tags(html_content)
 
         from_email = f"{campaign.house.name} <info@arqamhouse.com>"
-        to = [campaign.house.email]
+        to = [to_email]
         email = EmailMultiAlternatives(subject=subject, body=text_content, from_email=from_email, to=to)
         email.attach_alternative(html_content, "text/html")
         email.send()

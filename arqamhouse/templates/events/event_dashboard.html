@@ -530,28 +530,28 @@ color: #7396b0;
 		<form method="POST">{% csrf_token %}
 		{% if event.active %}
 		<div class="row justify-content-center" style="padding-bottom: 20px;">
-			<div class="col-lg-10">
+			<div class="col-lg-5 col-md-12" style="padding-bottom: 20px;">
 				<button type="submit" name="Archive" value="Archive" class="btn btn-brand btn-elevate btn-block btn-warning"><i
 						class="la la-archive"></i>Archive Event</button>
 			</div>
-		</div>
-		{% else %}
-		<div class="row justify-content-center" style="padding-bottom: 20px;">
-			<div class="col-lg-10" style="padding-top:10px;">
-				<button type="submit" name="Re-Open" value="Re-Open" id="recover-event" class="btn btn-brand btn-elevate btn-block btn-warning"><i
-						class="la la-archive"></i>Recover</button>
-			</div>
-		</div>
-		{% endif %}
-		<div class="row justify-content-center" style="padding-bottom: 20px;">
-			<div class="col-lg-10" style="padding-top:10px;">
+			<div class="col-lg-5 col-md-12">
 				<button type="submit" name="Delete" value="Delete" class="btn btn-brand btn-elevate btn-block btn-danger"><i
 						class="la la-trash"></i>Delete Event</button>
 			</div>
 		</div>
+		{% else %}
+		<div class="row justify-content-center" style="padding-bottom: 20px;">
+			<div class="col-lg-5 col-md-12" style="padding-bottom: 20px;">
+				<button type="submit" name="Re-Open" value="Re-Open" id="recover-event" class="btn btn-brand btn-elevate btn-block btn-warning"><i
+						class="la la-archive"></i>Recover</button>
+			</div>
+			<div class="col-lg-5 col-md-12" style="padding-bottom: 20px;">
+				<button type="submit" name="Delete" value="Delete" class="btn btn-brand btn-elevate btn-block btn-danger"><i
+						class="la la-trash"></i>Delete Event</button>
+			</div>
+		</div>
+		{% endif %}
 		</form>
-		
-
 	</div>
 </div>
 {% else %}
