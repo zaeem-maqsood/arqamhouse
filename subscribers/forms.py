@@ -15,7 +15,7 @@ class AddSubscriberForm(forms.Form):
 
 class GenericCampaignForm(forms.ModelForm):
 
-	content = forms.CharField(required=False, widget=FroalaEditor(options={
+	content = forms.CharField(required=True, widget=FroalaEditor(options={
 	                          'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True, 'useClasses': False, 'charCounterMax': 700 }))
 
 	

@@ -230,6 +230,7 @@ function GetAttendees(object) {
                 </div>
                 
 
+                {% if attendees %}
                 <div class="row" style="padding-bottom: 10px;">
                     <div class="col-12">
                         <input type="search" placeholder="Search For An Attendee" id="attendee-search" class="form-control m-input"
@@ -252,6 +253,7 @@ function GetAttendees(object) {
                         </tbody>
                     </table>
                 </div>
+                {% endif %}
 
                 </form>
                 

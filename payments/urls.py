@@ -18,5 +18,5 @@ urlpatterns = [
     path('payout/', PayoutView.as_view(), name='payout'),
     path('payout-settings/', PayoutSettingsListView.as_view(), name='payout_settings_list'),
     path('add-bank/', AddBankTransferView.as_view(), name='add_bank'),
-    path('bank/<int:bank_transfer_id>', UpdateBankTransferView.as_view(), name='update_bank'),
+    path('bank/<int:id>', UpdateBankTransferView.as_view(), name='update_bank'),
 ]

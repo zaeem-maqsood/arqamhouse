@@ -129,8 +129,8 @@ Dashboard | {{ house.name }}
 	color: #7396b0;
 }
 </style>
-<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
-	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+<div class="row justify-content-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-10 col-md-12 col-12">
 
 		<div class="kt-portlet kt-portlet--mobile" style="padding:10px;">
 			<div class="kt-portlet__body">
@@ -175,28 +175,25 @@ Dashboard | {{ house.name }}
 
 
 		<div class="row">
-			<div class="col-lg-4 col-md-4 col-6" style="padding-top:10px;">
-				<div class="kt-portlet kt-portlet--mobile" style="background-color: #4599d5;">
-					<div class="kt-portlet__body">
-						<div class="row text-center">
-							<div class="col-12">
-								<a class="dashboard-links" style="color:white;" href="{% if dashboard_events %}{{ dashboard_events.first.get_event_dashboard }}{% else %}{% url 'events:create' %}{% endif %}">
-									<i class="la la-calendar" style="font-size:3em;"></i>
-									<p style="padding-top: 10px;">{% if dashboard_events %}{{ dashboard_events.first.title }} | Dashboard{% else %}Create Event{% endif %}</p>
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		
-			<div class="col-lg-4 col-md-4 col-6" style="padding-top:10px;">
+			<div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
 				<div class="kt-portlet kt-portlet--mobile">
 					<div class="kt-portlet__body">
 						<div class="row text-center">
 							<div class="col-12">
 								<a class="dashboard-links" href="{% url 'payments:list' %}">
-									<i class="la la-money" style="font-size:3em;"></i>
+									<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 3em;height: 3em;"
+										viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+											<rect x="0" y="0" width="24" height="24" />
+											<path
+												d="M2,6 L21,6 C21.5522847,6 22,6.44771525 22,7 L22,17 C22,17.5522847 21.5522847,18 21,18 L2,18 C1.44771525,18 1,17.5522847 1,17 L1,7 C1,6.44771525 1.44771525,6 2,6 Z M11.5,16 C13.709139,16 15.5,14.209139 15.5,12 C15.5,9.790861 13.709139,8 11.5,8 C9.290861,8 7.5,9.790861 7.5,12 C7.5,14.209139 9.290861,16 11.5,16 Z"
+												fill="#000000" opacity="0.3"
+												transform="translate(11.500000, 12.000000) rotate(-345.000000) translate(-11.500000, -12.000000) " />
+											<path
+												d="M2,6 L21,6 C21.5522847,6 22,6.44771525 22,7 L22,17 C22,17.5522847 21.5522847,18 21,18 L2,18 C1.44771525,18 1,17.5522847 1,17 L1,7 C1,6.44771525 1.44771525,6 2,6 Z M11.5,16 C13.709139,16 15.5,14.209139 15.5,12 C15.5,9.790861 13.709139,8 11.5,8 C9.290861,8 7.5,9.790861 7.5,12 C7.5,14.209139 9.290861,16 11.5,16 Z M11.5,14 C12.6045695,14 13.5,13.1045695 13.5,12 C13.5,10.8954305 12.6045695,10 11.5,10 C10.3954305,10 9.5,10.8954305 9.5,12 C9.5,13.1045695 10.3954305,14 11.5,14 Z"
+												fill="#000000" />
+										</g>
+									</svg>
 									<p style="padding-top: 10px;">Payments</p>
 								</a>
 							</div>
@@ -205,23 +202,123 @@ Dashboard | {{ house.name }}
 				</div>
 			</div>
 		
-			<div class="col-lg-4 col-md-4 col-6" style="padding-top:10px;">
+			<div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
 				<div class="kt-portlet kt-portlet--mobile">
 					<div class="kt-portlet__body">
 						<div class="row text-center">
 							<div class="col-12">
-								<a class="dashboard-links" href="{% url 'houses:update' %}">
-									<i class="la la-home" style="font-size:3em;"></i>
-									<p style="padding-top: 10px;">House Details</p>
+								<a class="dashboard-links" href="{% url 'houses:manage' %}">
+									<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+										style="width: 3em;height: 3em;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+											<polygon points="0 0 24 0 24 24 0 24" />
+											<path
+												d="M18,8 L16,8 C15.4477153,8 15,7.55228475 15,7 C15,6.44771525 15.4477153,6 16,6 L18,6 L18,4 C18,3.44771525 18.4477153,3 19,3 C19.5522847,3 20,3.44771525 20,4 L20,6 L22,6 C22.5522847,6 23,6.44771525 23,7 C23,7.55228475 22.5522847,8 22,8 L20,8 L20,10 C20,10.5522847 19.5522847,11 19,11 C18.4477153,11 18,10.5522847 18,10 L18,8 Z M9,11 C6.790861,11 5,9.209139 5,7 C5,4.790861 6.790861,3 9,3 C11.209139,3 13,4.790861 13,7 C13,9.209139 11.209139,11 9,11 Z"
+												fill="#000000" fill-rule="nonzero" opacity="0.3" />
+											<path
+												d="M0.00065168429,20.1992055 C0.388258525,15.4265159 4.26191235,13 8.98334134,13 C13.7712164,13 17.7048837,15.2931929 17.9979143,20.2 C18.0095879,20.3954741 17.9979143,21 17.2466999,21 C13.541124,21 8.03472472,21 0.727502227,21 C0.476712155,21 -0.0204617505,20.45918 0.00065168429,20.1992055 Z"
+												fill="#000000" fill-rule="nonzero" />
+										</g>
+									</svg>
+									<p style="padding-top: 10px;">House Users</p>
 								</a>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		
+
+			<div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" href="{% url 'houses:update' %}">
+									<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+										style="width: 3em;height: 3em;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+											<rect opacity="0.300000012" x="0" y="0" width="24" height="24" />
+											<polygon fill="#000000" fill-rule="nonzero" opacity="0.3"
+												points="7 4.89473684 7 21 5 21 5 3 11 3 11 4.89473684" />
+											<path
+												d="M10.1782982,2.24743315 L18.1782982,3.6970464 C18.6540619,3.78325557 19,4.19751166 19,4.68102291 L19,19.3190064 C19,19.8025177 18.6540619,20.2167738 18.1782982,20.3029829 L10.1782982,21.7525962 C9.63486295,21.8510675 9.11449486,21.4903531 9.0160235,20.9469179 C9.00536265,20.8880837 9,20.8284119 9,20.7686197 L9,3.23140966 C9,2.67912491 9.44771525,2.23140966 10,2.23140966 C10.0597922,2.23140966 10.119464,2.2367723 10.1782982,2.24743315 Z M11.9166667,12.9060229 C12.6070226,12.9060229 13.1666667,12.2975724 13.1666667,11.5470105 C13.1666667,10.7964487 12.6070226,10.1879981 11.9166667,10.1879981 C11.2263107,10.1879981 10.6666667,10.7964487 10.6666667,11.5470105 C10.6666667,12.2975724 11.2263107,12.9060229 11.9166667,12.9060229 Z"
+												fill="#000000" />
+										</g>
+									</svg>
+									<p style="padding-top: 10px;">Switch House</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row text-center">
+							<div class="col-12">
+								<a class="dashboard-links" href="{% url 'houses:support_info' %}">
+									<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+										style="width: 3em;height: 3em;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+											<rect x="0" y="0" width="24" height="24" />
+											<path
+												d="M5,9 L19,9 C20.1045695,9 21,9.8954305 21,11 L21,20 C21,21.1045695 20.1045695,22 19,22 L5,22 C3.8954305,22 3,21.1045695 3,20 L3,11 C3,9.8954305 3.8954305,9 5,9 Z M18.1444251,10.8396467 L12,14.1481833 L5.85557487,10.8396467 C5.4908718,10.6432681 5.03602525,10.7797221 4.83964668,11.1444251 C4.6432681,11.5091282 4.77972206,11.9639747 5.14442513,12.1603533 L11.6444251,15.6603533 C11.8664074,15.7798822 12.1335926,15.7798822 12.3555749,15.6603533 L18.8555749,12.1603533 C19.2202779,11.9639747 19.3567319,11.5091282 19.1603533,11.1444251 C18.9639747,10.7797221 18.5091282,10.6432681 18.1444251,10.8396467 Z"
+												fill="#000000" />
+											<path
+												d="M11.1288761,0.733697713 L11.1288761,2.69017121 L9.12120481,2.69017121 C8.84506244,2.69017121 8.62120481,2.91402884 8.62120481,3.19017121 L8.62120481,4.21346991 C8.62120481,4.48961229 8.84506244,4.71346991 9.12120481,4.71346991 L11.1288761,4.71346991 L11.1288761,6.66994341 C11.1288761,6.94608579 11.3527337,7.16994341 11.6288761,7.16994341 C11.7471877,7.16994341 11.8616664,7.12798964 11.951961,7.05154023 L15.4576222,4.08341738 C15.6683723,3.90498251 15.6945689,3.58948575 15.5161341,3.37873564 C15.4982803,3.35764848 15.4787093,3.33807751 15.4576222,3.32022374 L11.951961,0.352100892 C11.7412109,0.173666017 11.4257142,0.199862688 11.2472793,0.410612793 C11.1708299,0.500907473 11.1288761,0.615386087 11.1288761,0.733697713 Z"
+												fill="#000000" fill-rule="nonzero" opacity="0.3"
+												transform="translate(11.959697, 3.661508) rotate(-270.000000) translate(-11.959697, -3.661508) " />
+										</g>
+									</svg>
+									<p style="padding-top: 10px;">Email &amp; Phone</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 		
 		</div>
+
+		{% for event in dashboard_events %}
+		<div class="row">
+			<div class="col-lg-12 col-md-12">
+				<div class="kt-portlet kt-portlet--mobile">
+					<div class="kt-portlet__body">
+						<div class="row">
+							<div class="col-md-4 col-sm-12 align-self-center">
+								<h5><a class="dashboard-links" href="{{ event.get_landing_view }}">{{ event.title }}</a></h5>
+								<p>Starts on {{ event.start }}</p>
+								<p style="margin-bottom: 0px;" class="d-none" ><i class="fa fa-eye"></i> {{ event.views }} &emsp; <i class="fa fa-user"></i> {{ event.views }}</p>
+							</div>
+							<div class="col-md-2 col-sm-3 col-6 text-center">
+								<h1 style="margin-bottom: 0px;"><a class="dashboard-links" href="{{ event.get_event_dashboard }}"><i class="la la-tachometer"></i></a></h1>
+								<p><a class="dashboard-links" href="{{ event.get_event_dashboard }}">Dashboard</a></p>
+							</div>
+							<div class="col-md-2 col-sm-3 col-6 text-center">
+								<h1 style="margin-bottom: 0px;"><a class="dashboard-links" href="{{ event.list_orders_view }}"><i class="la la-list"></i></a></h1>
+								<p><a class="dashboard-links" href="{{ event.list_orders_view }}">Orders</a></p>
+							</div>
+							<div class="col-md-2 col-sm-3 col-6 text-center">
+								<h1 style="margin-bottom: 0px;"><a class="dashboard-links" href="{{ event.list_attendees_view }}"><i class="la la-users"></i></a></h1>
+								<p><a class="dashboard-links" href="{{ event.list_attendees_view }}">Attendees</a></p>
+							</div>
+							<div class="col-md-2 col-sm-3 col-6 text-center">
+								<h1 style="margin-bottom: 0px;"><a class="dashboard-links" href="{{ event.checkin_view }}"><i class="la la-check"></i></a></h1>
+								<p><a class="dashboard-links" href="{{ event.checkin_view }}">Check-Ins</a></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+
+
+
 	</div>
 </div>
 {% endblock content %}

@@ -35,7 +35,7 @@ class PayoutSetting(models.Model):
 	
 	def get_edit_url(self):
 		view_name = "payments:update_bank"
-		return reverse(view_name, kwargs={"bank_transfer_id": self.pk})
+		return reverse(view_name, kwargs={"id": self.pk})
 
 
 

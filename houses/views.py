@@ -362,7 +362,6 @@ class DashboardView(HouseAccountMixin, DetailView):
         profile = self.get_profile()
 
         graph_data = self.graph_data(house)
-        print(graph_data)
 
         context["payout_set"] = PayoutSetting.objects.filter(house=house).exists()
         context["house_balance"] = house_balance

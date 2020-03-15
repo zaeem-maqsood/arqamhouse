@@ -281,14 +281,14 @@ class UpdateBankTransferView(HouseAccountMixin, CreateView):
 	def get(self, request, *args, **kwargs):
 		data = request.GET
 		print(data)
-		bank_transfer_id = kwargs['bank_transfer_id']
-		self.object = PayoutSetting.objects.get(id=bank_transfer_id)
+		payment_settings_id = self.kwargs["id"]
+		self.object = PayoutSetting.objects.get(id=payment_settings_id)
 		return render(request, self.template_name, self.get_context_data())
 
 	
 	def post(self, request, *args, **kwargs):
-		bank_transfer_id = kwargs['bank_transfer_id']
-		self.object = PayoutSetting.objects.get(id=bank_transfer_id)
+		payment_settings_id = self.kwargs["id"]
+		self.object = PayoutSetting.objects.get(id=payment_settings_id)
 		data = request.POST
 		house = self.get_house()
 		form = self.get_form()
@@ -308,7 +308,8 @@ class UpdateBankTransferView(HouseAccountMixin, CreateView):
 		context = {}
 		house = self.get_house()
 		form = self.get_form()
-		payout_setting = PayoutSetting.objects.get(house=house)
+		payment_settings_id = self.kwargs["id"]
+		payout_setting = PayoutSetting.objects.get(house=house, id=payment_settings_id)
 		context["form"] = form
 		context["payout_setting"] = payout_setting
 		context["dashboard_events"] = self.get_events()

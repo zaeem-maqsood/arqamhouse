@@ -90,6 +90,7 @@ $('#id_exclusive').change(function () {
                     </div>
 
 
+                    {% if tickets %}
                     {% if not update %}
                     <div class="row">
                         <div class="col-lg-12 col-md-12">
@@ -124,6 +125,7 @@ $('#id_exclusive').change(function () {
                             {% endfor %}
                         </div>
                     </div>
+                    {% endif %}
                     {% endif %}
 
                     {% if update %}
