@@ -17,7 +17,7 @@ class CheckinForm(forms.ModelForm):
                     "name": forms.TextInput(
                         attrs={
                             "class": "form-control m-input",
-                            "placeholder": "Main Registration",
+                            "placeholder": "Front Door Check-In",
                             "required": True
                         }
                     ),

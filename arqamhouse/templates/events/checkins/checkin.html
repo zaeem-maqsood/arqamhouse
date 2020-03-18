@@ -190,8 +190,8 @@ function GetAttendees(object) {
 
 {% block content %}
 
-<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
-	<div class="col-lg-10 offset-lg-1 col-md-12 col-12" style="padding: 0px;">
+<div class="row justify-content-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-8 col-md-12 col-12" style="padding: 0px;">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
@@ -245,9 +245,11 @@ function GetAttendees(object) {
                             {% for attendee in attendees %}
                             <tr>
                                 <td><a href="{{ attendee.get_attendee_view }}">{{ attendee.name }}</a></td>
-                                <td><button onclick="checkinAttendee(this);" type="button" id="checkin_attendee" name="manual" value="{{ attendee.unique_id }}" class="btn btn-outline-{% check_if_checked_in_color checkin attendee %} btn-block">{% check_if_checked_in checkin attendee %}</button></td>
-                                <td>{{ attendee.order.id }}</td>
                                 <td>{{ attendee.ticket.title }}</td>
+                                <td><button onclick="checkinAttendee(this);" type="button" id="checkin_attendee" name="manual"
+                                        value="{{ attendee.unique_id }}"
+                                        class="btn btn-outline-{% check_if_checked_in_color checkin attendee %} btn-block">{% check_if_checked_in checkin attendee %}</button>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

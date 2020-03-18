@@ -174,7 +174,7 @@ function initMap() {
             {% if attendee_common_questions.address %}
             
                 var input = document.getElementById('{{ quantity }}_{{ cart_item.ticket.id }}_address');
-                var autocomplete = new google.maps.places.Autocomplete(input);
+                var autocomplete = new google.maps.places.Autocomplete(input, { types: ['address'] });
 
             
             {% endif %}

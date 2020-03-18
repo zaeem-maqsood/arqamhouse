@@ -10,7 +10,11 @@
 {% endblock page_title %}
 
 {% block styles %}
-
+<style>
+    .card-header {
+    background-color: #e7f5ff;
+}
+</style>
 {% endblock styles %}
 
 
@@ -26,31 +30,27 @@
 
 {% block content %}
 <form method="POST">{% csrf_token %}
-<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
-    <div class="col-lg-8 offset-lg-2 col-md-12 col-12">
+<div class="row justify-content-center h-100" style="padding: 3rem 0px 3rem 0px;">
+    <div class="col-lg-6 col-md-12 col-12">
 
         <div class="kt-portlet kt-portlet--mobile">
-            <div class="kt-portlet__body" style="margin: 30px;">
+            <div class="kt-portlet__body">
 
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-10 offset-md-1">
-                                <p style="font-weight: 500;">Question <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
-                                {{ form.title }}
-                            </div>
-                        </div>
+                        <p style="font-weight: 500;">Question Prompt <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
+                        {{ form.title }}
                     </div>
                 </div>
 
                 <div class="row" style="padding-top:30px;">
-                    <div class="col-md-10 offset-md-1">
+                    <div class="col-md-12">
                         <p style="font-weight: 500;">Type <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
                         {{ form.question_type }}
                     </div>
                 </div>
                 <div class="row" style="padding-top:30px;">
-                    <div class="col-md-10 offset-md-1">
+                    <div class="col-md-12">
                         <p style="font-weight: 500;">Required <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" 
                         data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" 
                         data-original-title="Switch on if this question is required to answer."></i></p>
@@ -64,21 +64,17 @@
                 </div>
                 
                 <div class="row" style="padding-top:30px;">
-                    <div class="col-md-10 offset-md-1">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <p style="font-weight: 500;">Help Text <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" 
-                                data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" 
-                                data-original-title="You can provide buyers help text to assist them in answering this question."></i></p>
-                                {{ form.help_text }}
-                            </div>
-                        </div>
+                    <div class="col-md-12">
+                        <p style="font-weight: 500;">Help Text <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" 
+                        data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" 
+                        data-original-title="You can provide buyers help text to assist them in answering this question."></i></p>
+                        {{ form.help_text }}
                     </div>
                 </div>
 
                 {% if question.question_type == "Multiple Choice" %}
                 <div class="row" style="padding-top:30px;">
-                    <div class="col-md-10 offset-md-1">
+                    <div class="col-md-12">
                         <p style="font-weight: 500;">Options <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" 
                         data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" 
                         data-original-title="Add options for your question."></i>{% if question.approved %}{% else %}<span style="color: #FF4500;font-weight: 300;"> You must add at least 2 options to activate this question</span>{% endif %}</p>
@@ -93,48 +89,95 @@
 
 
                 <div class="row" style="padding-top: 50px;">
-                    <div class="col-md-10 offset-md-1">
-                        <p style="font-weight: 500;">Ask this question per order <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" 
-                        data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" 
-                        data-original-title="Switch on if you would like this question asked to ticket buyers once per order."></i></p>
-                        <span class="kt-switch">
-                            <label>
-                                <input type="checkbox" {% if event_question.order_question %}checked{% endif %} name="order_question" style="user-select: auto;" id="order_question">
-                            <span></span>
-                            </label>
-                        </span>
+                    <div class="col-md-12">
+                        <div style="padding-bottom: 30px;" class="accordion" id="accordionExample4">
+                            <div class="card">
+                                <div class="card-header" id="headingTwo1">
+                                    <div class="card-title collapsed" data-toggle="collapse" data-target="#collapseTwo4" aria-expanded="false"
+                                        aria-controls="collapseTwo4">
+                                        <i class="la la-plus"></i>More Options
+                                    </div>
+                                </div>
+                                <div id="collapseTwo4" class="collapse" aria-labelledby="headingTwo1" data-parent="#accordionExample4">
+                                    <div class="card-body">
+                            
+                            
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <p style="font-weight: 500;">Ask this question to the buyer <i style="color:#4599d5;font-size:1.1rem;"
+                                                        class="la la-info-circle" data-container="body" data-toggle="kt-tooltip" data-placement="top" title=""
+                                                        data-original-title="Switch on if you would like this question to be asked once per order."></i></p>
+                                                <span class="kt-switch">
+                                                    <label>
+                                                        <input type="checkbox" {% if event_question.order_question %}checked{% endif %} name="order_question"
+                                                            style="user-select: auto;" id="order_question">
+                                                        <span></span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+
+
+
+                                        <div class="row" style="padding-top: 40px;">
+                                            <div class="col-md-12">
+                                                <p style="font-weight: 500;">Choose when to ask this question
+                                                <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" 
+                                                data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" 
+                                                data-original-title="Switch on the tickets where you would like this question to be asked. 
+                                                If ticket buyers choose these tickets they will be prompted to answer this question."></i></p>
+                                            </div>
+                                        </div>
+
+                                        {% if creating %}
+                                            {% for ticket in tickets %}
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <p>{{ forloop.counter }}. {{ ticket.title }}</p>
+                                                    <span class="kt-switch">
+                                                        <label>
+                                                            <input type="checkbox" checked
+                                                                name="{{ ticket.id }}" style="user-select: auto;" id="ticket_{{ ticket.id }}">
+                                                            <span></span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            {% for ticket in tickets %}
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <p>{{ forloop.counter }}. {{ ticket.title }}</p>
+                                                    <span class="kt-switch">
+                                                        <label>
+                                                            <input type="checkbox" {% if event_question %}{{ ticket|ticket_checked:event_question }}{% endif %} name="{{ ticket.id }}" style="user-select: auto;" id="ticket_{{ ticket.id }}">
+                                                        <span></span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+
+                            
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
 
-                <div class="row" style="padding-top: 40px;">
-                    <div class="col-md-10 offset-md-1">
-                        <p style="font-weight: 500;">Ask this question per ticket
-                        <i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" 
-                        data-container="body" data-toggle="kt-tooltip" data-placement="top" title="" 
-                        data-original-title="Switch on the tickets where you would like this question to be asked. 
-                        If ticket buyers choose these tickets they will be prompted to answer this question."></i></p>
-                    </div>
-                </div>
+
+                
 
 
-                {% for ticket in tickets %}
-                <div class="row">
-                    <div class="col-md-10 offset-md-1">
-                        <p>{{ forloop.counter }}. {{ ticket.title }}</p>
-                        <span class="kt-switch">
-                            <label>
-                                <input type="checkbox" {% if event_question %}{{ ticket|ticket_checked:event_question }}{% endif %} name="{{ ticket.id }}" style="user-select: auto;" id="ticket_{{ ticket.id }}">
-                            <span></span>
-                            </label>
-                        </span>
-                    </div>
-                </div>
-                {% endfor %}
+                
 
 
                 <div class="row" style="padding-bottom: 10px;">
-                    <div class="col-md-10 offset-md-1">
+                    <div class="col-md-12">
                         <div class="row" style="padding-top:30px;">
                         {% if update %}
                                 <div class="col-md-6">

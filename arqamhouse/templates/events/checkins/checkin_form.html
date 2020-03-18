@@ -58,6 +58,16 @@ $('#id_exclusive').change(function () {
             <div class="kt-portlet__body" style="padding: 50px;">
                 <form method="POST" id="discount_form" enctype="multipart/form-data">{% csrf_token %}
 
+
+                    <div class="row" style="padding-bottom:10px;">
+                        <div class="col-md-12">
+                            <h4>Start checking your attendees in to your event</h4>
+                            <p>Give your check-in a name like 'Front Door Check-In' or 'VIP Check-In'. Then choose if the check-in is exclusive or not by selecting 
+                                which tickets are allowed to be cheked in. Simply leave 'Exclusive Check-in' off if the check-in is for all ticket types.
+                            </p>
+                        </div>
+                    </div>
+
                     {% if form.non_field_errors %}
                     <div class="row">
                         <div class="col-md-12">

@@ -43,7 +43,7 @@ class QuestionForm(forms.ModelForm):
 				"title": forms.TextInput(
 						attrs={
 							"class":"form-control m-input message",
-							"placeholder":"Do you like apples?",
+							"placeholder": "What's your favorite color?",
 							"required": True,
 							"maxlength": '100',
 						}

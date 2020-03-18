@@ -28,8 +28,8 @@ Tickets | {{ event.title }}
 {% block content %}
 
 
-<div class="row align-items-center h-100" style="padding: 2rem 0px 3rem 0px;">
-	<div class="col-lg-10 offset-lg-1 col-12">
+<div class="row justify-content-center" style="padding: 2rem 0px 0rem 0px;">
+	<div class="col-lg-8 col-12">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
@@ -39,6 +39,21 @@ Tickets | {{ event.title }}
 						{% if show_discount_code_button %}
 						<a class="btn btn-primary pull-right" href="{{ event.list_discounts_view }}">Discount Codes</a>
 						{% endif %}
+					</div>
+				</div>
+
+				<div class="row text-center" style="padding-bottom: 50px;">
+					<div class="col-md-4" style="padding-bottom: 20px;">
+						<a href="{{ event.create_paid_ticket }}" class="btn btn-secondary btn-elevate-hover btn-block"
+							id="new_paid_ticket"><i class="la la-plus" style="user-select: auto;"></i> Paid Ticket</a>
+					</div>
+					<div class="col-md-4" style="padding-bottom: 20px;">
+						<a href="{{ event.create_free_ticket }}" class="btn btn-secondary btn-elevate-hover btn-block"
+							id="new_free_ticket"><i class="la la-plus" style="user-select: auto;"></i> Free Ticket</a>
+					</div>
+					<div class="col-md-4" style="padding-bottom: 20px;">
+						<a href="{{ event.create_donation_ticket }}" class="btn btn-secondary btn-elevate-hover btn-block"
+							id="new_donation_ticket"><i class="la la-plus" style="user-select: auto;"></i> Donation Ticket</a>
 					</div>
 				</div>
 
@@ -64,17 +79,7 @@ Tickets | {{ event.title }}
 				{% endfor %}
 
 
-				<div class="row text-center">
-					<div class="col-md-4" style="padding-bottom: 20px;">
-						<a href="{{ event.create_paid_ticket }}" class="btn btn-primary btn-block" id="new_paid_ticket">New Paid Ticket</a>
-					</div>
-					<div class="col-md-4" style="padding-bottom: 20px;">
-						<a href="{{ event.create_free_ticket }}" class="btn btn-primary btn-block" id="new_free_ticket">New Free Ticket</a>
-					</div>
-					<div class="col-md-4" style="padding-bottom: 20px;">
-						<a href="{{ event.create_donation_ticket }}" class="btn btn-primary btn-block" id="new_donation_ticket">New Donation Ticket</a>
-					</div>
-				</div>
+				
 
 			</div>
 		</div>

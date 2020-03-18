@@ -10,8 +10,8 @@ from houses.models import House
 
 
 QUESTION_CHOICES = (
-    (("Simple"), ("Simple")),
-    (("Long"), ("Long")),
+    (("Simple"), ("Text")),
+    (("Long"), ("Paragraph Text")),
     (("Multiple Choice"), ("Multiple Choice")),
 )
 

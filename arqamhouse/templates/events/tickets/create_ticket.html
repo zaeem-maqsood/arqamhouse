@@ -108,11 +108,11 @@ function refundPolicy() {
 	title = document.getElementById('policy_title');
 
 	if (option == "7-days") {
-		paragraph.innerHTML = "A 7-day refund policy allows your attendees to request a refund from you 7 days before the start of your event (if your event has a start time). Otherwise they may request a refund at anytime. More info <a href='#'> here.</a>";
+		paragraph.innerHTML = "A 7-day refund policy allows your attendees to request a refund from you 7 days before the start of your event. Otherwise they may request a refund at anytime. More info <a href='#'> here.</a>";
 		title.innerHTML = "7-Days Policy"
 	}
 	else if (option == "30-days") {
-		paragraph.innerHTML = "A 30-day refund policy allows your attendees to request a refund from you 30 days before the start of your event (if your event has a start time). Otherwise they may request a refund at anytime. More info <a href='#'> here.</a>";
+		paragraph.innerHTML = "A 30-day refund policy allows your attendees to request a refund from you 30 days before the start of your event. Otherwise they may request a refund at anytime. More info <a href='#'> here.</a>";
 		title.innerHTML = "30-Days Policy"
 	}	
 	else if (option == "no refunds") {
@@ -121,7 +121,7 @@ function refundPolicy() {
 	}
 
 	else {
-		paragraph.innerHTML = "A standard refund policy allows your attendees to request a refund from you 24 hours before the start of your event (if your event has a start time). Otherwise they may request a refund at anytime. More info <a href='#'> here.</a>";
+		paragraph.innerHTML = "A standard refund policy allows your attendees to request a refund from you 24 hours before the start of your event. Otherwise they may request a refund at anytime. More info <a href='#'> here.</a>";
 		title.innerHTML = "Standard Policy"
 	}
 }
@@ -146,16 +146,16 @@ function refundPolicy() {
 
 
 <form method="POST" enctype="multipart/form-data">{% csrf_token %}
-	<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
-		<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
-			<div class="kt-portlet kt-portlet--mobile">
-				<div class="kt-portlet__body" style="margin: 30px;">
+	<div class="row justify-content-center" style="padding: 3rem 0px 0rem 0px;">
+		<div class="col-lg-8 col-md-12 col-12">
+			<div class="kt-portlet kt-portlet--mobile" style="padding: 20px;">
+				<div class="kt-portlet__body">
 
 					<input type="hidden" name="token" id="token">
 
 					{% if form.non_field_errors %}
-					<div class="row">
-						<div class="col-md-10">
+					<div class="row justify-content-center">
+						<div class="col-md-12">
 							{% for error in form.non_field_errors %}
 							<div class="alert alert-danger" role="alert">
 								<strong>Oh snap!</strong> {{ error }}
@@ -165,8 +165,8 @@ function refundPolicy() {
 					</div>
 					{% endif %}
 
-					<div class="row" {% if not donation_ticket %}style="padding-bottom: 20px;"{% endif %}>
-						<div class="col-md-10 offset-md-1">
+					<div class="row justify-content-center" {% if not donation_ticket %}style="padding-bottom: 20px;"{% endif %}>
+						<div class="col-md-12">
 							<p style="font-size:1.1rem;font-weight: 500;margin-bottom:0px;{% if form.title.errors %}color:red;{% endif %}">Ticket Name <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
 							{{ form.title }}
 							<br>
@@ -179,8 +179,8 @@ function refundPolicy() {
 					</div>
 
 					{% if paid_ticket %}
-					<div class="row" {% if not donation_ticket %}style="padding-bottom: 20px;"{% endif %}>
-						<div class="col-md-10 offset-md-1">
+					<div class="row justify-content-center" {% if not donation_ticket %}style="padding-bottom: 20px;"{% endif %}>
+						<div class="col-md-12">
 							<p style="font-weight: 600;margin-bottom:0px;{% if form.price.errors %}color:red;{% endif %}">Price <i style="color:#FF4500;font-weight:700;" class="la la-asterisk"></i></p>
 							{{ form.price }}
 							<br>
@@ -192,8 +192,8 @@ function refundPolicy() {
 						</div>
 					</div>
 
-					<div class="row" {% if not donation_ticket %}style="padding-bottom: 10px;"{% endif %}>
-						<div class="col-md-10 offset-md-1">
+					<div class="row justify-content-center" {% if not donation_ticket %}style="padding-bottom: 10px;"{% endif %}>
+						<div class="col-md-12">
 							<div style="padding-bottom: 30px;" class="accordion" id="accordionExample4">
 								<div class="card">
 									<div class="card-header" id="headingTwo1">
@@ -206,7 +206,7 @@ function refundPolicy() {
 
 											
 											<div class="row" style="padding-bottom: 10px;">
-												<div class="col-lg-4 col-md-4 col-4">
+												<div class="col-lg-4 col-md-4 col-12" style="padding-bottom: 10px;">
 													<span class="kt-switch kt-switch--icon mx-auto" style="user-select: auto;">
 														<label style="user-select: auto;margin-bottom: 0px;" >
 															{{ form.pass_fee }}
@@ -217,17 +217,17 @@ function refundPolicy() {
 																data-original-title="You can choose to pass on the processing fee to the ticket buyer."></i> Pass Fee</p>
 													</span>
 												</div>
-												<div class="col-md-4 col-4">
-													<h3 class="m--font-info" id="new_price_div">$0.00</h3>
+												<div class="col-md-4 col-6">
+													<h4 class="m--font-info" id="new_price_div">$0.00</h4>
 													<p><i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip"
 														data-placement="top" title=""
 														data-original-title="This is how much this ticket will cost buyers"></i>Buyer Price</p>
 												</div>
-												<div class="col-md-4 col-4">
-													<h3 class="m--font-success" id="amount_received_div">$0.00</h3>
+												<div class="col-md-4 col-6">
+													<h4 class="m--font-success" id="amount_received_div">$0.00</h4>
 													<p><i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body" data-toggle="kt-tooltip"
 														data-placement="top" title=""
-														data-original-title="This is how much you will recieve every time this ticket is sold"></i>Your Payout</p>
+														data-original-title="This is how much you will recieve every time this ticket is sold"></i>Payout</p>
 												</div>
 											</div>
 
@@ -239,8 +239,8 @@ function refundPolicy() {
 					</div>
 					{% endif %}
 
-					<div class="row" {% if not donation_ticket %}style="padding-bottom: 30px;"{% endif %}>
-						<div class="col-md-10 offset-md-1">
+					<div class="row justify-content-center" {% if not donation_ticket %}style="padding-bottom: 30px;"{% endif %}>
+						<div class="col-md-12">
 							<p style="font-weight: 600;margin-bottom:0px;{% if form.description.errors %}color:red;{% endif %}">Description</p>
 							{{ form.description }}
 							<br>
@@ -254,8 +254,8 @@ function refundPolicy() {
 
 
 					{% if not donation_ticket %}
-					<div class="row" style="padding-bottom: 10px;">
-						<div class="col-md-10 offset-md-1">
+					<div class="row justify-content-center" style="padding-bottom: 10px;">
+						<div class="col-md-12">
 							<div style="padding-bottom: 30px;" class="accordion" id="accordionExample4">
 								<div class="card">
 									<div class="card-header" id="headingTwo4">
@@ -307,13 +307,13 @@ function refundPolicy() {
 
 											<div class="row" style="padding-bottom: 20px;padding-top:30px;">
 												{% if paid_ticket %}
-												<div class="col-lg-4 col-md-12">
+												<div class="col-lg-4 col-md-12" style="padding-bottom: 20px;">
 													<p style="margin-bottom:0px;">
 														Refund Policy</p>
 													{{ form.refund_policy }}
 												</div>
 												{% endif %}
-												<div class="col-lg-4 col-md-12 text-center">
+												<div class="col-lg-4 col-md-12 text-center" style="padding-bottom: 20px;">
 													<p style="margin-bottom:0px;"><i style="color:#4599d5;font-size:1.1rem;" class="la la-info-circle" data-container="body"
 															data-toggle="kt-tooltip" data-placement="top" title=""
 															data-original-title="Express tickets are super easy for attendees to checkout with. However, you will not recieve information from attendees."></i>
@@ -343,7 +343,7 @@ function refundPolicy() {
 											<div class="row" style="padding-bottom: 10px;">
 												<div class="col-lg-12 col-md-12">
 													<h5 style="font-size: 1em;" id="policy_title">Standard Policy</h5>
-													<p id="policy_info">A standard refund policy allows your attendees to request a refund from you 24 hours before the start of your event (if your event has a start time).
+													<p id="policy_info">A standard refund policy allows your attendees to request a refund from you 24 hours before the start of your event.
 														Otherwise they may request a refund at anytime. More info <a href="#">here.</a>
 													</p>
 												</div>
@@ -358,7 +358,7 @@ function refundPolicy() {
 					{% endif %}
 					
 					<div class="row" style="padding-bottom: 10px;">
-						<div class="col-md-10 offset-md-1">
+						<div class="col-md-12">
 							<div class="row">
 							{% if button_text == "Update Ticket" %}
 									<div class="col-md-6" style="padding-top: 20px;">
@@ -383,6 +383,39 @@ function refundPolicy() {
 					</div>
 
 
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row justify-content-center" style="padding-bottom: 30px;">
+
+		<div class="col-lg-4 col-md-6 col-6" style="padding-top:10px;">
+			<div class="kt-portlet kt-portlet--mobile">
+				<div class="kt-portlet__body">
+					<div class="row text-center">
+						<div class="col-12">
+							<a class="dashboard-links" href="{{ event.list_tickets_view }}">
+								<i class="la la-external-link" style="font-size:2.5em;"></i>
+								<p style="padding-top: 10px;">Tickets</p>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-lg-4 col-md-6 col-6" style="padding-top:10px;">
+			<div class="kt-portlet kt-portlet--mobile">
+				<div class="kt-portlet__body">
+					<div class="row text-center">
+						<div class="col-12">
+							<a class="dashboard-links" href="{{ event.get_event_dashboard }}">
+								<i class="la la-edit" style="font-size:2.5em;"></i>
+								<p style="padding-top: 10px;">Dashboard</p>
+							</a>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

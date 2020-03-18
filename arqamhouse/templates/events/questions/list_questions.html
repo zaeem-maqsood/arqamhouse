@@ -291,7 +291,7 @@ $('#id_gender_required').change(function() {
 						<p>
 							{% if event_question.question.approved %}
 								{% if event_question.order_question %}
-									This question is asked for every order
+									This question is asked to the buyer
 									{% if event_question.tickets.all %} and if the buyer selects tickets 
 										{% for ticket in event_question.tickets.all %}
 										<span style="color:#4599d5;">| {{ ticket.title }}</span>
@@ -299,7 +299,7 @@ $('#id_gender_required').change(function() {
 									{% endif %}
 								{% else %}
 									{% if event_question.tickets.all %} 
-										This question is asked if the buyer selects tickets
+										Asked if an attendee chooses the following tickets
 										{% for ticket in event_question.tickets.all %}
 										<span style="color:#4599d5;">| {{ ticket.title }}</span>
 										{% endfor %}

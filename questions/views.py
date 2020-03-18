@@ -240,7 +240,7 @@ class QuestionCreateView(HouseAccountMixin, UserPassesTestMixin, CreateView):
 		one_to_one_id = self.kwargs['one_to_one_id']
 		one_to_one_object = self.get_one_to_one_object(one_to_one_type, one_to_one_id)
 
-
+		context["creating"] = True
 		if one_to_one_type == "events":
 			tickets = Ticket.objects.filter(event=one_to_one_object, deleted=False, express=False)
 			context["tickets"] = tickets
