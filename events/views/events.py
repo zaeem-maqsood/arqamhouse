@@ -132,6 +132,13 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         print(data)
         slug = kwargs['slug']
         event = self.get_event(slug)
+
+        all_attendees = Attendee.objects.filter(order__event=event).order_by('order__created_at')
+
+        if 'Export To Excel' in data:
+            return self.export_to_excel(event, all_attendees.filter(order__failed=False))
+
+
         if 'stop_sales' in data:
             if data['stop_sales'] == 'true':
                 event.ticket_sales = False
@@ -206,6 +213,123 @@ class EventDashboardView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         context["event"] = event
         context["request"] = request
         return render(request, self.template_name, context)
+
+
+    def export_to_excel(self, event, attendees):
+
+        event_questions = EventQuestion.objects.filter(
+            event=event, order_question=False, question__deleted=False)
+
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',)
+        response['Content-Disposition'] = 'attachment; filename={event}-guest-list.xlsx'.format(
+            event=event.slug)
+        workbook = Workbook()
+
+        # Get active worksheet/tab
+        worksheet = workbook.active
+        worksheet.title = 'Attendees'
+
+        # Define the titles for columns
+        columns = ['Name', 'Ticket', 'Order No.', 'Gender', 'Age',
+                    'Refunded', 'Address', 'City', 'Region', 'Country', ]
+        for event_question in event_questions:
+            columns.append(event_question.question.title)
+        row_num = 1
+
+        # Assign the titles for each cell of the header
+        for col_num, column_title in enumerate(columns, 1):
+            cell = worksheet.cell(row=row_num, column=col_num)
+            cell.value = column_title
+
+        # Iterate through all movies
+        for attendee in attendees:
+            row_num += 1
+
+            answers = Answer.objects.filter(attendee=attendee, question__question__deleted=False)
+
+            # Define the data for each cell in the row
+            row = []
+            row.append(attendee.name)
+            row.append(attendee.ticket.title)
+            row.append(attendee.order.number)
+            if attendee.gender:
+                row.append(attendee.gender)
+            else:
+                row.append("N/A")
+
+            if attendee.age:
+                row.append(attendee.age)
+            else:
+                row.append("N/A")
+
+            if attendee.active:
+                row.append("No")
+            else:
+                row.append("Yes")
+
+            if attendee.address:
+                try:
+                    row.append(attendee.address)
+                except:
+                    row.append("No Address")
+
+                try:
+                    row.append(attendee.city.name)
+                except:
+                    row.append("No City")
+                
+                try:
+                    row.append(attendee.region.name)
+                except:
+                    row.append("No Region")
+
+                try:
+                    row.append(attendee.country.name)
+                except:
+                    row.append("No Country")
+                    
+            else:
+                row.append("No Address")
+                row.append("No City")
+                row.append("No Region")
+                row.append("No Country")
+
+            for event_question in event_questions:
+                value = "N/A"
+                for answer in answers:
+                    if answer.question.pk == event_question.pk:
+                        value = answer.value
+                row.append(value)
+
+            # Assign the data for each cell of the row
+            for col_num, cell_value in enumerate(row, 1):
+                wrapped_alignment = Alignment(vertical='center', wrap_text=True)
+                cell = worksheet.cell(row=row_num, column=col_num)
+                cell.value = cell_value
+                cell.alignment = wrapped_alignment
+
+        # Change column widths
+        name_column_letter = get_column_letter(1)
+        ticket_name_column_letter = get_column_letter(2)
+        note_column_letter = get_column_letter(6)
+
+        name_column_dimensions = worksheet.column_dimensions[name_column_letter]
+        ticket_name_column_dimensions = worksheet.column_dimensions[ticket_name_column_letter]
+        note_column_dimensions = worksheet.column_dimensions[note_column_letter]
+
+        name_column_dimensions.width = 30
+        ticket_name_column_dimensions.width = 30
+        note_column_dimensions.width = 30
+
+        for x in range(7, (event_questions.count() + 11)):
+            column_letter = get_column_letter(x)
+            column_dimensions = worksheet.column_dimensions[column_letter]
+            column_dimensions.width = 40
+
+        workbook.save(response)
+
+        return response
 
 
 

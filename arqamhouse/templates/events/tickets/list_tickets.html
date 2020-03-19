@@ -13,7 +13,12 @@ Tickets | {{ event.title }}
 		padding-top: 15px;
 		padding-bottom: 15px;
 	}
+
+	.dashboard-links {
+		color: #7396b0;
+	}
 </style>
+
 {% endblock styles %}
 
 
@@ -28,21 +33,18 @@ Tickets | {{ event.title }}
 {% block content %}
 
 
-<div class="row justify-content-center" style="padding: 2rem 0px 0rem 0px;">
+<div class="row justify-content-center" style="padding: 3rem 0px 0rem 0px;">
 	<div class="col-lg-8 col-12">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
-				<div class="row" style="padding-bottom: 50px;">
+				<div class="row" style="padding-bottom: 20px;">
 					<div class="col-12">
 						<h3 style="display: inline-block;">Tickets</h3>
-						{% if show_discount_code_button %}
-						<a class="btn btn-primary pull-right" href="{{ event.list_discounts_view }}">Discount Codes</a>
-						{% endif %}
 					</div>
 				</div>
 
-				<div class="row text-center" style="padding-bottom: 50px;">
+				<div class="row text-center" style="padding-bottom: 30px;">
 					<div class="col-md-4" style="padding-bottom: 20px;">
 						<a href="{{ event.create_paid_ticket }}" class="btn btn-secondary btn-elevate-hover btn-block"
 							id="new_paid_ticket"><i class="la la-plus" style="user-select: auto;"></i> Paid Ticket</a>
@@ -78,9 +80,38 @@ Tickets | {{ event.title }}
 				</div>
 				{% endfor %}
 
+			</div>
+		</div>
+	</div>
+</div>
 
-				
+<div class="row justify-content-center" style="padding-bottom: 30px;">
+	<div class="col-lg-4 col-md-6 col-6" style="padding-bottom:10px;">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+				<div class="row text-center">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.get_event_dashboard }}">
+							<i class="la la-edit" style="font-size:2.5em;"></i>
+							<p style="padding-top: 10px;">Dashboard</p>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
+	<div class="col-lg-4 col-md-6 col-6" style="padding-bottom:10px;">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+				<div class="row text-center">
+					<div class="col-12">
+						<a class="dashboard-links" href="{{ event.get_landing_view }}">
+							<i class="la la-external-link" style="font-size:2.5em;"></i>
+							<p style="padding-top: 10px;">View Event</p>
+						</a>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

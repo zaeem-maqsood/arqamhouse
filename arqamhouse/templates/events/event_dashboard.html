@@ -437,7 +437,7 @@ color: #7396b0;
 										<a class="dashboard-links" {% if tickets %}{% if not email.message  %}style="color:white;"
 											{% endif %}{% endif %} href="{{ event.get_email_confirmation_view }}">
 											<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 3em;height: 3em;"
-												viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+												viewBox="0 0 24 24" version="1.1" class="kt-svg-icon" {% if not email.message  %}id="fill-svg"{% endif %}>
 												<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
 													<rect x="0" y="0" width="24" height="24" />
 													<path
@@ -448,7 +448,7 @@ color: #7396b0;
 														fill="#000000" />
 												</g>
 											</svg>
-											<p style="padding-top: 10px;">Confirmation <span class="d-none">Email</span></p>
+											<p style="padding-top: 10px;">Confirmation <span class="d-md-inline d-sm-none d-none">Email</span></p>
 										</a>
 									</div>
 								</div>
@@ -499,7 +499,7 @@ color: #7396b0;
 														transform="translate(11.959697, 3.661508) rotate(-90.000000) translate(-11.959697, -3.661508) " />
 												</g>
 											</svg>
-											<p style="padding-top: 10px;"><span class="d-none">Event</span> Campaign</p>
+											<p style="padding-top: 10px;"><span class="d-md-inline d-sm-none d-none">Event</span> Campaign</p>
 										</a>
 									</div>
 								</div>
@@ -528,7 +528,7 @@ color: #7396b0;
 							<div class="kt-portlet__body">
 								<div class="row text-center">
 									<div class="col-12">
-										<a class="dashboard-links" href="{{ event.get_traffic_view }}">
+										<form method="POST">{% csrf_token %}
 											<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 3em;height: 3em;"
 												viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
 												<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -540,8 +540,8 @@ color: #7396b0;
 														fill="#000000" />
 												</g>
 											</svg>
-											<p style="padding-top: 10px;">Guest List</p>
-										</a>
+											<button type="submit" name="Export To Excel" id="Export To Excel" class="btn btn-block btn-elevate dashboard-links">Guest List <span class="d-md-inline d-sm-none d-none">Excel</span></button>
+										</form>
 									</div>
 								</div>
 							</div>
@@ -613,7 +613,7 @@ color: #7396b0;
 													transform="translate(11.959697, 3.661508) rotate(-270.000000) translate(-11.959697, -3.661508) " />
 											</g>
 										</svg>
-										<button type="submit" name="Archive" value="Archive" class="btn btn-block btn-elevate dashboard-links" style="color: #525252;">Archive <span class="d-none">Event</span></button>
+										<button type="submit" name="Archive" value="Archive" class="btn btn-block btn-elevate dashboard-links" style="color: #525252;">Archive <span class="d-md-inline d-sm-none d-none">Event</span></button>
 										</form>
 									</div>
 								</div>
