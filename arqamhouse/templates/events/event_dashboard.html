@@ -378,13 +378,11 @@ color: #7396b0;
 					
 
 					<div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
-						<div class="kt-portlet kt-portlet--mobile" {% if tickets %}{% if not questions %}style="background-color: #4599d5;"
-							{% endif %}{% endif %}>
+						<div class="kt-portlet kt-portlet--mobile">
 							<div class="kt-portlet__body">
 								<div class="row text-center">
 									<div class="col-12">
-										<a class="dashboard-links" {% if tickets %}{% if not questions  %}style="color:white;"
-											{% endif %}{% endif %} href="{{ event.list_questions_view }}">
+										<a class="dashboard-links" href="{{ event.list_questions_view }}">
 											<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 3em;height: 3em;"
 												viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
 												<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -437,7 +435,7 @@ color: #7396b0;
 								<div class="row text-center">
 									<div class="col-12">
 										<a class="dashboard-links" {% if tickets %}{% if not email.message  %}style="color:white;"
-											{% endif %}{% endif %} href="{{ event.get_email_options_view }}">
+											{% endif %}{% endif %} href="{{ event.get_email_confirmation_view }}">
 											<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 3em;height: 3em;"
 												viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
 												<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -450,7 +448,7 @@ color: #7396b0;
 														fill="#000000" />
 												</g>
 											</svg>
-											<p style="padding-top: 10px;">Confirmation Email</p>
+											<p style="padding-top: 10px;">Confirmation <span class="d-none">Email</span></p>
 										</a>
 									</div>
 								</div>
@@ -464,7 +462,7 @@ color: #7396b0;
 							<div class="kt-portlet__body">
 								<div class="row text-center">
 									<div class="col-12">
-										<a class="dashboard-links" href="{{ event.checkin_view }}">
+										<a class="dashboard-links" href="{{ event.list_discounts_view }}">
 											<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 3em;height: 3em;"
 												viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
 												<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -482,12 +480,12 @@ color: #7396b0;
 						</div>
 					</div>
 
-					<div class="col-lg-3 col-md-4 col-md-6" style="padding-top:10px;">
+					<div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
 						<div class="kt-portlet kt-portlet--mobile">
 							<div class="kt-portlet__body">
 								<div class="row text-center">
 									<div class="col-12">
-										<a class="dashboard-links" href="{{ event.get_traffic_view }}">
+										<a class="dashboard-links" href="{{ event.get_create_event_campaign_view }}">
 											<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 3em;height: 3em;"
 												viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
 												<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -501,7 +499,7 @@ color: #7396b0;
 														transform="translate(11.959697, 3.661508) rotate(-90.000000) translate(-11.959697, -3.661508) " />
 												</g>
 											</svg>
-											<p style="padding-top: 10px;">Event Campaign</p>
+											<p style="padding-top: 10px;"><span class="d-none">Event</span> Campaign</p>
 										</a>
 									</div>
 								</div>
@@ -509,7 +507,7 @@ color: #7396b0;
 						</div>
 					</div>
 					
-					<div class="col-lg-3 col-md-6" style="padding-top:10px;">
+					<div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
 						<div class="kt-portlet kt-portlet--mobile">
 							<div class="kt-portlet__body">
 								<div class="row text-center">
@@ -525,7 +523,7 @@ color: #7396b0;
 					</div>
 
 
-					<div class="col-lg-3 col-md-4" style="padding-top:10px;">
+					<div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
 						<div class="kt-portlet kt-portlet--mobile">
 							<div class="kt-portlet__body">
 								<div class="row text-center">
@@ -593,7 +591,7 @@ color: #7396b0;
 
 					
 					{% if event.active %}
-					<div class="col-lg-3 col-md-4" style="padding-top:10px;">
+					<div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
 						<div class="kt-portlet kt-portlet--mobile" style="background-color: #ffd272;">
 							<div class="kt-portlet__body">
 								<div class="row text-center">
@@ -615,7 +613,7 @@ color: #7396b0;
 													transform="translate(11.959697, 3.661508) rotate(-270.000000) translate(-11.959697, -3.661508) " />
 											</g>
 										</svg>
-										<button type="submit" name="Archive" value="Archive" class="btn btn-block btn-elevate dashboard-links" style="color: #525252;">Archive Event</button>
+										<button type="submit" name="Archive" value="Archive" class="btn btn-block btn-elevate dashboard-links" style="color: #525252;">Archive <span class="d-none">Event</span></button>
 										</form>
 									</div>
 								</div>
@@ -623,7 +621,7 @@ color: #7396b0;
 						</div>
 					</div>
 					{% else %}
-					<div class="col-lg-3 col-md-4" style="padding-top:10px;">
+					<div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
 						<div class="kt-portlet kt-portlet--mobile" style="background-color: #7298ff;">
 							<div class="kt-portlet__body">
 								<div class="row text-center">
@@ -647,7 +645,7 @@ color: #7396b0;
 											</svg>
 											<button type="submit" name="Re-Open" value="Re-Open" id="recover-event"
 												class="btn btn-block btn-elevate dashboard-links" style="color: white;">Unarchive
-												Event</button>
+												<span class="d-none">Event</span></button>
 										</form>
 									</div>
 								</div>
@@ -657,7 +655,7 @@ color: #7396b0;
 					{% endif %}
 
 
-					<div class="col-lg-3 col-md-4" style="padding-top:10px;">
+					<div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
 						<div class="kt-portlet kt-portlet--mobile" style="background-color: #ff9d79;">
 							<div class="kt-portlet__body">
 								<div class="row text-center">
@@ -677,7 +675,7 @@ color: #7396b0;
 											</svg>
 											<button type="submit" name="Delete" value="Delete"
 												class="btn btn-block btn-elevate dashboard-links" style="color: #525252;">Delete
-												Event</button>
+												<span class="d-none">Event</span></button>
 										</form>
 									</div>
 								</div>
