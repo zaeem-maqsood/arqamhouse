@@ -174,7 +174,7 @@ color: #7396b0;
 		<div class="row">
 			<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
 				<div class="alert alert-warning" role="alert" style="user-select: auto;background-color: #f9bf93;">
-					<div class="alert-text" style="user-select: auto;">'{{ event.title }}' is archived. You can recover it <a href="#recover-event">here</a></div>
+					<div class="alert-text" style="user-select: auto;">'{{ event.title }}' is archived. You can recover it <a href="#recover-event">here</a>, just make sure the <a href="{{ event.get_update_view }}">start</a> and <a href="{{ event.get_update_view }}">end</a> times are after today!</div>
 				</div>
 			</div>
 		</div>

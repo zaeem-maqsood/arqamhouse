@@ -160,6 +160,10 @@ AUTH_TOKEN = 'f0ca4ed931e73f3ddefb62e3cb105f96'
 GOOGLE_MAPS_API = 'AIzaSyDtDBaUdChaO8Br25g14tY8W3bzXPtHqys'
 
 
+# OpenTok Credentials
+OPEN_TOK_API_KEY = '46593362'
+OPEN_TOK_SECRECT_KEY = 'd5717bdaa23dd3c54f102b2f7f1952eae485d857'
+
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators

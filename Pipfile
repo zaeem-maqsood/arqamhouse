@@ -41,6 +41,7 @@ twilio = "*"
 ics = "*"
 beautifulsoup4 = "*"
 django-stdimage = "*"
+opentok = "*"
 
 [requires]
 python_version = "3.7"

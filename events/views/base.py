@@ -37,6 +37,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment
 from twilio.rest import Client
 from weasyprint import HTML, CSS
+from opentok import OpenTok
 
 # Mixins
 from events.mixins import EventSecurityMixin, EventMixin
@@ -72,6 +73,74 @@ def archive_past_events(event):
             event.active = False
             event.save()
     return "done"
+
+
+
+class OpenTokSubscriberView(View):
+
+    template_name = "events/opentok/subscriber.html"
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+        api_key = settings.OPEN_TOK_API_KEY
+        api_secret = settings.OPEN_TOK_SECRECT_KEY
+        print(api_key)
+        print(api_secret)
+        opentok = OpenTok(api_key, api_secret)
+        # session = opentok.create_session()
+        # session_id = session.session_id
+        # token = session.generate_token()
+        # print(token)
+        # print(session_id)
+
+        api_key = 46593362
+        session_id = '1_MX40NjU5MzM2Mn5-MTU4NDk3NjU2NDc2Nn54K3RDWFVMNGlvRGg0TU13VmpQNkZKWUN-UH4'
+        # token = 'T1==cGFydG5lcl9pZD00NjU5MzM2MiZzaWc9ZmU2OTRiYmQzMWIzNmJhNzRlOTZkYjlmOWNjZWMxMDkyMjRkMmI2NTpzZXNzaW9uX2lkPTFfTVg0ME5qVTVNek0yTW41LU1UVTRORGszTmpVMk5EYzJObjU0SzNSRFdGVk1OR2x2UkdnMFRVMTNWbXBRTmtaS1dVTi1VSDQmY3JlYXRlX3RpbWU9MTU4NDk3NjU2NCZleHBpcmVfdGltZT0xNTg1MDYyOTY0JnJvbGU9cHVibGlzaGVyJm5vbmNlPTUyMDA3NyZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ=='
+        token = opentok.generate_token(session_id)
+
+        context["api_key"] = api_key
+        context["session_id"] = session_id
+        context["token"] = token
+        return context
+
+
+class OpenTokPublisherView(View):
+
+    template_name = "events/opentok/publisher.html"
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+        api_key = settings.OPEN_TOK_API_KEY
+        api_secret = settings.OPEN_TOK_SECRECT_KEY
+        print(api_key)
+        print(api_secret)
+        opentok = OpenTok(api_key, api_secret)
+        # session = opentok.create_session()
+        # session_id = session.session_id
+        # token = session.generate_token()
+        # print(token)
+        # print(session_id)
+
+        api_key = 46593362
+        session_id = '1_MX40NjU5MzM2Mn5-MTU4NDk3NjU2NDc2Nn54K3RDWFVMNGlvRGg0TU13VmpQNkZKWUN-UH4'
+        token = 'T1==cGFydG5lcl9pZD00NjU5MzM2MiZzaWc9ZmU2OTRiYmQzMWIzNmJhNzRlOTZkYjlmOWNjZWMxMDkyMjRkMmI2NTpzZXNzaW9uX2lkPTFfTVg0ME5qVTVNek0yTW41LU1UVTRORGszTmpVMk5EYzJObjU0SzNSRFdGVk1OR2x2UkdnMFRVMTNWbXBRTmtaS1dVTi1VSDQmY3JlYXRlX3RpbWU9MTU4NDk3NjU2NCZleHBpcmVfdGltZT0xNTg1MDYyOTY0JnJvbGU9cHVibGlzaGVyJm5vbmNlPTUyMDA3NyZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ=='
+        
+        # To get all streams in a session:
+        # stream_list = opentok.list_streams(session_id)
+        # print(stream_list)
+        # stream = stream_list.items[0]
+        # print(stream.id)
+
+        context["api_key"] = api_key
+        context["session_id"] = session_id
+        context["token"] = token
+        return context
 
 
 

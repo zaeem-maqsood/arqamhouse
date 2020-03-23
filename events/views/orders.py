@@ -189,6 +189,7 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
         event = self.get_event(slug)
         order = self.get_order(order_id)
         house = self.get_house()
+        subscriber = Subscriber.objects.get(house=event.house, profile__email=order.email)
         
 
         house_balance = HouseBalance.objects.get(house=house)
@@ -207,6 +208,7 @@ class OrderDetailView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin
         refund_requests = EventRefundRequest.objects.filter(order=order)
         context["refund_requests"] = refund_requests
 
+        context["subscriber"] = subscriber
         context["house_balance"] = house_balance
         context["event_cart_items"] = order.event_cart.eventcartitem_set.all
         context["house"] = house

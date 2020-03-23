@@ -2,7 +2,7 @@ from .base import *
 
 from events.views import (EventCreateView, EventUpdateView, PastEventsView, EventCheckoutView, EventDashboardView,
                           AddTicketsToCartView, ChannelsView, ChannelsRoomView, EventSendToSubscribersView, EventTrafficView,
-                          EventVenueView, EventImageView, EventDescriptionView, EventURLView)
+                          EventVenueView, EventImageView, EventDescriptionView, EventURLView, OpenTokPublisherView, OpenTokSubscriberView)
 
 
 urlpatterns += [
@@ -24,4 +24,9 @@ urlpatterns += [
 
     path('testing/chat', ChannelsView.as_view(), name='channels_test'),
     path('testing/chat/<str:room_name>/', ChannelsRoomView.as_view(), name='channels_test_room'),
+
+    path('testing/opentok', OpenTokPublisherView.as_view(), name='open_tok'),
+    path('testing/opentok/subscriber', OpenTokSubscriberView.as_view(), name='open_tok_sub'),
+
+
 ]

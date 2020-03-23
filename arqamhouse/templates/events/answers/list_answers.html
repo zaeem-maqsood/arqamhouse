@@ -348,20 +348,18 @@ Orders
         color: #7396b0;
     }
 </style>
-<div class="row align-items-center h-100">
-    <div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+<div class="row justify-content-center h-100">
+    <div class="col-lg-8 col-md-12 col-12">
 
         <div class="kt-portlet kt-portlet--mobile">
             <div class="kt-portlet__body">
 
-                <div class="row" style="padding-bottom:40px;">
+                <div class="row" style="padding-bottom: 20px;">
                     <div class="col-12">
                         <h3 style="margin-bottom: 10px;display: inline-block;">Answers</h3>
-                        <a class="btn btn-primary pull-right" href="{{ event.list_questions_view }}" data-container="body"
-                            data-toggle="kt-tooltip" data-placement="top" title=""
-                            data-original-title="Click here to view questions.">View Questions</a>
+                        
                         {% if not event_questions %}
-                        <p>You don't have any custom questions yet. You can add cutom questions <a
+                        <p>You don't have any custom questions yet. You can add custom questions <a
                                 href="{{ event.list_questions_view }}">here</a>.</p>
                         {% endif %}
                     </div>

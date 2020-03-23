@@ -98,8 +98,14 @@ Order #{{ order.number }} | {{ event.title }}
 				</div>
 				{% endif %}
 
+				<div class="row" style="padding-top: 20px;">
+					<div class="col-12">
+						<p class="lead">Subscriber | <a href="{{ subscriber.get_absolute_url }}">{{ subscriber.profile.name }}</a></p>
+					</div>
+				</div>
+
 				
-				<div class="row" style="padding-top: 40px;">
+				<div class="row" style="padding-top: 20px;">
 					<div class="col-12">
 						<h4>Attendees</h4>
 					</div>
