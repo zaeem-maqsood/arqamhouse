@@ -1,0 +1,151 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+{{ event.title|safe }}
+{% endblock title %}
+
+{% block styles %}
+<style>
+    #subscriber {
+        height: 200px;
+    }
+
+    @media only screen and (min-width: 576px) {
+
+        #subscriber {
+            height: 400px;
+        }
+
+    }
+</style>
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script src="https://static.opentok.com/v2/js/opentok.js"></script>
+<script>
+    // credentials
+    var apiKey = '{{ api_key }}';
+    var sessionId = '{{ session_id }}';
+    var token = '{{ token }}';
+
+    var connectionCount = -1;
+
+    // Handling all of our errors here by alerting them
+    function handleError(error) {
+        if (error) {
+            alert(error.message);
+        }
+    }
+
+    var session = OT.initSession(apiKey, sessionId);
+
+    session.connect(token, function (error) {
+        if (error) {
+            handleError(error);
+        } else {
+            console.log("Connected to the session.");
+
+        }
+    });
+
+    // Subscribe to a newly created stream
+    session.on('streamCreated', function (event) {
+        session.subscribe(event.stream, 'subscriber', {
+            insertMode: 'append',
+            width: '100%',
+            height: '100%',
+            restrictFrameRate: true,
+        }, handleError);
+
+        document.getElementById("video_frame").style.display = 'flex';
+        document.getElementById("offline_message").style.display = 'none';
+        document.getElementById("online_message").style.display = 'block'
+        console.log("New stream in the session: " + event.stream.streamId);
+
+    });
+
+    session.on({
+            connectionCreated: function (event) {
+                connectionCount++;
+                console.log(connectionCount + ' connections.');
+                document.getElementById("viewers").innerHTML = connectionCount
+            },
+            connectionDestroyed: function (event) {
+                connectionCount--;
+                console.log(connectionCount + ' connections.');
+                document.getElementById("viewers").innerHTML = connectionCount
+            },
+            sessionDisconnected: function sessionDisconnectHandler(event) {
+                // The event is defined by the SessionDisconnectEvent class
+                console.log('Disconnected from the session.');
+                document.getElementById('disconnectBtn').style.display = 'none';
+                if (event.reason == 'networkDisconnected') {
+                    alert('Your network connection terminated.')
+                }
+            }
+        });
+
+
+    session.on("streamDestroyed", function (event) {
+
+        document.getElementById("video_frame").style.display = 'none';
+        document.getElementById("offline_message").style.display = 'block';
+        document.getElementById("online_message").style.display = 'none'
+        console.log("Stream stopped. Reason: " + event.reason);
+    });
+
+
+
+
+</script>
+{% endblock scripts %}
+
+{% block content %}
+<section style="padding-top: 3em;padding-bottom:0px;">
+    <div class="container" style="padding-right: 0px;padding-left: 0px;">
+
+
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-lg-8 col-md-10 col-10" style="padding: 0px;">
+                <a href="{{ event.get_landing_view }}" class="btn btn--primary-1 btn-block" style="color: white;">Event Page</a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 10px;">
+            <div class="col-lg-8 col-md-10 col-10" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;border-radius: 15px;">
+
+                <div class="row text-center" style="padding-top: 20px;" id="offline_message">
+                    <div class="col-md-12">
+                        <h4 style="margin-bottom:0px;font-weight: 400;color: #d44444;">{{ event.house.name }} is currently offline.</h4>
+                    </div>
+                </div>
+
+                <div class="row text-center" style="padding-top: 20px;display: none;" id="online_message">
+                    <div class="col-md-12">
+                        <h4 style="margin-bottom:0px;font-weight: 400;color: #4498d4;">{{ event.house.name }} is now live</h4>
+                    </div>
+                </div>
+
+                <div class="row text-center" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <p><span id="viewers"></span> Viewers</p>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="padding-bottom: 50px;display: none;" id="video_frame">
+                    <div class="col-md-10">
+                        <div id="subscriber"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock content %}

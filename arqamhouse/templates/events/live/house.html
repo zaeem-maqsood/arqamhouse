@@ -1,0 +1,169 @@
+{% extends "backend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Testing
+{% endblock title %}
+
+
+{% block styles %}
+<style>
+
+#publisher {
+    height: 200px;
+}
+
+@media only screen and (min-width: 576px) {
+
+    #publisher {
+        height: 400px;
+    }
+  
+
+}
+
+</style>
+{% endblock styles %}
+
+
+{% block scripts %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.6/lottie.min.js" type="text/javascript"></script>
+<script>
+    var animation = bodymovin.loadAnimation({
+            container: document.getElementById('bm'), // Required
+            path: 'https://maxst.icons8.com/vue-static/landings/animated-icons/icons/video-record/video-record.json', // Required
+            renderer: 'svg', // Required
+            loop: true, // Optional
+            autoplay: true, // Optional
+        })
+</script>
+
+<script src="https://static.opentok.com/v2/js/opentok.js"></script>
+<script>
+
+    // Enable navigation prompt
+    window.onbeforeunload = function () {
+        return true;
+    };
+
+
+    // credentials
+    var apiKey = '{{ api_key }}';
+    var sessionId = '{{ session_id }}';
+    var token = '{{ token }}';
+
+    var connectionCount = -1;
+
+    // Handling all of our errors here by alerting them
+    function handleError(error) {
+        if (error) {
+            alert(error.message);
+        }
+    }
+
+    var session = OT.initSession(apiKey, sessionId);
+
+    // Create a publisher
+    var publisher = OT.initPublisher('publisher', {
+        insertMode: 'append',
+        width: '100%',
+        height: '100%',
+        facingMode: '{{ facing_mode }}'
+    }, handleError);
+
+
+    // Connect to the session
+    session.connect(token, function (error) {
+        // If the connection is successful, publish to the session
+        if (error) {
+            handleError(error);
+        } else {
+            console.log("publishing")
+            session.publish(publisher, handleError);
+        }
+    });
+
+    // publisher.on("streamCreated", function (event) {
+    //     console.log("Stream Started.");
+    // });
+
+    // publisher.on("streamDestroyed", function (event) {
+    //     console.log("Stream stopped. Reason: " + event.reason);
+    // });
+
+    // session.on("streamDestroyed", function (event) {
+    //     console.log("Stream stopped. Reason: " + event.reason);
+    // });
+
+
+    session.on({
+            connectionCreated: function (event) {
+                connectionCount++;
+                console.log(connectionCount + ' connections.');
+                document.getElementById("viewers").innerHTML = connectionCount
+            },
+            connectionDestroyed: function (event) {
+                connectionCount--;
+                console.log(connectionCount + ' connections.');
+                document.getElementById("viewers").innerHTML = connectionCount
+            },
+            sessionDisconnected: function sessionDisconnectHandler(event) {
+                // The event is defined by the SessionDisconnectEvent class
+                console.log('Disconnected from the session.');
+                document.getElementById('disconnectBtn').style.display = 'none';
+                if (event.reason == 'networkDisconnected') {
+                    alert('Your network connection terminated.')
+                }
+            }
+        });
+
+</script>
+{% endblock scripts %}
+
+{% block content %}
+
+
+
+
+
+<div class="row justify-content-center" style="padding: 3rem 0px 3rem 0px;">
+    <div class="col-lg-8 col-md-12 col-12">
+
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body" style="margin:20px;">
+
+                <div class="row justify-content-center" style="padding-bottom: 10px;">
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="col-9 align-middle">
+                                <h2 style="color: rgb(96, 96, 96);">You're Live.</h2>
+                            </div>
+                            <div class="col-3">
+                                <div id="bm" style="max-width: 30px;padding-top: 5px;" class="pull-right"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-md-10">
+                        <div id="publisher"></div>
+                    </div>
+                </div>
+
+                
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-md-10">
+                        <p><span id="viewers"></span> Viewers</p>
+                        <a class="btn btn-danger" href="{{ event.get_event_dashboard }}">End Live Event</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -127,15 +127,24 @@ class OpenTokPublisherView(View):
         # print(token)
         # print(session_id)
 
+
         api_key = 46593362
         session_id = '1_MX40NjU5MzM2Mn5-MTU4NDk3NjU2NDc2Nn54K3RDWFVMNGlvRGg0TU13VmpQNkZKWUN-UH4'
-        token = 'T1==cGFydG5lcl9pZD00NjU5MzM2MiZzaWc9ZmU2OTRiYmQzMWIzNmJhNzRlOTZkYjlmOWNjZWMxMDkyMjRkMmI2NTpzZXNzaW9uX2lkPTFfTVg0ME5qVTVNek0yTW41LU1UVTRORGszTmpVMk5EYzJObjU0SzNSRFdGVk1OR2x2UkdnMFRVMTNWbXBRTmtaS1dVTi1VSDQmY3JlYXRlX3RpbWU9MTU4NDk3NjU2NCZleHBpcmVfdGltZT0xNTg1MDYyOTY0JnJvbGU9cHVibGlzaGVyJm5vbmNlPTUyMDA3NyZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ=='
-        
+        # token = 'T1==cGFydG5lcl9pZD00NjU5MzM2MiZzaWc9ZmU2OTRiYmQzMWIzNmJhNzRlOTZkYjlmOWNjZWMxMDkyMjRkMmI2NTpzZXNzaW9uX2lkPTFfTVg0ME5qVTVNek0yTW41LU1UVTRORGszTmpVMk5EYzJObjU0SzNSRFdGVk1OR2x2UkdnMFRVMTNWbXBRTmtaS1dVTi1VSDQmY3JlYXRlX3RpbWU9MTU4NDk3NjU2NCZleHBpcmVfdGltZT0xNTg1MDYyOTY0JnJvbGU9cHVibGlzaGVyJm5vbmNlPTUyMDA3NyZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ=='
+        token = opentok.generate_token(session_id)
+
         # To get all streams in a session:
-        # stream_list = opentok.list_streams(session_id)
-        # print(stream_list)
-        # stream = stream_list.items[0]
-        # print(stream.id)
+        stream_list = opentok.list_streams(session_id)
+        print(stream_list)
+        stream = stream_list.items
+        print(len(stream))
+
+        if len(stream) == 0:
+            allow_publish = True
+        else:
+            allow_publish = False
+
+        context["allow_publish"] = allow_publish
 
         context["api_key"] = api_key
         context["session_id"] = session_id

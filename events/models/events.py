@@ -218,6 +218,18 @@ class Event(TimestampedModel):
         view_name = "events:traffic"
         return reverse(view_name, kwargs={"slug": self.slug})
 
+    def get_create_live_user_view(self):
+        view_name = "events:live_create"
+        return reverse(view_name, kwargs={"slug": self.slug, "facing_mode": 'user'})
+
+    def get_create_live_environment_view(self):
+        view_name = "events:live_create"
+        return reverse(view_name, kwargs={"slug": self.slug, "facing_mode": 'environment'})
+
+    def get_live_event_presenter_view(self):
+        view_name = "events:live_presenter"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
 
 def event_post_save_reciever(sender, instance, *args, **kwargs):
 
