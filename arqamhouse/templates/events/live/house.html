@@ -8,20 +8,54 @@ Testing
 
 
 {% block styles %}
+
+<style>
+/* Chrome, Safari and Opera syntax */
+:-webkit-full-screen {
+    background-color: white;
+}
+
+/* Firefox syntax */
+:-moz-full-screen {
+    background-color: white;
+}
+
+/* IE/Edge syntax */
+:-ms-fullscreen {
+    background-color: white;
+}
+
+/* Standard syntax */
+:fullscreen {
+    background-color: white;
+}
+
+</style>
+
 <style>
 
 #publisher {
     height: 200px;
 }
 
+#screen-preview {
+    height: 200px;
+}
+
+
+
 @media only screen and (min-width: 576px) {
 
     #publisher {
-        height: 400px;
+        height: 550px;
+    }
+
+    #screen-preview {
+        height: 550px;
     }
   
-
 }
+
 
 </style>
 {% endblock styles %}
@@ -38,6 +72,62 @@ Testing
             loop: true, // Optional
             autoplay: true, // Optional
         })
+</script>
+
+<script>
+var elem = document.getElementById("fullscreen_panel");
+function openFullscreen() {
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) { /* Firefox */
+        elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE/Edge */
+        elem.msRequestFullscreen();
+    }
+
+    {% if facing_mode == 'user' or facing_mode == 'environment' %}
+    document.getElementById("publisher").style.height = "600px";
+    document.getElementById("publisher").style.width = "950px";
+    {% endif %}
+
+
+    {% if facing_mode == 'screen' %}
+    document.getElementById("screen-preview").style.height = "600px";
+    document.getElementById("screen-preview").style.width = "950px";
+    {% endif %}
+
+    document.getElementById("open_full").style.display = 'none';
+    document.getElementById("close_full").style.display = 'block';
+
+}
+
+function closeFullscreen() {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+    }
+
+    {% if facing_mode == 'user' or facing_mode == 'environment' %}
+    document.getElementById("publisher").style.height = "550px";
+    document.getElementById("publisher").style.width = "100%";
+    {% endif %}
+
+    {% if facing_mode == 'screen' %}
+    document.getElementById("screen-preview").style.height = "550px";
+    document.getElementById("screen-preview").style.width = "100%";
+    {% endif %}
+
+    document.getElementById("close_full").style.display = 'none';
+    document.getElementById("open_full").style.display = 'block';
+
+}
 </script>
 
 <script src="https://static.opentok.com/v2/js/opentok.js"></script>
@@ -65,6 +155,7 @@ Testing
 
     var session = OT.initSession(apiKey, sessionId);
 
+    {% if facing_mode == 'user' or facing_mode == 'environment' %}
     // Create a publisher
     var publisher = OT.initPublisher('publisher', {
         insertMode: 'append',
@@ -85,17 +176,46 @@ Testing
         }
     });
 
-    // publisher.on("streamCreated", function (event) {
-    //     console.log("Stream Started.");
-    // });
+    {% endif %}
 
-    // publisher.on("streamDestroyed", function (event) {
-    //     console.log("Stream stopped. Reason: " + event.reason);
-    // });
 
-    // session.on("streamDestroyed", function (event) {
-    //     console.log("Stream stopped. Reason: " + event.reason);
-    // });
+    {% if facing_mode == 'screen' %}
+    OT.checkScreenSharingCapability(function (response) {
+            if (!response.supported || response.extensionRegistered === false) {
+                // This browser does not support screen sharing.
+            } 
+            
+            else if (response.extensionInstalled === false) 
+            {
+                // Prompt to install the extension.
+            } 
+            
+            else {
+                // Screen sharing is available. Publish the screen.
+                var publisher = OT.initPublisher('screen-preview',
+                    { 
+                        videoSource: 'screen',
+                        insertMode: 'append',
+                        width: '100%',
+                        height: '100%',
+                    
+                    },
+                    handleError
+                );
+
+                session.connect(token, function (error) {
+                    // If the connection is successful, publish to the session
+                    if (error) {
+                        handleError(error);
+                    } else {
+                        console.log("publishing")
+                        session.publish(publisher, handleError);
+                    }
+                });
+                
+            }
+        });
+    {% endif %}
 
 
     session.on({
@@ -129,13 +249,13 @@ Testing
 
 
 <div class="row justify-content-center" style="padding: 3rem 0px 3rem 0px;">
-    <div class="col-lg-8 col-md-12 col-12">
+    <div class="col-lg-10 col-md-12 col-12">
 
         <div class="kt-portlet kt-portlet--mobile">
-            <div class="kt-portlet__body" style="margin:20px;">
+            <div class="kt-portlet__body" style="margin:20px;" id="fullscreen_panel">
 
                 <div class="row justify-content-center" style="padding-bottom: 10px;">
-                    <div class="col-md-10">
+                    <div class="col-md-12">
                         <div class="row">
                             <div class="col-9 align-middle">
                                 <h2 style="color: rgb(96, 96, 96);">You're Live.</h2>
@@ -147,17 +267,67 @@ Testing
                     </div>
                 </div>
 
+                {% if facing_mode == 'user' or facing_mode == 'environment' %}
                 <div class="row justify-content-center" style="padding-bottom: 30px;">
-                    <div class="col-md-10">
+                    <div class="col-md-12">
                         <div id="publisher"></div>
                     </div>
                 </div>
+                {% endif %}
 
-                
+                {% if facing_mode == 'screen' %}
                 <div class="row justify-content-center" style="padding-bottom: 30px;">
-                    <div class="col-md-10">
+                    <div class="col-md-12">
+                        <div id="screen-preview"></div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="row justify-content-center" style="padding-bottom: 10px;">
+                    <div class="col-md-12">
                         <p><span id="viewers"></span> Viewers</p>
-                        <a class="btn btn-danger" href="{{ event.get_event_dashboard }}">End Live Event</a>
+                    </div>
+                </div>
+                
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-md-4">
+                        <a class="btn btn-block btn-danger" href="{{ event.get_event_dashboard }}">End Live Event</a>
+                    </div>
+
+                    {% if facing_mode == 'screen' %}
+                    <div class="col-md-4">
+                        <a class="btn btn-block btn-info" href="{{ event_live.get_live_user_view }}">Front Camera</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a class="btn btn-block btn-info" href="{{ event_live.get_live_environment_view }}">Rear Camera</a>
+                    </div>
+                    {% endif %}
+
+                    {% if facing_mode == 'user' %}
+                    <div class="col-md-4">
+                        <a class="btn btn-block btn-info" href="{{ event_live.get_live_screen_view }}">Screen View</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a class="btn btn-block btn-info" href="{{ event_live.get_live_environment_view }}">Rear Camera</a>
+                    </div>
+                    {% endif %}
+
+                    {% if facing_mode == 'environment' %}
+                    <div class="col-md-4">
+                        <a class="btn btn-block btn-info" href="{{ event_live.get_live_screen_view }}">Screen View</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a class="btn btn-block btn-info" href="{{ event_live.get_live_user_view }}">Front Camera</a>
+                    </div>
+                    {% endif %}
+
+                    
+                </div>
+
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-md-12">
+                        <button class="btn btn-danger" onclick="openFullscreen();" id="open_full">Open Full Screen</button>
+                        <button class="btn btn-danger" onclick="closeFullscreen();" id="close_full" style="display: none;">Close Full Screen</button>
                     </div>
                 </div>
 

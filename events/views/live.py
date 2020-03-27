@@ -68,7 +68,7 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         except Exception as e:
             print(e)
             view_name = "events:live_create"
-            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug, "facing_mode": 'user'}))
+            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug, "mode": 'user'}))
 
         session_id = event_live.session_id
         api_key = settings.OPEN_TOK_API_KEY
@@ -76,7 +76,14 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         opentok = OpenTok(api_key, api_secret)
         token = opentok.generate_token(session_id)
 
-        context["facing_mode"] = event_live.facing_mode
+        context["event_live"] = event_live
+
+        try:
+            context["facing_mode"] = self.kwargs["mode"]
+        except Exception as e:
+            print(e)
+            context["facing_mode"] = event_live.facing_mode
+            
         context["api_key"] = api_key
         context["session_id"] = session_id
         context["token"] = token
@@ -111,11 +118,15 @@ class LiveEventCreateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestM
         house = self.get_house()
         event = self.get_event()
 
-        facing_mode = self.kwargs["facing_mode"]
+        facing_mode = self.kwargs["mode"]
         if facing_mode == 'environment':
             context["facing_mode"] = 'environment'
-        else:
+        
+        if facing_mode == 'user':
             context["facing_mode"] = 'user'
+
+        if facing_mode == 'screen':
+            context["facing_mode"] = 'screen'
 
         api_key = settings.OPEN_TOK_API_KEY
         api_secret = settings.OPEN_TOK_SECRECT_KEY

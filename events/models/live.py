@@ -7,6 +7,7 @@ from events.models import Event
 roles = (
     ('user', 'User'),
     ('environment', 'Environment'),
+    ('screen', 'Screen'),
 )
 
 class EventLive(models.Model):
@@ -17,3 +18,15 @@ class EventLive(models.Model):
 
     def __str__(self):
         return self.event.title
+
+    def get_live_user_view(self):
+        view_name = "events:live_presenter"
+        return reverse(view_name, kwargs={"slug": self.event.slug, "mode": 'user'})
+
+    def get_live_environment_view(self):
+        view_name = "events:live_presenter"
+        return reverse(view_name, kwargs={"slug": self.event.slug, "mode": 'environment'})
+    
+    def get_live_screen_view(self):
+        view_name = "events:live_presenter"
+        return reverse(view_name, kwargs={"slug": self.event.slug, "mode": 'screen'})

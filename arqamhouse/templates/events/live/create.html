@@ -9,7 +9,27 @@ Testing
 
 {% block styles %}
 <style>
+    #publisher {
+        height: 200px;
+    }
 
+    #screen-preview {
+        height: 200px;
+    }
+
+
+
+    @media only screen and (min-width: 576px) {
+
+        #publisher {
+            height: 550px;
+        }
+
+        #screen-preview {
+            height: 550px;
+        }
+
+    }
 </style>
 {% endblock styles %}
 
@@ -34,6 +54,7 @@ Testing
 
     var session = OT.initSession(apiKey, sessionId);
 
+    {% if facing_mode == 'user' or facing_mode == 'environment' %}
     // Create a publisher
     var publisher = OT.initPublisher('publisher', {
         insertMode: 'append',
@@ -53,18 +74,44 @@ Testing
             session.publish(publisher, handleError);
         }
     });
+    {% endif %}
 
-    publisher.on("streamCreated", function (event) {
-        console.log("Stream Started.");
-    });
+    {% if facing_mode == 'screen' %}
+        OT.checkScreenSharingCapability(function (response) {
+            if (!response.supported || response.extensionRegistered === false) {
+                // This browser does not support screen sharing.
+            }
 
-    publisher.on("streamDestroyed", function (event) {
-        console.log("Stream stopped. Reason: " + event.reason);
-    });
+            else if (response.extensionInstalled === false) {
+                // Prompt to install the extension.
+            }
 
-    session.on("streamDestroyed", function (event) {
-        console.log("Stream stopped. Reason: " + event.reason);
-    });
+            else {
+                // Screen sharing is available. Publish the screen.
+                var publisher = OT.initPublisher('screen-preview',
+                    {
+                        videoSource: 'screen',
+                        insertMode: 'append',
+                        width: '100%',
+                        height: '100%',
+
+                    },
+                    handleError
+                );
+
+                session.connect(token, function (error) {
+                    // If the connection is successful, publish to the session
+                    if (error) {
+                        handleError(error);
+                    } else {
+                        console.log("publishing")
+                        session.publish(publisher, handleError);
+                    }
+                });
+
+            }
+        });
+        {% endif %}
 
 
 </script>
@@ -77,40 +124,74 @@ Testing
 
 
 <div class="row justify-content-center" style="padding: 3rem 0px 3rem 0px;">
-    <div class="col-lg-8 col-md-12 col-12">
+    <div class="col-lg-10 col-md-12 col-12">
 
         <div class="kt-portlet kt-portlet--mobile">
             <div class="kt-portlet__body" style="margin:20px;">
 
                 <div class="row justify-content-center" style="padding-bottom: 30px;">
-                    <div class="col-md-10">
+                    <div class="col-md-12">
                         <h1>Get Ready.</h1>
                         <p style="margin-bottom: 0px;">Please allow access to your camera and microphone.</p>
                         <p>If everything looks good continue into your virtual event.</p>
                     </div>
                 </div>
 
+                {% if facing_mode == 'user' or facing_mode == 'environment' %}
                 <div class="row justify-content-center" style="padding-bottom: 30px;">
-                    <div class="col-md-10">
-                        <div id="publisher" style="height: 400px;"></div>
+                    <div class="col-md-12">
+                        <div id="publisher"></div>
                     </div>
                 </div>
+                {% endif %}
+                
+                {% if facing_mode == 'screen' %}
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-md-12">
+                        <div id="screen-preview"></div>
+                    </div>
+                </div>
+                {% endif %}
 
                 <form method="POST">{% csrf_token %}
                 <div class="row justify-content-center" style="padding-bottom: 30px;">
-                    <div class="col-md-10">
-                        <p>If you are using a mobile phone you may choose a different camera.</p>
-                        {% if facing_mode == 'environment' %}
-                            <a class="btn btn-info" href="{{ event.get_create_live_user_view }}">Switch To Front Camera</a>
-                            <input type="hidden" id="facing_mode" name="facing_mode" value="{{ facing_mode }}">
-                        {% else %}
-                            <a class="btn btn-info" href="{{ event.get_create_live_environment_view }}">Switch To Rear Camera</a>
-                            <input type="hidden" id="facing_mode" name="facing_mode" value="{{ facing_mode }}">
-                        {% endif %}
+
+                    {% if facing_mode == 'screen' %}
+                    <div class="col-md-6">
+                        <a class="btn btn-block btn-info" href="{{ event.get_create_live_user_view }}">Front Camera</a>
+                        <input type="hidden" id="facing_mode" name="facing_mode" value="{{ facing_mode }}">
                     </div>
+                    <div class="col-md-6">
+                        <a class="btn btn-block btn-info" href="{{ event.get_create_live_environment_view }}">Rear Camera</a>
+                        <input type="hidden" id="facing_mode" name="facing_mode" value="{{ facing_mode }}">
+                    </div>
+                    {% endif %}
+                    
+                    {% if facing_mode == 'user' %}
+                    <div class="col-md-6">
+                        <a class="btn btn-block btn-info" href="{{ event.get_create_live_screen_view }}">Screen View</a>
+                        <input type="hidden" id="facing_mode" name="facing_mode" value="{{ facing_mode }}">
+                    </div>
+                    <div class="col-md-6">
+                        <a class="btn btn-block btn-info" href="{{ event.get_create_live_environment_view }}">Rear Camera</a>
+                        <input type="hidden" id="facing_mode" name="facing_mode" value="{{ facing_mode }}">
+                    </div>
+                    {% endif %}
+                    
+                    {% if facing_mode == 'environment' %}
+                    <div class="col-md-6">
+                        <a class="btn btn-block btn-info" href="{{ event.get_create_live_screen_view }}">Screen View</a>
+                        <input type="hidden" id="facing_mode" name="facing_mode" value="{{ facing_mode }}">
+                    </div>
+                    <div class="col-md-6">
+                        <a class="btn btn-block btn-info" href="{{ event.get_create_live_user_view }}">Front Camera</a>
+                        <input type="hidden" id="facing_mode" name="facing_mode" value="{{ facing_mode }}">
+                    </div>
+                    {% endif %}
+
                 </div>
                 <div class="row justify-content-center" style="padding-bottom: 30px;">
-                    <div class="col-md-10">
+                    <div class="col-md-12">
                         <button type="submit" name="create" value="create" class="btn btn-block btn-primary">Continue</button>
                     </div>
                 </div>
