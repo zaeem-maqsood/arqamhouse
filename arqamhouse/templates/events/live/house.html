@@ -36,6 +36,7 @@ Testing
 
 #publisher {
     height: 200px;
+    
 }
 
 #screen-preview {
@@ -72,6 +73,7 @@ Testing
 
 @media (min-width: 992px) {
     
+
     #publisher {
         height: 550px;
     }
@@ -194,17 +196,36 @@ Testing
 
     var session = OT.initSession(apiKey, sessionId);
 
-    {% if facing_mode == 'user' or facing_mode == 'environment' %}
+    
     // Create a publisher
     var publisher = OT.initPublisher('publisher', {
+
+        {% if facing_mode == 'screen' %}
+        insertMode: 'append',
+        width: '0%',
+        height: '0%',
+        fitMode: 'contain',
+        {% else %}
         insertMode: 'append',
         width: '100%',
         height: '100%',
         fitMode: 'contain',
+        {% endif %}
+
+        {% if facing_mode == 'screen' %}
+        facingMode: 'user',
+        {% else %}
         facingMode: '{{ facing_mode }}',
+        {% endif %}
+
         {% if facing_mode == 'environment' %}
         mirror: true,
         {% endif %}
+
+        {% if facing_mode == 'screen' %}
+        publishVideo: false,
+        {% endif %}
+
     }, handleError);
 
 
@@ -219,10 +240,30 @@ Testing
         }
     });
 
-    {% endif %}
+    
 
 
     {% if facing_mode == 'screen' %}
+
+    // var audioInputDevices;
+    // var videoInputDevices;
+    // OT.getDevices(function (error, devices) {
+    //     audioInputDevices = devices.filter(function (element) {
+    //         return element.kind == "audioInput";
+    //     });
+    //     videoInputDevices = devices.filter(function (element) {
+    //         return element.kind == "videoInput";
+    //     });
+    //     for (var i = 0; i < audioInputDevices.length; i++) {
+    //         console.log("audio input device: ", audioInputDevices[i].deviceId);
+    //     }
+    //     for (i = 0; i < videoInputDevices.length; i++) {
+    //         console.log("video input device: ", videoInputDevices[i].deviceId);
+    //     }
+    // });
+
+
+
     OT.checkScreenSharingCapability(function (response) {
             if (!response.supported || response.extensionRegistered === false) {
                 // This browser does not support screen sharing.
@@ -241,7 +282,7 @@ Testing
                         insertMode: 'append',
                         width: '100%',
                         height: '100%',
-                        publishAudio: true,
+                        
                     
                     },
                     handleError
@@ -311,16 +352,16 @@ Testing
                     </div>
                 </div>
 
-                {% if facing_mode == 'user' or facing_mode == 'environment' %}
-                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                
+                <div class="row justify-content-center" style="padding-bottom: 30px;{% if facing_mode == 'screen' %}height:20px;{% endif %}">
                     <div class="col-md-12">
                         <div id="publisher"></div>
                     </div>
                 </div>
-                {% endif %}
+                
 
                 {% if facing_mode == 'screen' %}
-                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                <div class="row justify-content-center" style="padding-bottom: 30px;padding-top:20px;">
                     <div class="col-md-12">
                         <div id="screen-preview"></div>
                     </div>
