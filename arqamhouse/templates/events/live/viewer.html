@@ -8,8 +8,13 @@
 
 {% block styles %}
 <style>
+
     #subscriber {
         height: 250px;
+    }
+
+    #screen-subscriber {
+        height: 470px;
     }
 
 
@@ -18,6 +23,10 @@
 
         #subscriber {
             height: 550px;
+        }
+
+        #screen-subscriber {
+            height: 470px;
         }
 
     }
@@ -29,6 +38,10 @@
             height: 390px;
         }
 
+        #screen-subscriber {
+            height: 470px;
+        }
+
     }
 
 
@@ -38,12 +51,20 @@
             height: 390px;
         }
 
+        #screen-subscriber {
+            height: 470px;
+        }
+
     }
 
 
     @media (min-width: 1200px) {
 
         #subscriber {
+            height: 470px;
+        }
+
+        #screen-subscriber {
             height: 470px;
         }
 
@@ -87,13 +108,35 @@
 
     // Subscribe to a newly created stream
     session.on('streamCreated', function (event) {
-        session.subscribe(event.stream, 'subscriber', {
-            insertMode: 'append',
-            width: '100%',
-            height: '100%',
-            fitMode: 'contain',
-            restrictFrameRate: true,
-        }, handleError);
+
+        if (event.stream.videoType == 'screen') {
+
+            session.subscribe(event.stream, 'screen-subscriber', {
+                insertMode: 'append',
+                width: '100%',
+                height: '100%',
+                fitMode: 'contain',
+                restrictFrameRate: true,
+            }, handleError);
+
+            document.getElementById("subscriber").style.height = '50px';
+            document.getElementById("subscriber").style.width = '50px';
+            document.getElementById("screen-subscriber").style.display = 'block';
+
+        } 
+        
+        else {
+
+            session.subscribe(event.stream, 'subscriber', {
+                insertMode: 'append',
+                width: '100%',
+                height: '100%',
+                fitMode: 'contain',
+                restrictFrameRate: true,
+            }, handleError);
+
+        }
+
 
         document.getElementById("video_frame").style.display = 'flex';
         document.getElementById("offline_message").style.display = 'none';
@@ -107,12 +150,14 @@
                 connectionCount++;
                 console.log(connectionCount + ' connections.');
                 document.getElementById("viewers").innerHTML = connectionCount
+
             },
             connectionDestroyed: function (event) {
                 connectionCount--;
                 console.log(connectionCount + ' connections.');
                 document.getElementById("viewers").innerHTML = connectionCount
             },
+
             sessionDisconnected: function sessionDisconnectHandler(event) {
                 // The event is defined by the SessionDisconnectEvent class
                 console.log('Disconnected from the session.');
@@ -121,10 +166,15 @@
                     alert('Your network connection terminated.')
                 }
             }
+
         });
 
 
     session.on("streamDestroyed", function (event) {
+
+        document.getElementById("subscriber").style.height = '';
+        document.getElementById("subscriber").style.width = '';
+        document.getElementById("screen-subscriber").style.display = 'none';
 
         document.getElementById("video_frame").style.display = 'none';
         document.getElementById("offline_message").style.display = 'block';
@@ -173,6 +223,7 @@
                 <div class="row justify-content-center" style="padding-bottom: 50px;display: none;" id="video_frame">
                     <div class="col-md-10">
                         <div id="subscriber"></div>
+                        <div id="screen-subscriber" style="display: none;"></div>
                     </div>
                 </div>
 

@@ -223,10 +223,24 @@ Testing
         {% endif %}
 
         {% if facing_mode == 'screen' %}
+        videoSource: null,
         publishVideo: false,
         {% endif %}
 
     }, handleError);
+
+
+    {% if facing_mode == 'screen' %}
+    var publisher2 = OT.initPublisher('screen-preview',
+        {
+            videoSource: 'screen',
+            insertMode: 'append',
+            width: '100%',
+            height: '100%',
+        },
+        handleError
+    );
+    {% endif %}
 
 
     // Connect to the session
@@ -237,70 +251,13 @@ Testing
         } else {
             console.log("publishing")
             session.publish(publisher, handleError);
+
+            {% if facing_mode == 'screen' %}
+            session.publish(publisher2, handleError);
+            {% endif %}
         }
     });
 
-    
-
-
-    {% if facing_mode == 'screen' %}
-
-    // var audioInputDevices;
-    // var videoInputDevices;
-    // OT.getDevices(function (error, devices) {
-    //     audioInputDevices = devices.filter(function (element) {
-    //         return element.kind == "audioInput";
-    //     });
-    //     videoInputDevices = devices.filter(function (element) {
-    //         return element.kind == "videoInput";
-    //     });
-    //     for (var i = 0; i < audioInputDevices.length; i++) {
-    //         console.log("audio input device: ", audioInputDevices[i].deviceId);
-    //     }
-    //     for (i = 0; i < videoInputDevices.length; i++) {
-    //         console.log("video input device: ", videoInputDevices[i].deviceId);
-    //     }
-    // });
-
-
-
-    OT.checkScreenSharingCapability(function (response) {
-            if (!response.supported || response.extensionRegistered === false) {
-                // This browser does not support screen sharing.
-            } 
-            
-            else if (response.extensionInstalled === false) 
-            {
-                // Prompt to install the extension.
-            } 
-            
-            else {
-                // Screen sharing is available. Publish the screen.
-                var publisher = OT.initPublisher('screen-preview',
-                    { 
-                        videoSource: 'screen',
-                        insertMode: 'append',
-                        width: '100%',
-                        height: '100%',
-                        
-                    
-                    },
-                    handleError
-                );
-
-                session.connect(token, function (error) {
-                    // If the connection is successful, publish to the session
-                    if (error) {
-                        handleError(error);
-                    } else {
-                        console.log("publishing")
-                        session.publish(publisher, handleError);
-                    }
-                });
-                
-            }
-        });
-    {% endif %}
 
 
     session.on({
