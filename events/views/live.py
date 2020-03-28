@@ -79,16 +79,21 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 
         context["event_live"] = event_live
 
-        if self.kwargs["mode"] == 'screen':
+        try:
+            mode = self.kwargs["mode"]
+        except:
+            mode = 'user'
+
+        if mode == 'screen':
             event_live.facing_mode = 'screen'
-        elif self.kwargs["mode"] == 'environment':
+        elif mode == 'environment':
             event_live.facing_mode = 'environment'
         else:
             event_live.facing_mode = 'user'
         event_live.save()
 
         try:
-            context["facing_mode"] = self.kwargs["mode"]
+            context["facing_mode"] = mode
         except Exception as e:
             print(e)
             context["facing_mode"] = event_live.facing_mode
