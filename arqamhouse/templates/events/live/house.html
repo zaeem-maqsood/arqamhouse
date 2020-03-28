@@ -39,7 +39,7 @@ Testing
 }
 
 #screen-preview {
-    height: 200px;
+    height: 250px;
 }
 
 
@@ -51,9 +51,48 @@ Testing
     }
 
     #screen-preview {
-        height: 550px;
+        height: 300px;
     }
   
+}
+
+
+@media (min-width: 768px) {
+
+    #publisher {
+        height: 500px;
+    }
+
+    #screen-preview {
+        height: 430px;
+    }
+            
+}
+
+
+@media (min-width: 992px) {
+    
+    #publisher {
+        height: 550px;
+    }
+
+    #screen-preview {
+        height: 350px;
+    }
+
+}
+
+
+@media (min-width: 1200px) {
+
+    #publisher {
+        height: 630px;
+    }
+
+    #screen-preview {
+        height: 530px;
+    }
+        
 }
 
 
@@ -75,59 +114,59 @@ Testing
 </script>
 
 <script>
-var elem = document.getElementById("fullscreen_panel");
-function openFullscreen() {
-    if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-    } else if (elem.mozRequestFullScreen) { /* Firefox */
-        elem.mozRequestFullScreen();
-    } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-        elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { /* IE/Edge */
-        elem.msRequestFullscreen();
-    }
+// var elem = document.getElementById("fullscreen_panel");
+// function openFullscreen() {
+//     if (elem.requestFullscreen) {
+//         elem.requestFullscreen();
+//     } else if (elem.mozRequestFullScreen) { /* Firefox */
+//         elem.mozRequestFullScreen();
+//     } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+//         elem.webkitRequestFullscreen();
+//     } else if (elem.msRequestFullscreen) { /* IE/Edge */
+//         elem.msRequestFullscreen();
+//     }
 
-    {% if facing_mode == 'user' or facing_mode == 'environment' %}
-    document.getElementById("publisher").style.height = "600px";
-    document.getElementById("publisher").style.width = "950px";
-    {% endif %}
+//     {% if facing_mode == 'user' or facing_mode == 'environment' %}
+//     document.getElementById("publisher").style.height = "600px";
+//     document.getElementById("publisher").style.width = "950px";
+//     {% endif %}
 
 
-    {% if facing_mode == 'screen' %}
-    document.getElementById("screen-preview").style.height = "600px";
-    document.getElementById("screen-preview").style.width = "950px";
-    {% endif %}
+//     {% if facing_mode == 'screen' %}
+//     document.getElementById("screen-preview").style.height = "600px";
+//     document.getElementById("screen-preview").style.width = "950px";
+//     {% endif %}
 
-    document.getElementById("open_full").style.display = 'none';
-    document.getElementById("close_full").style.display = 'block';
+//     document.getElementById("open_full").style.display = 'none';
+//     document.getElementById("close_full").style.display = 'block';
 
-}
+// }
 
-function closeFullscreen() {
-    if (document.exitFullscreen) {
-        document.exitFullscreen();
-    } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-    }
+// function closeFullscreen() {
+//     if (document.exitFullscreen) {
+//         document.exitFullscreen();
+//     } else if (document.mozCancelFullScreen) {
+//         document.mozCancelFullScreen();
+//     } else if (document.webkitExitFullscreen) {
+//         document.webkitExitFullscreen();
+//     } else if (document.msExitFullscreen) {
+//         document.msExitFullscreen();
+//     }
 
-    {% if facing_mode == 'user' or facing_mode == 'environment' %}
-    document.getElementById("publisher").style.height = "550px";
-    document.getElementById("publisher").style.width = "100%";
-    {% endif %}
+//     {% if facing_mode == 'user' or facing_mode == 'environment' %}
+//     document.getElementById("publisher").style.height = "";
+//     document.getElementById("publisher").style.width = "100%";
+//     {% endif %}
 
-    {% if facing_mode == 'screen' %}
-    document.getElementById("screen-preview").style.height = "550px";
-    document.getElementById("screen-preview").style.width = "100%";
-    {% endif %}
+//     {% if facing_mode == 'screen' %}
+//     document.getElementById("screen-preview").style.height = "550px";
+//     document.getElementById("screen-preview").style.width = "100%";
+//     {% endif %}
 
-    document.getElementById("close_full").style.display = 'none';
-    document.getElementById("open_full").style.display = 'block';
+//     document.getElementById("close_full").style.display = 'none';
+//     document.getElementById("open_full").style.display = 'block';
 
-}
+// }
 </script>
 
 <script src="https://static.opentok.com/v2/js/opentok.js"></script>
@@ -161,7 +200,11 @@ function closeFullscreen() {
         insertMode: 'append',
         width: '100%',
         height: '100%',
-        facingMode: '{{ facing_mode }}'
+        fitMode: 'contain',
+        facingMode: '{{ facing_mode }}',
+        {% if facing_mode == 'environment' %}
+        mirror: true,
+        {% endif %}
     }, handleError);
 
 
@@ -198,6 +241,7 @@ function closeFullscreen() {
                         insertMode: 'append',
                         width: '100%',
                         height: '100%',
+                        publishAudio: true,
                     
                     },
                     handleError
@@ -290,33 +334,33 @@ function closeFullscreen() {
                 </div>
                 
                 <div class="row" style="padding-bottom: 30px;">
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="padding-bottom: 10px;">
                         <a class="btn btn-block btn-danger" href="{{ event.get_event_dashboard }}">End Live Event</a>
                     </div>
 
                     {% if facing_mode == 'screen' %}
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="padding-bottom: 10px;">
                         <a class="btn btn-block btn-info" href="{{ event_live.get_live_user_view }}">Front Camera</a>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="padding-bottom: 10px;">
                         <a class="btn btn-block btn-info" href="{{ event_live.get_live_environment_view }}">Rear Camera</a>
                     </div>
                     {% endif %}
 
                     {% if facing_mode == 'user' %}
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="padding-bottom: 10px;">
                         <a class="btn btn-block btn-info" href="{{ event_live.get_live_screen_view }}">Screen View</a>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="padding-bottom: 10px;">
                         <a class="btn btn-block btn-info" href="{{ event_live.get_live_environment_view }}">Rear Camera</a>
                     </div>
                     {% endif %}
 
                     {% if facing_mode == 'environment' %}
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="padding-bottom: 10px;">
                         <a class="btn btn-block btn-info" href="{{ event_live.get_live_screen_view }}">Screen View</a>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="padding-bottom: 10px;">
                         <a class="btn btn-block btn-info" href="{{ event_live.get_live_user_view }}">Front Camera</a>
                     </div>
                     {% endif %}
@@ -324,12 +368,12 @@ function closeFullscreen() {
                     
                 </div>
 
-                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                <!-- <div class="row justify-content-center" style="padding-bottom: 30px;">
                     <div class="col-md-12">
                         <button class="btn btn-danger" onclick="openFullscreen();" id="open_full">Open Full Screen</button>
                         <button class="btn btn-danger" onclick="closeFullscreen();" id="close_full" style="display: none;">Close Full Screen</button>
                     </div>
-                </div>
+                </div> -->
 
             </div>
         </div>

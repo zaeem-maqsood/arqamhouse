@@ -3,7 +3,8 @@ from events.models import EventLive
 from profiles.mixins import ProfileMixin
 
 
-class LiveEventViewerView(ProfileMixin, View):
+# Add ProfileMixin after to make it so users have to login
+class LiveEventViewerView(View):
     template_name = "events/live/viewer.html"
 
     def get_event(self):

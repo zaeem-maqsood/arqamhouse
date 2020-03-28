@@ -71,7 +71,9 @@
         <td>{{ attendee.unique_id }}</td>
         <td>{{ attendee.name }}</td>
         <td>{{ attendee.ticket.title }}</td>
+        {% if attendee.code %}
         <td><img src="{{ attendee.code.url }}" style="max-height:90px;max-width: 90px;padding:0px;margin:0px;"></td>
+        {% endif %}
         <td>${{ attendee.ticket_buyer_price }}</td>
       </tr>
       

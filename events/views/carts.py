@@ -76,7 +76,6 @@ class AddTicketsToCartView(FormView):
         if 'HTTP_REFERER' in request.META:
             url = request.META['HTTP_REFERER']
             parsed_uri = urlparse(url)
-            print(dir(parsed_uri))
             result = '{uri.netloc}'.format(uri=parsed_uri)
             if result != 'www.arqamhouse.com':
                 try:
@@ -116,6 +115,15 @@ class AddTicketsToCartView(FormView):
 
         house_users = HouseUser.objects.filter(house=event.house, profile__is_superuser=False)
 
+        try: 
+            print("Did it come here")
+            event_live = EventLive.objects.get(event=event)
+            print(event_live)
+        except Exception as e:
+            print(e)
+            event_live = None
+
+        context["event_live"] = event_live
         context["house_users"] = house_users
         context["owner"] = owner
         context["form"] = form

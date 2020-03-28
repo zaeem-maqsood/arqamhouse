@@ -9,13 +9,42 @@
 {% block styles %}
 <style>
     #subscriber {
-        height: 200px;
+        height: 250px;
     }
+
+
 
     @media only screen and (min-width: 576px) {
 
         #subscriber {
-            height: 400px;
+            height: 550px;
+        }
+
+    }
+
+
+    @media (min-width: 768px) {
+
+        #subscriber {
+            height: 390px;
+        }
+
+    }
+
+
+    @media (min-width: 992px) {
+
+        #subscriber {
+            height: 390px;
+        }
+
+    }
+
+
+    @media (min-width: 1200px) {
+
+        #subscriber {
+            height: 470px;
         }
 
     }
@@ -26,7 +55,10 @@
 {% endblock top_page_scripts %}
 
 {% block scripts %}
+
 <script src="https://static.opentok.com/v2/js/opentok.js"></script>
+
+
 <script>
     // credentials
     var apiKey = '{{ api_key }}';
@@ -59,6 +91,7 @@
             insertMode: 'append',
             width: '100%',
             height: '100%',
+            fitMode: 'contain',
             restrictFrameRate: true,
         }, handleError);
 

@@ -51,7 +51,8 @@ from subscribers.tasks import send_campaign_emails
 from houses.models import HouseUser
 from events.models import (Event, AttendeeCommonQuestions, EventQuestion, Ticket, EventCart, ChargeError,
                            EventCartItem, Answer, OrderAnswer, EventOrder, Attendee, EventEmailConfirmation,
-                           EventRefundRequest, EventDiscount, Checkin, EventOrderRefund, EventRefererDomain)
+                           EventRefundRequest, EventDiscount, Checkin, EventOrderRefund, EventRefererDomain, 
+                           EventLive)
 from questions.models import Question
 from payments.models import Transaction, Refund, HouseBalance
 from profiles.models import Profile

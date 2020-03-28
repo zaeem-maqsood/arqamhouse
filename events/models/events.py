@@ -218,6 +218,10 @@ class Event(TimestampedModel):
         view_name = "events:traffic"
         return reverse(view_name, kwargs={"slug": self.slug})
 
+    def get_live_view(self):
+        view_name = "events:live_viewer"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
     def get_create_live_user_view(self):
         view_name = "events:live_create"
         return reverse(view_name, kwargs={"slug": self.slug, "mode": 'user'})
