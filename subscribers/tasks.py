@@ -24,7 +24,7 @@ def send_campaign_emails(campaign_id):
     subscribers = campaign.subscribers_sent_to.all()
     
     for subscriber in subscribers:
-        to = [subscriber.profile.email]
+        to = [str(subscriber.profile.email)]
         print(to)
         # Compose Email
         subject = f"{campaign.subject}"
@@ -37,7 +37,11 @@ def send_campaign_emails(campaign_id):
         html_content = render_to_string('emails/campaign_email.html', context)
         text_content = strip_tags(html_content)
 
-        from_email = f"{campaign.house.name} <{campaign.house.email}>"
+        if campaign.house.email:
+            from_email = f"{campaign.house.name} <{campaign.house.email}>"
+        else:
+            from_email = f"{campaign.house.name} <info@arqamhouse.com>"
+
         email = EmailMultiAlternatives(subject=subject, body=text_content, from_email=from_email, to=to)
         email.attach_alternative(html_content, "text/html")
         email.send()
