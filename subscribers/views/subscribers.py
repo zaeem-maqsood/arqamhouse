@@ -36,11 +36,15 @@ class SubscriberCreateView(HouseAccountMixin, FormView):
 
         passed_events = Event.objects.filter(house=house, active=False, deleted=False).count()
 
+        email = email.lower()
+        
         # First see if a profile exists with that email
         try:
             profile = Profile.objects.get(email=email)
         except:
-            profile = Profile.objects.create(name=name, email=email, password=get_random_string(length=10))
+            
+            profile = Profile.objects.create_user(name=name, email=email, password=get_random_string(length=10))
+
 
         # Check if they are already subscribed
         try:

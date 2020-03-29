@@ -488,12 +488,14 @@ class EventCheckoutView(FormView):
 
         # ====================== Create Arqam House Profile and Subscribe them to the house ===========================
         # Check if user exists in the system 
+        email = email.lower()
         try:
             profile = Profile.objects.get(email=data["email"])
 
         # If the user doesn't exist at all then we need to create a customer
         except:
-            profile = Profile.objects.create(name=data["name"], email=data["email"], password=get_random_string(length=10))
+
+            profile = Profile.objects.create_user(name=data["name"], email=data["email"], password=get_random_string(length=10))
 
 
         # Try for subscriber
