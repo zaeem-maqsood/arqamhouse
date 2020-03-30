@@ -368,7 +368,7 @@
                     </div>
                 </div>
                 {% else %}
-                <p>Please login to comment</p>
+                <p>Please <a href="{% url 'profiles:login' %}?next=/events/{{ event.slug }}/live">login</a> to comment</p>
                 {% endif %}
                 
                 
