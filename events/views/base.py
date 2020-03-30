@@ -177,6 +177,8 @@ class ChannelsRoomView(View):
     def get_context_data(self, *args, **kwargs):
         context = {}
 
+        local = settings.DEBUG
+        context["local"] = local
         room_name = self.kwargs["room_name"]
         print(room_name)
 

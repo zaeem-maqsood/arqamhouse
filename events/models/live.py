@@ -2,6 +2,7 @@
 
 from .base import *
 from events.models import Event
+from core.models import TimestampedModel
 
 
 roles = (
@@ -30,3 +31,15 @@ class EventLive(models.Model):
     def get_live_screen_view(self):
         view_name = "events:live_presenter"
         return reverse(view_name, kwargs={"slug": self.event.slug, "mode": 'screen'})
+
+
+
+class EventLiveComment(TimestampedModel):
+
+    event_live = models.ForeignKey(EventLive, on_delete=models.CASCADE, blank=False, null=False)
+    profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
+    comment = models.CharField(max_length=280, null=True, blank=True)
+    deleted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.event_live.event.title

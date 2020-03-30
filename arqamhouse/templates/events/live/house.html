@@ -30,6 +30,18 @@ Testing
     background-color: white;
 }
 
+.alert.alert-solid-primary  {
+    background: rgba(102, 191, 255, 0.2);
+    border-color: transparent;
+    color: #1c399e;
+}
+
+.alert.alert-solid-info  {
+    background: rgba(255, 138, 95, 0.2);
+    border-color: transparent;
+    color: #7f2707;
+}
+
 </style>
 
 <style>
@@ -282,14 +294,104 @@ Testing
         });
 
 </script>
+
+
+<script>
+
+    function scrollToBottom() {
+        childArea = document.getElementById("chat-area");
+        childArea.scrollTop = childArea.scrollHeight;
+    }
+
+    function play() {
+        var audio = new Audio("https://res.cloudinary.com/arqamhouse/video/upload/v1585583467/when_zh3rtz.mp3");
+        audio.play();
+    }
+
+    var slug = {{ slug_json }};
+
+    {% if local %}
+    console.log('ws://' + window.location.host + '/ws/chat/' + slug)
+    var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/' + slug);
+    {% else %}
+    var chatSocket = new WebSocket('wss://' + window.location.host + '/ws/chat/' + slug);
+    {% endif %}
+
+    chatSocket.onmessage = function (e) {
+        var data = JSON.parse(e.data);
+        console.log(data);
+        var message = data['message'];
+        var user = data['user']
+
+
+        // create a new div element 
+        var newDiv = document.createElement("div");
+        if (user == '{{ request.user }}') {
+            newDiv.className = 'alert alert-solid-primary alert-bold';
+        }
+        else {
+            newDiv.className = 'alert alert-solid-info pull-right';
+        }
+        
+        newDiv.setAttribute('role', 'alert');
+        newDiv.style = 'width: 51%;border-radius: 100px;'
+
+        var childDiv = document.createElement("div");
+        childDiv.className = 'alert-text';
+        // childDiv.innerHTML = message;
+
+        // Add User
+        var user_para = document.createElement("P");
+        user_para.innerText = user;
+        user_para.style = 'margin-bottom: 0px;font-size: 0.7em;font-style: italic;';
+        childDiv.appendChild(user_para);
+
+        // Add Message
+        var message_para = document.createElement("P");
+        message_para.innerText = message;
+        message_para.style = 'margin-bottom: 0px;';
+        childDiv.appendChild(message_para);
+
+
+        newDiv.appendChild(childDiv);
+        childArea = document.getElementById("chat-area");
+        childArea.appendChild(newDiv);
+
+
+        childArea.scrollTop = childArea.scrollHeight;
+        play();
+
+
+    };
+
+    chatSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function (e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function (e) {
+        var messageInputDom = document.querySelector('#chat-message-input');
+
+        var user = '{{ request.user }}';
+        var message = messageInputDom.value;
+
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'user': user
+        }));
+
+        messageInputDom.value = '';
+    };
+</script>
 {% endblock scripts %}
 
 {% block content %}
-
-
-
-
-
 <div class="row justify-content-center" style="padding: 3rem 0px 3rem 0px;">
     <div class="col-lg-10 col-md-12 col-12">
 
@@ -366,12 +468,48 @@ Testing
                     
                 </div>
 
-                <!-- <div class="row justify-content-center" style="padding-bottom: 30px;">
+                <div class="row">
                     <div class="col-md-12">
-                        <button class="btn btn-danger" onclick="openFullscreen();" id="open_full">Open Full Screen</button>
-                        <button class="btn btn-danger" onclick="closeFullscreen();" id="close_full" style="display: none;">Close Full Screen</button>
+                        <h4>Discission</h4>
+
                     </div>
-                </div> -->
+                </div>
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <input id="chat-message-input" type="text" class="form-control m-input" size="100" />
+                    </div>
+                </div>
+
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-md-12">
+                        <button id="chat-message-submit" type="button" value="Send" class="btn btn-primary">Send</button>
+                    </div>
+                </div>
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <hr>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="chat-area" class="overflow-auto" style="max-height: 400px;" onmousemove="scrollToBottom();">
+
+                            {% for comment in event_live_comments %}
+                            <div class="alert alert-solid-primary alert-bold" style="width: 51%;border-radius: 100px;">
+                                <div class="alert-text"> 
+                                    <p style="margin-bottom: 0px;font-size: 0.7em;font-style: italic;">{{ comment.profile.email }}</p>
+                                    <p style="margin-bottom: 0px;">{{ comment.comment }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+
 
             </div>
         </div>

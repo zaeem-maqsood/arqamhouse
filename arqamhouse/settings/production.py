@@ -37,3 +37,4 @@ DATABASES['default'] = dj_database_url.config(ssl_require=True)
 
 
 SECURE_SSL_REDIRECT = True
+

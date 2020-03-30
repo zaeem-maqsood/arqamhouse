@@ -1,5 +1,5 @@
 from .base import *
-from events.models import EventLive
+from events.models import EventLive, EventLiveComment
 from profiles.mixins import ProfileMixin
 
 
@@ -23,16 +23,30 @@ class LiveEventViewerView(View):
 
         try:
             event_live = EventLive.objects.get(event=event)
+            event_live_comments = EventLiveComment.objects.filter(event_live=event_live).order_by("created_at")
+            context["event_live_comments"] = event_live_comments
+            context["user_email"] = str(request.user)
         except Exception as e:
             event_live = None
 
+        if settings.DEBUG:
+            api_key = '45828062'
+            session_id = '2_MX40NTgyODA2Mn5-MTU4NTUxMTE2MzQ5Mn5RSmJNRjNrcUFvaTNhcUJlbWlTMmZQSzF-UH4'
+            token = 'T1==cGFydG5lcl9pZD00NTgyODA2MiZzaWc9OTZhZDk3MjM4YWNhY2UzZDU3OTE2YTMwNWQxMjQ0MDYwY2U1ZWY2ODpzZXNzaW9uX2lkPTJfTVg0ME5UZ3lPREEyTW41LU1UVTROVFV4TVRFMk16UTVNbjVSU21KTlJqTnJjVUZ2YVROaGNVSmxiV2xUTW1aUVN6Ri1VSDQmY3JlYXRlX3RpbWU9MTU4NTUxMTE4NiZub25jZT0wLjc2MTAwMTU4NzY1NDc5OCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTg1NTk3NTg2'
+            context["local"] = True
 
-        session_id = event_live.session_id
-        api_key = settings.OPEN_TOK_API_KEY
-        api_secret = settings.OPEN_TOK_SECRECT_KEY
-        opentok = OpenTok(api_key, api_secret)
-        token = opentok.generate_token(session_id)
+        else:
+            session_id = event_live.session_id
+            api_key = settings.OPEN_TOK_API_KEY
+            api_secret = settings.OPEN_TOK_SECRECT_KEY
+            opentok = OpenTok(api_key, api_secret)
+            token = opentok.generate_token(session_id)
+            context["local"] = False
 
+        slug = self.kwargs["slug"]
+
+
+        context["slug_json"] = mark_safe(json.dumps(slug))
         context["event_live"] = event_live
         context["facing_mode"] = event_live.facing_mode
         context["api_key"] = api_key
@@ -71,12 +85,23 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
             view_name = "events:live_create"
             return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug, "mode": 'user'}))
 
-        session_id = event_live.session_id
-        api_key = settings.OPEN_TOK_API_KEY
-        api_secret = settings.OPEN_TOK_SECRECT_KEY
-        opentok = OpenTok(api_key, api_secret)
-        token = opentok.generate_token(session_id)
 
+        if settings.DEBUG:
+            api_key = '45828062'
+            session_id = '2_MX40NTgyODA2Mn5-MTU4NTUxMTE2MzQ5Mn5RSmJNRjNrcUFvaTNhcUJlbWlTMmZQSzF-UH4'
+            token = 'T1==cGFydG5lcl9pZD00NTgyODA2MiZzaWc9OTZhZDk3MjM4YWNhY2UzZDU3OTE2YTMwNWQxMjQ0MDYwY2U1ZWY2ODpzZXNzaW9uX2lkPTJfTVg0ME5UZ3lPREEyTW41LU1UVTROVFV4TVRFMk16UTVNbjVSU21KTlJqTnJjVUZ2YVROaGNVSmxiV2xUTW1aUVN6Ri1VSDQmY3JlYXRlX3RpbWU9MTU4NTUxMTE4NiZub25jZT0wLjc2MTAwMTU4NzY1NDc5OCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTg1NTk3NTg2'
+            context["local"] = True
+
+        else:
+            session_id = event_live.session_id
+            api_key = settings.OPEN_TOK_API_KEY
+            api_secret = settings.OPEN_TOK_SECRECT_KEY
+            opentok = OpenTok(api_key, api_secret)
+            token = opentok.generate_token(session_id)
+            context["local"] = False
+
+        slug = self.kwargs["slug"]
+        context["slug_json"] = mark_safe(json.dumps(slug))
         context["event_live"] = event_live
 
         try:
@@ -97,6 +122,10 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         except Exception as e:
             print(e)
             context["facing_mode"] = event_live.facing_mode
+
+        
+        event_live_comments = EventLiveComment.objects.filter(event_live=event_live).order_by("created_at")
+        context["event_live_comments"] = event_live_comments
             
         context["api_key"] = api_key
         context["session_id"] = session_id

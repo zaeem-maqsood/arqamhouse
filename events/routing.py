@@ -1,8 +1,13 @@
 # chat/routing.py
 from django.urls import re_path
+from django.urls import path
 
-from . import consumers
+from events.consumers import ChatConsumer, LiveChatConsumer
 
 websocket_urlpatterns = [
-    re_path(r'ws/chat/(?P<room_name>\w+)/$', consumers.ChatConsumer),
+
+    path('ws/chat/<slug:slug>', LiveChatConsumer)
+    # re_path(r'ws/chat/(?P<slug>\w+)/$', LiveChatConsumer),
+    # re_path(r'ws/chat/(?P<room_name>\w+)/$', ChatConsumer),
+    
 ]
