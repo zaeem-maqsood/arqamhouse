@@ -136,7 +136,9 @@
         if (!response.supported || response.extensionRegistered === false) {
             // This browser does not support screen sharing
             document.getElementById("screen_sharing_option").style.display = 'none';
+            document.getElementById("environment_option").style.display = 'block';
             console.log("Screen sharing is not possible on this browser")
+
         }
         else {
             console.log("Screen sharing is possible on this browser")
@@ -151,6 +153,7 @@
         height: '100%',
         fitMode: 'contain',
         facingMode: 'user',
+        publishAudio: true,
         name: "{{ profile.name }}",
         style: { nameDisplayMode: "on", buttonDisplayMode: "on" },
 
@@ -209,6 +212,21 @@
 
         else {
             publisher.publishVideo(true);
+        }
+
+    }
+
+
+    function rearCamera(object) {
+
+        console.log(object.checked)
+        var checked = object.checked
+        if (checked) {
+            publisher.facingMode('environment');
+        }
+
+        else {
+            publisher.facingMode("user");
         }
 
     }
@@ -478,6 +496,15 @@
                         </div>
                         <p style="font-size: 0.7em;">Share Screen</p>
                 
+                    </div>
+                    <div class="col-4 align-self-center" id="environment_option" style="display: none;">
+                    
+                        <div class="input-checkbox input-checkbox--switch">
+                            <input type="checkbox" id="environment-check" onchange="rearCamera(this);">
+                            <label for="environment-check"></label>
+                        </div>
+                        <p style="font-size: 0.7em;">Rear Camera</p>
+                    
                     </div>
                     <div class="col-4">
                         <div class="input-checkbox input-checkbox--switch">
