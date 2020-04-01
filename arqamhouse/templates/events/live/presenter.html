@@ -145,6 +145,22 @@
         }
     });
 
+
+    var screen_publisher = OT.initPublisher('dummy-screen-share',
+        {
+            videoSource: null,
+            publishAudio: false,
+            publishVideo: false,
+            insertMode: 'replace',
+            width: '0%',
+            height: '0%',
+            fitMode: 'contain',
+
+        },
+        handleError
+    );
+
+
     // Create a publisher
     var publisher = OT.initPublisher('publisher', {
 
@@ -172,20 +188,6 @@
         }
     });
 
-
-    var screen_publisher = OT.initPublisher('dummy-screen-share',
-        {
-            videoSource: null,
-            publishAudio: false,
-            publishVideo: false,
-            insertMode: 'replace',
-            width: '0%',
-            height: '0%',
-            fitMode: 'contain',
-
-        },
-        handleError
-    );
 
     function muteAudio(object) {
 
@@ -222,14 +224,45 @@
         console.log(object.checked)
         var checked = object.checked
         if (checked) {
-            publisher.facingMode('environment');
+            publisher.destroy();
+            publisher = OT.initPublisher('publisher', {
+                insertMode: 'append',
+                width: '100%',
+                height: '100%',
+                fitMode: 'contain',
+                facingMode: 'environment',
+                publishAudio: true,
+                name: "{{ profile.name }}",
+                style: { nameDisplayMode: "on", buttonDisplayMode: "on" },
+
+            }, handleError);
+
+            session.publish(publisher, handleError);
         }
 
         else {
-            publisher.facingMode("user");
+            publisher.destroy();
+            publisher = OT.initPublisher('publisher', {
+                insertMode: 'append',
+                width: '100%',
+                height: '100%',
+                fitMode: 'contain',
+                facingMode: 'user',
+                publishAudio: true,
+                name: "{{ profile.name }}",
+                style: { nameDisplayMode: "on", buttonDisplayMode: "on" },
+
+            }, handleError);
+
+            session.publish(publisher, handleError);
         }
 
     }
+
+    publisher.on("streamDestroyed", function (event) {
+        
+        console.log("The publisher stopped streaming.");
+    });
 
 
 
@@ -262,8 +295,6 @@
             console.log("screen share was unpublished");
             session.unpublish(screen_publisher);
             document.getElementById("screen-share").style.display = 'none';
-            console.log(document.getElementById("screen-sharing-check").checked)
-            document.getElementById("screen-sharing-check").checked = false;
         }
     
     }
