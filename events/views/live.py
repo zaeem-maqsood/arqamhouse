@@ -88,25 +88,43 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         house = self.get_house()
         event = self.get_event()
 
-        if settings.DEBUG:
-            api_key = '45828062'
-            session_id = '2_MX40NTgyODA2Mn5-MTU4NTY2Nzk2NjIwNX5sNjJiMldOYURNY0lUbWhBQ2t1emtqdWl-UH4'
-            token = 'T1==cGFydG5lcl9pZD00NTgyODA2MiZzaWc9YjA5N2E2ZTQxNGNkYTkzM2JlNGUzZjE5YWFhNTk4ZTZlZjI2MDU0MzpzZXNzaW9uX2lkPTJfTVg0ME5UZ3lPREEyTW41LU1UVTROVFkyTnprMk5qSXdOWDVzTmpKaU1sZE9ZVVJOWTBsVWJXaEJRMnQxZW10cWRXbC1VSDQmY3JlYXRlX3RpbWU9MTU4NTY2Nzk2OSZub25jZT0wLjgxNTQ4OTkxNDQ2NDM5MzImcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTU4NTc1NDM2OQ=='
-            context["local"] = True
-
-        else:
-            session_id = event_live.session_id
-            api_key = settings.OPEN_TOK_API_KEY
-            api_secret = settings.OPEN_TOK_SECRECT_KEY
-            opentok = OpenTok(api_key, api_secret)
-            token = opentok.generate_token(session_id)
-            context["local"] = False
-
         try:
             event_live = EventLive.objects.get(event=event)
+            
+            if settings.DEBUG:
+                api_key = '45828062'
+                session_id = '2_MX40NTgyODA2Mn5-MTU4NTY2Nzk2NjIwNX5sNjJiMldOYURNY0lUbWhBQ2t1emtqdWl-UH4'
+                token = 'T1==cGFydG5lcl9pZD00NTgyODA2MiZzaWc9YjA5N2E2ZTQxNGNkYTkzM2JlNGUzZjE5YWFhNTk4ZTZlZjI2MDU0MzpzZXNzaW9uX2lkPTJfTVg0ME5UZ3lPREEyTW41LU1UVTROVFkyTnprMk5qSXdOWDVzTmpKaU1sZE9ZVVJOWTBsVWJXaEJRMnQxZW10cWRXbC1VSDQmY3JlYXRlX3RpbWU9MTU4NTY2Nzk2OSZub25jZT0wLjgxNTQ4OTkxNDQ2NDM5MzImcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTU4NTc1NDM2OQ=='
+                context["local"] = True
+
+            else:
+                session_id = event_live.session_id
+                api_key = settings.OPEN_TOK_API_KEY
+                api_secret = settings.OPEN_TOK_SECRECT_KEY
+                opentok = OpenTok(api_key, api_secret)
+                token = opentok.generate_token(session_id)
+                context["local"] = False
+
         except Exception as e:
             print(e)
+            if settings.DEBUG:
+                api_key = '45828062'
+                session_id = '2_MX40NTgyODA2Mn5-MTU4NTY2Nzk2NjIwNX5sNjJiMldOYURNY0lUbWhBQ2t1emtqdWl-UH4'
+                token = 'T1==cGFydG5lcl9pZD00NTgyODA2MiZzaWc9YjA5N2E2ZTQxNGNkYTkzM2JlNGUzZjE5YWFhNTk4ZTZlZjI2MDU0MzpzZXNzaW9uX2lkPTJfTVg0ME5UZ3lPREEyTW41LU1UVTROVFkyTnprMk5qSXdOWDVzTmpKaU1sZE9ZVVJOWTBsVWJXaEJRMnQxZW10cWRXbC1VSDQmY3JlYXRlX3RpbWU9MTU4NTY2Nzk2OSZub25jZT0wLjgxNTQ4OTkxNDQ2NDM5MzImcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTU4NTc1NDM2OQ=='
+                context["local"] = True
+            else:
+                api_key = settings.OPEN_TOK_API_KEY
+                api_secret = settings.OPEN_TOK_SECRECT_KEY
+                opentok = OpenTok(api_key, api_secret)
+                session = opentok.create_session()
+                session_id = session.session_id
+                token = session.generate_token()
+                context["local"] = False
+                
             event_live = EventLive.objects.create(event=event, session_id=session_id)
+
+
+        
 
         try:
             profile = Profile.objects.get(email=str(request.user))
