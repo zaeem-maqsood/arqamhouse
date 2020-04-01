@@ -25,14 +25,24 @@ class LiveEventViewerView(View):
             event_live = EventLive.objects.get(event=event)
             event_live_comments = EventLiveComment.objects.filter(event_live=event_live).order_by("created_at")
             context["event_live_comments"] = event_live_comments
-            context["user_email"] = str(request.user)
         except Exception as e:
-            event_live = None
+            view_name = "events:landing"
+            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
+
+
+        try:
+            profile = Profile.objects.get(email=str(request.user))
+            context["profile"] = profile
+        except:
+            # view_name = "events:landing"
+            # return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
+            pass
+
 
         if settings.DEBUG:
             api_key = '45828062'
-            session_id = '2_MX40NTgyODA2Mn5-MTU4NTUxMTE2MzQ5Mn5RSmJNRjNrcUFvaTNhcUJlbWlTMmZQSzF-UH4'
-            token = 'T1==cGFydG5lcl9pZD00NTgyODA2MiZzaWc9OTZhZDk3MjM4YWNhY2UzZDU3OTE2YTMwNWQxMjQ0MDYwY2U1ZWY2ODpzZXNzaW9uX2lkPTJfTVg0ME5UZ3lPREEyTW41LU1UVTROVFV4TVRFMk16UTVNbjVSU21KTlJqTnJjVUZ2YVROaGNVSmxiV2xUTW1aUVN6Ri1VSDQmY3JlYXRlX3RpbWU9MTU4NTUxMTE4NiZub25jZT0wLjc2MTAwMTU4NzY1NDc5OCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTg1NTk3NTg2'
+            session_id = '2_MX40NTgyODA2Mn5-MTU4NTY2Nzk2NjIwNX5sNjJiMldOYURNY0lUbWhBQ2t1emtqdWl-UH4'
+            token = 'T1==cGFydG5lcl9pZD00NTgyODA2MiZzaWc9YjA5N2E2ZTQxNGNkYTkzM2JlNGUzZjE5YWFhNTk4ZTZlZjI2MDU0MzpzZXNzaW9uX2lkPTJfTVg0ME5UZ3lPREEyTW41LU1UVTROVFkyTnprMk5qSXdOWDVzTmpKaU1sZE9ZVVJOWTBsVWJXaEJRMnQxZW10cWRXbC1VSDQmY3JlYXRlX3RpbWU9MTU4NTY2Nzk2OSZub25jZT0wLjgxNTQ4OTkxNDQ2NDM5MzImcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTU4NTc1NDM2OQ=='
             context["local"] = True
 
         else:
@@ -62,7 +72,7 @@ class LiveEventViewerView(View):
 
 
 class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, View):
-    template_name = "events/live/house.html"
+    template_name = "events/live/presenter.html"
 
     def get_event(self):
         event_slug = self.kwargs['slug']
@@ -78,18 +88,10 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         house = self.get_house()
         event = self.get_event()
 
-        try:
-            event_live = EventLive.objects.get(event=event)
-        except Exception as e:
-            print(e)
-            view_name = "events:live_create"
-            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug, "mode": 'user'}))
-
-
         if settings.DEBUG:
             api_key = '45828062'
-            session_id = '2_MX40NTgyODA2Mn5-MTU4NTUxMTE2MzQ5Mn5RSmJNRjNrcUFvaTNhcUJlbWlTMmZQSzF-UH4'
-            token = 'T1==cGFydG5lcl9pZD00NTgyODA2MiZzaWc9OTZhZDk3MjM4YWNhY2UzZDU3OTE2YTMwNWQxMjQ0MDYwY2U1ZWY2ODpzZXNzaW9uX2lkPTJfTVg0ME5UZ3lPREEyTW41LU1UVTROVFV4TVRFMk16UTVNbjVSU21KTlJqTnJjVUZ2YVROaGNVSmxiV2xUTW1aUVN6Ri1VSDQmY3JlYXRlX3RpbWU9MTU4NTUxMTE4NiZub25jZT0wLjc2MTAwMTU4NzY1NDc5OCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTg1NTk3NTg2'
+            session_id = '2_MX40NTgyODA2Mn5-MTU4NTY2Nzk2NjIwNX5sNjJiMldOYURNY0lUbWhBQ2t1emtqdWl-UH4'
+            token = 'T1==cGFydG5lcl9pZD00NTgyODA2MiZzaWc9YjA5N2E2ZTQxNGNkYTkzM2JlNGUzZjE5YWFhNTk4ZTZlZjI2MDU0MzpzZXNzaW9uX2lkPTJfTVg0ME5UZ3lPREEyTW41LU1UVTROVFkyTnprMk5qSXdOWDVzTmpKaU1sZE9ZVVJOWTBsVWJXaEJRMnQxZW10cWRXbC1VSDQmY3JlYXRlX3RpbWU9MTU4NTY2Nzk2OSZub25jZT0wLjgxNTQ4OTkxNDQ2NDM5MzImcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTU4NTc1NDM2OQ=='
             context["local"] = True
 
         else:
@@ -100,32 +102,26 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
             token = opentok.generate_token(session_id)
             context["local"] = False
 
+        try:
+            event_live = EventLive.objects.get(event=event)
+        except Exception as e:
+            print(e)
+            event_live = EventLive.objects.create(event=event, session_id=session_id)
+
+        try:
+            profile = Profile.objects.get(email=str(request.user))
+        except:
+            view_name = "events:dashboard"
+            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
+
+
         slug = self.kwargs["slug"]
         context["slug_json"] = mark_safe(json.dumps(slug))
         context["event_live"] = event_live
 
-        try:
-            mode = self.kwargs["mode"]
-        except:
-            mode = 'user'
-
-        if mode == 'screen':
-            event_live.facing_mode = 'screen'
-        elif mode == 'environment':
-            event_live.facing_mode = 'environment'
-        else:
-            event_live.facing_mode = 'user'
-        event_live.save()
-
-        try:
-            context["facing_mode"] = mode
-        except Exception as e:
-            print(e)
-            context["facing_mode"] = event_live.facing_mode
-
-        
         event_live_comments = EventLiveComment.objects.filter(event_live=event_live).order_by("created_at")
         context["event_live_comments"] = event_live_comments
+        context["profile"] = profile
             
         context["api_key"] = api_key
         context["session_id"] = session_id
@@ -217,7 +213,7 @@ class LiveEventCreateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestM
             return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
         except Exception as e:
             print(e)
-            event_live = EventLive.objects.create(event=event, session_id=session_id, facing_mode=facing_mode)
+            event_live = EventLive.objects.create(event=event, session_id=session_id)
             view_name = "events:live_presenter"
             return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
         

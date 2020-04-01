@@ -224,15 +224,7 @@ class Event(TimestampedModel):
 
     def get_create_live_user_view(self):
         view_name = "events:live_create"
-        return reverse(view_name, kwargs={"slug": self.slug, "mode": 'user'})
-
-    def get_create_live_environment_view(self):
-        view_name = "events:live_create"
-        return reverse(view_name, kwargs={"slug": self.slug, "mode": 'environment'})
-
-    def get_create_live_screen_view(self):
-        view_name = "events:live_create"
-        return reverse(view_name, kwargs={"slug": self.slug, "mode": 'screen'})
+        return reverse(view_name, kwargs={"slug": self.slug})
 
     def get_live_event_presenter_view(self):
         view_name = "events:live_presenter"

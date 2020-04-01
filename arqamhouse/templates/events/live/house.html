@@ -191,6 +191,12 @@ Testing
         return true;
     };
 
+    function stopVideo() {
+        console.log("Did it come here")
+        publisher.cycleVideo();
+
+    }
+
 
     // credentials
     var apiKey = '{{ api_key }}';
@@ -490,6 +496,12 @@ Testing
                 <div class="row" style="padding-bottom: 20px;">
                     <div class="col-md-12">
                         <hr>
+                    </div>
+                </div>
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <button onclick="stopVideo();" class="btn">test</button>
                     </div>
                 </div>
 
