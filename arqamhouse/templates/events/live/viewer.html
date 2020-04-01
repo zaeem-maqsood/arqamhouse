@@ -208,36 +208,34 @@
 
 <script>
 
-    function updateSpotLight() {
-        console.log("Is this working")
-        // let elementsArray = document.querySelectorAll("OT_subscriber");
-        elementsArray = document.querySelectorAll('.OT_subscriber');
-        console.log(elementsArray)
+function resizeElement(e) {
+    source_element = e.target;
+    parentDiv = source_element.parentNode;
+    parentDiv1 = parentDiv.parentNode;
 
-        elementsArray.forEach(function (elem) {
-            elem.addEventListener("click", function () {
-
-                if (elem.classList.contains('col-6')) {
-                    console.log("Yeaaaaaaa")
-                    elem.classList.remove("col-6");
-                    // elem.classList.remove("OT_subscriber");
-                    elem.classList.add('col-12');
-                    elem.classList.add("spotlight-height");
-                }
-
-                
-                else {
-                    elem.classList.remove("spotlight-height");
-                    elem.classList.remove("col-12");
-                    elem.classList.add('col-6');
-                    // elem.classList.add("OT_subscriber");
-                }
-
-
-
-            });
-        });
+    if (parentDiv1.classList.contains('spotlight-height')) {
+        parentDiv1.classList.remove('spotlight-height');
+        parentDiv1.classList.remove("col-12");
+        parentDiv1.classList.add('col-6');
     }
+
+    else {
+        parentDiv1.classList.remove('col-6');
+        parentDiv1.classList.add("spotlight-height");
+        parentDiv1.classList.add("col-12");
+    }
+}
+
+function updateSpotLight() {
+    console.log("update spot light was called")
+    elementsArray = document.querySelectorAll('.OT_subscriber');
+    console.log(elementsArray);
+
+    elementsArray.forEach(function (elem) {
+        console.log("Added function");
+        elem.addEventListener("click", resizeElement);
+    });
+}
 </script>
 
 
