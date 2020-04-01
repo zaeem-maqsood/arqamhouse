@@ -25,7 +25,7 @@
     }
 
     .OT_subscriber {
-        height: 175px !important;
+        height: 310px !important;
     }
 
     .spotlight-height {
@@ -147,7 +147,8 @@
         subscriberFrames = document.querySelectorAll('.OT_subscriber');
         console.log(subscriberFrames)
         for (var i = 0; i < subscriberFrames.length; i++) {
-            subscriberFrames[i].classList.add('col-6');
+            subscriberFrames[i].classList.add('col-sm-6');
+            subscriberFrames[i].classList.add('col-12');
             subscriberFrames[i].classList.add('row-padder');
         }
 
@@ -205,39 +206,6 @@
 
     
 </script>
-
-<script>
-
-function resizeElement(e) {
-    source_element = e.target;
-    parentDiv = source_element.parentNode;
-    parentDiv1 = parentDiv.parentNode;
-
-    if (parentDiv1.classList.contains('spotlight-height')) {
-        parentDiv1.classList.remove('spotlight-height');
-        parentDiv1.classList.remove("col-12");
-        parentDiv1.classList.add('col-6');
-    }
-
-    else {
-        parentDiv1.classList.remove('col-6');
-        parentDiv1.classList.add("spotlight-height");
-        parentDiv1.classList.add("col-12");
-    }
-}
-
-function updateSpotLight() {
-    console.log("update spot light was called")
-    elementsArray = document.querySelectorAll('.OT_subscriber');
-    console.log(elementsArray);
-
-    elementsArray.forEach(function (elem) {
-        console.log("Added function");
-        elem.addEventListener("click", resizeElement);
-    });
-}
-</script>
-
 
 <!-- Chat -->
 <script>
