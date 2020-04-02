@@ -98,6 +98,7 @@
 
 {% block scripts %}
 
+{% if allow_entry %}
 <script src="https://static.opentok.com/v2/js/opentok.js"></script>
 
 
@@ -207,6 +208,39 @@
     
 </script>
 
+<script>
+
+function resizeElement(e) {
+    source_element = e.target;
+    parentDiv = source_element.parentNode;
+    parentDiv1 = parentDiv.parentNode;
+
+    if (parentDiv1.classList.contains('spotlight-height')) {
+        parentDiv1.classList.remove('spotlight-height');
+        parentDiv1.classList.remove("col-md-12");
+        // parentDiv1.classList.add('col-12');
+    }
+
+    else {
+        // parentDiv1.classList.remove('col-6');
+        parentDiv1.classList.add("spotlight-height");
+        parentDiv1.classList.add("col-md-12");
+    }
+}
+
+function updateSpotLight() {
+    console.log("update spot light was called")
+    elementsArray = document.querySelectorAll('.OT_subscriber');
+    console.log(elementsArray);
+
+    elementsArray.forEach(function (elem) {
+        console.log("Added function");
+        elem.addEventListener("click", resizeElement);
+    });
+}
+</script>
+
+
 <!-- Chat -->
 <script>
 
@@ -299,7 +333,7 @@
     };
     {% endif %}
 </script>
-
+{% endif %}
 {% endblock scripts %}
 
 {% block content %}
@@ -314,14 +348,13 @@
         </div>
 
 
+        {% if allow_entry %}
         <div class="row">
-            
-
             <!-- Spotlight -->
             <div class="col-lg-8 col-12" style="padding-bottom: 30px;">
                 <div class="row">
 
-                    <div class="col-12" id="offline_message" style="display: none;">
+                    <div class="col-12 text-center" id="offline_message" style="display: none;">
                         <h3>{{ event.house }} will be live shortly</h3>
                     </div>
 
@@ -380,10 +413,26 @@
 
         <div class="row justify-content-center" style="padding-bottom: 30px;">
             <div class="col-sm-12 col-10" style="padding: 0px;">
-                <p>Psst! Click on a screen share to expand it.</p>
+                <p>Psst! Click on a screen to expand it.</p>
             </div>
         </div>
+        {% else %}
 
+        {% if not request.user.is_authenticated %}
+        <div class="row">
+            <div class="col-12 text-center">
+                <h3>Please <a href="{% url 'profiles:login' %}?next=/events/{{ event.slug }}/live">login</a> to view the live stream.</h3>
+            </div>
+        </div>
+        {% else %}
+        <div class="row">
+            <div class="col-12 text-center">
+                <h3>Please <a href="{{ event.get_landing_view }}">purchase a ticket</a> to view the live stream</h3>
+            </div>
+        </div>
+        {% endif %}
+
+        {% endif %}
 
     </div>
 </section>

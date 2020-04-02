@@ -48,7 +48,7 @@ from events.tasks import send_test_email
 from subscribers.tasks import send_campaign_emails
 
 # Models
-from houses.models import HouseUser
+from houses.models import HouseUser, House
 from events.models import (Event, AttendeeCommonQuestions, EventQuestion, Ticket, EventCart, ChargeError,
                            EventCartItem, Answer, OrderAnswer, EventOrder, Attendee, EventEmailConfirmation,
                            EventRefundRequest, EventDiscount, Checkin, EventOrderRefund, EventRefererDomain, 

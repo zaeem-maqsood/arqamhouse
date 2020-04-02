@@ -7,6 +7,36 @@ from profiles.mixins import ProfileMixin
 class LiveEventViewerView(View):
     template_name = "events/live/viewer.html"
 
+    def get_profile(self):
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except:
+            return None
+
+    def allow_entry(self):
+        
+        # First check for profile
+        profile = self.get_profile()
+        if profile:
+
+            # Second Check if house user
+            try:
+                house_user = HouseUser.objects.get(profile=profile)
+                return True
+            except:
+                pass
+
+            # Third Check if event order exists for the user
+            event_order = EventOrder.objects.filter(email=profile.email).exists()
+            if event_order:
+                return True
+            else:
+                return False
+        else:
+            return False
+
+
     def get_event(self):
         event_slug = self.kwargs['slug']
         try:
@@ -21,6 +51,17 @@ class LiveEventViewerView(View):
         event = self.get_event()
         house = event.house
 
+        if not event.allow_non_ticket_live_viewers:
+            allow_entry = self.allow_entry()
+        else:
+            allow_entry = True
+            
+        if not allow_entry:
+            context["allow_entry"] = False
+
+        else:
+            context["allow_entry"] = True
+
         try:
             event_live = EventLive.objects.get(event=event)
             event_live_comments = EventLiveComment.objects.filter(event_live=event_live).order_by("created_at")
@@ -28,15 +69,6 @@ class LiveEventViewerView(View):
         except Exception as e:
             view_name = "events:landing"
             return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
-
-
-        try:
-            profile = Profile.objects.get(email=str(request.user))
-            context["profile"] = profile
-        except:
-            # view_name = "events:landing"
-            # return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
-            pass
 
 
         if settings.DEBUG:
@@ -51,8 +83,7 @@ class LiveEventViewerView(View):
         token = opentok.generate_token(session_id)
 
         slug = self.kwargs["slug"]
-
-
+        context["profile"] = self.get_profile()
         context["slug_json"] = mark_safe(json.dumps(slug))
         context["event_live"] = event_live
         context["facing_mode"] = event_live.facing_mode
