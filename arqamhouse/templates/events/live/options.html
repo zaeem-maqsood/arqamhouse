@@ -52,6 +52,29 @@ Testing
         /* Copy the text inside the text field */
         document.execCommand("copy");
     }
+
+
+    function ajaxUpdateTicketOption(object) {
+
+        var token = '{{ csrf_token }}';
+
+        $.ajax({
+
+            type: "POST",
+            headers: { "X-CSRFToken": token },
+            url: '{{ request.path }}',
+
+            data: {
+                'value': object.checked
+            },
+
+            success: function (data) {
+                console.log(data)
+
+            }
+        });
+
+    }
 </script>
 {% endblock scripts %}
 
@@ -86,7 +109,7 @@ Testing
                         <span class="kt-switch">
                             <label>
                                 <input type="checkbox" {% if event.allow_non_ticket_live_viewers %}checked{% else %}{% endif %} name=""
-                                    style="user-select: auto;" id="id_age">
+                                    style="user-select: auto;" id="id_age" onchange="ajaxUpdateTicketOption(this);">
                                 <span></span>
                             </label>
                         </span>

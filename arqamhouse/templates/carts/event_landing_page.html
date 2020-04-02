@@ -246,28 +246,6 @@ function myFunction() {
     document.execCommand("copy");
 }
 
-
-function ajaxUpdateTicketOption(object, required) {
-
-    var token = '{{ csrf_token }}';
-
-    $.ajax({
-
-        type: "POST",
-        headers: { "X-CSRFToken": token },
-        url: '{{ request.path }}',
-
-        data: {
-            'value': object.checked
-        },
-
-        success: function (data) {
-            console.log(data)
-
-        }
-    });
-
-}
 </script>
 {% endif %}
 
