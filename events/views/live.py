@@ -135,9 +135,9 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 
 
 
-class LiveEventCreateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, FormView):
+class LiveEventOptionsView(HouseAccountMixin, View):
     model = EventLive
-    template_name = "events/live/create.html"
+    template_name = "events/live/options.html"
 
     def get_success_url(self):
         view_name = "subscribers:campaign_list"
@@ -157,66 +157,34 @@ class LiveEventCreateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestM
         house = self.get_house()
         event = self.get_event()
 
-        facing_mode = self.kwargs["mode"]
-        if facing_mode == 'environment':
-            context["facing_mode"] = 'environment'
-        
-        if facing_mode == 'user':
-            context["facing_mode"] = 'user'
-
-        if facing_mode == 'screen':
-            context["facing_mode"] = 'screen'
-
-        api_key = settings.OPEN_TOK_API_KEY
-        api_secret = settings.OPEN_TOK_SECRECT_KEY
-        opentok = OpenTok(api_key, api_secret)
-        session = opentok.create_session()
-        session_id = session.session_id
-        token = session.generate_token()
-
-        context["api_key"] = api_key
-        context["session_id"] = session_id
-        context["token"] = token
-
         context["event"] = event
         context["dashboard_events"] = self.get_events()
         context["event_tab"] = True
         context["house"] = house
         return context
 
-    def get(self, request, *args, **kwargs):
 
+    def get(self, request, *args, **kwargs):
         event = self.get_event()
-        try:
-            event_live = EventLive.objects.get(event=event)
-            view_name = "events:live_presenter"
-            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
-        except Exception as e:
-            print(e)
-            return render(request, self.template_name, self.get_context_data())
+        return render(request, self.template_name, self.get_context_data())
+
 
     def post(self, request, *args, **kwargs):
         data = request.POST
         print(data)
+
         event = self.get_event()
+        value = data['value']
 
-        facing_mode = data["facing_mode"]
-        api_key = settings.OPEN_TOK_API_KEY
-        api_secret = settings.OPEN_TOK_SECRECT_KEY
-        opentok = OpenTok(api_key, api_secret)
-        session = opentok.create_session()
-        session_id = session.session_id
+        if value == "true":
+            value = True
+        else:
+            value = False
 
-        try:
-            event_live = EventLive.objects.get(event=event)
-            view_name = "events:dashboard"
-            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
-        except Exception as e:
-            print(e)
-            event_live = EventLive.objects.create(event=event, session_id=session_id)
-            view_name = "events:live_presenter"
-            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
-        
+        event.allow_non_ticket_live_viewers = value
+        event.save()
+
+        return HttpResponse("Done")
 
         
     

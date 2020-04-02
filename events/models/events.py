@@ -70,6 +70,7 @@ class Event(TimestampedModel):
     deleted = models.BooleanField(default=False)
     send_to_subscribers = models.BooleanField(default=False)
     views = models.PositiveIntegerField(blank=True, null=True, default=0)
+    allow_non_ticket_live_viewers = models.BooleanField(default=False)
     objects = EventManager()
 
     def __str__(self):
@@ -222,8 +223,8 @@ class Event(TimestampedModel):
         view_name = "events:live_viewer"
         return reverse(view_name, kwargs={"slug": self.slug})
 
-    def get_create_live_user_view(self):
-        view_name = "events:live_create"
+    def get_live_options_view(self):
+        view_name = "events:live_options"
         return reverse(view_name, kwargs={"slug": self.slug})
 
     def get_live_event_presenter_view(self):

@@ -26,11 +26,11 @@
     }
 
     .OT_subscriber {
-        height: 215px !important;
+        height: 290px !important;
     }
 
     #publisher {
-        height: 210px;
+        height: 290px;
     }
 
     #screen-share {
@@ -171,7 +171,7 @@
         facingMode: 'user',
         publishAudio: true,
         name: "{{ profile.name }}",
-        style: { nameDisplayMode: "on", buttonDisplayMode: "on" },
+        style: { nameDisplayMode: "on", buttonDisplayMode: "off" },
 
     }, handleError);
 
@@ -233,7 +233,7 @@
                 facingMode: 'environment',
                 publishAudio: true,
                 name: "{{ profile.name }}",
-                style: { nameDisplayMode: "on", buttonDisplayMode: "on" },
+                style: { nameDisplayMode: "on", buttonDisplayMode: "off" },
 
             }, handleError);
 
@@ -250,7 +250,7 @@
                 facingMode: 'user',
                 publishAudio: true,
                 name: "{{ profile.name }}",
-                style: { nameDisplayMode: "on", buttonDisplayMode: "on" },
+                style: { nameDisplayMode: "on", buttonDisplayMode: "off" },
 
             }, handleError);
 
@@ -334,7 +334,7 @@
                 insertMode: 'after',
                 width: '100%',
                 height: '100%',
-                style: { nameDisplayMode: "on", buttonDisplayMode: "on" },
+                style: { nameDisplayMode: "on", buttonDisplayMode: "off" },
             }, handleError);
         }
 
@@ -343,14 +343,15 @@
                 insertMode: 'after',
                 width: '100%',
                 height: '100%',
-                style: { nameDisplayMode: "on", buttonDisplayMode: "on" },
+                style: { nameDisplayMode: "on", buttonDisplayMode: "off" },
             }, handleError);
         }
 
         subscriberFrames = document.querySelectorAll('.OT_subscriber');
         for (var i = 0; i < subscriberFrames.length; i++) {
             subscriberFrames[i].classList.add('col-lg-12');
-            subscriberFrames[i].classList.add('col-6');
+            subscriberFrames[i].classList.add('col-sm-6');
+            subscriberFrames[i].classList.add('col-12');
             subscriberFrames[i].classList.add('row-padder');
         }
 
@@ -510,9 +511,9 @@
             <div class="col-lg-4 col-12">
 
                 <div class="row" style="padding-bottom: 20px;">
-                    <div class="col-lg-12 col-6" id="publisher" style="padding-bottom: 10px;">
+                    <div class="col-lg-12 col-md-6 col-sm-6" id="publisher" style="padding-bottom: 10px;">
                     </div>
-                    <div class="col-lg-12 col-6" id="screen-share" style="display: none;">
+                    <div class="col-lg-12 col-md-6 col-sm-6" id="screen-share" style="display: none;">
                         <div id="dummy-screen-share" style="display: none;"></div>
                     </div>
                 </div>
