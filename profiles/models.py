@@ -9,6 +9,7 @@ from django.conf import settings
 from django.urls import reverse
 import itertools
 
+from core.utils import strip_non_ascii
 from stdimage import StdImageField
 from cities_light.models import City, Region, Country
 from django.contrib.auth.models import User
@@ -85,7 +86,7 @@ class Profile(AbstractUser):
 
     def _generate_slug(self):
         max_length = self._meta.get_field('slug').max_length
-        value = self.name
+        value = strip_non_ascii(self.name)
         slug_candidate = slug_original = slugify(value, allow_unicode=True)
         for i in itertools.count(1):
             if not Profile.objects.filter(slug=slug_candidate).exists():

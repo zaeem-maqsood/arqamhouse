@@ -52,6 +52,7 @@ class EventManager(models.Manager):
         return self.filter(Q(deleted=True))
 
 
+
 class Event(TimestampedModel):
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
     title = models.CharField(max_length=50, null=True, blank=False)
@@ -80,9 +81,9 @@ class Event(TimestampedModel):
     def _generate_slug(self):
         max_length = self._meta.get_field('slug').max_length
         if self.url:
-            value = self.url
+            value = strip_non_ascii(self.url)
         else:
-            value = self.title
+            value = strip_non_ascii(self.title)
 
         slug_candidate = slug_original = slugify(value, allow_unicode=True)
         for i in itertools.count(1):
@@ -96,9 +97,9 @@ class Event(TimestampedModel):
     def _update_slug(self):
         max_length = self._meta.get_field('slug').max_length
         if self.url:
-            value = self.url
+            value = strip_non_ascii(self.url)
         else:
-            value = self.title
+            value = strip_non_ascii(self.title)
         updated_slug = slugify(value, allow_unicode=True)
         if Event.objects.filter(slug=updated_slug).exists():
             pass

@@ -13,6 +13,8 @@ from arqamhouse.aws.utils import PrivateMediaStorage
 
 from django.core.exceptions import ValidationError
 
+from core.utils import strip_non_ascii
+
 # ------------------------------------------- Constants -----------------------------------------
 roles = (
             ('admin', 'Administrator'),
@@ -81,7 +83,7 @@ class House(TimestampedModel):
         # if self.url:
         # 	value = self.url
         # else:
-        value = self.name
+        value = strip_non_ascii(self.name)
         slug_candidate = slug_original = slugify(value, allow_unicode=True)
         for i in itertools.count(1):
             if not House.objects.filter(slug=slug_candidate).exists():
