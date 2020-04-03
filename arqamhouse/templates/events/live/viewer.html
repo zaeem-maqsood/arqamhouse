@@ -176,19 +176,18 @@ Live | {{ event.title|safe }}
         connectionCreated: function (event) {
             connectionCount++;
             console.log(connectionCount + ' connections.');
-            // document.getElementById("viewers").innerHTML = connectionCount
+            document.getElementById("viewers").innerHTML = connectionCount
 
         },
         connectionDestroyed: function (event) {
             connectionCount--;
             console.log(connectionCount + ' connections.');
-            // document.getElementById("viewers").innerHTML = connectionCount
+            document.getElementById("viewers").innerHTML = connectionCount
         },
 
         sessionDisconnected: function sessionDisconnectHandler(event) {
             // The event is defined by the SessionDisconnectEvent class
             console.log('Disconnected from the session.');
-            // document.getElementById('disconnectBtn').style.display = 'none';
             if (event.reason == 'networkDisconnected') {
                 alert('Your network connection terminated.')
             }
@@ -209,9 +208,11 @@ Live | {{ event.title|safe }}
     function checkStreamAmount() {
         if (streamAmount == 0) {
             document.getElementById("offline_message").style.display = 'block';
+            document.getElementById("screen_expand_message").style.display = 'none';
         }
         else {
             document.getElementById("offline_message").style.display = 'none';
+            document.getElementById("screen_expand_message").style.display = 'block';
         }
     }
 
@@ -353,9 +354,15 @@ function updateSpotLight() {
     <div class="container" style="padding-right: 0px;padding-left: 0px;">
 
 
-        <div class="row justify-content-center" style="padding-bottom: 30px;">
+        <div class="row justify-content-center" style="padding-bottom: 10px;">
             <div class="col-sm-12 col-10" style="padding: 0px;">
-                <a href="{{ event.get_landing_view }}" class="btn btn--primary-1 btn-block" style="color: white;">Event Page</a>
+                <a href="{{ event.get_landing_view }}" class="btn btn--primary-1 btn-block" style="color: white;">{{ event.title }}</a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
+            <div class="col-sm-12 col-10" style="padding: 0px;">
+                <p>Participants | <span id="viewers"></span></p>
             </div>
         </div>
 
@@ -367,11 +374,18 @@ function updateSpotLight() {
                 <div class="row">
 
                     <div class="col-12 text-center" id="offline_message" style="display: none;">
-                        <h3>{{ event.house }} will be live shortly</h3>
+                        <h3>{{ event.title }} will commence shortly.</h3>
                     </div>
 
                     <div id="subscriber"></div>
                 </div>
+
+                <div class="row justify-content-center text-center" id="screen_expand_message"  style="display: none;padding-top: 30px;">
+                    <div class="col-sm-12 col-10" style="padding: 0px;">
+                        <p>Psst! Click on a screen to expand it.</p>
+                    </div>
+                </div>
+
             </div>
                     
             
@@ -421,12 +435,6 @@ function updateSpotLight() {
                 </div>
             </div>
 
-        </div>
-
-        <div class="row justify-content-center" style="padding-bottom: 30px;">
-            <div class="col-sm-12 col-10" style="padding: 0px;">
-                <p>Psst! Click on a screen to expand it.</p>
-            </div>
         </div>
         {% else %}
 
