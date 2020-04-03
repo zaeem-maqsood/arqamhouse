@@ -1,6 +1,7 @@
 from .base import *
 from events.models import EventLive, EventLiveComment
 from profiles.mixins import ProfileMixin
+from django.utils.crypto import get_random_string
 
 
 # Add ProfileMixin after to make it so users have to login
@@ -14,7 +15,7 @@ class LiveEventViewerView(View):
         except:
             return None
 
-    def allow_entry(self):
+    def allow_entry(self, event):
         
         # First check for profile
         profile = self.get_profile()
@@ -22,7 +23,7 @@ class LiveEventViewerView(View):
 
             # Second Check if house user
             try:
-                house_user = HouseUser.objects.get(profile=profile)
+                house_user = HouseUser.objects.get(house=event.house, profile=profile)
                 return True
             except:
                 pass
@@ -52,10 +53,17 @@ class LiveEventViewerView(View):
         house = event.house
 
         if not event.allow_non_ticket_live_viewers:
-            allow_entry = self.allow_entry()
+            allow_entry = self.allow_entry(event)
         else:
             allow_entry = True
-            
+
+        data = request.GET
+        if 'secret' in data:
+            if data['secret'] == event.secret_live_id:
+                allow_entry = True
+            else: 
+                allow_entry = False
+
         if not allow_entry:
             context["allow_entry"] = False
 
@@ -197,25 +205,36 @@ class LiveEventOptionsView(HouseAccountMixin, View):
 
     def get(self, request, *args, **kwargs):
         event = self.get_event()
+        if not event.secret_live_id:
+            secret_live_id = get_random_string(length=32)
+            event.secret_live_id = secret_live_id
+            event.save()
         return render(request, self.template_name, self.get_context_data())
 
 
     def post(self, request, *args, **kwargs):
         data = request.POST
         print(data)
-
         event = self.get_event()
-        value = data['value']
 
-        if value == "true":
-            value = True
-        else:
-            value = False
+        if 'value' in data:
+            value = data['value']
 
-        event.allow_non_ticket_live_viewers = value
-        event.save()
+            if value == "true":
+                value = True
+            else:
+                value = False
+
+            event.allow_non_ticket_live_viewers = value
+            event.save()
+
+        if 'refresh' in data:
+            secret_live_id = get_random_string(length=32)
+            event.secret_live_id = secret_live_id
+            event.save()
 
         return HttpResponse("Done")
+
 
         
     

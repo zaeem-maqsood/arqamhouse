@@ -71,6 +71,7 @@ class Event(TimestampedModel):
     send_to_subscribers = models.BooleanField(default=False)
     views = models.PositiveIntegerField(blank=True, null=True, default=0)
     allow_non_ticket_live_viewers = models.BooleanField(default=False)
+    secret_live_id = models.CharField(max_length=150, null=True, blank=True)
     objects = EventManager()
 
     def __str__(self):

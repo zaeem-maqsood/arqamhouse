@@ -53,6 +53,19 @@ Testing
         document.execCommand("copy");
     }
 
+    function copyToClipboardSecret() {
+        /* Get the text field */
+        var copyText = document.getElementById("id_secret_link");
+        console.log(copyText)
+
+        /* Select the text field */
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+        /* Copy the text inside the text field */
+        document.execCommand("copy");
+    }
+
 
     function ajaxUpdateTicketOption(object) {
 
@@ -73,6 +86,31 @@ Testing
 
             }
         });
+
+    }
+
+
+    function ajaxRefreshSecret(object) {
+
+        var token = '{{ csrf_token }}';
+
+        $.ajax({
+
+            type: "POST",
+            headers: { "X-CSRFToken": token },
+            url: '{{ request.path }}',
+
+            data: {
+                'refresh': true
+            },
+
+            success: function (data) {
+                console.log(data)
+
+            }
+        });
+
+        window.location.reload(true);
 
     }
 </script>
@@ -98,7 +136,7 @@ Testing
                     <div class="col-md-12">
                         <h4>Go To Virtual Event</h4>
                         <p>Click the button to go to the virtual event.</p>
-                        <a class="btn btn-danger btn-block blinking" href="{{ event.get_live_event_presenter_view }}">Go To Virtual Event</a>
+                        <a class="btn btn-info btn-block blinking" href="{{ event.get_live_event_presenter_view }}">Go To Virtual Event</a>
                     </div>
                 </div>
 
@@ -120,19 +158,17 @@ Testing
                     <div class="col-md-12">
                         <h4>Presenter Link</h4>
                         <p>The URL event speakers/presenters will use.</p>
-                        <div></div>
-                        
                     </div>
                 </div>
 
                 <div class="row justify-content-center" style="padding-bottom: 30px;">
                     <div class="col-md-9 col-12" style="padding-bottom: 10px;">
                         <input type="text" class="form-control m-input message" value="www.arqamhouse.com{{ event.get_live_event_presenter_view }}" required=""
-                            maxlength="180" id="id_presenter_link" >
+                            maxlength="180" id="id_presenter_link" readonly>
                     </div>
                     <div class="col-md-3 col-12">
                         <button class="btn btn-primary btn-block" onclick="copyToClipboard();">
-                            copy</button>
+                            Copy</button>
                     </div>
                 </div>
 
@@ -147,11 +183,31 @@ Testing
                     <div class="col-md-9 col-12" style="padding-bottom: 10px;">
                         <input type="text" class="form-control m-input message"
                             value="www.arqamhouse.com{{ event.get_live_view }}" required="" maxlength="180"
-                            id="id_viewer_link">
+                            id="id_viewer_link" readonly>
                     </div>
                     <div class="col-md-3 col-12">
                         <button class="btn btn-primary btn-block" onclick="copyToClipboardViewer();">
-                            copy</button>
+                            Copy</button>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="padding-bottom: 10px;">
+                    <div class="col-md-12">
+                        <h4>Secret Link</h4>
+                        <p>We've generated a secret link you can give whomever you choose. This link will grant anyone access to your live event so please keep it safe.</p>
+                        <p>If you feel your link is compromised you can always refresh it below.</p>
+                        <button class="btn btn-danger" onclick="ajaxRefreshSecret();">Refresh</button>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-md-9 col-12" style="padding-bottom: 10px;">
+                        <input type="text" class="form-control m-input message" value="www.arqamhouse.com{{ event.get_live_view }}?secret={{ event.secret_live_id }}"
+                            required="" maxlength="180" id="id_secret_link" readonly>
+                    </div>
+                    <div class="col-md-3 col-12">
+                        <button class="btn btn-primary btn-block" onclick="copyToClipboardSecret();">
+                            Copy</button>
                     </div>
                 </div>
 

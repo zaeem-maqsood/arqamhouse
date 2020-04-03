@@ -494,8 +494,9 @@ class EventCheckoutView(FormView):
 
         # If the user doesn't exist at all then we need to create a customer
         except:
-
-            profile = Profile.objects.create_user(name=data["name"], email=data["email"], password=get_random_string(length=10))
+            profile_temp_password = get_random_string(length=10)
+            profile = Profile.objects.create_user(name=data["name"], email=data["email"], password=profile_temp_password)
+            self.send_new_profile_email(profile, profile_temp_password)
 
 
         # Try for subscriber
@@ -786,6 +787,22 @@ class EventCheckoutView(FormView):
         return render(request, self.template_name, self.get_context_data(data))
 
 
+    def send_new_profile_email(self, profile, password):
+
+        # Compose Email
+        subject = 'Arqam House Account Credentials'
+        context = {}
+        context["profile"] = profile
+        context["password"] = password
+        html_content = render_to_string('emails/account_creation_from_order.html', context)
+        text_content = strip_tags(html_content)
+        from_email = 'Arqam House <info@arqamhouse.com>'
+        to = ['%s' % (profile.email)]
+        email = EmailMultiAlternatives(subject=subject, body=text_content,
+                                       from_email=from_email, to=to)
+        email.attach_alternative(html_content, "text/html")
+        email.send()
+        return "Done"
 
 
     def send_confirmation_email(self, event, email, order):
