@@ -10,6 +10,42 @@ from cities_light.models import City, Region, Country
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget, PhoneNumberPrefixWidget
 
 
+class HouseLogoForm(forms.ModelForm):
+
+	class Meta:
+		model = House
+		fields = [
+			"logo",
+		]
+
+
+		widgets = {
+
+			"logo": forms.FileInput(
+					attrs={
+						"onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
+						"class": "form-control m-input",
+					}
+				),
+			}
+
+	def clean_logo(self):
+		logo = self.cleaned_data.get('logo')
+		if logo:
+			image_extensions = ['.jpg', '.png', '.JPG', '.PNG', '.JPEG', '.jpeg']
+			error = True
+			for extension in image_extensions:
+				if logo.name.lower().endswith(extension) or logo.name != self.instance.slug:
+					error = False
+
+			if error:
+				raise forms.ValidationError('Only .jpg .png or .jpeg files are accepted.')
+			return logo
+		else:
+			return logo
+
+
+
 class HouseUserOptionsForm(forms.ModelForm):
 
 	class Meta:

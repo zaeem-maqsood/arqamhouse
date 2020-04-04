@@ -161,6 +161,14 @@ function Subscribe(boolean) {
                             <div class="col-lg-12 col-md-6 col-8">
                                 {% if house.logo %}
                                 <img style="margin-bottom: 10px;max-height: 150px;" src="{{ house.logo.url }}">
+                                {% else %}
+                                    {% if owner %}
+                                    <a href="{% url 'houses:update' %}">
+                                    <i class="fa fa-image" style="font-size: 3em;"></i>
+                                    <p>Add logo</p>
+                                    </a>
+                                    <br>
+                                    {% endif %}
                                 {% endif %}
                                 <h4 style="color: grey;margin-bottom: 10px;">{{ house.name }}</h4>
                             </div>

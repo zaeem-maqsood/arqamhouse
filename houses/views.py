@@ -35,7 +35,7 @@ from django.contrib.auth.models import User
 from profiles.models import Profile
 from .models import House, HouseUser, HouseDirector
 from .forms import (AddUserToHouse, HouseSupportInfoForm, HouseChangeForm, HouseForm, HouseVerificationForm, 
-                    HouseDirectorForm, HouseUserOptionsForm)
+                    HouseDirectorForm, HouseUserOptionsForm, HouseLogoForm)
 
 from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
 from profiles.models import Profile
@@ -537,9 +537,10 @@ class HouseUpdateView(HouseAccountMixin, FormView):
         house_users = HouseUser.objects.filter(profile=profile)
 
         current_house_user = HouseUser.objects.get(profile=profile, house=house)
-        print(house_users)
         house_change_form = HouseChangeForm(house_users=house_users, initial={"house_select": current_house_user})
+        house_logo_form = HouseLogoForm(instance=self.get_house())
 
+        context["house_logo_form"] = house_logo_form
         context["dashboard_events"] = self.get_events()
         context["house_change_form"] = house_change_form
         context["profile"] = profile
@@ -554,7 +555,6 @@ class HouseUpdateView(HouseAccountMixin, FormView):
         data = request.POST
         house = self.get_house()
 
-        print(data)
         if 'house_user' in data:
             house_user = HouseUser.objects.get(id=data["house_user"])
             profile = self.request.user
@@ -563,17 +563,18 @@ class HouseUpdateView(HouseAccountMixin, FormView):
             messages.success(request, 'You have changed your house to  %s!' % (house_user.house))
             return HttpResponse("/house/update")
 
-        else:
-            profile = self.request.user
-            house_users = HouseUser.objects.filter(profile=profile)
-            form = HouseUpdateForm(data=data, instance=self.get_house())
+        if 'Remove' in data:
+            house.logo = None
+            house.save()
+            messages.warning(request, 'Event image successfully removed')
+        
+        house_logo_form = HouseLogoForm(data=data, instance=self.get_house())
 
-            if form.is_valid():
-                messages.success(request, 'House Updated!')
-                return self.form_valid(form, request, house)
-            else:
-                messages.warning(request, 'House Name Invalid')
-                return self.form_invalid(form)
+        if house_logo_form.is_valid():
+            return self.form_valid(house_logo_form, request, house)
+        else:
+            messages.warning(request, 'Error updating logo')
+            return self.form_invalid(house_logo_form)
 
     def form_valid(self, form, request, house):
         house = form.save()
@@ -584,6 +585,8 @@ class HouseUpdateView(HouseAccountMixin, FormView):
     def form_invalid(self, form):
         print(form.errors)
         return self.render_to_response(self.get_context_data(form=form))
+
+
 
 
 class HouseCreateView(LoginRequiredMixin, CreateView):

@@ -57,13 +57,13 @@ function changeHouse(object) {
         color: #7396b0;
     }
 </style>
-<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
-    <div class="col-lg-8 offset-lg-2 col-md-12 col-12">
+<div class="row justify-content-center h-100" style="padding: 3rem 0px 3rem 0px;">
+    <div class="col-lg-8 col-md-12 col-12">
         <div class="kt-portlet kt-portlet--mobile" style="padding:30px;">
             <div class="kt-portlet__body">
 
-                    <div class="row" style="padding-bottom:30px;">
-                        <div class="col-10 offset-1">
+                    <div class="row justify-content-center" style="padding-bottom:30px;">
+                        <div class="col-10">
 
                             <div class="row" style="padding-bottom: 30px;">
                                 <div class="col-12">
@@ -80,94 +80,47 @@ function changeHouse(object) {
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row" style="padding-bottom:30px;">
                                 <div class="col-md-12" style="padding-bottom:30px;">
                                     <a href="{% url 'houses:create' %}" class="btn btn-primary">Create a new house</a>
                                 </div>
                             </div>
 
-                        </div>
-                    </div>
-
-
-                    <div class="row" style="padding-bottom:30px;">
-                        <div class="col-10 offset-1">
-                    
-                            <div class="row" style="padding-bottom:30px;">
-                                <div class="col-12">
-                                    <h4>Support Settings</h4>
-                                    <p>Edit support email and phone number.
-                                    </p>
-                                    <a href="{% url 'houses:support_info' %}" class="btn btn-primary">Support Settings</a>
-                                </div>
-                            </div>
-                    
-                        </div>
-                    </div>
-
-
-                    <div class="row" style="padding-bottom:30px;">
-                        <div class="col-10 offset-1">
-                    
-                            <div class="row" style="padding-bottom:30px;">
-                                <div class="col-12">
-                                    <h4>Payout Methods</h4>
-                                    <p>Add payout methods.
-                                    </p>
-                                    <a href="{% url 'payments:payout_settings_list' %}" class="btn btn-primary">Payout Methods</a>
-                                </div>
-                            </div>
-                    
-                        </div>
-                    </div>
-
-
-                    <div class="row" style="padding-bottom:30px;">
-                        <div class="col-10 offset-1">
-                    
-                            <div class="row" style="padding-bottom:30px;">
-                                <div class="col-12">
-                                    <h4>House Members</h4>
-                                    <p>Add or remove people from your house.
-                                    </p>
-                                    <a href="{% url 'houses:manage' %}" class="btn btn-primary">House Users</a>
-                                </div>
-                            </div>
-                    
-                        </div>
-                    </div>
-
-
-                    <div class="row" style="padding-bottom:30px;">
-                        <div class="col-10 offset-1">
-
-                            {% if house.verification_pending or house.verified %}
-                            <div class="row" style="padding-bottom:30px;">
-                                <div class="col-12">
-                                    <h4>House {% if not house.verified %}Verification Pending{% else %}Verified <i style="color: #4399d5;" class="fa fa-check-circle"></i>{% endif %}</h4>
-                                    {% if not house.verified %}
-                                    <p>House details are currently being processed. We will contact you at <b>{{ house.email }}</b> for any updates.</p>
+                            <form action="" method="POST">{% csrf_token %}
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-lg-4 col-md-6 col-12">
+                                    <h4>House Logo</h4>
+                                    <br>
+                                    {% if house.logo %}
+                                    <img id="image-placeholder" src="{{ house.logo.url }}" alt="House Image" width="100%" />
+                                    <br>
+                                    {% if house.logo %}
+                                    <br>
+                                    <button type="submit" class="btn btn-outline-danger btn-block" name="Remove" value="Remove">Remove
+                                        Image</button>
+                                    {% endif %}
                                     {% else %}
-                                    <p>Congratulations! {{ house.name }} is verified.</p>
+                                    <img id="image-placeholder" src="{% static 'images/logo.png' %}" alt="House Image" width="100%" />
                                     {% endif %}
                                 </div>
                             </div>
-                            {% else %}
-                            <div class="row" style="padding-bottom:30px;">
+                            
+                            <div class="row" style="padding-bottom: 20px;">
                                 <div class="col-12">
-                                    <h4>House Verification</h4>
-                                    <p>Verification in Arqam House is required to enable larger payouts, collect sales tax, or issue tax-deductible receipts if
-                                    you’re a non-profit.</p>
-                                    {% if not house.verification_pending  %}
-                                    <a href="{% url 'houses:verify' %}" class="btn btn-primary">Verify House</a>
-                                    {% endif %}
+                                    {{ house_logo_form.logo }}
                                 </div>
                             </div>
-                            {% endif %}
 
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-12">
+                                    <button class="btn btn-primary">Update Logo</button>
+                                </div>
+                            </div>
+                            </form>
 
                         </div>
                     </div>
+
 
             </div>
         </div>
