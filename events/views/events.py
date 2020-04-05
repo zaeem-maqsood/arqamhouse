@@ -490,12 +490,12 @@ class EventCheckoutView(FormView):
         # Check if user exists in the system 
         email = email.lower()
         try:
-            profile = Profile.objects.get(email=data["email"])
+            profile = Profile.objects.get(email=email)
 
         # If the user doesn't exist at all then we need to create a customer
         except:
             profile_temp_password = get_random_string(length=10)
-            profile = Profile.objects.create_user(name=data["name"], email=data["email"], password=profile_temp_password)
+            profile = Profile.objects.create_user(name=data["name"], email=email, password=profile_temp_password)
             self.send_new_profile_email(profile, profile_temp_password)
 
 
@@ -503,7 +503,7 @@ class EventCheckoutView(FormView):
         # Either they are already a subscriber 
         try:
             subscriber = Subscriber.objects.get(profile=profile, house=event.house)
-            event_order = EventOrder.objects.filter(event=event, email=data["email"]).exists()
+            event_order = EventOrder.objects.filter(event=event, email=email).exists()
             if not event_order:
                 subscriber.attendance_total = subscriber.attendance_total + 1
                 subscriber.events.add(event)
@@ -544,7 +544,7 @@ class EventCheckoutView(FormView):
                 if profile.stripe_customer_id:
                     customer = stripe.Customer.retrieve(profile.stripe_customer_id)
                 else:
-                    customer = stripe.Customer.create(source=stripe_token, email=data['email'], name=data['name'])
+                    customer = stripe.Customer.create(source=stripe_token, email=email, name=data['name'])
                     print(customer)
                     profile.stripe_customer_id = customer.id
                     profile.save()
@@ -736,7 +736,7 @@ class EventCheckoutView(FormView):
             transaction.risk_level = charge.outcome['risk_level']
             transaction.seller_message = charge.outcome['seller_message']
             transaction.outcome_type = charge.outcome['type']
-            transaction.email = data['email']
+            transaction.email = email
             transaction.name = data['name']
             transaction.address_line_1 = charge.source['address_line1']
             transaction.address_state = charge.source['address_state']
@@ -768,7 +768,7 @@ class EventCheckoutView(FormView):
             transaction.stripe_amount = 0.00
             transaction.house_amount = 0.00
 
-            transaction.email = data['email']
+            transaction.email = email
             transaction.name = data["name"]
 
             cart.processed = True
@@ -777,7 +777,7 @@ class EventCheckoutView(FormView):
             del request.session['cart']
             request.session.modified = True
 
-            self.send_confirmation_email(event, data['email'], order)
+            self.send_confirmation_email(event, email, order)
             self.send_owner_confirmation_email(event, order)
 
             messages.success(request, "Congratulations! You're all set.")
