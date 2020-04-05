@@ -568,7 +568,7 @@ class HouseUpdateView(HouseAccountMixin, FormView):
             house.save()
             messages.warning(request, 'Event image successfully removed')
         
-        house_logo_form = HouseLogoForm(data=data, instance=self.get_house())
+        house_logo_form = HouseLogoForm(data, request.FILES, instance=self.get_house())
 
         if house_logo_form.is_valid():
             return self.form_valid(house_logo_form, request, house)
