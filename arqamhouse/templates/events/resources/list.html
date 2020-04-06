@@ -1,0 +1,109 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Resources | {{ event.title|safe }}
+{% endblock title %}
+
+{% block page_description %}
+<meta name="description" content="{{ event.description|safe|striptags }}">
+{% if event.image %}
+<meta property="og:image" content="{{ event.image.url }}">
+{% else %}
+<meta property="og:image" content="{% static 'images/logo.png' %}">
+{% endif %}
+
+<meta property="og:url" content="{{ request.path }}">
+<meta name="twitter:card" content="{{ event.slug }}">
+{% endblock page_description %}
+
+{% block styles %}
+
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<section style="padding-top: 3em;padding-bottom:0px;">
+    <div class="container" style="padding-right: 0px;padding-left: 0px;">
+
+
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-sm-12 col-10" style="padding: 0px;">
+                <a href="{{ event.get_landing_view }}" class="btn btn--primary-1 btn-block" style="color: white;">{{ event.title }}</a>
+            </div>
+        </div>
+
+
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-lg-3 col-sm-6 col-5" style="padding-bottom: 10px;">
+            <a class="btn btn-block" href="{{ event.create_file_resource }}">
+                <span class="btn__text">+ File</span>
+            </a>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 col-5" style="padding-bottom: 10px;">
+                <a class="btn btn-block" href="#">
+                    <span class="btn__text">+ Link</span>
+                </a>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 col-5" style="padding-bottom: 10px;">
+                <a class="btn btn-block" href="#">
+                    <span class="btn__text">+ Image</span>
+                </a>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 col-5" style="padding-bottom: 10px;">
+                <a class="btn btn-block" href="#">
+                    <span class="btn__text">+ Text</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+        {% for resource in resources %}
+            <div class="col-lg-6 col-md-6 col-sm-12 col-11">
+                <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
+                    style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px;border-radius: 10px;margin-bottom: 20px;"
+                    id="homepage_updates">
+                    <div class="row justify-content-center">
+                        {% if resource.image %}
+                        <div class="col-lg-3 col-md-4 col-sm-4 col-4">
+                            <a href="{{ resource.get_absolute_url }}">
+                                <img style="padding: 10px;" src="{{ resource.image.url }}">
+                            </a>
+                        </div>
+                        {% endif %}
+                        <div
+                            class="{% if resource.image %}col-lg-9 col-md-8 col-sm-8 col-8{% else %}col-lg-12 col-md-12 col-sm-12 col-11{% endif %}">
+                            <p class="lead" id="updates_title"
+                                style="margin-bottom: 0px; text-align: left;{% if not resource.image %}padding-left:10px;{% endif %}">
+                                <a style="text-decoration: none;" href="{{ resource.get_absolute_url }}">{{ resource.name }}</a>
+                            </p>
+                            <hr style="margin-top: 0px;margin-bottom:25px;">
+                            {% if resource.link %}
+                            <a class="btn" href="{{ resource.link }}" target="_blank">
+                                <span class="btn__text">View Resource</span>
+                            </a>
+                            {% else %}
+                            <a class="btn" href="{{ resource.get_absolute_url }}">
+                                <span class="btn__text">View Resource</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+
+
+    </div>
+</section>
+{% endblock content %}

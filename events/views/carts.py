@@ -123,6 +123,11 @@ class AddTicketsToCartView(FormView):
             print(e)
             event_live = None
 
+        
+        event_resources = EventResource.objects.filter(event=event)
+        if event_resources:
+            context["event_resources"] = event_resources
+
         context["event_live"] = event_live
         context["house_users"] = house_users
         context["owner"] = owner

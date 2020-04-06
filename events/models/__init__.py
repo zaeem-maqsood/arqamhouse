@@ -10,3 +10,4 @@ from .attendees import *
 from .answers import *
 from .emails import *
 from .live import *
+from .resources import *

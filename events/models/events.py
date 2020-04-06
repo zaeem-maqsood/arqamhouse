@@ -233,6 +233,26 @@ class Event(TimestampedModel):
         view_name = "events:live_presenter"
         return reverse(view_name, kwargs={"slug": self.slug})
 
+    def get_resources_view(self):
+        view_name = "events:resources"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+    def create_file_resource(self):
+        view_name = "events:create_resource_file"
+        return reverse(view_name, kwargs={"slug": self.slug, "type": "file"})
+
+    def create_image_resource(self):
+        view_name = "events:create_resource_image"
+        return reverse(view_name, kwargs={"slug": self.slug, "type": "image"})
+
+    def create_link_resource(self):
+        view_name = "events:create_resource_link"
+        return reverse(view_name, kwargs={"slug": self.slug, "type": "link"})
+
+    def create_text_resource(self):
+        view_name = "events:create_resource_text"
+        return reverse(view_name, kwargs={"slug": self.slug, "type": "text"})
+
 
 def event_post_save_reciever(sender, instance, *args, **kwargs):
 

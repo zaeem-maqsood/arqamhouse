@@ -1,0 +1,136 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Create Resource | {{ event.title|safe }}
+{% endblock title %}
+
+{% block page_description %}
+<meta name="description" content="{{ event.description|safe|striptags }}">
+{% if event.image %}
+<meta property="og:image" content="{{ event.image.url }}">
+{% else %}
+<meta property="og:image" content="{% static 'images/logo.png' %}">
+{% endif %}
+
+<meta property="og:url" content="{{ request.path }}">
+<meta name="twitter:card" content="{{ event.slug }}">
+{% endblock page_description %}
+
+{% block styles %}
+<link href="https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/css/froala_editor.pkgd.min.css" rel="stylesheet"
+    type="text/css" />
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script type="text/javascript"
+    src="https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/js/froala_editor.pkgd.min.js"></script>
+{% endblock scripts %}
+
+{% block content %}
+<section style="padding-top: 3em;padding-bottom:0px;">
+    <div class="container" style="padding-right: 0px;padding-left: 0px;">
+
+
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-lg-8 col-sm-10 col-10" style="padding: 0px;">
+                <a href="{{ event.get_resources_view }}" class="btn btn--primary-1 btn-block" style="color: white;">Resources</a>
+            </div>
+        </div>
+
+        {{ form.media }}
+        <form method="POST" enctype="multipart/form-data">{% csrf_token %}
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-lg-8 col-md-10 col-10" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;border-radius: 15px;">
+
+                <div class="row justify-content-center" style="padding-top: 30px;">
+                    <div class="col-lg-11 col-sm-12 col-10">
+                        <h3>Create {{ resource_type }} resource</h3>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-lg-11 col-sm-12 col-10">
+                        <p style="margin-bottom: 0px;">Resource Name</p>
+                        {{ form.name }}
+                    </div>
+                </div>
+
+                {% if resource_type == 'file' %}
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-lg-11 col-sm-12 col-10">
+                        <p style="margin-bottom: 0px;">File</p>
+                        {{ form.file }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if resource_type == 'image' %}
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-lg-11 col-sm-12 col-10">
+                        <p style="margin-bottom: 0px;">Image</p>
+
+                        {% if form.instance.image %}
+                        <img id="image-placeholder" src="{{ form.instance.image.url }}" alt="Event Image"
+                            style="max-width: 300px;max-height: 300px;" />
+                        <br>
+                        <br>
+                        {% else %}
+                        <img id="image-placeholder" src="{% static 'images/image_placeholder.jpg' %}" alt="Event Image"
+                            style="max-width: 300px;max-height: 300px;" />
+                        {% endif %}
+
+                        {{ form.image }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if resource_type == 'link' %}
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-lg-11 col-sm-12 col-10">
+                        <p style="margin-bottom: 0px;">Link</p>
+                        {{ form.link }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if resource_type == 'text' %}
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-lg-11 col-sm-12 col-10">
+                        <p style="margin-bottom: 0px;">Link</p>
+                        {{ form.text }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if resource_type == 'file' or resource_type == 'image' %}
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-lg-11 col-sm-12 col-10">
+                        <button class="btn btn--primary" type="submit">
+                            <span class="btn__text">Upload File</span>
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if resource_type == 'link' or resource_type == 'text' %}
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-lg-11 col-sm-12 col-10">
+                        <button class="btn btn--primary" type="submit">
+                            <span class="btn__text">Save</span>
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+        </form>
+
+    </div>
+</section>
+{% endblock content %}

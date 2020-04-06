@@ -52,7 +52,7 @@ from houses.models import HouseUser, House
 from events.models import (Event, AttendeeCommonQuestions, EventQuestion, Ticket, EventCart, ChargeError,
                            EventCartItem, Answer, OrderAnswer, EventOrder, Attendee, EventEmailConfirmation,
                            EventRefundRequest, EventDiscount, Checkin, EventOrderRefund, EventRefererDomain, 
-                           EventLive)
+                           EventLive, EventResource)
 from questions.models import Question
 from payments.models import Transaction, Refund, HouseBalance
 from profiles.models import Profile
