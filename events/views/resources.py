@@ -269,6 +269,7 @@ class EventResourceListView(View):
         house = event.house
         resources = EventResource.objects.filter(event=event)
 
+        context["is_owner"] = self.check_if_user_is_owner(event)
         context["resources"] = resources
         context["event"] = event
         context["house"] = house
