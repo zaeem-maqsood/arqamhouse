@@ -49,19 +49,19 @@ Resources | {{ event.title|safe }}
             </div>
 
             <div class="col-lg-3 col-sm-6 col-5" style="padding-bottom: 10px;">
-                <a class="btn btn-block" href="#">
+                <a class="btn btn-block" href="{{ event.create_link_resource }}">
                     <span class="btn__text">+ Link</span>
                 </a>
             </div>
 
             <div class="col-lg-3 col-sm-6 col-5" style="padding-bottom: 10px;">
-                <a class="btn btn-block" href="#">
+                <a class="btn btn-block" href="{{ event.create_image_resource }}">
                     <span class="btn__text">+ Image</span>
                 </a>
             </div>
 
             <div class="col-lg-3 col-sm-6 col-5" style="padding-bottom: 10px;">
-                <a class="btn btn-block" href="#">
+                <a class="btn btn-block" href="{{ event.create_text_resource }}">
                     <span class="btn__text">+ Text</span>
                 </a>
             </div>
