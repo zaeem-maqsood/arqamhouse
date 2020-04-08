@@ -1,0 +1,86 @@
+{% extends "backend/base.html" %}
+{% load tz %}
+{% load static %}
+
+{% block title %}
+Add Broadcast | {{ event.title }}
+{% endblock title %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+
+{% block content %}
+
+<div class="row justify-content-center" style="padding: 3rem 0px 3rem 0px;">
+    <div class="col-lg-10 col-md-12 col-12">
+        <div class="kt-portlet kt-portlet--mobile" style="padding:20px;">
+            <div class="kt-portlet__body">
+
+                <form method="POST">{% csrf_token %}
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12 col-12">
+                            <h5 style="font-weight: 400;">Create {{ stream_type|title }} Braodcast</h5>
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12 col-12">
+                            <p>Broadcast Name</p>
+                            {{ form.name }}
+                        </div>
+                    </div>
+
+                    {% if stream_type == 'youtube' %}
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12 col-12">
+                            <p>Broadcast Server URL. You can find this <a href="https://www.youtube.com/live_dashboard" target="_blank">here</a>.</p>
+                            {{ form.youtube_url }}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12 col-12">
+                            <p>Broadcast Server URL. You can find this <a href="https://www.facebook.com/live/create" target="_blank">here</a>.</p>
+                            {{ form.facebook_url }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12 col-12">
+                            <p>Broadcast name/key. You can find this <a {% if stream_type == 'youtube' %}href="https://www.youtube.com/live_dashboard"{% else %}href="https://www.facebook.com/live/create"{% endif %} target="_blank">here</a>.</p>
+                            {{ form.stream_key }}
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        {% if update %}
+                        <div class="col-6">
+                            <button type="submit" name="Update" value="Update" id="update"
+                                class="btn btn-primary btn-block">Update</button>
+                        </div>
+                        <div class="col-6">
+                            <button type="submit" name="delete" value="delete" id="delete" class="btn btn-danger btn-block">Delete</button>
+                        </div>
+                        {% else %}
+                        <div class="col-12">
+                            <button type="submit" name="send-test" value="create" id="create"
+                                class="btn btn-info">Create</button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

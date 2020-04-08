@@ -1,10 +1,410 @@
 from .base import *
-from events.models import EventLive, EventLiveComment
+from events.models import EventLive, EventLiveComment, EventLiveArchive, EventLiveBroadcast
 from profiles.mixins import ProfileMixin
 from django.utils.crypto import get_random_string
 
+from events.forms import BroadcastFacebookForm, BroadcastYoutubeForm
 
-# Add ProfileMixin after to make it so users have to login
+from opentok import MediaModes
+
+import boto3
+from botocore.client import Config
+
+
+class BroadcastUpdateView(HouseAccountMixin, UpdateView):
+    model = EventLiveBroadcast
+    template_name = "events/live/broadcast.html"
+
+    def get_success_url(self):
+        view_name = "events:live_options"
+        return reverse(view_name, kwargs={"slug": self.kwargs["slug"]})
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+        event = self.get_event()
+        house = self.get_house()
+
+        if self.object.facebook_url:
+            stream_type = 'facebook'
+            form = BroadcastFacebookForm(instance=self.object)
+        else:
+            stream_type = 'youtube'
+            form = BroadcastYoutubeForm(instance=self.object)            
+
+        context["update"] = True
+        context["stream_type"] = stream_type
+        context["form"] = form
+        context["event"] = event
+        context["house"] = house
+        return context
+
+    def get_event(self):
+        event_slug = self.kwargs['slug']
+        try:
+            event = Event.objects.get(slug=event_slug)
+            return event
+        except Exception as e:
+            print(e)
+            raise Http404
+
+    def get_event_live(self):
+        event_live_pk = self.kwargs['pk']
+        try:
+            event_live = EventLive.objects.get(id=event_live_pk)
+            return event_live
+        except Exception as e:
+            print(e)
+            raise Http404
+
+    def get_event_live_broadcast(self):
+        event_live_broadcast_pk = self.kwargs['broadcast_pk']
+        try:
+            event_live_broadcast = EventLiveBroadcast.objects.get(id=event_live_broadcast_pk)
+            return event_live_broadcast
+        except Exception as e:
+            print(e)
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_event_live_broadcast()
+        return render(request, self.template_name, self.get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_event_live_broadcast()
+        data = request.POST
+        house = self.get_house()
+
+        if self.object.facebook_url:
+            stream_type = 'facebook'
+            form = BroadcastFacebookForm(data, request.FILES, instance=self.object)
+        else:
+            stream_type = 'youtube'
+            form = BroadcastYoutubeForm(data, request.FILES, instance=self.object)
+
+        if form.is_valid():
+            return self.form_valid(form, request)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form, request):
+        self.object = form.save()
+
+        if 'delete' in request.POST:
+            self.object.delete()
+            messages.info(request, 'Broadcast Stream Deleted!')
+            view_name = "events:live_options"
+            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": self.kwargs['slug']}))
+
+
+        messages.success(request, 'Broadcast Stream Updated!')
+        valid_data = super(BroadcastUpdateView, self).form_valid(form)
+        return valid_data
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+
+
+
+class BroadcastCreateView(HouseAccountMixin, CreateView):
+    model = EventLiveBroadcast
+    template_name = "events/live/broadcast.html"
+
+    def get_success_url(self):
+        view_name = "events:live_options"
+        return reverse(view_name, kwargs={"slug": self.kwargs["slug"]})
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+        event = self.get_event()
+        house = self.get_house()
+
+        stream_type = self.kwargs['stream_type']
+
+        if stream_type == 'facebook':
+            form = BroadcastFacebookForm()
+        else:
+            form = BroadcastYoutubeForm()
+        
+        context["stream_type"] = stream_type
+        context["form"] = form
+        context["event"] = event
+        context["house"] = house
+        return context
+
+    def get_event(self):
+        event_slug = self.kwargs['slug']
+        try:
+            event = Event.objects.get(slug=event_slug)
+            return event
+        except Exception as e:
+            print(e)
+            raise Http404
+
+    def get_event_live(self):
+        event_live_pk = self.kwargs['pk']
+        try:
+            event_live = EventLive.objects.get(id=event_live_pk)
+            return event_live
+        except Exception as e:
+            print(e)
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        self.object = None
+        return render(request, self.template_name, self.get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        data = request.POST
+        house = self.get_house()
+        
+        stream_type = self.kwargs['stream_type']
+
+        if stream_type == 'facebook':
+            form = BroadcastFacebookForm(data, request.FILES)
+        else:
+            form = BroadcastYoutubeForm(data, request.FILES)
+
+        event_live = self.get_event_live()
+
+        if form.is_valid():
+            return self.form_valid(form, request, event_live)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form, request, event_live):
+        form.instance.event_live = event_live
+        self.object = form.save()
+
+        print(form.cleaned_data)
+
+        messages.success(request, 'Broadcast Added!')
+        valid_data = super(BroadcastCreateView, self).form_valid(form)
+        return valid_data
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+
+
+class ArchivedDetailView(View):
+    template_name = "events/live/archive_detail.html"
+
+    def get_profile(self):
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except:
+            return None
+
+    def allow_entry(self, event):
+        
+        # First check for profile
+        profile = self.get_profile()
+        if profile:
+
+            # Second Check if house user
+            try:
+                house_user = HouseUser.objects.get(house=event.house, profile=profile)
+                return True
+            except:
+                return False
+        else:
+            return False
+
+
+    def check_if_user_is_owner(self, event):
+        profile = self.request.user
+
+        try:
+            if event.house == profile.house:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(e)
+            return False
+
+
+    def get_event(self):
+        event_slug = self.kwargs['slug']
+        try:
+            event = Event.objects.get(slug=event_slug)
+            return event
+        except Exception as e:
+            print(e)
+            raise Http404
+
+    def get_archive(self):
+        archive_pk = self.kwargs['pk']
+        try:
+            event_live_archive = EventLiveArchive.objects.get(id=archive_pk)
+            return event_live_archive
+        except Exception as e:
+            print(e)
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        event = self.get_event()
+        house = event.house
+
+        if not event.allow_non_ticket_archive_viewers:
+            allow_entry = self.allow_entry(event)
+        else:
+            allow_entry = True
+
+        data = request.GET
+        if 'secret' in data:
+            if data['secret'] == event.secret_archive_id:
+                allow_entry = True
+            else: 
+                allow_entry = False
+
+        if not allow_entry:
+            context["allow_entry"] = False
+
+        else:
+            context["allow_entry"] = True
+
+
+        is_owner = self.check_if_user_is_owner(event)
+
+        
+        from urllib.parse import unquote
+        event_live_archive = self.get_archive()
+        s3_client = boto3.client('s3', 'ca-central-1', config=Config(signature_version='s3v4'),
+                                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+        response = s3_client.generate_presigned_url('get_object', Params={
+                                                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME, 'Key': event_live_archive.archive_location}, ExpiresIn=3600)
+        # print(unquote(response))
+        context["event_live_archive_url"] = response
+        context["is_owner"] = is_owner
+        context["event_live_archive"] = event_live_archive
+        context["profile"] = self.get_profile()
+        context["event"] = event
+        context["house"] = house
+        return render(request, self.template_name, context)
+
+
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        print(data)
+
+        if 'delete' in data:
+
+            event = self.get_event()
+            event_live = EventLive.objects.get(event=event)
+            event_live_archive = self.get_archive()
+
+            s3_client = boto3.client('s3', 'ca-central-1', config=Config(signature_version='s3v4'),
+                                     aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+            response = s3_client.delete_object(
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                Key=event_live_archive.archive_location,
+            )
+            print(response)
+            event_live_archive.delete()
+        
+        view_name = "events:archives"
+        return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
+
+
+
+
+class ArchivedListView(View):
+    template_name = "events/live/archives.html"
+
+    def get_profile(self):
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except:
+            return None
+
+    def allow_entry(self, event):
+        
+        # First check for profile
+        profile = self.get_profile()
+        if profile:
+
+            # Second Check if house user
+            try:
+                house_user = HouseUser.objects.get(house=event.house, profile=profile)
+                return True
+            except:
+                return False
+        else:
+            return False
+
+    def check_if_user_is_owner(self, event):
+        profile = self.request.user
+
+        try:
+            if event.house == profile.house:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(e)
+            return False
+
+
+    def get_event(self):
+        event_slug = self.kwargs['slug']
+        try:
+            event = Event.objects.get(slug=event_slug)
+            return event
+        except Exception as e:
+            print(e)
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        event = self.get_event()
+        house = event.house
+
+        if not event.allow_non_ticket_archive_viewers:
+            allow_entry = self.allow_entry(event)
+        else:
+            allow_entry = True
+
+        data = request.GET
+        if 'secret' in data:
+            if data['secret'] == event.secret_archive_id:
+                allow_entry = True
+            else: 
+                allow_entry = False
+
+        if not allow_entry:
+            view_name = "events:landing"
+            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
+        else:
+            pass
+
+        event_live = EventLive.objects.get(event=event)
+        event_live_archives = EventLiveArchive.objects.filter(event_live=event_live).order_by("created_at")
+
+        is_owner = self.check_if_user_is_owner(event)
+
+        context["is_owner"] = is_owner
+        context["event_live_archives"] = event_live_archives
+        context["profile"] = self.get_profile()
+        context["event"] = event
+        context["house"] = house
+        return render(request, self.template_name, context)
+
+
+
+
+
+
 class LiveEventViewerView(View):
     template_name = "events/live/viewer.html"
 
@@ -138,7 +538,7 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
             api_key = settings.OPEN_TOK_API_KEY
             api_secret = settings.OPEN_TOK_SECRECT_KEY
             opentok = OpenTok(api_key, api_secret)
-            session = opentok.create_session()
+            session = opentok.create_session(media_mode=MediaModes.routed)
             session_id = session.session_id
             token = session.generate_token()
             event_live = EventLive.objects.create(event=event, session_id=session_id)
@@ -154,6 +554,11 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         else:
             context["local"] = False
 
+        
+        event_live_broadcasts = EventLiveBroadcast.objects.filter(event_live=event_live)
+        print(event_live_broadcasts)
+        context["event_live_broadcasts"] = event_live_broadcasts
+
         slug = self.kwargs["slug"]
         context["slug_json"] = mark_safe(json.dumps(slug))
         context["event_live"] = event_live
@@ -161,6 +566,7 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         event_live_comments = EventLiveComment.objects.filter(event_live=event_live).order_by("created_at")
         context["event_live_comments"] = event_live_comments
         context["profile"] = profile
+
             
         context["api_key"] = api_key
         context["session_id"] = session_id
@@ -171,6 +577,91 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         context["dashboard_events"] = self.get_events()
         context["event_tab"] = True
         return render(request, self.template_name, context)
+
+
+
+    def post(self, request, *args, **kwargs):
+        import json
+
+        data = request.POST
+        print(data)
+
+        json_data = json.loads(request.body)
+
+        event = self.get_event()
+        event_name = event.slug
+        event_live = EventLive.objects.get(event=event)
+        session_id = event_live.session_id
+        api_key = settings.OPEN_TOK_API_KEY
+        api_secret = settings.OPEN_TOK_SECRECT_KEY
+        opentok = OpenTok(api_key, api_secret)
+
+        last_archive = EventLiveArchive.objects.filter(event_live=event_live).order_by("-created_at").first()
+        
+        if json_data:
+
+            try:
+                value = json_data['record']
+                print(value)
+
+                if value:
+                    archive = opentok.start_archive(session_id, name=event_name, resolution="1280x720")
+                    archive_location = f"{api_key}/{archive.id}/archive.mp4"
+                    event_live_archive = EventLiveArchive.objects.create(event_live=event_live, archive_id=archive.id, archive_location=archive_location)
+                else:
+                    opentok.stop_archive(last_archive.archive_id)
+
+            except Exception as e:
+                print(e)
+
+
+
+
+            try:
+                event_live_broadcasts = EventLiveBroadcast.objects.filter(event_live=event_live)
+                rtmp = []
+                for event_live_broadcast in event_live_broadcasts:
+                    rtmp_dict = {}
+                    print(event_live_broadcast.name)
+                    rtmp_dict["id"] = event_live_broadcast.name
+                    if event_live_broadcast.facebook_url:
+                        rtmp_dict["serverUrl"] = event_live_broadcast.facebook_url
+                    else:
+                        rtmp_dict["serverUrl"] = event_live_broadcast.youtube_url
+                    rtmp_dict["streamName"] = event_live_broadcast.stream_key
+                    rtmp.append(rtmp_dict)
+
+
+                print(rtmp)
+                value = json_data['broadcast']
+                print(value)
+
+                if value:
+                    session_id = session_id
+                    options = {
+                        'layout': {
+                            'type': 'bestFit',
+                        },
+                        'maxDuration': 7200,
+                        'outputs': {
+                        'hls': {},
+                        'rtmp': rtmp
+                        },
+                        'resolution': '1280x720'
+                    }
+
+                    broadcast = opentok.start_broadcast(session_id, options)
+                    broadcast_id = broadcast.id
+                    event_live.broadcast_id = broadcast_id
+                    event_live.save()
+                    
+                else:
+                    broadcast = opentok.stop_broadcast(event_live.broadcast_id)
+
+            except Exception as e:
+                print(e)
+
+        return HttpResponse("Done")
 
 
 
@@ -196,6 +687,11 @@ class LiveEventOptionsView(HouseAccountMixin, View):
         house = self.get_house()
         event = self.get_event()
 
+        event_live = EventLive.objects.get(event=event)
+        event_live_broadcasts = EventLiveBroadcast.objects.filter(event_live=event_live)
+
+        context["event_live"] = event_live
+        context["event_live_broadcasts"] = event_live_broadcasts
         context["event"] = event
         context["dashboard_events"] = self.get_events()
         context["event_tab"] = True
@@ -205,10 +701,30 @@ class LiveEventOptionsView(HouseAccountMixin, View):
 
     def get(self, request, *args, **kwargs):
         event = self.get_event()
+
+        try:
+            event_live = EventLive.objects.get(event=event)
+        except Exception as e:
+            print(e)
+            api_key = settings.OPEN_TOK_API_KEY
+            api_secret = settings.OPEN_TOK_SECRECT_KEY
+            opentok = OpenTok(api_key, api_secret)
+            session = opentok.create_session(media_mode=MediaModes.routed)
+            session_id = session.session_id
+            event_live = EventLive.objects.create(event=event, session_id=session_id)
+
+
         if not event.secret_live_id:
             secret_live_id = get_random_string(length=32)
             event.secret_live_id = secret_live_id
             event.save()
+
+        if not event.secret_archive_id:
+            secret_archive_id = get_random_string(length=32)
+            event.secret_archive_id = secret_archive_id
+            event.save()
+
+        
         return render(request, self.template_name, self.get_context_data())
 
 
@@ -231,6 +747,21 @@ class LiveEventOptionsView(HouseAccountMixin, View):
         if 'refresh' in data:
             secret_live_id = get_random_string(length=32)
             event.secret_live_id = secret_live_id
+            event.save()
+
+        if 'archive' in data:
+            archive = data['archive']
+            if archive == "true":
+                archive = True
+            else:
+                archive = False
+
+            event.allow_non_ticket_archive_viewers = archive
+            event.save()
+
+        if 'refresh_archive' in data:
+            secret_archive_id = get_random_string(length=32)
+            event.secret_archive_id = secret_archive_id
             event.save()
 
         return HttpResponse("Done")

@@ -9,6 +9,31 @@
 {% block styles %}
 <style>
 
+    .blinking{
+        animation:blinkingText 1.2s infinite;
+    }
+    @keyframes blinkingText{
+        0%{     color: #fff;    }
+        49%{    color: #fff; }
+        60%{    color: transparent; }
+        99%{    color:transparent;  }
+        100%{   color: #fff;    }
+    }
+
+
+    .bg--googleplus {
+        background: #fc8080;
+    }
+
+    .bg--green-button {
+        background: #44b682;
+    }
+
+    .bg--blue-button {
+        background: #44abb6;
+    }
+
+
     .alert.bg--primary  {
         background: rgba(102, 191, 255, 0.2);
         border-color: transparent;
@@ -492,6 +517,107 @@
     };
 </script>
 
+
+<script>
+function toggleRecord(object) {
+
+    var token = '{{ csrf_token }}';
+
+
+    if (object.innerHTML == "Record") {
+        object.innerHTML = "Recording..."
+        object.classList.add('blinking');
+        object.classList.add('bg--pinterest');
+        object.classList.remove('bg--green-button');
+        record = true;
+    } else {
+        object.classList.remove('blinking');
+        object.classList.remove('bg--pinterest'); 
+        object.innerHTML = "Record"
+        object.classList.add('bg--green-button');
+        console.log("It came block")
+        record = false;
+    }
+
+    console.log(record);
+    const url = '{{ request.path }}';
+
+    let data = {
+        record: record
+    }
+
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: { 
+            'X-CSRFToken': token,
+            'Content-Type': 'application/json; charset=utf-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        
+    }
+    
+    fetch(url, fetchData)
+        .then(function () {
+            // Handle response you get from the server
+            console.log("Success")
+        });
+
+}
+</script>
+
+
+
+<script>
+function toggleBroadcast(object) {
+
+    var token = '{{ csrf_token }}';
+
+
+    if (object.innerHTML == "Broadcast") {
+        object.innerHTML = "Broadcasting..."
+        object.classList.add('blinking');
+        object.classList.add('bg--pinterest');
+        object.classList.remove('bg--blue-button');
+        broadcast = true;
+    } else {
+        object.classList.remove('blinking');
+        object.classList.remove('bg--pinterest'); 
+        object.innerHTML = "Broadcast"
+        object.classList.add('bg--blue-button');
+        console.log("It came block")
+        broadcast = false;
+    }
+
+    console.log(broadcast);
+    const url = '{{ request.path }}';
+
+    let data = {
+        broadcast: broadcast
+    }
+
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: { 
+            'X-CSRFToken': token,
+            'Content-Type': 'application/json; charset=utf-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        
+    }
+    
+    fetch(url, fetchData)
+        .then(function () {
+            // Handle response you get from the server
+            console.log("Success")
+        });
+
+}
+</script>
+
 {% endblock scripts %}
 
 {% block content %}
@@ -515,6 +641,21 @@
             
             <!-- Publisher -->
             <div class="col-lg-4 col-12">
+
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-lg-12 col-md-6 col-sm-6" {% if event_live_broadcasts %}style="padding-bottom: 0px;"{% else %}style="padding-bottom: 10px;"{% endif %}>
+                        <button class="btn bg--green-button btn-block" style="color: white;" onclick="toggleRecord(this);">Record</button>
+                    </div>
+                </div>
+
+                {% if event_live_broadcasts %}
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-lg-12 col-md-6 col-sm-6" style="padding-bottom: 10px;">
+                        <button class="btn bg--blue-button btn-block" style="color: white;" onclick="toggleBroadcast(this);">Broadcast</button>
+                    </div>
+                </div>
+                {% endif %}
+
 
                 <div class="row" style="padding-bottom: 20px;">
                     <div class="col-lg-12 col-md-6 col-sm-6" id="publisher" style="padding-bottom: 10px;">
@@ -608,6 +749,13 @@
                             <div class="col-md-12 col-10">
                                 <a id="chat-message-submit" href="{{ event.get_resources_view }}" target="_blank"
                                     class="btn btn--primary-1 btn-block"><span class="btn__text">Event Resources</span></a>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center" style="padding-bottom: 10px;">
+                            <div class="col-md-12 col-10">
+                                <a id="chat-message-submit" href="{{ event.get_archives_view }}" target="_blank"
+                                    class="btn btn--primary-1 btn-block"><span class="btn__text">Archives</span></a>
                             </div>
                         </div>
                     </div>

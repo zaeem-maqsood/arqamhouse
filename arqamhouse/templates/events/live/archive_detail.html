@@ -1,0 +1,107 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Recordings | {{ event.title|safe }}
+{% endblock title %}
+
+{% block page_description %}
+<meta name="description" content="{{ event.description|safe|striptags }}">
+{% if event.image %}
+<meta property="og:image" content="{{ event.image.url }}">
+{% else %}
+<meta property="og:image" content="{% static 'images/logo.png' %}">
+{% endif %}
+
+<meta property="og:url" content="{{ request.path }}">
+<meta name="twitter:card" content="{{ event.slug }}">
+{% endblock page_description %}
+
+{% block styles %}
+
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script>
+    function copyToClipboardSecretArchive() {
+        /* Get the text field */
+        var copyText = document.getElementById("id_secret_archive_link");
+        console.log(copyText)
+
+        /* Select the text field */
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+        /* Copy the text inside the text field */
+        document.execCommand("copy");
+    } 
+</script>
+{% endblock scripts %}
+
+{% block content %}
+<section style="padding-top: 3em;padding-bottom:0px;">
+    <div class="container">
+
+
+        
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-lg-10 col-sm-12 col-12">
+                <a href="{{ event.get_archives_view }}" class="btn btn--primary-1 btn-block" style="color: white;">Archives</a>
+            </div>
+        </div>
+
+
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-lg-10 col-sm-12 col-12" >
+                <div class="video-cover border--round">
+                    <div class="video-play-icon video-play-icon--sm"></div>
+                    <video controls>
+                        <source src="{{ event_live_archive_url }}" type="video/mp4">
+                    </video>
+                </div>
+                <!--end video cover-->
+            </div>
+        </div>
+
+        {% if is_owner %}
+        {% if not event.allow_non_ticket_archive_viewers %}
+        <div class="row justify-content-center" style="padding-top:10px;">
+            <div class="col-lg-10 col-sm-12 col-12">
+                <h4>Secret Video Link</h4>
+            </div>
+        </div>
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-xl-7 col-lg-7 col-md-8 col-sm-8 col-12" style="padding-bottom: 10px;">
+                <input type="text" class="form-control m-input message"
+                    value="www.arqamhouse.com{{ event_live_archive.get_absolute_url }}?secret={{ event.secret_archive_id }}" required=""
+                    maxlength="180" id="id_secret_archive_link" readonly>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4 col-12">
+                <button class="btn btn--primary-1 btn-block" style="color: white;margin-top: 0px;" onclick="copyToClipboardSecretArchive();">
+                    Copy</button>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        {% if is_owner %}
+        <form method="POST">{% csrf_token %}
+        <div class="row justify-content-center" style="padding-bottom: 30px;padding-top: 60px;">
+            <div class="col-lg-10 col-sm-12 col-12">
+                <button class="btn btn--icon bg--googleplus" style="color: white;margin-top: 0px;" value="delete" name="delete" type="submit">
+                    Delete Archive</button>
+            </div>
+        </div>
+        </form>
+        {% endif %}
+
+
+
+
+    </div>
+</section>
+{% endblock content %}

@@ -8,4 +8,5 @@ from .answers import *
 from .discounts import *
 from .emails import *
 from .checkins import *
+from .live import *
 from .resources import *

@@ -72,7 +72,9 @@ class Event(TimestampedModel):
     send_to_subscribers = models.BooleanField(default=False)
     views = models.PositiveIntegerField(blank=True, null=True, default=0)
     allow_non_ticket_live_viewers = models.BooleanField(default=False)
+    allow_non_ticket_archive_viewers = models.BooleanField(default=True)
     secret_live_id = models.CharField(max_length=150, null=True, blank=True)
+    secret_archive_id = models.CharField(max_length=150, null=True, blank=True)
     objects = EventManager()
 
     def __str__(self):
@@ -252,6 +254,10 @@ class Event(TimestampedModel):
     def create_text_resource(self):
         view_name = "events:create_resource_text"
         return reverse(view_name, kwargs={"slug": self.slug, "type": "text"})
+
+    def get_archives_view(self):
+        view_name = "events:archives"
+        return reverse(view_name, kwargs={"slug": self.slug})
 
 
 def event_post_save_reciever(sender, instance, *args, **kwargs):
