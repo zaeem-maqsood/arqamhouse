@@ -130,7 +130,7 @@ class UserSubscribersView(ProfileMixin, View):
     def get(self, request, *args, **kwargs):
         context = {}
         profile = self.get_profile()
-        subscribers = Subscriber.objects.filter(profile=profile)
+        subscribers = Subscriber.objects.filter(profile=profile, unsubscribed=False)
         print(subscribers)
         context["subscribers"] = subscribers
         context["profile"] = profile
