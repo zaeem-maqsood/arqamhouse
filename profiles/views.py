@@ -93,6 +93,8 @@ def load_regions(request):
     return render(request, 'components/region_dropdown_list_options.html', {'regions': regions})
 
 
+
+
 class UserOrdersView(ProfileMixin, View):
     template_name = "profiles/orders.html"
 
@@ -109,6 +111,28 @@ class UserOrdersView(ProfileMixin, View):
         orders = EventOrder.objects.filter(email=profile.email).order_by("-created_at")
         print(orders)
         context["orders"] = orders
+        context["profile"] = profile
+        return render(request, self.template_name, context)
+
+
+
+
+class UserSubscribersView(ProfileMixin, View):
+    template_name = "profiles/subscribers.html"
+
+    def get_profile(self):
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except:
+            return None
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        profile = self.get_profile()
+        subscribers = Subscriber.objects.filter(profile=profile)
+        print(subscribers)
+        context["subscribers"] = subscribers
         context["profile"] = profile
         return render(request, self.template_name, context)
 
@@ -140,7 +164,7 @@ class UserDashboardView(ProfileMixin, View):
         houses = []
         for subscription in subscriptions:
             houses.append(subscription.house)
-        events = Event.objects.filter(house__in=houses)
+        events = Event.objects.filter(house__in=houses, deleted=False, active=True)
         return events
 
     def get(self, request, *args, **kwargs):

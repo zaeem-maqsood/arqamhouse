@@ -72,26 +72,26 @@ Profile Dashboard
                 </div>
                 {% endif %}
 
-                <div class="row d-sm-flex d-md-none d-lg-none" style="padding-bottom: 30px;">
-                    <div class="col-md-12">
-                        <p><a href="{% url 'profiles:logout' %}"><i class="fa fa-sign-out"></i></a> | <a {% if not profile.house %}href="{% url 'houses:create' %}" {% else %} href="{% url 'houses:dashboard' %}" {% endif %}><i class="fa fa-home"></i></a> | <a href="{% url 'profiles:dashboard' %}"><i class="fa fa-user"></i></a></p>
-                    </div>
-                </div>
-                        
-                <div class="row d-md-flex d-none" style="padding-top: 20px;padding-bottom: 10px;">
-                    <div class="col-md-4" style="padding-bottom: 20px;">
-                        <a class="btn btn--primary btn-block btn--icon" href="{% url 'profiles:logout' %}">
-                            <span class="btn__text"> <i class="fa fa-sign-out"></i> Log Out</span>
+                <div class="row" style="padding-top: 20px;padding-bottom: 20px;">
+                    <div class="col-md-3 col-6" style="padding-bottom: 20px;">
+                        <a class="btn btn--primary btn-block" href="{% url 'profiles:dashboard' %}">
+                            <span class="btn__text"> Dashboard </span>
                         </a>
                     </div>
-                    <div class="col-md-4" style="padding-bottom: 20px;">
-                        <a class="btn btn-block btn--icon" {% if not profile.house %}href="{% url 'houses:create' %}" {% else %} href="{% url 'houses:dashboard' %}" {% endif %}>
-                            <span class="btn__text"> <i class="fa fa-home"></i> {% if not profile.house %}Create House{% else %}House Dashboard{% endif %}</span>
+                    <div class="col-md-3 col-6" style="padding-bottom: 20px;">
+                        <a class="btn btn--primary btn-block" href="{% url 'profiles:subscribers' %}">
+                            <span class="btn__text"> Subscriptions </span>
                         </a>
                     </div>
-                    <div class="col-md-4" style="padding-bottom: 20px;">
-                        <a class="btn btn--primary btn-block btn--icon" href="{% url 'profiles:dashboard' %}">
-                            <span class="btn__text"> <i class="fa fa-user"></i> Profile</span>
+                    <div class="col-md-3 col-6" style="padding-bottom: 20px;">
+                        <a class="btn btn-block bg--facebook" {% if not profile.house %}href="{% url 'houses:create' %}" {% else %}
+                            href="{% url 'houses:dashboard' %}" {% endif %}>
+                            <span class="btn__text">{% if not profile.house %}Create House{% else %}House{% endif %}</span>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6" style="padding-bottom: 20px;">
+                        <a class="btn bg--googleplus btn-block" href="{% url 'profiles:logout' %}">
+                            <span class="btn__text"> Log Out</span>
                         </a>
                     </div>
                 </div>

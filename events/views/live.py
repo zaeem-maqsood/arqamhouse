@@ -11,7 +11,16 @@ import boto3
 from botocore.client import Config
 
 
-class BroadcastUpdateView(HouseAccountMixin, UpdateView):
+def get_event_live(event_live_pk):
+    try:
+        event_live = EventLive.objects.get(id=event_live_pk)
+        return event_live
+    except Exception as e:
+        print(e)
+        raise Http404
+
+
+class BroadcastUpdateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, UpdateView):
     model = EventLiveBroadcast
     template_name = "events/live/broadcast.html"
 
@@ -21,7 +30,7 @@ class BroadcastUpdateView(HouseAccountMixin, UpdateView):
 
     def get_context_data(self, *args, **kwargs):
         context = {}
-        event = self.get_event()
+        event = get_event(self.kwargs['slug'])
         house = self.get_house()
 
         if self.object.facebook_url:
@@ -37,24 +46,6 @@ class BroadcastUpdateView(HouseAccountMixin, UpdateView):
         context["event"] = event
         context["house"] = house
         return context
-
-    def get_event(self):
-        event_slug = self.kwargs['slug']
-        try:
-            event = Event.objects.get(slug=event_slug)
-            return event
-        except Exception as e:
-            print(e)
-            raise Http404
-
-    def get_event_live(self):
-        event_live_pk = self.kwargs['pk']
-        try:
-            event_live = EventLive.objects.get(id=event_live_pk)
-            return event_live
-        except Exception as e:
-            print(e)
-            raise Http404
 
     def get_event_live_broadcast(self):
         event_live_broadcast_pk = self.kwargs['broadcast_pk']
@@ -108,7 +99,9 @@ class BroadcastUpdateView(HouseAccountMixin, UpdateView):
 
 
 
-class BroadcastCreateView(HouseAccountMixin, CreateView):
+
+
+class BroadcastCreateView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, CreateView):
     model = EventLiveBroadcast
     template_name = "events/live/broadcast.html"
 
@@ -118,7 +111,7 @@ class BroadcastCreateView(HouseAccountMixin, CreateView):
 
     def get_context_data(self, *args, **kwargs):
         context = {}
-        event = self.get_event()
+        event = get_event(self.kwargs['slug'])
         house = self.get_house()
 
         stream_type = self.kwargs['stream_type']
@@ -133,24 +126,6 @@ class BroadcastCreateView(HouseAccountMixin, CreateView):
         context["event"] = event
         context["house"] = house
         return context
-
-    def get_event(self):
-        event_slug = self.kwargs['slug']
-        try:
-            event = Event.objects.get(slug=event_slug)
-            return event
-        except Exception as e:
-            print(e)
-            raise Http404
-
-    def get_event_live(self):
-        event_live_pk = self.kwargs['pk']
-        try:
-            event_live = EventLive.objects.get(id=event_live_pk)
-            return event_live
-        except Exception as e:
-            print(e)
-            raise Http404
 
     def get(self, request, *args, **kwargs):
         self.object = None
@@ -168,7 +143,7 @@ class BroadcastCreateView(HouseAccountMixin, CreateView):
         else:
             form = BroadcastYoutubeForm(data, request.FILES)
 
-        event_live = self.get_event_live()
+        event_live = get_event_live(self.kwargs['pk'])
 
         if form.is_valid():
             return self.form_valid(form, request, event_live)
@@ -192,15 +167,13 @@ class BroadcastCreateView(HouseAccountMixin, CreateView):
 
 
 
+
+
+
+
+
 class ArchivedDetailView(View):
     template_name = "events/live/archive_detail.html"
-
-    def get_profile(self):
-        try:
-            profile = Profile.objects.get(email=str(self.request.user))
-            return profile
-        except:
-            return None
 
     def allow_entry(self, event):
         
@@ -230,16 +203,6 @@ class ArchivedDetailView(View):
             print(e)
             return False
 
-
-    def get_event(self):
-        event_slug = self.kwargs['slug']
-        try:
-            event = Event.objects.get(slug=event_slug)
-            return event
-        except Exception as e:
-            print(e)
-            raise Http404
-
     def get_archive(self):
         archive_pk = self.kwargs['pk']
         try:
@@ -251,7 +214,7 @@ class ArchivedDetailView(View):
 
     def get(self, request, *args, **kwargs):
         context = {}
-        event = self.get_event()
+        event = get_event(self.kwargs['slug'])
         house = event.house
 
         if not event.allow_non_ticket_archive_viewers:
@@ -286,7 +249,7 @@ class ArchivedDetailView(View):
         context["event_live_archive_url"] = response
         context["is_owner"] = is_owner
         context["event_live_archive"] = event_live_archive
-        context["profile"] = self.get_profile()
+        context["profile"] = get_profile(self.request.user)
         context["event"] = event
         context["house"] = house
         return render(request, self.template_name, context)
@@ -299,7 +262,7 @@ class ArchivedDetailView(View):
 
         if 'delete' in data:
 
-            event = self.get_event()
+            event = get_event(self.kwargs['slug'])
             event_live = EventLive.objects.get(event=event)
             event_live_archive = self.get_archive()
 
@@ -318,15 +281,16 @@ class ArchivedDetailView(View):
 
 
 
+
+
+
+
+
+
+
 class ArchivedListView(View):
     template_name = "events/live/archives.html"
 
-    def get_profile(self):
-        try:
-            profile = Profile.objects.get(email=str(self.request.user))
-            return profile
-        except:
-            return None
 
     def allow_entry(self, event):
         
@@ -355,19 +319,9 @@ class ArchivedListView(View):
             print(e)
             return False
 
-
-    def get_event(self):
-        event_slug = self.kwargs['slug']
-        try:
-            event = Event.objects.get(slug=event_slug)
-            return event
-        except Exception as e:
-            print(e)
-            raise Http404
-
     def get(self, request, *args, **kwargs):
         context = {}
-        event = self.get_event()
+        event = get_event(self.kwargs['slug'])
         house = event.house
 
         if not event.allow_non_ticket_archive_viewers:
@@ -395,7 +349,7 @@ class ArchivedListView(View):
 
         context["is_owner"] = is_owner
         context["event_live_archives"] = event_live_archives
-        context["profile"] = self.get_profile()
+        context["profile"] = get_profile(self.request.user)
         context["event"] = event
         context["house"] = house
         return render(request, self.template_name, context)
@@ -405,20 +359,21 @@ class ArchivedListView(View):
 
 
 
+
+
+
+
+
+
+
 class LiveEventViewerView(View):
     template_name = "events/live/viewer.html"
 
-    def get_profile(self):
-        try:
-            profile = Profile.objects.get(email=str(self.request.user))
-            return profile
-        except:
-            return None
 
     def allow_entry(self, event):
         
         # First check for profile
-        profile = self.get_profile()
+        profile = get_profile(self.request.user)
         if profile:
 
             # Second Check if house user
@@ -438,18 +393,9 @@ class LiveEventViewerView(View):
             return False
 
 
-    def get_event(self):
-        event_slug = self.kwargs['slug']
-        try:
-            event = Event.objects.get(slug=event_slug)
-            return event
-        except Exception as e:
-            print(e)
-            raise Http404
-
     def get(self, request, *args, **kwargs):
         context = {}
-        event = self.get_event()
+        event = get_event(self.kwargs['slug'])
         house = event.house
 
         if not event.allow_non_ticket_live_viewers:
@@ -491,7 +437,7 @@ class LiveEventViewerView(View):
         token = opentok.generate_token(session_id)
 
         slug = self.kwargs["slug"]
-        context["profile"] = self.get_profile()
+        context["profile"] = get_profile(self.request.user)
         context["slug_json"] = mark_safe(json.dumps(slug))
         context["event_live"] = event_live
         context["facing_mode"] = event_live.facing_mode
@@ -507,22 +453,22 @@ class LiveEventViewerView(View):
 
 
 
+
+
+
+
+
+
+
+
 class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, View):
     template_name = "events/live/presenter.html"
 
-    def get_event(self):
-        event_slug = self.kwargs['slug']
-        try:
-            event = Event.objects.get(slug=event_slug)
-            return event
-        except Exception as e:
-            print(e)
-            raise Http404
 
     def get(self, request, *args, **kwargs):
         context = {}
         house = self.get_house()
-        event = self.get_event()
+        event = get_event(self.kwargs['slug'])
 
         try:
             event_live = EventLive.objects.get(event=event)
@@ -588,7 +534,7 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 
         json_data = json.loads(request.body)
 
-        event = self.get_event()
+        event = get_event(self.kwargs['slug'])
         event_name = event.slug
         event_live = EventLive.objects.get(event=event)
         session_id = event_live.session_id
@@ -665,7 +611,16 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
 
 
 
-class LiveEventOptionsView(HouseAccountMixin, View):
+
+
+
+
+
+
+
+
+
+class LiveEventOptionsView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, View):
     model = EventLive
     template_name = "events/live/options.html"
 
@@ -673,19 +628,11 @@ class LiveEventOptionsView(HouseAccountMixin, View):
         view_name = "subscribers:campaign_list"
         return reverse(view_name)
 
-    def get_event(self):
-        event_slug = self.kwargs['slug']
-        try:
-            event = Event.objects.get(slug=event_slug)
-            return event
-        except Exception as e:
-            print(e)
-            raise Http404
 
     def get_context_data(self, *args, **kwargs):
         context = {}
         house = self.get_house()
-        event = self.get_event()
+        event = get_event(self.kwargs['slug'])
 
         event_live = EventLive.objects.get(event=event)
         event_live_broadcasts = EventLiveBroadcast.objects.filter(event_live=event_live)
@@ -700,7 +647,7 @@ class LiveEventOptionsView(HouseAccountMixin, View):
 
 
     def get(self, request, *args, **kwargs):
-        event = self.get_event()
+        event = get_event(self.kwargs['slug'])
 
         try:
             event_live = EventLive.objects.get(event=event)
@@ -731,7 +678,7 @@ class LiveEventOptionsView(HouseAccountMixin, View):
     def post(self, request, *args, **kwargs):
         data = request.POST
         print(data)
-        event = self.get_event()
+        event = get_event(self.kwargs['slug'])
 
         if 'value' in data:
             value = data['value']

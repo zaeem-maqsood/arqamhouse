@@ -12,48 +12,7 @@ Profile Dashboard
 {% endblock footer %}
 
 {% block styles %}
-<style>
 
-
-#homepage_updates {
-      margin: 20px
-  }
-
-
-#updates_host_and_start {
-      padding-top: 10px;
-  }
-
-
-
-
-@media only screen and (max-width: 750px) {
-
-
-  #homepage_updates {
-      margin: 0px
-  }
-
-  #updates_title {
-      font-size: 12px;
-  }
-
-  #updates_host {
-      font-size: 10px;
-  }
-
-  #updates_description {
-      font-size: 10px;
-  }
-
-  #updates_host_and_start {
-      margin: 0px;
-      padding-top: 0px;
-  }
-
-}
-
-</style>
 {% endblock styles %}
 
 {% block top_page_scripts %}
@@ -114,8 +73,8 @@ Profile Dashboard
                         </a>
                     </div>
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
-                        <a class="btn btn--primary btn-block" href="{% url 'profiles:subscribers' %}">
-                            <span class="btn__text"> Subscriptions </span>
+                        <a class="btn btn--primary btn-block" href="{% url 'profiles:dashboard' %}">
+                            <span class="btn__text"> Dashboard </span>
                         </a>
                     </div>
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
@@ -132,57 +91,48 @@ Profile Dashboard
                 </div>
 
 
+
+                {% if subscribers %}
                 <div class="row" style="padding-bottom: 20px;">
                     <div class="col-md-12">
-
-                        {% if events %}
-
-                        {% for event in events %}
+                        <p>You're subscribed to {{ subscribers.count }} house{% if subscribers.count > 1 %}s{% endif %}!</p>
+                    </div>
+                </div>
+  
+                <div class="row" style="padding-bottom: 20px;">
+                    {% for subscriber in subscribers %}
+                    <div class="col-md-6">
                         <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
-                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px;border-radius: 10px;margin-bottom: 20px;" id="homepage_updates">
-                            <div class="row">
-                                {% if event.image %}
-                                <div class="col-lg-3 col-md-3 col-sm-4 col-4">
-                                    <a href="{{ event.get_landing_view }}">
-                                    <img style="padding: 10px;" src="{{ event.image.url }}">
+                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 10px;border-radius: 10px;margin-bottom: 20px;">
+                            <div class="row" style="min-height: 75px;">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-5" style="align-self: center;">
+                                    <a href="{{ subscriber.house.get_home_page_url }}">
+                                        {% if subscriber.house.logo %}
+                                        <img style="padding: 5px;max-height:80px;" src="{{ subscriber.house.logo.url }}">
+                                        {% else %}
+                                        <i class="fa fa-home" style="font-size: 5em;display: inline;"></i>
+                                        {% endif %}
                                     </a>
                                 </div>
-                                {% endif %}
-                                <div class="{% if event.image %}col-lg-9 col-md-9 col-sm-8 col-8{% else %}col-lg-12 col-md-12 col-sm-12 col-12{% endif %}">
-                                    <p class="lead" id="updates_title" style="margin-bottom: 0px; text-align: left;{% if not event.image %}padding-left:10px;{% endif %}">
-                                        <a style="text-decoration: none;" href="{{ event.get_landing_view }}">{{ event.title }}</a>
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-7" style="align-self: center;">
+                                    <p class="lead" id="updates_title" style="margin-bottom: 0px; text-align: left;{% if not subscriber.house.logo %}padding-left:10px;{% endif %}">
+                                        <a style="text-decoration: none;" href="{{ subscriber.house.get_home_page_url }}">{{ subscriber.house.name }}</a>
                                     </p>
-                                    <hr style="margin-top: 0px;margin-bottom:5px;">
-                                    <div class="row" id="updates_host_and_start" style="padding-bottom: 10px;{% if not event.image %}padding: 10px 0 0 10px;{% endif %}" >
-                                        <div class="col-12">
-                                            {% if event.description %}
-                                            <p id="updates_description" style="text-align: left;line-height: normal;">{{ event.description|striptags|truncatechars:150 }}</p>
-                                            {% else %}
-                                            <p id="updates_description" style="text-align: left;line-height: normal;">Learn more by heading over to the event page.</p">
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row" style="padding:10px;padding-bottom: 0px;">
-                                <div class="col-lg-6 col-md-6 col-6">
-                                    <a id="updates_host" class="pull-left" style="text-decoration: none;font-weight: 400;margin-bottom: 0px;"
-                                        href="{{ event.house.get_home_page_url }}">By {{ event.house.name }}</a>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-6">
-                                    <p id="updates_host" class="pull-right" style="margin-bottom: 0px;">{{ event.start|localtime|date:"D N jS, f a" }}</p>
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
-
-                        {% else %}
-                            <h3>No updates yet! subscribe to a house to get started.</h3>
-                            <!-- <img src="{% url 'profiles:dashboard' %}" style="width: 100px;height: 1px;background-color: SlateGray;"> -->
-                        {% endif %}
                         
                     </div>
+                    {% endfor %}
                 </div>
+
+                {% else %}
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <h3>No subscribers yet! subscribe to a house to get started.</h3>
+                    </div>
+                </div>
+                {% endif %}
 
 
             </div>

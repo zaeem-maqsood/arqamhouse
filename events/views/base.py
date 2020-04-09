@@ -66,6 +66,24 @@ from events.forms import (EventForm, EventCheckoutForm, AttendeeForm, TicketsToC
 
 
 
+def get_event(slug):
+    try:
+        event = Event.objects.get(slug=slug)
+        return event
+    except Exception as e:
+        print(e)
+        raise Http404
+
+
+
+def get_profile(user):
+        try:
+            profile = Profile.objects.get(email=str(user))
+            return profile
+        except:
+            return None
+
+
 def archive_past_events(event):
     if event.active and event.end:
         current_time = timezone.now()
