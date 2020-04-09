@@ -4,6 +4,7 @@ import decimal
 import numpy as np
 import sys
 import time
+import json
 from base64 import b64encode
 from PIL import Image
 from django.conf import settings
@@ -22,7 +23,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponsePermanentRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponsePermanentRedirect, JsonResponse
 from django.template.loader import render_to_string
 
 from twilio.rest import Client
@@ -113,19 +114,22 @@ class HouseHomePageView(DetailView):
 
     def post(self, request, *args, **kwargs):
         data = request.POST
+
+        json_data = json.loads(request.body)
+
         house = self.get_house(kwargs["slug"])
-        print(data)
+        print(json_data)
 
         # If user is subscribed - they can unsubscribe
         # subscribed = false
         # subscribe = true
-        if 'subscribe_trigger' in data:
-            value = data['subscribe_trigger']
+        if json_data:
+            value = json_data['subscribe_trigger']
             print(value)
 
             profile = request.user
 
-            if value == 'true':
+            if value:
                 print('The value is true')
                 try:
                     subscriber = Subscriber.objects.get(profile=profile, house=house)
@@ -146,7 +150,7 @@ class HouseHomePageView(DetailView):
                     subscriber = Subscriber.objects.create(profile=profile, house=house, events_total=1, attendance_total=1, unsubscribed=True)
                 html = render_to_string('houses/subscribe.html')
 
-            return HttpResponse(html)
+            return JsonResponse({'html': html})
 
     
         else:

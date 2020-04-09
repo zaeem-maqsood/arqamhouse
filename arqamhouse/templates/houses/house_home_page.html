@@ -106,6 +106,7 @@
 {% endblock top_page_scripts %}
 
 {% block scripts %}
+
 <script>
 
 {% if user.is_authenticated %}
@@ -116,25 +117,46 @@ function Subscribe(boolean) {
 
     console.log("IS it coming here")
     console.log(boolean)
-    var token = '{{csrf_token}}';
+    var token = '{{ csrf_token }}';
 
-    $.ajax({
-        type:"POST",
-        headers: { "X-CSRFToken": token },
-        url: '{{ request.path }}',
-        data: {
-          'subscribe_trigger': boolean,
-        },
-        success: function (data) {
-            document.getElementById("subscriber_switch").innerHTML = data;
+    const url = '{{ request.path }}';
+
+    let data = {
+        subscribe_trigger: boolean
+    }
+
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: { 
+            'X-CSRFToken': token,
+            'Content-Type': 'application/json; charset=utf-8',
+            'X-Requested-With': 'XMLHttpRequest'
         },
         
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
-            alert(errorThrown);
-            //some stuff on failure
-        },
-    });
-    
+    }
+
+
+    fetch(url, fetchData)
+        .then(
+            function (response) {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                        response.status);
+                    return;
+                }
+
+                // Examine the text in the response
+                response.json().then(function (data) {
+                    document.getElementById("subscriber_switch").innerHTML = data['html'];
+                });
+            }
+        )
+        .catch(function (err) {
+            console.log('Fetch Error :-S', err);
+        });
+
 }
 
 
