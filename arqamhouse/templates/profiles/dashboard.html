@@ -93,8 +93,19 @@ Profile Dashboard
                 <div class="row" style="padding-top: 30px;">
                     <div class="col-md-12">
                         <h4 style="margin-bottom: 5px;color: gray;">Hello, {{ profile.name }}</h4>
+                        {% if profile.temp_password %}
+                        <p style="margin-bottom: 0px;color: red;">Please change your temporary password immediately.</p>
+                        {% endif %}
                     </div>
                 </div>
+
+                {% if profile.temp_password %}
+                <div class="row" style="padding-top: 10px;">
+                    <div class="col-md-12">
+                        <a href="{% url 'profiles:change_password' %}" class="btn bg--pinterest"><span class="btn__text">Change Temporary Password</span></a>
+                    </div>
+                </div>
+                {% endif %}
 
                 <div class="row d-sm-flex d-md-none d-lg-none" style="padding-bottom: 30px;">
                     <div class="col-md-12">

@@ -97,6 +97,18 @@ function myFunction() {
         <div class="row justify-content-around" style="padding:20px;padding-bottom: 0px;padding-top:10px;">
             <div class="col-lg-9 col-md-12 col-12" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 20px;border-radius: 15px;">
 
+                {% if profile.temp_password %}
+                <div class="row text-center" style="padding-bottom: 20px;padding-top: 30px;">
+                    <div class="col-md-12">
+                        <h4 style="color: #2584C7;font-weight: 500;">Arqam House Temporary Login</h4>
+                        <p style="margin-bottom:0px;"><span style="color:rgb(199, 48, 37);font-weight: 700;">Please login and change your password.</p>
+                        <p style="margin-bottom:0px;"><span style="color:#2584C7;font-weight: 700;">Email | </span> {{ profile.email }}</p>
+                        <p style="margin-bottom:5px;"><span style="color:#2584C7;font-weight: 700;">Password | </span> {{ profile.temp_password }}</p>
+                        <a href="{% url 'profiles:login' %}" target="_blank" class="btn btn--primary" style="color: white;">Login</a>
+                    </div>
+                </div>
+                {% endif %}
+
                 <div class="row" style="padding-bottom: 20px;padding-top: 30px;">
                     <div class="col-md-12">
                         <h4 style="color: #2584C7;font-weight: 500;">Order Details</h4>

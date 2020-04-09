@@ -75,6 +75,14 @@ class OrderPublicDetailView(DetailView):
             print(e)
             raise Http404
 
+
+    def get_profile(self, order):
+        try:
+            profile = Profile.objects.get(email=order.email)
+            return profile
+        except:
+            return None
+
     def view_tickets(self, event, order):
 
         # PDF Attachment
@@ -138,10 +146,10 @@ class OrderPublicDetailView(DetailView):
         time_left_hours = time_left.seconds//3600
 
         refund_requests = EventRefundRequest.objects.filter(order=order, dismissed=False, processed=False)
-        print("Refund Requests")
-        print(refund_requests)
-        context["refund_requests"] = refund_requests
 
+        profile = self.get_profile(order)
+        context["profile"] = profile
+        context["refund_requests"] = refund_requests
         context["event_start_time"] = event_start_time
         context["time_left_days"] = time_left_days
         context["time_left_hours"] = time_left_hours

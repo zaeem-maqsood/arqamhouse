@@ -491,12 +491,14 @@ class EventCheckoutView(FormView):
         email = email.lower()
         try:
             profile = Profile.objects.get(email=email)
+            account_created = False
 
         # If the user doesn't exist at all then we need to create a customer
         except:
             profile_temp_password = get_random_string(length=10)
-            profile = Profile.objects.create_user(name=data["name"], email=email, password=profile_temp_password)
+            profile = Profile.objects.create_user(name=data["name"], email=email, password=profile_temp_password, temp_password=profile_temp_password)
             self.send_new_profile_email(profile, profile_temp_password)
+            account_created = True
 
 
         # Try for subscriber
@@ -757,7 +759,11 @@ class EventCheckoutView(FormView):
             self.send_confirmation_email(event, data['email'], order)
             self.send_owner_confirmation_email(event, order)
             
-            messages.success(request, "Congratulations! You're all set.")
+
+            if account_created:
+                messages.success(request, f"Congratulations! tickets are now linked to {email}, please login with provided temporary login to view all orders and login to live events.")
+            else:
+                messages.success(request, "Congratulations! You're all set.")
             return HttpResponseRedirect(self.get_successful_order_url(order))
 
         # If there is no payment to be made
@@ -780,7 +786,10 @@ class EventCheckoutView(FormView):
             self.send_confirmation_email(event, email, order)
             self.send_owner_confirmation_email(event, order)
 
-            messages.success(request, "Congratulations! You're all set.")
+            if account_created:
+                messages.success(request, f"Congratulations! tickets are now linked to {email}, please login with provided credentials to view all orders and login to live events.")
+            else:
+                messages.success(request, "Congratulations! You're all set.")
             return HttpResponseRedirect(self.get_successful_order_url(order))
 
 

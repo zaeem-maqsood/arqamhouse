@@ -66,6 +66,7 @@ class Profile(AbstractUser):
     
     username = None
     email = models.EmailField(_('email address'), unique=True)
+    temp_password = models.CharField(max_length=120, null=True, blank=True)
     name = models.CharField(max_length=120, null=True, blank=False)
     picture = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 150, 'height': 150}}, null=True, blank=True)
     slug = models.SlugField(unique = False, blank=True)

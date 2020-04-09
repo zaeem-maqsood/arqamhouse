@@ -3,6 +3,24 @@ from .models import Profile
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from cities_light.models import City, Region, Country
 
+from django.contrib.auth.password_validation import validate_password
+
+
+
+class ProfileChangePasswordForm(forms.Form):
+
+	password = forms.CharField(max_length=100, required=True, widget=forms.PasswordInput(attrs={'class': 'validate-required', 'placeholder': 'Enter Password', "autocomplete": "off"}))
+
+
+	def clean_password(self):
+		password = self.cleaned_data.get('password')
+		if len(password) < 8:
+			raise forms.ValidationError('Please choose a password greater than 8 chracters')
+
+		if validate_password(password):
+			raise forms.ValidationError('Please choose another password')
+		return password
+
 
 
 class LoginForm(forms.Form):
