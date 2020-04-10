@@ -178,7 +178,7 @@ class ArchivedDetailView(View):
     def allow_entry(self, event):
         
         # First check for profile
-        profile = self.get_profile()
+        profile = get_profile(self.request.user)
         if profile:
 
             # Second Check if house user
@@ -192,7 +192,7 @@ class ArchivedDetailView(View):
 
 
     def check_if_user_is_owner(self, event):
-        profile = self.request.user
+        profile = get_profile(self.request.user)
 
         try:
             if event.house == profile.house:
