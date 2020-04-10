@@ -22,7 +22,7 @@ from django.core import mail
 
 from subscribers.models import Subscriber
 from .models import Profile
-from .forms import ProfileForm, LoginForm, ProfileUpdateForm, ProfileChangePasswordForm
+from .forms import ProfileForm, LoginForm, ProfileUpdateForm, ProfileChangePasswordForm, ProfileAlreadyExistsForm
 from .mixins import ProfileMixin
 from cities_light.models import City, Region, Country
 from events.models import Event, EventOrder
@@ -191,7 +191,7 @@ def activate_account(request, uidb64, token):
         return HttpResponseRedirect(reverse('profiles:login'))
 
 
-class ProfileCreateView(CreateView):
+class ProfileCreateView(FormView):
     model = Profile
     form_class = ProfileForm
     template_name = "profiles/profile_create.html"
@@ -214,19 +214,34 @@ class ProfileCreateView(CreateView):
 
     def post(self, request, *args, **kwargs):
         data = request.POST
-        form = self.get_form()
+
+        email = data['email']
+        email = email.lower()
+        print(f"the email is {email}")
+
+        already_exists = False
+
+        try:
+            profile = Profile.objects.get(email=email)
+            if profile.temp_password:
+                print("Did it come here")
+                form = ProfileAlreadyExistsForm(data, request.FILES, instance=profile)
+                already_exists = True
+            else:
+                 form = self.get_form()
+        except:
+            form = self.get_form()
+
 
         if form.is_valid():
-            return self.form_valid(form, request)
+            return self.form_valid(form, request, already_exists)
         else:
             return self.form_invalid(form, request)
 
+    def form_valid(self, form, request, already_exists):
 
-    def form_valid(self, form, request):
-        
         # Get email and password from the form
         email = form.cleaned_data.get("email")
-        password = form.cleaned_data.get("password")
         name = form.cleaned_data.get("name")
         country = form.cleaned_data.get("country")
         region = form.cleaned_data.get("region")
@@ -234,36 +249,64 @@ class ProfileCreateView(CreateView):
 
         email = email.lower()
 
-        # Create a user with this email and password
-        try:
-            profile = Profile.objects.get(email=email)
-            form.add_error("email", "It seems this email is already in use, please login or use a different email.")
-            return self.render_to_response(self.get_context_data(form=form, request=request))
-        except Exception as e:
-            print(e)
-            print("errors")
 
-        # Save form
-        self.object = form.save(commit=False)
-        self.object.email = email.lower()
-        self.object.is_active = True #Change this to false and when we want email authntication again.
-        self.object.save()
+        if already_exists:
 
-        # Uncomment this when we want email activation again
-        # current_site = get_current_site(request)
-        # subject = 'Finish Activating Your Account'
-        # context = {}
-        # context["name"] = name
-        # context["user"] = self.object
-        # context["domain"] = current_site.domain
-        # context["uid"] = urlsafe_base64_encode(force_bytes(self.object.pk))
-        # context["token"] = account_activation_token.make_token(self.object)
-        # html_message = render_to_string('emails/account_activation.html', context)
-        # plain_message = strip_tags(html_message)
-        # from_email = 'Arqam House <info@arqamhouse.com>'
-        # to = [email]
-        # mail.send_mail(subject, plain_message, from_email, to, html_message=html_message)
-        # messages.success(request, 'Account Created! Please check your email to finish activation.')
+            try:
+                profile = Profile.objects.get(email=email)
+            except Exception as e:
+                print(e)
+                print("errors")
+
+
+            password1 = form.cleaned_data.get("password1")
+            password2 = form.cleaned_data.get("password2")
+
+            if password1 != password2:
+                form.add_error("email", "Password don't match!")
+                return self.render_to_response(self.get_context_data(form=form, request=request))
+
+            else:
+                profile.set_password(password1)
+                profile.temp_password = None
+                profile.save()
+
+
+
+        else:
+
+            password = form.cleaned_data.get("password")
+
+            # Create a user with this email and password
+            try:
+                profile = Profile.objects.get(email=email)
+                form.add_error("email", "It seems this email is already in use, please login or use a different email.")
+                return self.render_to_response(self.get_context_data(form=form, request=request))
+            except Exception as e:
+                print(e)
+                print("errors")
+
+            # Save form
+            self.object = form.save(commit=False)
+            self.object.email = email.lower()
+            self.object.is_active = True #Change this to false and when we want email authntication again.
+            self.object.save()
+
+            # Uncomment this when we want email activation again
+            # current_site = get_current_site(request)
+            # subject = 'Finish Activating Your Account'
+            # context = {}
+            # context["name"] = name
+            # context["user"] = self.object
+            # context["domain"] = current_site.domain
+            # context["uid"] = urlsafe_base64_encode(force_bytes(self.object.pk))
+            # context["token"] = account_activation_token.make_token(self.object)
+            # html_message = render_to_string('emails/account_activation.html', context)
+            # plain_message = strip_tags(html_message)
+            # from_email = 'Arqam House <info@arqamhouse.com>'
+            # to = [email]
+            # mail.send_mail(subject, plain_message, from_email, to, html_message=html_message)
+            # messages.success(request, 'Account Created! Please check your email to finish activation.')
 
         messages.success(request, 'Account Created! Login to continue.')
 
@@ -340,10 +383,15 @@ class LoginView(FormView):
         email = form.cleaned_data.get("email")
         password = form.cleaned_data.get("password")
 
+        email = email.lower()
+
         # Added this bit of code because some users signed up with capital letters in their email
         try:
-            profile_getter = Profile.objects.get(email__iexact=email)
-            email = profile_getter.email
+            profile_getter = Profile.objects.get(email=email)
+            
+            if profile_getter.temp_password:
+                form.add_error("email", "Please create an account to continue.")
+                return self.render_to_response(self.get_context_data(form=form))
         except Exception as e:
             print(e)
 

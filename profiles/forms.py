@@ -113,6 +113,84 @@ class ProfileUpdateForm(forms.ModelForm):
 
 
 
+
+class ProfileAlreadyExistsForm(forms.ModelForm):
+
+	email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={"required" : True, "class":"validate-required", "placeholder": "Email", "autocomplete": "off"}))
+	password1 = forms.CharField(max_length=100, required=True, widget=forms.PasswordInput(attrs={'class': 'validate-required', 'placeholder': 'Enter Password', "autocomplete": "off"}))
+	password2 = forms.CharField(max_length=100, required=True, widget=forms.PasswordInput(attrs={'class': 'validate-required', 'placeholder': 'Enter Password Again', "autocomplete": "off"}))
+	agree = forms.BooleanField(widget=forms.CheckboxInput)
+
+	class Meta():
+		model = Profile
+		fields = [
+			"name",
+			"email",
+			"picture",
+			"region",
+			"city"
+		]
+
+
+		widgets = {
+				"name": forms.TextInput(
+					attrs={
+						"class":"validate-required",
+						"placeholder":"Name",
+						"required": True
+					}
+				),
+				"picture": forms.FileInput(
+					attrs={
+						"onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
+						"class": "validate-required",
+					}
+				),
+				"region": forms.Select(
+						attrs={
+							"required" : True,
+							"class":"validate-required",
+						}
+					),
+				"city": forms.Select(
+						attrs={
+							"required" : True,
+							"class":"validate-required",
+						}
+					),
+			}
+
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self.fields['city'].empty_label = None
+		self.fields['region'].empty_label = None
+
+		self.fields['city'].queryset = City.objects.all()
+		self.fields['region'].queryset = Region.objects.all()
+
+		self.fields['region'].initial = Region.objects.get(name="Ontario")
+		self.fields['city'].initial = City.objects.get(name="Toronto")
+
+		self.fields["region"].label_from_instance = lambda obj: "%s" % obj.name
+		self.fields["city"].label_from_instance = lambda obj: "%s" % obj.name
+
+
+
+	def clean(self, *args, **kwargs):
+		cleaned_data = super(ProfileAlreadyExistsForm, self).clean(*args, **kwargs)
+		name = self.cleaned_data.get("name")
+
+		if len(name) <= 3:
+			raise forms.ValidationError("Please Enter A Name With More Than 2 Characters")
+		return cleaned_data
+
+
+
+
+
+
 class ProfileForm(UserCreationForm):
 
 	email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={"required" : True, "class":"validate-required", "placeholder": "Email", "autocomplete": "off"}))
