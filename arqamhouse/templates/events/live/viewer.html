@@ -276,7 +276,8 @@ function updateSpotLight() {
         var data = JSON.parse(e.data);
         console.log(data);
         var message = data['message'];
-        var user = data['user']
+        var user = data['user'];
+        var name = data['name'];
 
 
         // create a new div element 
@@ -303,7 +304,7 @@ function updateSpotLight() {
 
         // Add User
         var user_para = document.createElement("span");
-        user_para.innerText = user;
+        user_para.innerText = name;
         user_para.style = 'margin-bottom: 0px;font-size: 0.7em;font-style: italic;display:block';
         childDiv.appendChild(user_para);
 
@@ -339,7 +340,8 @@ function updateSpotLight() {
 
         chatSocket.send(JSON.stringify({
             'message': message,
-            'user': user
+            'user': user,
+            'name': name,
         }));
 
         messageInputDom.value = '';
@@ -401,7 +403,7 @@ function updateSpotLight() {
                                         <div class="alert__body">
                                             <span style="margin-bottom: 0px;">{{ comment.comment }}</span>
                                             <span
-                                                style="margin-bottom: 0px;font-size: 0.7em;font-style: italic;display:block">{{ comment.profile.email }}</span>
+                                                style="margin-bottom: 0px;font-size: 0.7em;font-style: italic;display:block">{{ comment.profile.name }}</span>
                                         </div>
                                     </div>
                                     {% endfor %}

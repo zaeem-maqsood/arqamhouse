@@ -551,15 +551,21 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
                 print(value)
 
                 if value:
+                    print("value")
                     archive = opentok.start_archive(session_id, name=event_name, resolution="1280x720")
+                    print("Did it come here")
+                    print("the archive is")
+                    print(archive)
+                    print("the archive is")
                     archive_location = f"{api_key}/{archive.id}/archive.mp4"
                     event_live_archive = EventLiveArchive.objects.create(event_live=event_live, archive_id=archive.id, archive_location=archive_location)
                 else:
+                    print("No value")
                     opentok.stop_archive(last_archive.archive_id)
 
             except Exception as e:
                 print(e)
-
+                print("The exception happend")
 
 
 

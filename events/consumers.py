@@ -35,7 +35,9 @@ class LiveChatConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         user = text_data_json['user']
+        name = text_data_json['name']
         print(f"The user is {user}")
+        print(f"The user is {name}")
 
         event_slug = self.scope['url_route']['kwargs']['slug']
 
@@ -56,6 +58,7 @@ class LiveChatConsumer(WebsocketConsumer):
                 'type': 'chat_message',
                 'message': message,
                 'user': profile.email,
+                'name': profile.name
             }
         )
 
@@ -63,11 +66,13 @@ class LiveChatConsumer(WebsocketConsumer):
     def chat_message(self, event):
         message = event['message']
         user = event['user']
+        name = event['name']
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             'message': message,
             'user': user,
+            'name': name
         }))
 
 
