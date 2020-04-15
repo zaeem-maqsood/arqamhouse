@@ -15,7 +15,6 @@ from cities_light.models import City, Region, Country
 from django.contrib.auth.models import User
 from core.models import TimestampedModel
 from houses.models import House
-from events.models import Event
 
 
 def validate_file_size(value):

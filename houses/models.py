@@ -74,6 +74,7 @@ class House(TimestampedModel):
     address_entered = models.BooleanField(default=False)
     verification_pending = models.BooleanField(default=False)
     verified = models.BooleanField(default=False)
+    free_live_video = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.name)

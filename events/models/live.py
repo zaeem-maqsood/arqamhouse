@@ -3,7 +3,9 @@
 from .base import *
 from events.models import Event
 from core.models import TimestampedModel
+from payments.models import ArqamHouseServiceFee
 
+from django.db.models.signals import pre_save, post_save
 
 roles = (
     ('user', 'User'),
@@ -85,3 +87,35 @@ class EventLiveComment(TimestampedModel):
 
     def __str__(self):
         return self.event_live.event.title
+
+
+
+
+class EventLiveFee(TimestampedModel):
+    event_live = models.ForeignKey(EventLive, on_delete=models.CASCADE, blank=False, null=False)
+    subscribed_mins = models.PositiveSmallIntegerField(blank=True, null=True, default=0)
+    archived_mins = models.PositiveSmallIntegerField(blank=True, null=True, default=0)
+    arqam_house_service_fee = models.ForeignKey(ArqamHouseServiceFee, on_delete=models.CASCADE, blank=True, null=True)
+    presenters = models.PositiveSmallIntegerField(blank=True, null=True, default=0)
+    processed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.event_live.event.title
+
+    def save(self, *args, **kwargs):
+        if self.presenters == 0:
+            self.processed = True
+            subscribed_mins_fee = 0.007 * self.subscribed_mins
+            archived_mins_fee = 0.09 * self.archived_mins
+
+            session_fee = subscribed_mins_fee + archived_mins_fee
+            session_fee = decimal.Decimal(session_fee)
+
+            if self.event_live.event.house.free_live_video:
+                arqam_house_service_fee = ArqamHouseServiceFee.objects.create(amount=session_fee, house=self.event_live.event.house, live_video=True, free=True)
+            else:
+                arqam_house_service_fee = ArqamHouseServiceFee.objects.create(amount=session_fee, house=self.event_live.event.house, live_video=True)
+
+            self.arqam_house_service_fee = arqam_house_service_fee
+
+        super().save(*args, **kwargs)

@@ -1,6 +1,6 @@
 from django import template
 from payments.models import Payout, Transaction, Refund, HousePayment
-from events.models import EventOrder
+from events.models import EventOrder, EventLiveFee
 
 
 register = template.Library()
@@ -27,6 +27,11 @@ def get_type(instance):
     if instance.opening_balance:
         return "Opening Balance"
 
+    if instance.arqam_house_service_fee:
+        if instance.arqam_house_service_fee.live_video:
+            event_live_fee = EventLiveFee.objects.get(arqam_house_service_fee=instance.arqam_house_service_fee)
+            return f"Virtual Event Fee <ul style='margin-bottom: 0px;'><li>Subscribed Mins: {event_live_fee.subscribed_mins}</li><li> Archived Mins: {event_live_fee.archived_mins}</li></ul><a href='#' style='font-size: 10px;'>More Info</a>"
+
 
 
 @register.simple_tag
@@ -47,6 +52,11 @@ def get_amount(instance):
     if instance.opening_balance:
         return '{0:.2f}'.format(0.00)
 
+    if instance.arqam_house_service_fee:
+        if instance.arqam_house_service_fee.free:
+            return '{0:.2f}'.format(0.00)
+        return instance.arqam_house_service_fee.amount
+
 
 
 @register.simple_tag
@@ -66,6 +76,9 @@ def get_type_color(instance):
 
     if instance.opening_balance:
         return "#4599d5"
+
+    if instance.arqam_house_service_fee:
+        return "#ff8b52"
 
 
 @register.simple_tag
@@ -104,6 +117,9 @@ def get_type_icon(instance):
 
     if instance.opening_balance:
         return '<i style="font-size:1.1em;" class="la la-flag-checkered"></i>'
+
+    if instance.arqam_house_service_fee:
+        return '<i style="font-size:1.1em;" class="la la-camera"></i>'
 
 
 

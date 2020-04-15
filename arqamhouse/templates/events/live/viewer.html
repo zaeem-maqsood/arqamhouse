@@ -134,18 +134,6 @@ Live | {{ event.title|safe }}
 
     var session = OT.initSession(apiKey, sessionId);
 
-
-
-    session.connect(token, function (error) {
-        if (error) {
-            handleError(error);
-        } else {
-            console.log("Connected to the session.");
-
-        }
-    });
-    
-
     // Subscribe to a newly created stream
     session.on('streamCreated', function (event) {
 
@@ -171,6 +159,15 @@ Live | {{ event.title|safe }}
 
     });
 
+    session.connect(token, function (error) {
+        if (error) {
+            handleError(error);
+        } else {
+            console.log("Connected to the session.");
+
+        }
+    });
+    
 
     session.on({
         connectionCreated: function (event) {
@@ -335,7 +332,8 @@ function updateSpotLight() {
     document.querySelector('#chat-message-submit').onclick = function (e) {
         var messageInputDom = document.querySelector('#chat-message-input');
 
-        var user = '{{ request.user }}';
+        var user = '{{ profile.email }}';
+        var name = '{{ profile.name }}'
         var message = messageInputDom.value;
 
         chatSocket.send(JSON.stringify({
@@ -348,6 +346,7 @@ function updateSpotLight() {
     };
     {% endif %}
 </script>
+
 {% endif %}
 {% endblock scripts %}
 

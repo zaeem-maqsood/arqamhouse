@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Transaction, Refund, Payout, HousePayment, HouseBalance, HouseBalanceLog, PayoutSetting
+from .models import Transaction, Refund, Payout, HousePayment, HouseBalance, HouseBalanceLog, PayoutSetting, ArqamHouseServiceFee
 
 
 class TransactionAdmin(admin.ModelAdmin):
@@ -49,3 +49,4 @@ admin.site.register(HousePayment, HousePaymentAdmin)
 admin.site.register(HouseBalance, HouseBalanceAdmin)
 admin.site.register(HouseBalanceLog, HouseBalanceLogAdmin)
 admin.site.register(PayoutSetting, PayoutSettingAdmin)
+admin.site.register(ArqamHouseServiceFee)

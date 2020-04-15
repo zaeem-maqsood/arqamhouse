@@ -54,7 +54,7 @@ from events.models import (Event, AttendeeCommonQuestions, EventQuestion, Ticket
                            EventRefundRequest, EventDiscount, Checkin, EventOrderRefund, EventRefererDomain, 
                            EventLive, EventResource)
 from questions.models import Question
-from payments.models import Transaction, Refund, HouseBalance
+from payments.models import Transaction, Refund, HouseBalance, ArqamHouseServiceFee, HouseBalanceLog
 from profiles.models import Profile
 from subscribers.models import Subscriber, Campaign
 

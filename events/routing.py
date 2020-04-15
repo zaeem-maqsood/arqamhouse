@@ -2,12 +2,12 @@
 from django.urls import re_path
 from django.urls import path
 
-from events.consumers import ChatConsumer, LiveChatConsumer
+from events.consumers import LiveChatConsumer, LiveEventFeeConsumer
 
 websocket_urlpatterns = [
 
-    path('ws/chat/<slug:slug>', LiveChatConsumer)
-    # re_path(r'ws/chat/(?P<slug>\w+)/$', LiveChatConsumer),
-    # re_path(r'ws/chat/(?P<room_name>\w+)/$', ChatConsumer),
+    path('ws/chat/<slug:slug>', LiveChatConsumer),
+    path('ws/live-event-fee/<slug:slug>', LiveEventFeeConsumer)
+    
     
 ]

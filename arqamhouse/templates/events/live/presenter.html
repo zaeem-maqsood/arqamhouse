@@ -146,6 +146,7 @@
     var token = '{{ token }}';
 
     var connectionCount = -1;
+    var streamAmount = 0;
 
     // Handling all of our errors here by alerting them
     function handleError(error) {
@@ -174,7 +175,7 @@
     var screen_publisher = OT.initPublisher('dummy-screen-share',
         {
             videoSource: null,
-            publishAudio: false,
+            publishAudio: true,
             publishVideo: false,
             insertMode: 'replace',
             width: '0%',
@@ -196,7 +197,7 @@
         facingMode: 'user',
         publishAudio: true,
         name: "{{ profile.name }}",
-        style: { nameDisplayMode: "on", buttonDisplayMode: "off" },
+        style: { nameDisplayMode: "on", buttonDisplayMode: "auto" },
 
     }, handleError);
 
@@ -287,6 +288,7 @@
     publisher.on("streamDestroyed", function (event) {
         
         console.log("The publisher stopped streaming.");
+        streamAmount--;
     });
 
 
@@ -330,6 +332,7 @@
         // The user clicked stop.
         console.log("screen share was destroyed");
         document.getElementById("screen-sharing-check").checked = false;
+
     });
 
     screen_publisher.on('streamDestroyed', function (event) {
@@ -347,8 +350,36 @@
         else {
             console.log("else")
         }
+
+        streamAmount--;
     });
     
+
+
+    session.on({
+        connectionCreated: function (event) {
+            connectionCount++;
+            console.log(connectionCount + ' connections.');
+            document.getElementById("viewers").innerHTML = connectionCount
+
+        },
+        connectionDestroyed: function (event) {
+            connectionCount--;
+            console.log(connectionCount + ' connections.');
+            document.getElementById("viewers").innerHTML = connectionCount
+        },
+
+        sessionDisconnected: function sessionDisconnectHandler(event) {
+            // The event is defined by the SessionDisconnectEvent class
+            console.log('Disconnected from the session.');
+            // document.getElementById('disconnectBtn').style.display = 'none';
+            if (event.reason == 'networkDisconnected') {
+                alert('Your network connection terminated.')
+            }
+        }
+
+
+    });
 
 
     // Subscribe to a newly created stream
@@ -380,31 +411,7 @@
             subscriberFrames[i].classList.add('row-padder');
         }
 
-
-    });
-
-
-    session.on({
-        connectionCreated: function (event) {
-            connectionCount++;
-            console.log(connectionCount + ' connections.');
-            document.getElementById("viewers").innerHTML = connectionCount
-
-        },
-        connectionDestroyed: function (event) {
-            connectionCount--;
-            console.log(connectionCount + ' connections.');
-            document.getElementById("viewers").innerHTML = connectionCount
-        },
-
-        sessionDisconnected: function sessionDisconnectHandler(event) {
-            // The event is defined by the SessionDisconnectEvent class
-            console.log('Disconnected from the session.');
-            // document.getElementById('disconnectBtn').style.display = 'none';
-            if (event.reason == 'networkDisconnected') {
-                alert('Your network connection terminated.')
-            }
-        }
+        streamAmount++;
 
     });
 
@@ -429,11 +436,6 @@
         childArea = document.getElementById("chat-area");
         childArea.scrollTop = childArea.scrollHeight;
     }
-
-    // function play() {
-    //     var audio = new Audio("https://res.cloudinary.com/arqamhouse/video/upload/v1585583467/when_zh3rtz.mp3");
-    //     audio.play();
-    // }
 
     var slug = {{ slug_json }};
 
@@ -524,10 +526,80 @@
 </script>
 
 
+
+<!-- Live Event Fee -->
+<script>
+
+    var slug = {{ slug_json }};
+
+    {% if local %}
+    console.log('ws://' + window.location.host + '/ws/live-event-fee/' + slug)
+    var chatSocket2 = new WebSocket('ws://' + window.location.host + '/ws/live-event-fee/' + slug);
+    {% else %}
+    var chatSocket2 = new WebSocket('wss://' + window.location.host + '/ws/live-event-fee/' + slug);
+    {% endif %}
+
+    chatSocket2.onmessage = function (e) {
+        var data = JSON.parse(e.data);
+        console.log(data);
+    };
+
+    chatSocket2.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+
+    function feeUpdate() {
+
+        participants = connectionCount;
+        stream_amount = streamAmount;
+
+        record_element = document.getElementById("record_button");
+        if (record_element.classList.contains('bg--green-button')) {
+            recording = false;
+        }
+        else {
+            recording = true;
+        }
+
+        {% if event_live_broadcasts %}
+        broadcast_element = document.getElementById("broadcast_button");
+        if (broadcast_element.classList.contains('bg--blue-button')) {
+            broadcasting = false;
+        }
+        else {
+            broadcasting = true;
+        }
+        {% else %}
+        broadcasting = false;
+        {% endif %}
+
+        console.log(stream_amount);
+        console.log(recording);
+        console.log(broadcasting);
+        console.log(participants);
+
+
+        chatSocket2.send(JSON.stringify({
+            'stream_amount': stream_amount,
+            'recording': recording,
+            'broadcasting': broadcasting,
+            'participants': participants
+        }));
+
+    };
+
+    setInterval(feeUpdate, 120000);
+    
+    
+</script>
+
+
+
 <script>
 
 // 5400
-var timeleft = 120;
+var timeleft = 5400;
 var timer = 0;
 
 
@@ -543,7 +615,7 @@ function toggleRecord(object) {
         object.classList.remove('bg--green-button');
         record = true;
         // 5400000
-        setTimeout(stopRecordingTimeLimit, 120000);
+        setTimeout(stopRecordingTimeLimit, 5400000);
         
         timer = setInterval(myTimer, 1000);
         timeleft = timeleft - 1;
@@ -588,15 +660,15 @@ function toggleRecord(object) {
 
 function myTimer() {
     // 5400
-    document.getElementById("progressBar").value = 120 - timeleft;
+    document.getElementById("progressBar").value = 5400 - timeleft;
     timeleft = timeleft - 1;
 }
 
 function resetTimer() {
-    // 120
-    timeleft = 120;
+    // 5400
+    timeleft = 5400;
     clearInterval(timer);
-    document.getElementById("progressBar").value = 120 - timeleft;
+    document.getElementById("progressBar").value = 5400 - timeleft;
 }
 
 function stopRecordingTimeLimit() {
@@ -657,6 +729,71 @@ function toggleBroadcast(object) {
 }
 </script>
 
+
+
+<script>
+function eventLiveFeeCalculations() {
+
+    participants = connectionCount;
+    stream_amount = streamAmount;
+
+    record_element = document.getElementById("record_button");
+    if (record_element.classList.contains('bg--green-button')) {
+        recording = false;
+    }
+    else {
+        recording = true;
+    }
+
+    {% if event_live_broadcasts %}
+    broadcast_element = document.getElementById("broadcast_button");
+    if (broadcast_element.classList.contains('bg--blue-button')) {
+        broadcasting = false;
+    }
+    else {
+        broadcasting = true;
+    }
+    {% else %}
+    broadcasting = false;
+    {% endif %}
+
+    console.log(stream_amount);
+    console.log(recording);
+    console.log(broadcasting);
+    console.log(participants);
+
+    var token = '{{ csrf_token }}';
+    const url = '{{ request.path }}';
+
+    let data = {
+        stream_amount: stream_amount,
+        participants: participants,
+        recording: recording,
+        broadcasting: broadcasting,
+    }
+
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: { 
+            'X-CSRFToken': token,
+            'Content-Type': 'application/json; charset=utf-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        
+    }
+    
+    fetch(url, fetchData)
+        .then(function () {
+            // Handle response you get from the server
+            console.log("Success")
+        });
+
+}
+
+</script>
+
 {% endblock scripts %}
 
 {% block content %}
@@ -691,7 +828,7 @@ function toggleBroadcast(object) {
                 {% if event_live_broadcasts %}
                 <div class="row" style="padding-bottom: 10px;">
                     <div class="col-lg-12 col-md-6 col-sm-6" style="padding-bottom: 10px;">
-                        <button class="btn bg--blue-button btn-block" style="color: white;" onclick="toggleBroadcast(this);">Broadcast</button>
+                        <button class="btn bg--blue-button btn-block" style="color: white;" id="broadcast_button" onclick="toggleBroadcast(this);">Broadcast</button>
                     </div>
                 </div>
                 {% endif %}
