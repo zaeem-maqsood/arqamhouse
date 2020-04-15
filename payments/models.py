@@ -202,7 +202,10 @@ def house_balance_update(object_type, instance, *args, **kwargs):
             house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, arqam_house_service_fee=instance, balance=house_balance.balance, gross_balance=house_balance.gross_balance)
             house_balance_log.save()
         else:
+            print(instance.amount)
             house_balance = HouseBalance.objects.get(house=instance.house)
+            print(house_balance.balance)
+            print(house_balance.gross_balance)
             house_balance.balance -= instance.amount
             house_balance.gross_balance -= instance.amount
             house_balance.save()
