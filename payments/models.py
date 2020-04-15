@@ -119,7 +119,7 @@ class HousePayment(models.Model):
 class ArqamHouseServiceFee(models.Model):
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=False)
     created_at = models.DateTimeField(default=timezone.now, null=True)
-    amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+    amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2, default=decimal.Decimal('0.00'))
     live_video = models.BooleanField(default=False)
     free = models.BooleanField(default=False)
 
