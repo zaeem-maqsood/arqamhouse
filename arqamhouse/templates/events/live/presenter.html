@@ -61,7 +61,7 @@
     }
 
     #publisher {
-        height: 290px;
+        height: 205px;
     }
 
     #screen-share {
@@ -76,7 +76,7 @@
         }
 
         #publisher {
-            height: 154px;
+            height: 145px;
         }
 
         #screen-share {
@@ -93,7 +93,7 @@
         }
 
         #publisher {
-            height: 204px;
+            height: 196px;
         }
 
         #screen-share {
@@ -110,7 +110,7 @@
         }
 
         #publisher {
-            height: 179px;
+            height: 174px;
         }
 
         #screen-share {
@@ -127,7 +127,7 @@
         }
 
         #publisher {
-            height: 213px;
+            height: 207px;
         }
 
         #screen-share {
@@ -821,7 +821,7 @@ function eventLiveFeeCalculations() {
 
 {% block content %}
 <section style="padding-top: 3em;padding-bottom:0px;">
-    <div class="container" style="padding-right: 0px;padding-left: 0px;">
+    <div class="container">
 
 
         <div class="row justify-content-center" style="padding-bottom: 10px;">
@@ -841,7 +841,7 @@ function eventLiveFeeCalculations() {
             <!-- Publisher -->
             <div class="col-lg-4 col-12">
 
-                <div class="row" style="padding-bottom: 10px;">
+                <div class="row justify-content-center" style="padding-bottom: 10px;">
                     <div class="col-lg-12 col-md-6 col-sm-6" {% if event_live_broadcasts %}style="padding-bottom: 0px;"{% else %}style="padding-bottom: 10px;"{% endif %}>
                         <button class="btn bg--green-button btn-block" style="color: white;" id="record_button" onclick="toggleRecord(this);">Record</button>
                         <progress value="0" max="5400" id="progressBar" style="width: 100%;"></progress>
@@ -849,7 +849,7 @@ function eventLiveFeeCalculations() {
                 </div>
 
                 {% if event_live_broadcasts %}
-                <div class="row" style="padding-bottom: 10px;">
+                <div class="row justify-content-center" style="padding-bottom: 10px;">
                     <div class="col-lg-12 col-md-6 col-sm-6" style="padding-bottom: 10px;">
                         <button class="btn bg--blue-button btn-block" style="color: white;" id="broadcast_button" onclick="toggleBroadcast(this);">Broadcast</button>
                     </div>
@@ -857,7 +857,7 @@ function eventLiveFeeCalculations() {
                 {% endif %}
 
 
-                <div class="row" style="padding-bottom: 20px;">
+                <div class="row justify-content-center" style="padding-bottom: 20px;">
                     <div class="col-lg-12 col-md-6 col-sm-6" id="publisher" style="padding-bottom: 10px;">
                     </div>
                     <div class="col-lg-12 col-md-6 col-sm-6" id="screen-share" style="display: none;">
