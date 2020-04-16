@@ -84,6 +84,7 @@ class EventLiveComment(TimestampedModel):
     profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     comment = models.CharField(max_length=280, null=True, blank=True)
     deleted = models.BooleanField(default=False)
+    private = models.BooleanField(default=False)
 
     def __str__(self):
         return self.event_live.event.title

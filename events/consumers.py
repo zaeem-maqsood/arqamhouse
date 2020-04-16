@@ -153,6 +153,7 @@ class LiveChatConsumer(WebsocketConsumer):
         message = text_data_json['message']
         user = text_data_json['user']
         name = text_data_json['name']
+        private_message = text_data_json['private_message']
         print(f"The user is {user}")
         print(f"The user is {name}")
 
@@ -164,9 +165,9 @@ class LiveChatConsumer(WebsocketConsumer):
             event = Event.objects.get(slug=event_slug)
             event_live = EventLive.objects.get(event=event)
             event_live_comment = EventLiveComment.objects.create(
-                event_live=event_live, profile=profile, comment=message)
-        except:
-            pass
+                event_live=event_live, profile=profile, comment=message, private=private_message)
+        except Exception as e:
+            print(e)
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
@@ -175,7 +176,8 @@ class LiveChatConsumer(WebsocketConsumer):
                 'type': 'chat_message',
                 'message': message,
                 'user': profile.email,
-                'name': profile.name
+                'name': profile.name,
+                'private_message': private_message,
             }
         )
 
@@ -184,12 +186,14 @@ class LiveChatConsumer(WebsocketConsumer):
         message = event['message']
         user = event['user']
         name = event['name']
+        private_message = event['private_message']
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             'message': message,
             'user': user,
-            'name': name
+            'name': name,
+            'private_message': private_message
         }))
 
 

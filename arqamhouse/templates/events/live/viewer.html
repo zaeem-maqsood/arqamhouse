@@ -26,6 +26,12 @@ Live | {{ event.title|safe }}
         color: #1c399e;
     }
 
+    .alert.bg--private {
+        background: rgba(176, 102, 255, 0.2);
+        border-color: transparent;
+        color: #8c20a0;
+    }
+
     .alert.bg--success {
         background: rgba(255, 138, 95, 0.2);
         border-color: transparent;
@@ -275,43 +281,90 @@ function updateSpotLight() {
         var message = data['message'];
         var user = data['user'];
         var name = data['name'];
+        var private_message = data["private_message"];
+
+        var current_user = "{{ profile.email }}";
+
+        console.log("Private message");
+        console.log(private_message);
+        console.log("Private message");
+
+        if (private_message == true) {
+
+            if (user == current_user) {
+
+                // create a new div element 
+                var newDiv = document.createElement("div");
+                newDiv.className = 'alert bg--private';
+
+                newDiv.style = 'border-radius: 6px;padding: 5px;margin-bottom: 10px;'
+
+                var childDiv = document.createElement("div");
+                childDiv.className = 'alert__body';
+                // childDiv.innerHTML = message;
 
 
-        // create a new div element 
-        var newDiv = document.createElement("div");
-        if (user == '{{ request.user }}') {
-            newDiv.className = 'alert bg--primary';
+                // Add Message
+                var message_para = document.createElement("span");
+                message_para.innerText = message;
+                message_para.style = 'margin-bottom: 0px;';
+                childDiv.appendChild(message_para);
+
+                // Add User
+                var user_para = document.createElement("span");
+                user_para.innerText = 'Presenters and ' + name + ' only';
+                user_para.style = 'margin-bottom: 0px;font-size: 0.7em;font-style: italic;display:block';
+                childDiv.appendChild(user_para);
+
+
+                newDiv.appendChild(childDiv);
+                childArea = document.getElementById("chat-area");
+                childArea.appendChild(newDiv);
+
+
+                childArea.scrollTop = childArea.scrollHeight;
+            }
         }
+
         else {
-            newDiv.className = 'alert bg--success';
+
+            // create a new div element 
+            var newDiv = document.createElement("div");
+            if (user == '{{ request.user }}') {
+                newDiv.className = 'alert bg--primary';
+            }
+            else {
+                newDiv.className = 'alert bg--success';
+            }
+
+            newDiv.style = 'border-radius: 6px;padding: 5px;margin-bottom: 10px;'
+
+            var childDiv = document.createElement("div");
+            childDiv.className = 'alert__body';
+            // childDiv.innerHTML = message;
+
+
+            // Add Message
+            var message_para = document.createElement("span");
+            message_para.innerText = message;
+            message_para.style = 'margin-bottom: 0px;';
+            childDiv.appendChild(message_para);
+
+            // Add User
+            var user_para = document.createElement("span");
+            user_para.innerText = name;
+            user_para.style = 'margin-bottom: 0px;font-size: 0.7em;font-style: italic;display:block';
+            childDiv.appendChild(user_para);
+
+
+            newDiv.appendChild(childDiv);
+            childArea = document.getElementById("chat-area");
+            childArea.appendChild(newDiv);
+
+
+            childArea.scrollTop = childArea.scrollHeight;
+
         }
-
-        newDiv.style = 'border-radius: 6px;padding: 5px;margin-bottom: 10px;'
-
-        var childDiv = document.createElement("div");
-        childDiv.className = 'alert__body';
-        // childDiv.innerHTML = message;
-
-
-        // Add Message
-        var message_para = document.createElement("span");
-        message_para.innerText = message;
-        message_para.style = 'margin-bottom: 0px;';
-        childDiv.appendChild(message_para);
-
-        // Add User
-        var user_para = document.createElement("span");
-        user_para.innerText = name;
-        user_para.style = 'margin-bottom: 0px;font-size: 0.7em;font-style: italic;display:block';
-        childDiv.appendChild(user_para);
-
-
-        newDiv.appendChild(childDiv);
-        childArea = document.getElementById("chat-area");
-        childArea.appendChild(newDiv);
-
-
-        childArea.scrollTop = childArea.scrollHeight;
 
 
     };
@@ -340,10 +393,30 @@ function updateSpotLight() {
             'message': message,
             'user': user,
             'name': name,
+            'private_message': false
         }));
 
         messageInputDom.value = '';
     };
+
+    document.querySelector('#chat-message-submit-private').onclick = function (e) {
+        var messageInputDom = document.querySelector('#chat-message-input');
+
+        var user = '{{ profile.email }}';
+        var name = '{{ profile.name }}';
+        var message = messageInputDom.value;
+
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'user': user,
+            'name': name,
+            'private_message': true,
+        }));
+
+        messageInputDom.value = '';
+    };
+
+
     {% endif %}
 </script>
 
@@ -413,13 +486,27 @@ function updateSpotLight() {
                             <div class="col-md-12 col-10">
                                 <div id="chat-area" class="overflow-auto" style="max-height: 400px;" onmousemove="scrollToBottom();">
                                     {% for comment in event_live_comments %}
-                                    <div class="alert {% if profile.email == comment.profile.email %}bg--primary{% else %}alert bg--success{% endif %}" style="padding: 5px;margin-bottom: 10px;">
-                                        <div class="alert__body">
-                                            <span style="margin-bottom: 0px;">{{ comment.comment }}</span>
-                                            <span
-                                                style="margin-bottom: 0px;font-size: 0.7em;font-style: italic;display:block">{{ comment.profile.name }}</span>
+                                        {% if comment.private %}
+                                            {% if comment.profile.email == profile.email %}
+                                                <div class="alert bg--private"
+                                                    style="padding: 5px;margin-bottom: 10px;">
+                                                    <div class="alert__body">
+                                                        <span style="margin-bottom: 0px;">{{ comment.comment }}</span>
+                                                        <span
+                                                            style="margin-bottom: 0px;font-size: 0.7em;font-style: italic;display:block">Presenters and {{ comment.profile.name }} only</span>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                            {% endif %}
+                                        {% else %}
+                                        <div class="alert {% if profile.email == comment.profile.email %}bg--primary{% else %}alert bg--success{% endif %}" style="padding: 5px;margin-bottom: 10px;">
+                                            <div class="alert__body">
+                                                <span style="margin-bottom: 0px;">{{ comment.comment }}</span>
+                                                <span
+                                                    style="margin-bottom: 0px;font-size: 0.7em;font-style: italic;display:block">{{ comment.profile.name }}</span>
+                                            </div>
                                         </div>
-                                    </div>
+                                        {% endif %}
                                     {% endfor %}
                                 </div>
                             </div>
@@ -436,6 +523,13 @@ function updateSpotLight() {
                             <div class="col-md-12 col-10">
                                 <button id="chat-message-submit" type="button" value="Send" class="btn btn--primary btn-block"><span
                                         class="btn__text">Send</span></button>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center" style="padding-bottom: 10px;">
+                            <div class="col-md-12 col-10">
+                                <button id="chat-message-submit-private" type="button" value="Send" class="btn btn--primary btn-block"><span
+                                        class="btn__text">Send Private</span></button>
                             </div>
                         </div>
 

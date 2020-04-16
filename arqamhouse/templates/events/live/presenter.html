@@ -40,6 +40,12 @@
         color: #1c399e;
     }
 
+    .alert.bg--private {
+        background: rgba(176, 102, 255, 0.2);
+        border-color: transparent;
+        color: #8c20a0;
+    }
+
     .alert.bg--success  {
         background: rgba(255, 138, 95, 0.2);
         border-color: transparent;
@@ -452,6 +458,7 @@
         var message = data['message'];
         var user = data['user'];
         var name = data['name'];
+        var private_message = data["private_message"];
 
         console.log("The name is");
         console.log(name);
@@ -459,12 +466,20 @@
 
         // create a new div element 
         var newDiv = document.createElement("div");
-        if (user == '{{ request.user }}') {
-            newDiv.className = 'alert bg--primary';
+
+        if (private_message) {
+            newDiv.className = 'alert bg--private';
         }
+
         else {
-            newDiv.className = 'alert bg--success';
+            if (user == '{{ request.user }}') {
+                newDiv.className = 'alert bg--primary';
+            }
+            else {
+                newDiv.className = 'alert bg--success';
+            }
         }
+        
 
         newDiv.style = 'border-radius: 6px;padding: 5px;margin-bottom: 10px;'
 
@@ -508,21 +523,25 @@
         }
     };
 
+
     document.querySelector('#chat-message-submit').onclick = function (e) {
         var messageInputDom = document.querySelector('#chat-message-input');
 
         var user = '{{ profile.email }}';
-        var name = '{{ profile.name }}'
+        var name = '{{ profile.name }}';
         var message = messageInputDom.value;
 
         chatSocket.send(JSON.stringify({
             'message': message,
             'user': user,
             'name': name,
+            'private_message': false,
         }));
 
         messageInputDom.value = '';
     };
+
+
 </script>
 
 
@@ -897,11 +916,11 @@ function eventLiveFeeCalculations() {
                             <div class="col-md-12 col-10">
                                 <div id="chat-area" class="overflow-auto" style="max-height: 400px;">
                                     {% for comment in event_live_comments %}
-                                    <div class="alert {% if profile.email == comment.profile.email %}bg--primary{% else %}alert bg--success{% endif %}" style="padding: 5px;margin-bottom: 10px;">
+                                    <div class="alert {% if comment.private %}bg--private{% else %}{% if profile.email == comment.profile.email %}bg--primary{% else %}alert bg--success{% endif %}{% endif %}" style="padding: 5px;margin-bottom: 10px;">
                                         <div class="alert__body">
                                             <span style="margin-bottom: 0px;">{{ comment.comment }}</span>
                                             <span
-                                                style="margin-bottom: 0px;font-size: 0.7em;font-style: italic;display:block">{{ comment.profile.name }}</span>
+                                                style="margin-bottom: 0px;font-size: 0.7em;font-style: italic;display:block">{% if comment.private %}Presenters and {{ comment.profile.name }} only{% else %}{{ comment.profile.name }}{% endif %}</span>
                                         </div>
                                     </div>
                                     {% endfor %}
