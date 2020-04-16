@@ -18,7 +18,7 @@ CHANNEL_LAYERS = {
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['arqam.herokuapp.com', 'arqamhouse.com', 'www.arqamhouse.com' ]
+ALLOWED_HOSTS = ['arqam.herokuapp.com', 'arqamhouse.com', 'www.arqamhouse.com', 'www.arqam.house']
 
 
 # # Test Keys

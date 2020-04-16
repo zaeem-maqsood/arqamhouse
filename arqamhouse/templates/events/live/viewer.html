@@ -351,21 +351,30 @@ function updateSpotLight() {
 {% endblock scripts %}
 
 {% block content %}
-<section style="padding-top: 3em;padding-bottom:0px;">
+<section class="" style="padding-top: 10px;padding-bottom: 10px;">
+    <div class="container">
+        <div class="row justify-content-center" style="padding-top:5px;padding-bottom:5px;">
+            {% if event.house.logo %}
+            <div class="col-3">
+                <a href="{{ event.house.get_home_page_url }}"><img src="{{ event.house.logo.url }}"
+                        style="max-height: 3em;margin-bottom:5px;"></a>
+                
+            </div>
+            <div class="col-md-9 col-10 align-self-center" style="padding: 0px;">
+                <a href="{{ event.get_landing_view }}" class="btn btn--primary-1 btn-block"
+                    style="color: white;">{{ event.title }}</a>
+            </div>
+            {% else %}
+            <div class="col-md-12 align-self-center" style="padding: 0px;">
+                <a href="{{ event.get_landing_view }}" class="btn btn--primary-1 btn-block"
+                    style="color: white;">{{ event.title }}</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+<section style="padding-top: 1em;padding-bottom:0px;">
     <div class="container" style="padding-right: 0px;padding-left: 0px;">
-
-
-        <div class="row justify-content-center" style="padding-bottom: 10px;">
-            <div class="col-sm-12 col-10" style="padding: 0px;">
-                <a href="{{ event.get_landing_view }}" class="btn btn--primary-1 btn-block" style="color: white;">{{ event.title }}</a>
-            </div>
-        </div>
-
-        <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
-            <div class="col-sm-12 col-10" style="padding: 0px;">
-                <p>Participants | <span id="viewers"></span></p>
-            </div>
-        </div>
 
 
         {% if allow_entry %}
@@ -374,8 +383,8 @@ function updateSpotLight() {
             <div class="col-lg-8 col-12" style="padding-bottom: 30px;">
                 <div class="row">
 
-                    <div class="col-12 text-center" id="offline_message" style="display: none;">
-                        <h3>{{ event.title }} will commence shortly.</h3>
+                    <div class="col-12 text-center" id="offline_message" style="display: none;padding-top: 30px;">
+                        <h3>{{ event.title }} will commence shortly</h3>
                     </div>
 
                     <div id="subscriber"></div>
@@ -393,6 +402,12 @@ function updateSpotLight() {
             <div class="col-lg-4 col-12" style="padding-bottom: 30px;">
                 <div class="row">
                     <div class="col-12">
+
+                        <div class="row justify-content-center text-center" style="padding-bottom: 10px;">
+                            <div class="col-sm-12 col-10" style="padding: 0px;">
+                                <p>Participants | <span id="viewers"></span></p>
+                            </div>
+                        </div>
                         
                         <div class="row justify-content-center" style="padding-bottom: 20px;">
                             <div class="col-md-12 col-10">
@@ -448,6 +463,14 @@ function updateSpotLight() {
                         </div>
                         {% endif %}
 
+                        <div class="row justify-content-center" style="padding-top: 50px;">
+                            <div class="col-12 text-center">
+                                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}"
+                                        style="max-height: 3em;margin-bottom:0px;"></a>
+                                <p style="font-size: 8px;">Powered by Arqam House</p>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
@@ -475,6 +498,8 @@ function updateSpotLight() {
         {% endif %}
 
         {% endif %}
+
+       
 
     </div>
 </section>
