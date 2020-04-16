@@ -1,0 +1,18 @@
+{% for comment in event_live_comments %}
+<div class="row justify-content-center">
+    <div class="col-9" style="align-self: center;">
+        <p style="margin-bottom: 0px;">{{ comment.comment }}</p>
+        <p style="margin-bottom: 0px;font-size: 10px;font-style: italic;">{{ comment.profile.name }}
+            {% if comment.private %}<span style="color: red;">- Private</span>{% endif %}</p>
+    </div>
+    <div class="col-3">
+        <button class="btn btn-danger pull-right" onclick="ajaxDeleteComment(this);" value="{{ comment.id }}"
+            href="{{ event.get_live_event_presenter_view }}">Delete</button>
+    </div>
+</div>
+<div class="row justify-content-center" style="padding-bottom: 40px;">
+    <div class="col-12">
+        <hr>
+    </div>
+</div>
+{% endfor %}

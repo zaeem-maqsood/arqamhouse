@@ -231,6 +231,10 @@ class Event(TimestampedModel):
         view_name = "events:live_options"
         return reverse(view_name, kwargs={"slug": self.slug})
 
+    def get_live_comments_view(self):
+        view_name = "events:live_comments"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
     def get_live_event_presenter_view(self):
         view_name = "events:live_presenter"
         return reverse(view_name, kwargs={"slug": self.slug})

@@ -1,7 +1,7 @@
 from .base import *
 
 from events.views import (LiveEventOptionsView, LiveEventHouseView, LiveEventViewerView, 
-                          ArchivedListView, ArchivedDetailView, BroadcastCreateView, BroadcastUpdateView)
+                          ArchivedListView, ArchivedDetailView, BroadcastCreateView, BroadcastUpdateView, LiveEventCommentsView)
 
 urlpatterns += [
 
@@ -11,6 +11,7 @@ urlpatterns += [
 
     path('<slug:slug>/live/presenter', LiveEventHouseView.as_view(), name='live_presenter'),
     path('<slug:slug>/live/options', LiveEventOptionsView.as_view(), name='live_options'),
+    path('<slug:slug>/live/comments', LiveEventCommentsView.as_view(), name='live_comments'),
 
     path('<slug:slug>/live/<int:pk>/create-facebook-broadcast', BroadcastCreateView.as_view(), name='broadcast_facebook', kwargs={"stream_type":"facebook"}),
     path('<slug:slug>/live/<int:pk>/create-youtube-broadcast', BroadcastCreateView.as_view(), name='broadcast_youtube', kwargs={"stream_type":"youtube"}),

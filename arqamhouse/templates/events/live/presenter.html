@@ -526,17 +526,18 @@
 
     document.querySelector('#chat-message-submit').onclick = function (e) {
         var messageInputDom = document.querySelector('#chat-message-input');
-
         var user = '{{ profile.email }}';
         var name = '{{ profile.name }}';
         var message = messageInputDom.value;
 
-        chatSocket.send(JSON.stringify({
-            'message': message,
-            'user': user,
-            'name': name,
-            'private_message': false,
-        }));
+        if (message != '') {
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'user': user,
+                'name': name,
+                'private_message': false,
+            }));
+        }
 
         messageInputDom.value = '';
     };

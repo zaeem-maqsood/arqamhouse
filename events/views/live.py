@@ -630,11 +630,6 @@ class LiveEventOptionsView(HouseAccountMixin, EventSecurityMixin, UserPassesTest
     model = EventLive
     template_name = "events/live/options.html"
 
-    def get_success_url(self):
-        view_name = "subscribers:campaign_list"
-        return reverse(view_name)
-
-
     def get_context_data(self, *args, **kwargs):
         context = {}
         house = self.get_house()
@@ -722,3 +717,55 @@ class LiveEventOptionsView(HouseAccountMixin, EventSecurityMixin, UserPassesTest
 
         
     
+
+
+
+
+
+
+
+class LiveEventCommentsView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, View):
+    template_name = "events/live/comments.html"
+
+    def get_success_url(self):
+        view_name = "subscribers:campaign_list"
+        return reverse(view_name)
+
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+        house = self.get_house()
+        event = get_event(self.kwargs['slug'])
+        event_live = EventLive.objects.get(event=event)
+        event_live_comments = EventLiveComment.objects.filter(event_live=event_live).order_by("created_at")
+
+        context["event_live"] = event_live
+        context["event_live_comments"] = event_live_comments
+        context["event"] = event
+        context["dashboard_events"] = self.get_events()
+        context["event_tab"] = True
+        context["house"] = house
+        return context
+
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
+
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        print(data)
+
+        if 'comment_id' in data:
+            comment_id = data['comment_id']
+            event_live_comment = EventLiveComment.objects.get(id=comment_id).delete()
+
+        event = get_event(self.kwargs['slug'])
+        event_live = EventLive.objects.get(event=event)
+
+        if 'delete_all' in data:
+            event_live_comments = EventLiveComment.objects.filter(event_live=event_live).delete()
+
+        event_live_comments = EventLiveComment.objects.filter(event_live=event_live).order_by("created_at")
+        html = render_to_string('events/live/dynamic-comments-section.html', {'event_live_comments': event_live_comments})
+        return HttpResponse(html)
