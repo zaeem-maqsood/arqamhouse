@@ -82,7 +82,7 @@ prButton.on('click', function (ev) {
 
     paymentRequest.update({
         total: {
-            label: 'Demo total',
+            label: '{{ house.name }} Donation',
             amount: amount * 100,
         },
     });
@@ -437,11 +437,11 @@ function stripeTokenHandler(token) {
                     {% endif %}
 
                     <div class="row" style="padding-bottom: 10px;">
-                        <div class="col-xl-10 col-lg-9 col-md-9 col-8" style="padding-bottom: 10px;">
+                        <div class="col-xl-10 col-lg-9 col-md-9 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Donation Type</p>
                             {{ form.donation_type }}
                         </div>
-                        <div class="col-xl-2 col-lg-3 col-md-3 col-4" style="padding-bottom: 10px;">
+                        <div class="col-xl-2 col-lg-3 col-md-3 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Hide Name</p>
                             <div class="input-checkbox input-checkbox--switch">
                                 {{ form.anonymous }}
@@ -546,17 +546,4 @@ function stripeTokenHandler(token) {
 
     </div>
 </section>
-
-<section class="text-center" style="padding-bottom: 40px;padding-top: 90px;">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8">
-                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;margin-bottom:0px;"></a>
-                <p style="font-size: 10px;">Powered by Arqam House Inc.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-
 {% endblock content %}
