@@ -663,8 +663,8 @@ class DonationTypeUpdateView(HouseAccountMixin, UpdateView):
     template_name = "donations/type.html"
 
     def get_success_url(self):
-        view_name = "events:resources"
-        return reverse(view_name, kwargs={"slug": self.kwargs["slug"]})
+        view_name = "donations:types"
+        return reverse(view_name)
 
     def get_context_data(self, form, *args, **kwargs):
         context = {}
