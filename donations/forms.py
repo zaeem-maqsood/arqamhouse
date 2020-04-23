@@ -10,7 +10,7 @@ class DonationTypeForm(forms.ModelForm):
     class Meta:
         model = DonationType
         fields = [
-            "name", "pass_fee", "issue_receipts",
+            "name", "pass_fee", "issue_receipts", "collect_address"
         ]
 
         widgets = {
@@ -26,6 +26,7 @@ class DonationTypeForm(forms.ModelForm):
 
                 "pass_fee": forms.CheckboxInput(),
                 "issue_receipts": forms.CheckboxInput(),
+                "collect_address": forms.CheckboxInput(),
         }
 
 

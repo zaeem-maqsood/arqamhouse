@@ -28,7 +28,7 @@ Donation Types | {{ house.name }}
 				<div class="row" style="padding-bottom: 10px;">
 					<div class="col-lg-12">
 						<h3>Donation Types</h3>
-                        <p>Create donation types for targeted donations.</p>
+                        <p>{% if update %}Update{% else %}Create{% endif %} donation types for targeted donations.</p>
 					</div>
 				</div>
 
@@ -61,11 +61,20 @@ Donation Types | {{ house.name }}
                             </span>
                         </div>
                         {% endif %}
+                        <div class="col-6">
+                            <p style="margin-bottom: 5px;">Collect Address</p>
+                            <span class="kt-switch">
+                                <label>
+                                    {{ form.collect_address }}
+                                    <span></span>
+                                </label>
+                            </span>
+                        </div>
                     </div>
 
                     <div class="row" style="padding-bottom:40px;">
                         <div class="col-lg-12">
-                            <button type="submit" name="save" value='true' class="btn btn-primary btn-block">Create Donation Type</button>
+                            <button type="submit" name="save" value='true' class="btn btn-primary btn-block">{% if update %}Update{% else %}Create{% endif %} Donation Type</button>
                         </div>
                     </div>
                 </form>

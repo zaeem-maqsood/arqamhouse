@@ -621,6 +621,7 @@ class DonationTypeCreateView(HouseAccountMixin, CreateView):
         context["form"] = form
         context["house"] = house
         context["donation_tab"] = True
+        context["dashboard_events"] = self.get_events()
         return context
 
 
@@ -671,6 +672,8 @@ class DonationTypeUpdateView(HouseAccountMixin, UpdateView):
         context["form"] = form
         context["house"] = house
         context["donation_tab"] = True
+        context["update"] = True
+        context["dashboard_events"] = self.get_events()
         return context
 
     def get_donation_type(self):
@@ -694,11 +697,11 @@ class DonationTypeUpdateView(HouseAccountMixin, UpdateView):
         house = self.get_house()
         form = DonationTypeForm(instance=self.object, data=data)
         if form.is_valid():
-            return self.form_valid(form, request, event)
+            return self.form_valid(form, request)
         else:
             return self.form_invalid(form)
 
-    def form_valid(self, form, request, event):
+    def form_valid(self, form, request):
         house = self.get_house()
         form.instance.house = house
         self.object = form.save()
