@@ -20,12 +20,20 @@ class Subscriber(TimestampedModel):
     profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=False, null=False)
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
     engagement = models.CharField(max_length=150, choices=engagement_types, blank=True, null=True)
-    engagement_total = models.PositiveIntegerField(blank=True, null=True, default=0)
+
+    # Campaign Scores out of 100
     engagement_score = models.PositiveIntegerField(blank=True, null=True, default=0)
+    engagement_total = models.PositiveIntegerField(blank=True, null=True, default=0)
+    campaigns_total = models.PositiveIntegerField(blank=True, null=True, default=0)
+
     # Subscriber score out of 100
     attendance_score = models.PositiveIntegerField(blank=True, null=True, default=0)
     attendance_total = models.PositiveIntegerField(blank=True, null=True, default=0)
     events_total = models.PositiveIntegerField(blank=True, null=True, default=0)
+
+    # Total subscriber score out of 100
+    subscriber_score = models.PositiveIntegerField(blank=True, null=True, default=0)
+    
     events = models.ManyToManyField(Event, blank=True)
     unsubscribed = models.BooleanField(default=False) 
     
@@ -37,13 +45,24 @@ class Subscriber(TimestampedModel):
         view_name = "subscribers:detail"
         return reverse(view_name, kwargs={"slug": self.profile.slug})
 
+    def update_subscriber_score(self):
+        attendance_score = self.attendance_score * 0.70
+        engagement_score = self.engagement_score * 0.30
+        self.subscriber_score = attendance_score + engagement_score
+    
+
     def update_attendance_score(self):
         if self.events_total > 0:
             self.attendance_score = (self.attendance_total / self.events_total) * 100
 
+    def update_engagement_score(self):
+        if self.campaigns_total > 0:
+            self.engagement_score = (self.engagement_total / self.campaigns_total) * 100
 
     def save(self, *args, **kwargs):
         self.update_attendance_score()
+        self.update_engagement_score()
+        self.update_subscriber_score()
         super().save(*args, **kwargs)
 
 

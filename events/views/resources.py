@@ -96,6 +96,9 @@ class EventResourceUpdateView(HouseAccountMixin, UpdateView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
+
+
+
 class EventResourceCreateView(HouseAccountMixin, CreateView):
     model = EventResource
     template_name = "events/resources/form.html"

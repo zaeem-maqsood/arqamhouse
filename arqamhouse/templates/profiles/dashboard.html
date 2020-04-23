@@ -13,7 +13,19 @@ Profile Dashboard
 
 {% block styles %}
 <style>
+    #button-font-size {
+        font-size: 10px;
+    }
 
+    @media (min-width: 768px) {
+
+        #button-font-size {
+            font-size: 12px;
+        }
+    }
+</style>
+
+<style>
 
 #homepage_updates {
       margin: 20px
@@ -63,7 +75,7 @@ Profile Dashboard
 {% endblock scripts %}
 
 {% block content %}
-<section class="text-center">
+<section class="text-center" style="padding-top: 30px;">
     <div class="container" style="padding-bottom: 60px;">
         <div class="row" style="padding-bottom: 20px;">
             <div class="col-md-12 col-lg-9">
@@ -73,7 +85,7 @@ Profile Dashboard
                     <div class="col-md-12">
                         <a href="#">
                             {% if profile.picture %}
-                            <img src="{{ profile.picture.thumbnail.url }}" style="max-width: 150px;max-height: 150px;border-radius: 100px;">
+                            <img src="{{ profile.picture.thumbnail.url }}" style="max-width: 100px;max-height: 100px;border-radius: 100px;">
                             {% else %}
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100px" height="100px"
                                 viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
@@ -90,43 +102,32 @@ Profile Dashboard
                     </div>
                 </div>
                 
-                <div class="row" style="padding-top: 30px;">
+                <div class="row" style="padding-top: 20px;">
                     <div class="col-md-12">
-                        <h4 style="margin-bottom: 5px;color: gray;">Hello, {{ profile.name }}</h4>
-                        {% if profile.temp_password %}
-                        <p style="margin-bottom: 0px;color: red;">Please change your temporary password immediately.</p>
-                        {% endif %}
+                        <p style="margin-bottom: 5px;color: gray;">Hello, {{ profile.name }}</p>
                     </div>
                 </div>
-
-                {% if profile.temp_password %}
-                <div class="row" style="padding-top: 10px;">
-                    <div class="col-md-12">
-                        <a href="{% url 'profiles:change_password' %}" class="btn bg--pinterest"><span class="btn__text">Change Temporary Password</span></a>
-                    </div>
-                </div>
-                {% endif %}
                 
                 <div class="row" style="padding-top: 20px;padding-bottom: 20px;">
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
                         <a class="btn btn--primary btn-block" href="{% url 'profiles:orders' %}">
-                            <span class="btn__text"> Orders </span>
+                            <span class="btn__text" id="button-font-size"> Orders </span>
                         </a>
                     </div>
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
                         <a class="btn btn--primary btn-block" href="{% url 'profiles:subscribers' %}">
-                            <span class="btn__text"> Subscriptions </span>
+                            <span class="btn__text" id="button-font-size"> Subscriptions </span>
                         </a>
                     </div>
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
                         <a class="btn btn-block bg--facebook" {% if not profile.house %}href="{% url 'houses:create' %}" {% else %}
                             href="{% url 'houses:dashboard' %}" {% endif %}>
-                            <span class="btn__text">{% if not profile.house %}Create House{% else %}House{% endif %}</span>
+                            <span class="btn__text" id="button-font-size">{% if not profile.house %}Create House{% else %}House{% endif %}</span>
                         </a>
                     </div>
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
                         <a class="btn bg--googleplus btn-block" href="{% url 'profiles:logout' %}">
-                            <span class="btn__text"> Log Out</span>
+                            <span class="btn__text" id="button-font-size"> Log Out</span>
                         </a>
                     </div>
                 </div>
@@ -156,7 +157,7 @@ Profile Dashboard
                                     <div class="row" id="updates_host_and_start" style="padding-bottom: 10px;{% if not event.image %}padding: 10px 0 0 10px;{% endif %}" >
                                         <div class="col-12">
                                             {% if event.description %}
-                                            <p id="updates_description" style="text-align: left;line-height: normal;">{{ event.description|striptags|truncatechars:150 }}</p>
+                                            <p id="updates_description" style="text-align: left;line-height: normal;">{{ event.description|striptags|truncatechars:180 }}</p>
                                             {% else %}
                                             <p id="updates_description" style="text-align: left;line-height: normal;">Learn more by heading over to the event page.</p">
                                             {% endif %}

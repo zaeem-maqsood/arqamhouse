@@ -134,7 +134,7 @@ jQuery(document).ready(function() {
                                     {% endif %}
                                 </td>
 								<td class="align-middle"><a href="{{ subscriber.get_absolute_url }}">{{ subscriber.profile.name|title }}</a></td>
-								<td class="align-middle"><h2 style="color: #acacac;">{{ subscriber.attendance_score }}%</h2></td>
+								<td class="align-middle"><h2 style="color: #acacac;">{{ subscriber.subscriber_score }}%</h2></td>
 							</tr>
 							{% endfor %}
 						</tbody>

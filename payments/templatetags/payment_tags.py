@@ -10,7 +10,10 @@ register = template.Library()
 def get_type(instance):
 
     if instance.transaction:
-        return "Payment"
+        if instance.transaction.donation_transaction:
+            return "Donation"
+        else:
+            return "Payment"
     
     if instance.refund:
         return "Refund"

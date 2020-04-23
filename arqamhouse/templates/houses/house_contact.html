@@ -1,0 +1,190 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+{% load checkout_form_tags %}
+
+{% block title %}
+Contact | {{ house.name }}
+{% endblock title %}
+
+{% block styles %}
+<style>
+    #button-font-size {
+        font-size: 8px;
+    }
+
+    .g-recaptcha {
+        transform:scale(0.77);
+        transform-origin:0 0;
+    }
+
+    #captcha-g {
+        padding-bottom: 0px;
+    }
+
+    @media (min-width: 768px) {
+
+        #button-font-size {
+            font-size: 1em;
+        }
+
+        .g-recaptcha {
+            transform:scale(1);
+            transform-origin:0 0;
+        }
+
+        #captcha-g {
+            padding-bottom: 30px;
+        }
+    }
+</style>
+{% endblock styles %}
+
+{% block top_page_scripts %}
+
+{% endblock top_page_scripts %}
+
+
+{% block scripts %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endblock scripts %}
+
+
+
+{% block content %}
+<section style="padding-top: 30px;">
+    <div class="container">
+
+            {% if house.logo %}
+            <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+                <div class="col-lg-8 col-md-10 col-sm-12 col-10">
+                    <a href="{{ house.get_home_page_url }}">
+                        <img src="{{ house.logo.url }}" style="max-height: 4em;">
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            
+
+            <div class="row justify-content-center" style="margin: 5px;">
+                <div class="col-lg-8 col-md-10 col-sm-12 col-12"
+                    style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px; margin: 10px;border-radius: 15px;align-self: center;">
+
+                    {% if messages %}
+                    <div class="row justify-content-center " style="padding-bottom:30px;">
+                        <div class="col-md-10">
+                            {% for message in messages %}
+                            <div class="alert bg--{{ message.tags }}">
+                                <div class="alert__body">
+                                    <span>{{ message }}</span>
+                                </div>
+                                <div class="alert__close"> × </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if house.phone %}
+                    <div class="row justify-content-center text-center" style="padding-top: 30px;padding-bottom: 30px;">
+                        <div class="col-10">
+
+                            <div class="row">
+                                <div class="col-4" style="padding-bottom: 10px;padding-right: 5px;padding-left: 5px;">
+                                    <a href="mailto:{{ house.email }}?Subject=Hello" class="btn btn--primary btn-block" style="color: white;" id="button-font-size">Email</a>
+                                </div>
+                                {% if house.phone %}
+                                <div class="col-4" style="padding-bottom: 10px;padding-right: 5px;padding-left: 5px;">
+                                    <a href="tel:{{ house.phone }}" class="btn btn-block" id="button-font-size">Phone</a>
+                                </div>
+                                {% endif %}
+                                {% if house.website %}
+                                <div class="col-4" style="padding-bottom: 10px;padding-right: 5px;padding-left: 5px;">
+                                    <a href="{{ house.website }}" target="_blank" class="btn btn-block" id="button-font-size">Website</a>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.errors %}
+                    <div class="row justify-content-center " style="padding-bottom: 30px;">
+                        <div class="col-md-10">
+                            {% for error in form.non_field_errors %}
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    <span>{{ error }}</span>
+                                </div>
+                                <div class="alert__close"> × </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
+                        <div class="col-md-10">
+                            <p class="lead">Send {{ house.name }} a message</p>
+                        </div>
+                    </div>
+
+                    <form action="" method="POST">{% csrf_token %}
+                        <div class="row justify-content-center" style="padding-bottom: 20px;">
+                            <div class="col-md-10">
+                                <div class="col-md-12">
+                                    {{ form.name }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center" style="padding-bottom: 20px;">
+                            <div class="col-md-10">
+                                <div class="col-md-12">
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row justify-content-center" style="padding-bottom: 20px;">
+                            <div class="col-md-10">
+                                <div class="col-md-12">
+                                    {{ form.message }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center">
+                            <div class="col-md-10 col-12" id="captcha-g">
+                                <div class="g-recaptcha" data-sitekey="6LexQcoUAAAAANF6ZK4NbVleE8COp2X0XByx9Y5-"></div>
+                            </div>
+                        </div>
+                    
+                        <div class="row justify-content-center" style="padding-bottom: 40px;">
+                            <div class="col-md-10">
+                                <div class="col-md-12">
+                                    <button class="btn btn--primary" type="submit">Send Message</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+    </div>
+</section>
+
+<section class="text-center" style="padding-bottom: 40px;padding-top: 90px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;margin-bottom:0px;"></a>
+                <p style="font-size: 10px;">Powered by Arqam House</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock content %}

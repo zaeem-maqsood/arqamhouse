@@ -13,10 +13,24 @@ Profile Dashboard
 
 {% block styles %}
 <style>
-   @media only screen and (max-width: 750px) {
-       .small-tables {
-           font-size: 10px;
-       } 
+
+    #button-font-size {
+        font-size: 10px;
+    }
+
+    .small-tables {
+        font-size: 10px;
+    } 
+
+   @media (min-width: 768px) {
+
+       #button-font-size {
+            font-size: 12px;
+        }
+
+        .small-tables {
+            font-size: 1em;
+        } 
    } 
 </style>
 {% endblock styles %}
@@ -28,7 +42,7 @@ Profile Dashboard
 {% endblock scripts %}
 
 {% block content %}
-<section class="text-center">
+<section class="text-center" style="padding-top: 30px;">
     <div class="container" style="padding-bottom: 60px;">
 
 
@@ -40,7 +54,7 @@ Profile Dashboard
                     <div class="col-md-12">
                         <a href="#">
                             {% if profile.picture %}
-                            <img src="{{ profile.picture.thumbnail.url }}" style="max-width: 150px;max-height: 150px;border-radius: 100px;">
+                            <img src="{{ profile.picture.thumbnail.url }}" style="max-width: 100px;max-height: 100px;border-radius: 100px;">
                             {% else %}
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100px" height="100px"
                                 viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
@@ -57,41 +71,32 @@ Profile Dashboard
                     </div>
                 </div>
                         
-                <div class="row" style="padding-top: 30px;">
-                    <div class="col-md-12">
-                        <h4 style="margin-bottom: 5px;color: gray;">{{ profile.name }}'s Orders</h4>
-                    </div>
-                </div>
-
-                {% if profile.temp_password %}
                 <div class="row" style="padding-top: 10px;">
                     <div class="col-md-12">
-                        <a href="{% url 'profiles:change_password' %}" class="btn bg--pinterest"><span class="btn__text">Change
-                                Temporary Password</span></a>
+                        <p style="margin-bottom: 5px;color: gray;">{{ profile.name }}'s Orders</p>
                     </div>
                 </div>
-                {% endif %}
 
                 <div class="row" style="padding-top: 20px;padding-bottom: 20px;">
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
                         <a class="btn btn--primary btn-block" href="{% url 'profiles:dashboard' %}">
-                            <span class="btn__text"> Dashboard </span>
+                            <span class="btn__text" id="button-font-size"> Dashboard </span>
                         </a>
                     </div>
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
                         <a class="btn btn--primary btn-block" href="{% url 'profiles:subscribers' %}">
-                            <span class="btn__text"> Subscriptions </span>
+                            <span class="btn__text" id="button-font-size"> Subscriptions </span>
                         </a>
                     </div>
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
                         <a class="btn btn-block bg--facebook" {% if not profile.house %}href="{% url 'houses:create' %}" {% else %}
                             href="{% url 'houses:dashboard' %}" {% endif %}>
-                            <span class="btn__text">{% if not profile.house %}Create House{% else %}House{% endif %}</span>
+                            <span class="btn__text" id="button-font-size">{% if not profile.house %}Create House{% else %}House{% endif %}</span>
                         </a>
                     </div>
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
                         <a class="btn bg--googleplus btn-block" href="{% url 'profiles:logout' %}">
-                            <span class="btn__text"> Log Out</span>
+                            <span class="btn__text" id="button-font-size"> Log Out</span>
                         </a>
                     </div>
                 </div>
@@ -108,7 +113,7 @@ Profile Dashboard
                                 <tr>
                                     <th>Event</th>
                                     <th>Tickets</th>
-                                    <th>Date</th>
+                                    <th class="d-md-table-cell d-none">Date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -116,7 +121,7 @@ Profile Dashboard
                                 <tr>
                                     <td><a class="small-tables" href="{{ order.get_public_order_view }}">{{ order.event }}</a></td>
                                     <td><p class="small-tables" >{{ order.attendee_set.all.count }}</p></td>
-                                    <td><p class="small-tables" >{{ order.created_at|localtime }}</p></td>
+                                    <td class="d-md-table-cell d-none"><p class="small-tables" >{{ order.created_at|localtime }}</p></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

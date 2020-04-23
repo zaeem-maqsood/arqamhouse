@@ -19,35 +19,31 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
-from houses.views import DashboardView, ConnectVerificationView, ChangeEntityTypeView
+from houses.views import DashboardView, HouseHomePageView
 from .views import HomePageView, ReportErrorView, ApplePayVerificationView, AboutUsView
 from events.views import OrderPublicDetailView
 
 urlpatterns = [
 
     path('', HomePageView.as_view(), name='home'),
+    path('zaeem/', admin.site.urls),
     path('about', AboutUsView.as_view(), name='about'),
     path('report', ReportErrorView.as_view(), name='report'),
-    path('change-entity', ChangeEntityTypeView.as_view(), name='change_entity'),
-    path('verification', ConnectVerificationView.as_view(), name='verification'),
     path('house/', include('houses.urls')),
     path('profile/', include('profiles.urls')),
-    path('zaeem/', admin.site.urls),
     path('events/', include('events.urls')),
     path('questions/', include('questions.urls')),
     path('payments/', include('payments.urls')),
     path('subscribers/', include('subscribers.urls')),
-    path('orders/<public_id>/', OrderPublicDetailView.as_view(), name='order_detail_public'),
-    path('.well-known/apple-developer-merchantid-domain-association', ApplePayVerificationView.as_view(), name='apple_verification'),
+    path('donations/', include('donations.urls')),
 
-
-    # path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
     path('password_reset/', auth_views.PasswordResetView.as_view(html_email_template_name='registration/password_reset_email.html'), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('password_reset/confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(),  name='password_reset_confirm'),
     path('password_reset/complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
-]
 
-# if settings.DEBUG:
-# 	urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
-# 	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
+    path('orders/<public_id>/', OrderPublicDetailView.as_view(), name='order_detail_public'),
+    path('.well-known/apple-developer-merchantid-domain-association', ApplePayVerificationView.as_view(), name='apple_verification'),
+
+    path('<slug:slug>/', include('houses.public_urls')),
+]

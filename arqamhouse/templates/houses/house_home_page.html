@@ -172,17 +172,20 @@ function Subscribe(boolean) {
 {% block content %}
 <section class="text-center" id="homepage_section">
     <div class="container" style="padding-bottom: 60px;">
-        <div class="row" style="padding-bottom: 20px;padding-top: 30px;">
+        <div class="row" style="padding-bottom: 20px;">
             <div class="col-md-12 col-lg-10">
 
 
                 <div class="row" style="padding-bottom: 40px;">
                     <div class="col-lg-3" id="homepage_first">
                         
-                        <div class="row" style="padding-top:30px;">
+                        <div class="row" style="padding-top:30px;padding-bottom: 20px;">
                             <div class="col-lg-12 col-md-6 col-8">
                                 {% if house.logo %}
-                                <img style="margin-bottom: 10px;max-height: 150px;" src="{{ house.logo.url }}">
+                                <a href="{{ house.get_home_page_url }}">
+                                    <img style="margin-bottom: 10px;max-height: 150px;" src="{{ house.logo.url }}">
+                                </a>
+                                
                                 {% else %}
                                     {% if owner %}
                                     <a href="{% url 'houses:update' %}">
@@ -190,56 +193,77 @@ function Subscribe(boolean) {
                                     <p>Add logo</p>
                                     </a>
                                     <br>
+                                    {% else %}
+                                    <h4 style="color: grey;margin-bottom: 10px;">{{ house.name }}</h4>
                                     {% endif %}
-                                {% endif %}
-                                <h4 style="color: grey;margin-bottom: 10px;">{{ house.name }}</h4>
-                            </div>
-                        </div>
-
-                        <div class="row d-md-flex d-lg-none">
-                            <div class="col-md-12">
-                                <p><a href="mailto:{{ house.email }}?Subject=Hello"><i class="fa fa-envelope"></i></a> | <a href="tel:{{ house.phone }}"><i class="fa fa-phone"></i></a></p>
-                            </div>
-                        </div>
-
-                        <div class="row d-none d-sm-none d-md-none d-lg-flex" style="padding-top:30px;">
-                            <div class="col-md-12">
-                                <p id="homepage_links_p" style="margin-bottom: 0px;"><a style="text-decoration: none;" href="mailto:{{ house.email }}?Subject=Hello">Email</a></p>
-                                {% if house.phone %}
-                                <p id="homepage_links_p" style="margin-bottom: 0px;"><a style="text-decoration: none;" href="tel:{{ house.phone }}">Phone</a></p>
                                 {% endif %}
                             </div>
                         </div>
 
                         {% if owner %}
-                        <div class="row" style="padding-bottom:30px;">
-                            <div class="col-md-12">
-                                <a id="homepage_links_a" class="btn btn--sm btn--primary-2" href="{% url 'houses:dashboard' %}"
+                        <div class="row justify-content-center" style="padding-bottom:30px;">
+                            <div class="col-lg-12 col-md-6 col-sm-6 col-6">
+                                <a id="homepage_links_a" class="btn btn--sm btn--primary-2 btn-block" href="{% url 'houses:dashboard' %}"
                                     style="margin-top: 10px;">
                                     <span class="btn__text">Dashboard</span>
+                                </a>            
+                            </div>
+
+                            {% if house.allow_donations %}
+                            <div class="col-lg-12 col-md-6 col-sm-6 col-6">
+                                <a id="homepage_links_a" class="btn btn--sm btn--primary btn-block" href="{{ house.get_public_donations_url }}"
+                                    style="margin-top: 10px;">
+                                    <span class="btn__text">Donations</span>
                                 </a>
                             </div>
+                            {% endif %}
+
+                            <div class="col-lg-12 col-md-6 col-sm-6 col-6">
+                                <a id="homepage_links_a" class="btn btn--sm btn--primary btn-block" href="{{ house.get_contact_url }}"
+                                    style="margin-top: 10px;">
+                                    <span class="btn__text">Contact</span>
+                                </a>
+                            </div>
+
                         </div>
+
                         {% else %}
-                            <div class="row" style="padding-bottom:30px;">
-                                <div class="col-md-12" id="subscriber_switch">
+                            <div class="row justify-content-center" style="padding-bottom:30px;">
+                                <div class="col-lg-12 col-md-6 col-sm-6 col-6" id="subscriber_switch">
                                     {% if not request.user.is_authenticated %}
-                                        <a id="homepage_links_a" class="btn btn--sm" style="margin-top: 10px;" href="{% url 'profiles:login' %}?next=/house/{{ house.slug }}">
+                                        <a id="homepage_links_a" class="btn btn--sm btn-block" style="margin-top: 10px;" href="{% url 'profiles:login' %}?next=/house/{{ house.slug }}">
                                             <span class="btn__text" id="inner_button">
                                                 Subscribe</span>
                                         </a>
                                     {% else %}
                                         {% if subscribed %}
-                                        <a id="homepage_links_a" class="btn btn--sm btn--primary-2" onclick="Subscribe(false);" style="margin-top: 10px;">
+                                        <a id="homepage_links_a" class="btn btn--sm btn--primary-2 btn-block" onclick="Subscribe(false);" style="margin-top: 10px;">
                                             <span class="btn__text" id="inner_button"><i class="fa fa-check" style="color: white;font-size: 1em;"></i> Subscribed</span>
                                         </a>
                                         {% else %}
-                                        <a id="homepage_links_a" class="btn btn--sm" onclick="Subscribe(true);" style="margin-top: 10px;">
+                                        <a id="homepage_links_a" class="btn btn--sm btn-block" onclick="Subscribe(true);" style="margin-top: 10px;">
                                             <span class="btn__text" id="inner_button">Subscribe</span>
                                         </a>
                                         {% endif %}
                                     {% endif %}
                                 </div>
+
+                                {% if house.allow_donations %}
+                                <div class="col-lg-12 col-md-6 col-sm-6 col-6">
+                                    <a id="homepage_links_a" class="btn btn--sm btn--primary btn-block" href="{{ house.get_public_donations_url }}"
+                                        style="margin-top: 10px;">
+                                        <span class="btn__text">Donate</span>
+                                    </a>
+                                </div>
+                                {% endif %}
+
+                                <div class="col-lg-12 col-md-6 col-sm-6 col-6">
+                                    <a id="homepage_links_a" class="btn btn--sm btn--primary-1 btn-block" href="{{ house.get_contact_url }}"
+                                        style="margin-top: 10px;">
+                                        <span class="btn__text">Contact</span>
+                                    </a>
+                                </div>
+
                             </div>
                         {% endif %}
                         
@@ -293,7 +317,7 @@ function Subscribe(boolean) {
                                     <div class="row" id="updates_host_and_start" style="padding-bottom: 10px;{% if not event.image %}padding: 10px 0 0 10px;{% endif %}">
                                         <div class="col-12">
                                             {% if event.description %}
-                                            <p id="updates_description" style="text-align: left;line-height: normal;">{{ event.description|striptags|truncatechars:150 }}</p>
+                                            <p id="updates_description" style="text-align: left;line-height: normal;">{{ event.description|striptags|truncatechars:180 }}</p>
                                             {% else %}
                                             <p id="updates_description" style="text-align: left;">Learn more by heading over to the event page.</p">
                                             {% endif %}
@@ -324,7 +348,7 @@ function Subscribe(boolean) {
                         </div>
                         {% for event in past_events %}
                         <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
-                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px;border-radius: 10px;" id="homepage_updates">
+                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px;border-radius: 10px;margin-bottom: 10px;" id="homepage_updates">
                             <div class="row">
                                 {% if event.image %}
                                 <div class="col-lg-3 col-md-3 col-4">

@@ -14,7 +14,7 @@ class SubscriberCreateView(HouseAccountMixin, FormView):
     def get(self, request, *args, **kwargs):
         self.object = None
         form = AddSubscriberForm()
-        return self.render_to_response(self.get_context_data(form=form, request=request))
+        return self.render_to_response(self.get_context_data(form=form, request=request, subscribers_tab=True))
 
 
     def post(self, request, *args, **kwargs):
@@ -63,7 +63,7 @@ class SubscriberCreateView(HouseAccountMixin, FormView):
     def form_invalid(self, form, request):
         print(form.errors)
         print(form.non_field_errors)
-        return self.render_to_response(self.get_context_data(form=form, request=request))
+        return self.render_to_response(self.get_context_data(form=form, request=request, subscribers_tab=True))
 
         
 
@@ -84,6 +84,7 @@ class SubscriberDetailView(HouseAccountMixin, View):
         result_list = sorted(chain(seen_campaigns, orders), key=attrgetter('created_at'))
         result_list.reverse()
 
+        context["subscribers_tab"] = True
         context["result_list"] = result_list
         context["seen_campaigns"] = seen_campaigns
         context["subscriber"] = subscriber
@@ -100,59 +101,6 @@ class SubscriberListView(HouseAccountMixin, ListView):
     template_name = "subscribers/list.html"
 
     def get(self, request, *args, **kwargs):
-
-        # RUN THIS IN THE CONSOLE ---------------------------------------------------------------------------------
-        # from django.utils.crypto import get_random_string
-        # from events.models import EventOrder
-        # from subscribers.models import Subscriber
-        # from profiles.models import Profile
-
-        # event_orders = EventOrder.objects.all()
-        # print(event_orders)
-        
-        # for order in event_orders:
-        #     passed_events = Event.objects.filter(house=order.event.house, active=False, deleted=False).count()
-        #     print(f"passed events {passed_events}")
-        #     try:
-        #         profile = Profile.objects.get(email=order.email)
-        #     except:
-        #         profile = Profile.objects.create(name=order.name, email=order.email, password=get_random_string(length=10))
-
-        #     # Check if they are already subscribed
-        #     try:
-        #         subscriber = Subscriber.objects.get(profile=profile, house=order.event.house)
-        #     except:
-        #         subscriber = Subscriber.objects.create(profile=profile, house=order.event.house, events_total=passed_events)
-
-
-        # subscribers = Subscriber.objects.all()
-        # for subscriber in subscribers:
-        #     events = Event.objects.filter(house=subscriber.house, active=False, deleted=False)
-        #     for event in events:
-        #         event_orders = EventOrder.objects.filter(event=event, email=subscriber.profile.email).exists
-        #         if event_orders:
-        #             subscriber.attendance_total = subscriber.attendance_total + 1
-        #             subscriber.save()
-
-
-        # print("\nWe ran this\n")
-        # subscribers = Subscriber.objects.all()
-        # for subscriber in subscribers:
-        #     subscriber.events.clear()
-
-        #     events = Event.objects.filter(house=subscriber.house)
-        #     for event in events:
-        #         event_orders = EventOrder.objects.filter(event=event, email=subscriber.profile.email)
-        #         print(event_orders.count())
-        #         if event_orders:
-        #             print(event_orders.count())
-        #             subscriber.events.add(event)
-        #             subscriber.save()
-
-
-        # RUN THIS IN THE CONSOLE ---------------------------------------------------------------------------------
-
-
         return render(request, self.template_name, self.get_context_data())
 
 
@@ -161,6 +109,7 @@ class SubscriberListView(HouseAccountMixin, ListView):
         house = self.get_house()
         subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
 
+        context["subscribers_tab"] = True
         context["dashboard_events"] = self.get_events()
         context["subscribers"] = subscribers
         context["house"] = house

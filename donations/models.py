@@ -1,0 +1,82 @@
+from django.db import models
+from django.urls import reverse
+from django.utils.crypto import get_random_string
+
+from core.models import TimestampedModel
+from payments.models import Transaction
+from houses.models import House
+
+
+
+# Create your models here.
+class DonationType(models.Model):
+    house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
+    name = models.CharField(max_length=150, null=True, blank=True)
+    pass_fee = models.BooleanField(default=False)
+    issue_receipts = models.BooleanField(default=False)
+    general_donation = models.BooleanField(default=False)
+    collect_address = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return (self.name)
+
+    def get_update_url(self):
+        view_name = "donations:update_type"
+        return reverse(view_name, kwargs={"pk": self.id})
+
+
+
+class Donation(TimestampedModel):
+
+    donation_type = models.ForeignKey(DonationType, on_delete=models.CASCADE, blank=False, null=True)
+    name = models.CharField(max_length=150, null=True, blank=True)
+    email = models.EmailField(max_length=300, blank=False, null=False)
+    message = models.CharField(max_length=100, null=True, blank=True)
+    address = models.CharField(max_length=200, null=True, blank=True)
+    postal_code = models.CharField(max_length=6, null=True, blank=True)
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, blank=False, null=False)
+    issue_receipt = models.BooleanField(default=False)
+    receipt_number = models.PositiveIntegerField(null=True, blank=True, default=0)
+    public_id = models.CharField(max_length=150, null=True, blank=True)
+    pass_fee = models.BooleanField(default=False)
+    anonymous = models.BooleanField(default=False)
+
+
+    def __str__(self):
+        return (self.name)
+
+    def set_receipt_number(self):
+        self.issue_receipt = True
+        donations = Donation.objects.filter(donation_type__house=self.donation_type.house)
+        donations_exist = donations.exists()
+        if donations_exist:
+            latest_donation = donations.order_by("-created_at")[0]
+            self.number = latest_donation.number + 1
+        else:
+            self.number = 1
+
+    def generate_public_id(self):
+        while True:
+            public_id = get_random_string(length=32)
+            try:
+                Donation.objects.get(public_id=public_id)
+            except:
+                break
+        self.public_id = public_id
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.generate_public_id()
+            if self.donation_type.house.issue_tax_deductible_receipts:
+                self.set_receipt_number()
+
+        super().save(*args, **kwargs)
+
+
+    def get_donation_view(self):
+        view_name = "donations:detail"
+        return reverse(view_name, kwargs={"public_id": self.public_id})
+
+
+    

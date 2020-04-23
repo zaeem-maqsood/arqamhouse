@@ -12,7 +12,18 @@ Profile Dashboard
 {% endblock footer %}
 
 {% block styles %}
+<style>
+    #button-font-size {
+        font-size: 10px;
+    }
 
+    @media (min-width: 768px) {
+
+        #button-font-size {
+            font-size: 12px;
+        }
+    }
+</style>
 {% endblock styles %}
 
 {% block top_page_scripts %}
@@ -22,7 +33,7 @@ Profile Dashboard
 {% endblock scripts %}
 
 {% block content %}
-<section class="text-center">
+<section class="text-center" style="padding-top: 30px;">
     <div class="container" style="padding-bottom: 60px;">
         <div class="row" style="padding-bottom: 20px;">
             <div class="col-md-12 col-lg-9">
@@ -32,7 +43,7 @@ Profile Dashboard
                     <div class="col-md-12">
                         <a href="#">
                             {% if profile.picture %}
-                            <img src="{{ profile.picture.thumbnail.url }}" style="max-width: 150px;max-height: 150px;border-radius: 100px;">
+                            <img src="{{ profile.picture.thumbnail.url }}" style="max-width: 100px;max-height: 100px;border-radius: 100px;">
                             {% else %}
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100px" height="100px"
                                 viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
@@ -49,43 +60,32 @@ Profile Dashboard
                     </div>
                 </div>
                 
-                <div class="row" style="padding-top: 30px;">
-                    <div class="col-md-12">
-                        <h4 style="margin-bottom: 5px;color: gray;">Hello, {{ profile.name }}</h4>
-                        {% if profile.temp_password %}
-                        <p style="margin-bottom: 0px;color: red;">Please change your temporary password immediately.</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                {% if profile.temp_password %}
                 <div class="row" style="padding-top: 10px;">
                     <div class="col-md-12">
-                        <a href="{% url 'profiles:change_password' %}" class="btn bg--pinterest"><span class="btn__text">Change Temporary Password</span></a>
+                        <p style="margin-bottom: 5px;color: gray;">Hello, {{ profile.name }}</p>
                     </div>
                 </div>
-                {% endif %}
                 
                 <div class="row" style="padding-top: 20px;padding-bottom: 20px;">
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
                         <a class="btn btn--primary btn-block" href="{% url 'profiles:orders' %}">
-                            <span class="btn__text"> Orders </span>
+                            <span class="btn__text" id="button-font-size"> Orders </span>
                         </a>
                     </div>
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
                         <a class="btn btn--primary btn-block" href="{% url 'profiles:dashboard' %}">
-                            <span class="btn__text"> Dashboard </span>
+                            <span class="btn__text" id="button-font-size"> Dashboard </span>
                         </a>
                     </div>
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
                         <a class="btn btn-block bg--facebook" {% if not profile.house %}href="{% url 'houses:create' %}" {% else %}
                             href="{% url 'houses:dashboard' %}" {% endif %}>
-                            <span class="btn__text">{% if not profile.house %}Create House{% else %}House{% endif %}</span>
+                            <span class="btn__text" id="button-font-size">{% if not profile.house %}Create House{% else %}House{% endif %}</span>
                         </a>
                     </div>
                     <div class="col-md-3 col-6" style="padding-bottom: 20px;">
                         <a class="btn bg--googleplus btn-block" href="{% url 'profiles:logout' %}">
-                            <span class="btn__text"> Log Out</span>
+                            <span class="btn__text" id="button-font-size"> Log Out</span>
                         </a>
                     </div>
                 </div>
@@ -104,21 +104,22 @@ Profile Dashboard
                     <div class="col-md-6">
                         <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
                             style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 10px;border-radius: 10px;margin-bottom: 20px;">
-                            <div class="row" style="min-height: 75px;">
-                                <div class="col-lg-4 col-md-4 col-sm-4 col-5" style="align-self: center;">
+                            <div class="row justify-content-center" style="min-height: 75px;">
+
+                                {% if subscriber.house.logo %}
+                                <div class="col-lg-10 col-md-10 col-sm-10 col-10" style="align-self: center;">
                                     <a href="{{ subscriber.house.get_home_page_url }}">
-                                        {% if subscriber.house.logo %}
                                         <img style="padding: 5px;max-height:80px;" src="{{ subscriber.house.logo.url }}">
-                                        {% else %}
-                                        <i class="fa fa-home" style="font-size: 80px;display: inline;"></i>
-                                        {% endif %}
                                     </a>
                                 </div>
-                                <div class="col-lg-8 col-md-8 col-sm-8 col-7" style="align-self: center;">
-                                    <p class="lead" id="updates_title" style="margin-bottom: 0px; text-align: left;{% if not subscriber.house.logo %}padding-left:10px;{% endif %}">
-                                        <a style="text-decoration: none;" href="{{ subscriber.house.get_home_page_url }}">{{ subscriber.house.name }}</a>
-                                    </p>
+                                {% else %}
+                                <div class="{% if subscriber.house.logo %}col-lg-7 col-md-7 col-sm-7 col-6{% else %}col-lg-12 col-md-12 col-sm-10 col-10{% endif %}" style="align-self: center;">
+                                    <h3 id="updates_title" style="margin-bottom: 0px; text-align: center;{% if not subscriber.house.logo %}padding-left:10px;{% endif %}">
+                                        <a style="text-decoration: none;font-weight: 400;" href="{{ subscriber.house.get_home_page_url }}">{{ subscriber.house.name }}</a>
+                                    </h3>
                                 </div>
+                                {% endif %}
+
                             </div>
                         </div>
                         

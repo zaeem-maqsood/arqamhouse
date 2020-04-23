@@ -1,0 +1,138 @@
+{% extends "backend/base.html" %}
+{% load tz %}
+{% load static %}
+
+{% block title %}
+Donation Types | {{ house.name }}
+{% endblock title %}
+
+
+{% block styles %}
+
+{% endblock styles %}
+
+
+{% block scripts %}
+
+{% endblock scripts %}
+
+
+
+{% block content %}
+
+<div class="row justify-content-center h-100"style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-6 col-md-12 col-12">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+				<div class="row" style="padding-bottom: 10px;">
+					<div class="col-12">
+						<h3>Donation Detail</h3>
+                        <p style="margin-bottom: 5px;"><span style="font-weight: 700;">ID |</span> {{ donation.public_id }}</p>
+                        <p><span style="font-weight: 700;">Type |</span> <a href="{{ donation.donation_type.get_update_url }}">{{ donation.donation_type }}</a></p>
+					</div>
+				</div>
+
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-12">
+                        <h5 style="margin-bottom: 5px;">Name</h5>
+                        <p>{{ donation.name }}</p>
+                    </div>
+                </div>
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-12">
+                        <h5 style="margin-bottom: 5px;">Email</h5>
+                        <a href="#">{{ donation.email }}</a>
+                    </div>
+                </div>
+
+                
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-lg-12">
+                        <h5 style="margin-bottom: 5px;">Address</h5>
+                        {% if donation.address %}
+                        <p>{{ donation.address }}</p>
+                        {% else %}
+                        <p>No Address Given</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h5 style="margin-bottom: 5px;">Postal Code</h5>
+                        {% if donation.postal_code %}
+                        <p style="margin-bottom: 5px;">{{ donation.postal_code }}</p>
+                        {% else %}
+                        <p style="margin-bottom: 5px;">No Postal Code Given</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-12">
+                        <hr>
+                    </div>
+                </div>
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-12">
+                        <h5 style="margin-bottom: 5px;">Total Charged</h5>
+                        <p style="margin-bottom: 5px;">${{ donation.transaction.amount }}</p>
+                        {% if donation.pass_fee %}
+                        {% else %}
+                        <p style="color: #4599d5;font-weight: 600;font-size: 10px;">Amount for tax deductable receipt - if applicable
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-12">
+                        <h5 style="margin-bottom: 5px;">Payment Fee</h5>
+                        <p style="margin-bottom: 5px;">${{ total_fee }}</p>
+                        {% if donation.pass_fee %}
+                        <p style="color: #4599d5;font-weight: 600;font-size: 10px;">Paid by donor
+                        </p>
+                        {% else %}
+                        <p style="color: #4599d5;font-weight: 600;font-size: 10px;">Paid by you
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-12">
+                        <h5 style="margin-bottom: 5px;">Total Received</h5>
+                        <p style="margin-bottom: 5px;">${{ donation.transaction.house_amount }}</p>
+                        {% if donation.pass_fee %}
+                        <p style="color: #4599d5;font-weight: 600;font-size: 10px;">Amount for tax deductable receipt - if applicable
+                        </p>
+                        {% else %}
+                        {% endif %}
+                    </div>
+                </div>
+
+			</div>
+					
+		</div>
+	</div>
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

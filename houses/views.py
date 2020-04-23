@@ -36,7 +36,7 @@ from django.contrib.auth.models import User
 from profiles.models import Profile
 from .models import House, HouseUser, HouseDirector
 from .forms import (AddUserToHouse, HouseSupportInfoForm, HouseChangeForm, HouseForm, HouseVerificationForm, 
-                    HouseDirectorForm, HouseUserOptionsForm, HouseLogoForm)
+                    HouseDirectorForm, HouseUserOptionsForm, HouseLogoForm, HouseContactForm)
 
 from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
 from profiles.models import Profile
@@ -163,12 +163,103 @@ class HouseHomePageView(DetailView):
 
 
 
+
+
+
+class HouseContactPageView(DetailView):
+    model = House
+    template_name = "houses/house_contact.html"
+
+    def get_house(self, slug):
+        try:
+            house = House.objects.get(slug=slug)
+            return house
+        except:
+            raise Http404 
+
+    def check_if_user_is_owner(self, house):
+        user = self.request.user
+        if user.is_anonymous:
+            return False
+        house_users = HouseUser.objects.filter(profile=user, house=house)
+        print(house_users)
+        if house_users.exists():
+            return True
+        else:
+            return False
+
+
+    def get(self, request, *args, **kwargs):
+
+        context = {}
+        house = self.get_house(kwargs["slug"])
+        owner = self.check_if_user_is_owner(house)
+        form = HouseContactForm()
+
+        context["form"] = form
+        context["owner"] = owner
+        context["house"] = house
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        print(data)
+        form = HouseContactForm(data=data)
+        if 'g-recaptcha-response' in data:
+            if data['g-recaptcha-response'] == '':
+                form.add_error(None, 'Please confirm you are human.')
+                return self.form_invalid(form)
+            if form.is_valid():
+                return self.form_valid(form, request)
+            else:
+                return self.form_invalid(form)
+        else:
+            form.add_error(None, 'Please confirm you are human.')
+            return self.form_invalid(form)
+
+    def form_valid(self, form, request):
+        name = form.cleaned_data["name"]
+        message = form.cleaned_data["message"]
+        email = form.cleaned_data["email"]
+        self.send_email(name, message, email)
+        messages.success(request, 'Message Sent!')
+        valid_data = super(HouseContactPageView, self).form_valid(form)
+        return valid_data
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+    def send_email(self, name, message, email):
+        house = self.get_house()
+        subject = f"New Message from {name}"
+        context = {}
+        context["name"] = name
+        context["message"] = message
+        html_message = render_to_string('emails/error_report.html', context)
+        plain_message = strip_tags(html_message)
+        from_email = f'{name} <{email}>'
+        to = [house.email]
+        mail.send_mail(subject, plain_message, from_email, to, html_message=html_message)
+        return "Done"
+
+
+
+
+
+
+
+
+
+
+
 class HouseSupportInfoView(HouseAccountMixin, FormView):
     model = House
     template_name = "houses/support_info.html"
 
     def get_success_url(self):
-        view_name = "houses:update"
+        view_name = "houses:dashboard"
         return reverse(view_name)
 
     def get(self, request, *args, **kwargs):
@@ -190,6 +281,7 @@ class HouseSupportInfoView(HouseAccountMixin, FormView):
 
         form = HouseSupportInfoForm(instance=house, data=request.POST)
         if form.is_valid():
+
             return self.form_valid(form, request)
         else:
             return self.form_invalid(form)
@@ -198,6 +290,7 @@ class HouseSupportInfoView(HouseAccountMixin, FormView):
     def form_valid(self, form, request):
         house = self.get_house()
         self.object = form.save()
+        messages.info(request, 'Contact Info Updated')
         valid_data = super(HouseSupportInfoView, self).form_valid(form)
         return valid_data
 
@@ -216,39 +309,35 @@ class HouseVerificationView(HouseAccountMixin, FormView):
 
     def get_success_url(self):
         house = self.get_house()
-
-        if house.verification_pending:
-            view_name = "houses:update"
-        else:
-            view_name = "houses:verify"
-
+        view_name = "houses:verify"
         return reverse(view_name)
 
     def get(self, request, *args, **kwargs):
         house = self.get_house()
         
-        try:
-            house_director = HouseDirector.objects.get(house=house)
-            return HttpResponseRedirect(self.get_success_url())
-        except:
-            pass
-        return self.render_to_response(self.get_context_data())
+        # try:
+        #     house_director = HouseDirector.objects.get(house=house)
+        #     return HttpResponseRedirect(self.get_success_url())
+        # except:
+        #     pass
 
-    def get_context_data(self, *args, **kwargs):
+        if house.address_entered:
+            form = HouseDirectorForm()
+        elif house.house_type:
+            form = HouseVerificationForm(instance=house)
+        else:
+            form = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_context_data(self, form, *args, **kwargs):
         context = {}
         house = self.get_house()
         profile = self.request.user
         current_house_user = HouseUser.objects.get(profile=profile, house=house)
+        house_directors = HouseDirector.objects.filter(house=house)
 
-        if house.address_entered:
-            form = HouseDirectorForm()
-            context["form"] = form
-        elif house.house_type:
-            form = HouseVerificationForm(instance=house)
-            context["form"] = form
-        else:
-            form = None
-
+        context["house_directors"] = house_directors
+        context["form"] = form
         context["current_house_user"] = current_house_user
         context["profile"] = profile
         context["house"] = house
@@ -665,242 +754,6 @@ class HouseCreateView(LoginRequiredMixin, CreateView):
                     from_='+16475571902',
                     to='+16472985582'
                 )
-
-
-
-
-
-
-
-
-
-def merge_images(file1, file2):
-    """Merge two images into one, displayed side by side
-    :param file1: path to first image file
-    :param file2: path to second image file
-    :return: the merged Image object
-    """
-    image1 = Image.open(file1)
-    image2 = Image.open(file2)
-
-    (width1, height1) = image1.size
-    (width2, height2) = image2.size
-
-    result_width = width1 + width2
-    result_height = max(height1, height2)
-
-    result = Image.new('RGB', (result_width, result_height))
-    result.paste(im=image1, box=(0, 0))
-    result.paste(im=image2, box=(width1, 0))
-    return result
-
-
-
-class ChangeEntityTypeView(HouseAccountMixin, View):
-
-    def get(self, request, *args, **kwargs):
-        House = self.get_House()
-        House.entity = None
-        House.save()
-        view_name = "verification"
-        return HttpResponseRedirect(reverse(view_name))
-
-
-
-
-class ConnectVerificationView(HouseAccountMixin, FormView):
-    template_name = 'houses/connect_verification.html'
-    form_class = None
-    success_url = '/dashboard'
-
-    def get_context_data(self, form, *args, **kwargs):
-        context = {}
-        House = self.get_House()
-        profile = self.get_profile()
-
-        if House.entity == "individual":
-                context["business"] = False
-        else:
-            context["business"] = True
-
-        context["profile"] = profile
-        context["House"] = House
-        context["form"] = form
-        return context
-
-    def get(self, request, *args, **kwargs):
-        House = self.get_House()
-        form = None
-
-        if House.entity:
-            if House.entity == "individual":
-                self.form_class = ConnectIndividualVerificationForm
-            else:
-                self.form_class = ConnectCompanyVerificationForm
-            form = self.get_form()
-
-        else:
-            self.template_name = "houses/select_entity.html"
-            entity = False
-        
-        return self.render_to_response(self.get_context_data(form))
-
-
-    def get_client_ip(self, request):
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
-        else:
-            ip = request.META.get('REMOTE_ADDR')
-        return ip
-
-
-    def form_valid(self, form, request, token):
-
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        House = self.get_House()
-
-        # Form Field Variables
-        business_name = form.cleaned_data.get("business_name")
-        business_number = form.cleaned_data.get("business_number")
-        email = form.cleaned_data.get("primary_email")
-        first_name = form.cleaned_data.get("first_name")
-        last_name = form.cleaned_data.get("last_name")
-        city = form.cleaned_data.get("city")
-        line_1 = form.cleaned_data.get("line_1")
-        postal_code = form.cleaned_data.get("postal_code")
-        state = form.cleaned_data.get("province")
-        dob_day = form.cleaned_data.get("dob_day")
-        dob_month = form.cleaned_data.get("dob_month")
-        dob_year = form.cleaned_data.get("dob_year")
-        personal_id_number = form.cleaned_data.get("personal_id_number")
-
-        ip_address = self.get_client_ip(request)
-        if not ip_address:
-            ip_address = "70.50.85.53"
-
-
-        # Stripe Account Creation
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        stripe_account = stripe.Account.create(country="CA", type="custom", email=email)
-
-        # Save Stripe Account ID to House model
-        House.connected_stripe_account_id = stripe_account.id
-        house.save()
-
-        # Add required fields to stripe account 
-        stripe_account.tos_acceptance.date = int(time.time())
-        stripe_account.tos_acceptance.ip = ip_address
-        stripe_account.legal_entity.business_name = business_name
-        stripe_account.legal_entity.business_tax_id = business_number
-        stripe_account.legal_entity.type = "individual"
-        stripe_account.legal_entity.first_name = first_name
-        stripe_account.legal_entity.last_name = last_name
-        stripe_account.legal_entity.personal_id_number = personal_id_number
-        stripe_account.legal_entity.address.city = city
-        stripe_account.legal_entity.address.line1 = line_1
-        stripe_account.legal_entity.address.postal_code = postal_code
-        stripe_account.legal_entity.address.state = state
-        stripe_account.legal_entity.dob.day = dob_day
-        stripe_account.legal_entity.dob.month = dob_month
-        stripe_account.legal_entity.dob.year = dob_year
-
-        try:
-            stripe_account.save()
-        except Exception as e:
-            body = e.json_body
-            err = body.get('error', {})
-            print(err)
-        
-
-        front_side = form.cleaned_data.get("front_side_drivers_license")
-        back_side = form.cleaned_data.get("back_side_drivers_license")
-
-        print(form.cleaned_data)
-        
-        house.front_side = front_side
-        house.back_side = back_side
-        house.save()
-
-        inImg1 = request.FILES["front_side_drivers_license"]
-        inImg2 = request.FILES["back_side_drivers_license"]
-        result = merge_images(inImg1, inImg2)
-        w, h = result.size
-
-        result = result.resize((int(w/3), int(h/3)))
-
-        image_io = BytesIO()
-        result.save(image_io, format='JPEG', quality=90)
-        house.legal_document.save("legal_document.JPEG", ContentFile(image_io.getvalue()))
-        house.save()
-
-
-        # Stripe File Upload 
-        from django.core.files.uploadedfile import SimpleUploadedFile
-        print(house.legal_document.url)
-        
-        fp = SimpleUploadedFile(house.legal_document.url, house.legal_document.read())
-        file_upload = stripe.FileUpload.create(purpose="identity_document", file=fp, stripe_account=stripe_account.id)
-
-        house.stripe_legal_document_id = file_upload.id
-        house.save()
-        print(file_upload)
-
-        stripe_account.legal_entity.verification.document = file_upload.id
-        stripe_account.save()
-        print(stripe_account)
-
-        
-
-        valid_data = super(ConnectVerificationView, self).form_valid(form)
-        return valid_data
-
-
-    def post(self, request, *args, **kwargs):
-        data = request.POST
-        house = self.get_house()
-
-        if "Individual" in data:
-            house.entity = "individual"
-            house.save()
-            return redirect('verification')
-        elif "Company" in data:
-            house.entity = "company"
-            house.save()
-            return redirect('verification')
-        else:
-            print(data)
-            if house.entity == "individual":
-                self.form_class = ConnectIndividualVerificationForm
-            else:
-                self.form_class = ConnectCompanyVerificationForm
-
-            # stripe.api_key = settings.STRIPE_SECRET_KEY
-            token = data["token"]
-            # print(token)
-            # stripe_account = stripe.Account.create(country="CA", type="custom", account_token=token)
-            # house.connected_stripe_account_id = stripe_account.id
-            # house.save()
-
-            form = self.get_form()
-            if form.is_valid():
-                return self.form_valid(form, request, token)
-            else:
-                return self.form_invalid(form, request)
-
-    def form_invalid(self, form, request):
-        print(form.errors)
-        return self.render_to_response(self.get_context_data(form=form))
-
-
-
-
-
-
-
-
-
-
 
 
 

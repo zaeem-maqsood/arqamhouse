@@ -8,15 +8,12 @@ class UnsubscribeFromEmailView(View):
     def get(self, request, *args, **kwargs):
         context = {}
         data = request.GET
-        print("OMG IT CAME HERE")
-        print(data)
-        subscriber_id = data["subscriber_id"]
+        
         try:
+            subscriber_id = data["subscriber_id"]
             subscriber = Subscriber.objects.get(id=int(subscriber_id))
             subscriber.unsubscribed = True
             subscriber.save()
-            print("We got unsubscriber")
-            print(subscriber)
             view_name = "houses:home_page"
             return HttpResponseRedirect(reverse(view_name, kwargs={"slug": subscriber.house.slug}))
         except:
@@ -31,11 +28,10 @@ class CampaignTrackerView(View):
     def get(self, request, *args, **kwargs):
         context = {}
         data = request.GET
-        print("OMG IT CAME HERE")
-        print(data)
-        campaign_id = data["campaign_id"]
-        subscriber_id = data["subscriber_id"]
+    
         try:
+            campaign_id = data["campaign_id"]
+            subscriber_id = data["subscriber_id"]
             campaign = Campaign.objects.get(id=int(campaign_id))
             try:
                 subscriber = Subscriber.objects.get(id=int(subscriber_id))
@@ -162,6 +158,11 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
                 subscribers = Subscriber.objects.filter(house=house, unsubscribed=False, events=self.object.event)
             else:
                 subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
+
+            for subscriber in subscribers:
+                subscriber.campaigns_total += 1
+                subscriber.save()
+
             subscribers = list(subscribers)
             self.object.subscribers_sent_to.add(*subscribers)
             self.object.draft = False

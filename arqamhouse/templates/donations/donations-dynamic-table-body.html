@@ -1,0 +1,9 @@
+{% load tz %}
+{% for donation in donations %}
+<tr>
+    <td><a href="{{ order.get_order_view }}">{{ donation.name|title }}</a></td>
+    <td>$ {% if donation.transaction.amount %}{{ donation.transaction.amount }}{% else %}0.00{% endif %}</td>
+    <td>{{ donation.donation_type }}</td>
+    <td class="d-none d-sm-none d-md-table-cell">{{ donation.created_at|localtime }}</td>
+</tr>
+{% endfor %}

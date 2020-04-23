@@ -78,6 +78,7 @@ class Transaction(models.Model):
     address_postal_code = models.CharField(max_length=150, null=True, blank=True)
     address_city = models.CharField(max_length=150, null=True, blank=True)
     address_country = models.CharField(max_length=150, null=True, blank=True)
+    donation_transaction = models.BooleanField(default=False)
 
     def fee(self):
         fee = self.stripe_amount + self.arqam_amount
@@ -197,11 +198,7 @@ def house_balance_update(object_type, instance, *args, **kwargs):
 
 
     if object_type == 'arqam_house_service_fee':
-        if instance.house.free_live_video:
-            house_balance = HouseBalance.objects.get(house=instance.house)
-            house_balance_log = HouseBalanceLog.objects.create(house_balance=house_balance, arqam_house_service_fee=instance, balance=house_balance.balance, gross_balance=house_balance.gross_balance)
-            house_balance_log.save()
-        else:
+        if not instance.house.free_live_video:
             house_balance = HouseBalance.objects.get(house=instance.house)
             house_balance.balance -= instance.amount
             house_balance.gross_balance -= instance.amount

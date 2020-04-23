@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'payments',
     'events',
     'questions',
-    'subscribers'
+    'subscribers',
+    'donations',
 
 ]
 

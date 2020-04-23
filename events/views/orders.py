@@ -20,8 +20,6 @@ class OrderListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, 
 
     def post(self, request, *args, **kwargs):
         data = request.POST
-        print("It came to post")
-        print(data)
         event = self.get_event(self.kwargs['slug'])
         all_orders = EventOrder.objects.select_related('transaction').filter(event=event).order_by('-created_at')
         search_terms = data["search"].split()
@@ -41,7 +39,6 @@ class OrderListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, 
                 counter += 1
         
         orders = orders[:100]
-        print(orders)
         html = render_to_string('events/orders/orders-dynamic-table-body.html', {'orders': orders, 'request':request})
         return HttpResponse(html)
 
@@ -50,7 +47,6 @@ class OrderListView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMixin, 
         house = self.get_house()
         event = self.get_event(self.kwargs['slug'])
         orders = EventOrder.objects.filter(event=event).order_by('-created_at')
-        print(orders)
         
         context["house"] = house
         context["orders"] = orders

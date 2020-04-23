@@ -59,14 +59,127 @@ function initMap() {
         color: #7396b0;
     }
 </style>
-<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
-    <div class=" {% if not house.house_type %}col-lg-10 offset-lg-1{% else %}col-lg-6 offset-lg-3{% endif %} col-md-12 col-12">
+<div class="row justify-content-center h-100" style="padding: 3rem 0px 3rem 0px;">
+    <div class="col-lg-8 col-md-12 col-12">
         <div class="kt-portlet kt-portlet--mobile" style="padding:10px;">
             <div class="kt-portlet__body">
 
+                {% if house.verification_pending %}
+
+                    {% if house.verified %}
+                    <div class="row justify-content-center" style="padding-bottom:10px;">
+                        <div class="col-12">
+                            <h4 style="margin-bottom:0px;">Verification Complete</h4>
+                            <p>We have successfully verified the information you have provided! {{ house.name }} is now a verified house.</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="row justify-content-center" style="padding-bottom:10px;">
+                        <div class="col-12">
+                            <h4 style="margin-bottom:0px;">Verification Application Under Review</h4>
+                            <p>We are going over the information you provided and will be in touch with you shortly.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if house.house_type == 'Individual' %}
+                    <div class="row justify-content-center" style="padding-bottom:10px;">
+                        <div class="col-12">
+                            <h4 style="margin-bottom:0px;">Individual Information</h4>
+                            <br>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Individual Name</p>
+                            <p>{{ house.legal_name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Country</p>
+                            <p>{{ house.country }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Region</p>
+                            <p>{{ house.region.name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">City</p>
+                            <p>{{ house.city.name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Address</p>
+                            <p>{{ house.address }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Postal Code</p>
+                            <p>{{ house.postal_code }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if house.house_type == 'Business' %}
+                    <div class="row justify-content-center" style="padding-bottom:10px;">
+                        <div class="col-12">
+                            <h4 style="margin-bottom:0px;">Business Information</h4>
+                            <br>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Business Name</p>
+                            <p>{{ house.legal_name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Tax ID / Corporation Number</p>
+                            <p>{{ house.tax_id }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Business Number</p>
+                            <p>{{ house.business_number }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Country</p>
+                            <p>{{ house.country }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Region</p>
+                            <p>{{ house.region.name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">City</p>
+                            <p>{{ house.city.name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Address</p>
+                            <p>{{ house.address }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Postal Code</p>
+                            <p>{{ house.postal_code }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if house.house_type == 'Nonprofit' %}
+                    <div class="row justify-content-center" style="padding-bottom:10px;">
+                        <div class="col-12">
+                            <h4 style="margin-bottom:0px;">Nonprofit Information</h4>
+                            <br>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Nonprofit Name</p>
+                            <p>{{ house.legal_name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Registration Number</p>
+                            <p>{{ house.charitable_registration_number }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Country</p>
+                            <p>{{ house.country }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Region</p>
+                            <p>{{ house.region.name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">City</p>
+                            <p>{{ house.city.name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Address</p>
+                            <p>{{ house.address }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Postal Code</p>
+                            <p>{{ house.postal_code }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% for house_director in house_directors %}
+                    <div class="row justify-content-center" style="padding-bottom:10px;">
+                        <div class="col-12">
+                            <h4 style="margin-bottom:0px;">Beneficial Owner</h4>
+                            <br>
+                            <p style="margin-bottom: 0px;font-weight: 700;">First Name</p>
+                            <p>{{ house_director.first_name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Last Name</p>
+                            <p>{{ house_director.last_name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Date of Birth Provided</p>
+                            <p>Yes</p>
+                            <p style="margin-bottom: 0px;font-weight: 700;">Identification Provided</p>
+                            <p>Yes</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="row justify-content-center" style="padding-bottom:10px;">
+                        <div class="col-12">
+                            <p>Contact us if any of the information above changes.</p>
+                            <a href="mailto:info@arqamhouse.com?Subject=Hello" class="btn btn-primary">Contact Us</a>
+                        </div>
+                    </div>
+
+
+                {% else %}
                 <form method="POST" enctype="multipart/form-data" id="houseVerificationForm" action="" data-cities-url="{% url 'profiles:ajax_load_cities' %}">{% csrf_token %}
 
-                    <div class="row" style="padding-bottom:10px;">
+                    <div class="row justify-content-center" style="padding-bottom:10px;">
                         <div class="col-12">
                             <h4 style="margin-bottom:0px;">Verification <i style="color: #4399d5;" class="fa fa-check-circle" data-container="body"
                                                         data-toggle="kt-tooltip" data-placement="top" title=""
@@ -75,25 +188,27 @@ function initMap() {
                     </div>
 
                     {% if not house.house_type %}
-                    <div class="row" style="padding-bottom:50px;">
+                    <div class="row justify-content-center">
                         <div class="col-12">
                             <p style="margin-bottom:0px;">Verification in Arqam House is required to enable larger payouts, collect sales tax, or issue tax-deductible receipts if
                             you’re a non-profit.</p>
+                            <hr>
                         </div>
                     </div>
                     {% endif %}
 
 
                     {% if house.house_type and not house.address_entered %}
-                    <div class="row" style="padding-bottom:50px;">
+                    <div class="row" style="padding-bottom:20px;">
                         <div class="col-12">
                             <p style="margin-bottom:0px;">We need to collect this information so we can submit accurate tax reports..</p>
+                            <hr>
                         </div>
                     </div>
                     {% endif %}
 
                     {% if house.address_entered %}
-                    <div class="row" style="padding-bottom:50px;">
+                    <div class="row" style="padding-bottom:20px;">
                         <div class="col-12">
                             {% if house.house_type == "Individual" %}
                             <p style="margin-bottom:0px;">Please confirm your identity.</p>
@@ -111,23 +226,24 @@ function initMap() {
 
                     {% if not house.house_type %}
                     <div class="row">
-                        <div class="col-md-4" style="padding: 30px;">
-                            <h1><i class="la la-user"></i></h1>
-                            <h5>Individual House</h5>
+                        <div class="col-12" style="padding: 30px;">
+                            <h5><i class="la la-user"></i> Individual House</h5>
                             <p>You are an individual entity that will use Arqam House for personal uses. You cannot issue sales receipts with an individual account, attendees will not receive receipts.</p>
-                            <button type="submit" name="house_type" value="Individual" class="btn btn-primary btn-block">Choose</button>
+                            <button type="submit" name="house_type" value="Individual" class="btn btn-primary">Individual</button>
                         </div>
-                        <div class="col-md-4" style="padding: 30px;">
-                            <h1><i class="la la-suitcase"></i></h1>
-                            <h5>Business House</h5>
+                    </div>
+                    <div class="row">
+                        <div class="col-12" style="padding: 30px;">
+                            <h5><i class="la la-suitcase"></i> Business House</h5>
                             <p>You will be using Arqam House as a business entity. You will be able to charge sales tax on receipts and Arqam house will facilitate issuing receipts on your behalf.</p>
-                            <button type="submit" name="house_type" value="Business" class="btn btn-primary btn-block">Choose</button>
+                            <button type="submit" name="house_type" value="Business" class="btn btn-primary">Business</button>
                         </div>
-                        <div class="col-md-4" style="padding: 30px;">
-                            <h1><i class="la la-leaf"></i></h1>
-                            <h5>Nonprofit House</h5>
-                            <p>You will be using Arqam House as a nonprofit with charitable status. Arqam House will facilitate in the creation of tax deductible receipts for your attendees.</p>
-                            <button type="submit" name="house_type" value="Nonprofit" class="btn btn-primary btn-block">Choose</button>
+                    </div>
+                    <div class="row">
+                        <div class="col-12" style="padding: 30px;">
+                            <h5><i class="la la-leaf"></i> Nonprofit House</h5>
+                            <p>You will be using Arqam House as a nonprofit with charitable status. Arqam House will facilitate in the creation of tax deductible receipts for your attendees if you choose to do so.</p>
+                            <button type="submit" name="house_type" value="Nonprofit" class="btn btn-primary">Nonprofit</button>
                         </div>
                     </div>
                     {% endif %}
@@ -135,20 +251,74 @@ function initMap() {
                     {% if house.house_type and not house.address_entered %}
                     <div class="row">
                         <div class="col-12">
+
+                            {% if form.non_field_errors %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {% for error in form.non_field_errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                        <strong>Oh snap!</strong> {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
                             
                             <div class="row" style="padding-bottom: 30px;">
                                 <div class="col-md-12">
-                                    <h5>{% if house.house_type == "Individual" %}Legal Name{% else %}Legal Business Name{% endif %}</h5>
+                                    <h5>{% if house.house_type == "Individual" %}Legal Name{% elif house.house_type == "Nonprofit" %}Nonprofit Name{% else %}Business Name{% endif %}</h5>
                                     {{ form.legal_name }}
+                                    {% for error in form.legal_name.errors %}
+                                    <br>
+                                    <div class="alert m-alert--outline alert-danger" role="alert">
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            {% if house.house_type == "Business" %}
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <h5>Corporation Number</h5>
+                                    {{ form.tax_id }}
+                                    {% for error in form.tax_id.errors %}
+                                    <br>
+                                    <div class="alert m-alert--outline alert-danger" role="alert">
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
                                 </div>
                             </div>
 
                             <div class="row" style="padding-bottom: 30px;">
                                 <div class="col-md-12">
-                                    <h5>{% if house.house_type == "Individual" %}Tax Identification Number{% else %}Corporation Number{% endif %}</h5>
-                                    {{ form.tax_id }}
+                                    <h5>Business Number</h5>
+                                    {{ form.business_number }}
+                                    {% for error in form.business_number.errors %}
+                                    <br>
+                                    <div class="alert m-alert--outline alert-danger" role="alert">
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
                                 </div>
                             </div>
+                            {% endif %}
+
+                            {% if house.house_type == "Nonprofit" %}
+                            <div class="row" style="padding-bottom: 30px;">
+                                <div class="col-md-12">
+                                    <h5>Registration Number</h5>
+                                    {{ form.charitable_registration_number }}
+                                    {% for error in form.charitable_registration_number.errors %}
+                                    <br>
+                                    <div class="alert m-alert--outline alert-danger" role="alert">
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
 
                             <div class="row" style="padding-bottom: 30px;">
                                 <div class="col-md-12">
@@ -158,24 +328,19 @@ function initMap() {
                             </div>
                             
                             <div class="row" style="padding-bottom: 30px;">
-                                <div class="col-12">
+                                <div class="col-md-4 col-12" style="padding-bottom: 20px;">
                                     <h5>Region</h5>
                                     {{ form.region }}
                                 </div>
-                            </div>
-                            
-                            <div class="row" style="padding-bottom: 30px;">
-                                <div class="col-12">
+                                <div class="col-md-4 col-12" style="padding-bottom: 20px;">
                                     <h5>City</h5>
                                     {{ form.city }}
                                 </div>
-                            </div>
-                            
-                            <div class="row" style="padding-bottom: 30px;">
-                                <div class="col-12">
+                                <div class="col-md-4 col-12" style="padding-bottom: 20px;">
                                     <h5>Postal Code</h5>
                                     {{ form.postal_code }}
                                 </div>
+
                             </div>
                             
                             <div class="row" style="padding-bottom: 30px;">
@@ -259,14 +424,14 @@ function initMap() {
                     
                             <div class="row" style="padding-bottom: 30px;">
                                 <div class="col-md-12">
-                                    <h5>Drivers Licence Front</h5>
+                                    <h5>Drivers Licence Front - <span style="font-size:10px">Encrypted File Upload</span></h5>
                                     {{ form.front_id }}
                                 </div>
                             </div>
                     
                             <div class="row" style="padding-bottom: 30px;">
                                 <div class="col-md-12">
-                                    <h5>Drivers Licence Back</h5>
+                                    <h5>Drivers Licence Back - <span style="font-size:10px">Encrypted File Upload</span></h5>
                                     {{ form.back_id }}
                                 </div>
                             </div>
@@ -279,11 +444,8 @@ function initMap() {
                         </div>
                     </div>
                     {% endif %}
-
-
-                    
-
                 </form>
+                {% endif %}
 
             </div>
         </div>

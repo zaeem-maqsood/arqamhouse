@@ -10,11 +10,11 @@ Dashboard | {{ house.name }}
 {% endblock css_vendors %}
 
 {% block vendors %}
-<link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js" type="text/javascript" />
+
 {% endblock vendors %}
 
 {% block scripts %}
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
 <script type="text/javascript">
 	var ctx2 = document.getElementById("myChart2");
 	var myChart2 = new Chart(ctx2, {
@@ -272,7 +272,7 @@ Dashboard | {{ house.name }}
 												transform="translate(11.959697, 3.661508) rotate(-270.000000) translate(-11.959697, -3.661508) " />
 										</g>
 									</svg>
-									<p style="padding-top: 10px;">Email &amp; Phone</p>
+									<p style="padding-top: 10px;">Communication</p>
 								</a>
 							</div>
 						</div>

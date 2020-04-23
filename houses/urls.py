@@ -23,6 +23,8 @@ from .views import (HouseCreateView, HouseLandingView,
                     DashboardView, HouseUpdateView, AddUserToHouseView, HouseVerificationView, HouseSupportInfoView,
                     HouseHomePageView, HouseUserDetailView)
 
+from donations.views import DonationListView
+
 
 app_name="houses"
 
@@ -50,7 +52,7 @@ urlpatterns = [
     # Verifiy House
 	path('verify', HouseVerificationView.as_view(), name='verify'),
 
-    # House Home Page
-	path('<slug:slug>', HouseHomePageView.as_view(), name='home_page'),
+    # # Donations
+	# path('manage-donations', DonationListView.as_view(), name='donations'),
 
 ]

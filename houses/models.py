@@ -57,6 +57,7 @@ class House(TimestampedModel):
     name = models.CharField(max_length=120, null=True, blank=False)
     email = models.EmailField(blank=True, null=True)
     phone = PhoneNumberField(blank=True, null=True)
+    website = models.CharField(max_length=200, null=True, blank=True)
     order_confirmations = models.BooleanField(default=True)
     ticket_sales = models.BooleanField(default=True)
     slug = models.SlugField(unique = False, blank=True)
@@ -66,6 +67,7 @@ class House(TimestampedModel):
     city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=True)
     address = models.CharField(max_length=200, null=True, blank=True)
     business_number = models.CharField(max_length=200, null=True, blank=True)
+    charitable_registration_number = models.CharField(max_length=200, null=True, blank=True)
     postal_code = models.CharField(max_length=6, null=True, blank=True)
     house_type = models.CharField(max_length=150, choices=house_types, blank=True, null=True)
     legal_name = models.CharField(max_length=200, null=True, blank=True)
@@ -75,6 +77,8 @@ class House(TimestampedModel):
     verification_pending = models.BooleanField(default=False)
     verified = models.BooleanField(default=False)
     free_live_video = models.BooleanField(default=False)
+    allow_donations = models.BooleanField(default=False)
+    issue_tax_deductible_receipts = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.name)
@@ -108,7 +112,19 @@ class House(TimestampedModel):
         return reverse(view_name)
 
     def get_home_page_url(self):
-        view_name = "houses:home_page"
+        view_name = "home_page"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+    def get_public_donations_url(self):
+        view_name = "public_donations"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+    def get_donate_url(self):
+        view_name = "donate"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+    def get_contact_url(self):
+        view_name = "house_contact"
         return reverse(view_name, kwargs={"slug": self.slug})
 
 
