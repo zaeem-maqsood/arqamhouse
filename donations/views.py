@@ -485,6 +485,10 @@ class DonationDashboardView(HouseAccountMixin, View):
                 messages.warning(request, 'Donations are now stopped.')
             else:
                 house.allow_donations = True
+                general_donation_type = DonationType.objects.filter(house=house, general_donation=True)
+                if not general_donation_type:
+                    general_donation_type = DonationType.objects.create(house=house, general_donation=True, name="General Donation")
+                
                 messages.success(request, 'You are now accepting donations')
             house.save()
 
