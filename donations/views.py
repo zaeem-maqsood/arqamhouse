@@ -55,7 +55,7 @@ class DonationPublicListView(View):
 
     def graph_data(self, house):
         
-        transactions = Transaction.objects.filter(house=house, donation_transaction=True)
+        donations = Donation.objects.filter(donation_type__house=house)
         today = timezone.now()
         days_earlier = today - timedelta(days=10)
         day_label = []
@@ -64,14 +64,17 @@ class DonationPublicListView(View):
 
         for x in range(10):
             one_day_earlier = today - timedelta(days=x)
-            transactions_for_day = transactions.filter(created_at__day=one_day_earlier.day, created_at__month=one_day_earlier.month, created_at__year=one_day_earlier.year)
-
+            
+            donations_for_day = donations.filter(transaction__created_at__day=one_day_earlier.day,
+                                                 transaction__created_at__month=one_day_earlier.month, transaction__created_at__year=one_day_earlier.year)
+    
             sales_sum = 0
-            for transaction in transactions_for_day:
-                if transaction.house_amount:
-                    sales_sum += transaction.house_amount
+            for donation in donations_for_day:
+                if donation.pass_fee:
+                    sales_sum += donation.transaction.house_amount
                 else:
-                    sales_sum += decimal.Decimal(0.00)
+                    sales_sum += donation.transaction.amount
+                
 
             sales_label.append('{0:.2f}'.format(sales_sum))
             day_label.append("%s" % (one_day_earlier.day))
