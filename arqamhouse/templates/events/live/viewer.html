@@ -430,9 +430,11 @@ function updateSpotLight() {
     <div class="container">
         <div class="row justify-content-center" style="padding-top:5px;padding-bottom:5px;">
             {% if event.house.logo %}
-            <div class="col-3">
-                <a href="{{ event.house.get_home_page_url }}"><img src="{{ event.house.logo.url }}"
-                        style="max-height: 3em;margin-bottom:5px;"></a>
+            <div class="col-sm-3 col-6">
+                <a href="{{ event.house.get_home_page_url }}">
+                    <img src="{{ event.house.logo.url }}"
+                        style="max-height: 3em;margin-bottom:5px;">
+                </a>
                 
             </div>
             <div class="col-md-9 col-10 align-self-center" style="padding: 0px;">
@@ -484,7 +486,7 @@ function updateSpotLight() {
                             </div>
                         </div>
                         
-                        <div class="row justify-content-center" style="padding-bottom: 20px;">
+                        <div class="row justify-content-center">
                             <div class="col-md-12 col-10">
                                 <div id="chat-area" class="overflow-auto" style="max-height: 400px;" onmousemove="scrollToBottom();">
                                     {% for comment in event_live_comments %}
@@ -521,18 +523,19 @@ function updateSpotLight() {
                             </div>
                         </div>
                         
-                        <div class="row justify-content-center" style="padding-bottom: 10px;">
-                            <div class="col-md-12 col-10">
-                                <button id="chat-message-submit" type="button" value="Send" class="btn btn--primary btn-block"><span
+                        <div class="row justify-content-center" style="padding-bottom: 20px;">
+                            <div class="col-md-6 col-5" style="padding-bottom: 10px;"> 
+                                <button id="chat-message-submit" type="button" value="Send" class="btn btn--primary btn-block" style="margin-top: 0px;"><span
                                         class="btn__text">Send</span></button>
+                            </div>
+                            <div class="col-md-6 col-5">
+                                <button id="chat-message-submit-private" type="button" value="Send" class="btn btn--primary btn-block" style="margin-top: 0px;"><span
+                                        class="btn__text">Send <span style="font-style: italic;font-size: 0.9em;">Private</span></span></button>
                             </div>
                         </div>
 
                         <div class="row justify-content-center" style="padding-bottom: 10px;">
-                            <div class="col-md-12 col-10">
-                                <button id="chat-message-submit-private" type="button" value="Send" class="btn btn--primary btn-block"><span
-                                        class="btn__text">Send Private</span></button>
-                            </div>
+                            
                         </div>
 
                         {% else %}
@@ -555,6 +558,15 @@ function updateSpotLight() {
                             <div class="col-md-12 col-10">
                                 <a id="chat-message-submit" href="{{ event.get_archives_view }}" target="_blank"
                                     class="btn btn--primary-1 btn-block"><span class="btn__text">Archives</span></a>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if event.house.allow_donations %}
+                        <div class="row justify-content-center" style="padding-bottom: 10px;">
+                            <div class="col-md-12 col-10">
+                                <a id="chat-message-submit" href="{{ event.house.get_public_donations_url }}" style="background: #319c9c;border-color: #319c9c;" target="_blank"
+                                    class="btn btn--primary-1 btn-block"><span class="btn__text">Donate</span></a>
                             </div>
                         </div>
                         {% endif %}
