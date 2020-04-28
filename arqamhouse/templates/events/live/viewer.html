@@ -433,7 +433,7 @@ function updateSpotLight() {
     };
 
     window.onload = function () { 
-        participantUpdate(true);
+        setTimeout(participantUpdate(true), 3000);
     };
 
     var slug = {{ slug_json }};
