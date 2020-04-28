@@ -3,6 +3,7 @@ from .models import Profile
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from cities_light.models import City, Region, Country
 
+from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget, PhoneNumberPrefixWidget
 from django.contrib.auth.password_validation import validate_password
 
 
@@ -126,6 +127,7 @@ class ProfileAlreadyExistsForm(forms.ModelForm):
 		fields = [
 			"name",
 			"email",
+			"phone",
 			"picture",
 			"region",
 			"city"
@@ -146,6 +148,13 @@ class ProfileAlreadyExistsForm(forms.ModelForm):
 						"class": "validate-required",
 					}
 				),
+				"phone": PhoneNumberPrefixWidget(
+                        attrs={
+                            "required": True,
+                            "class": "validate-required",
+							"placeholder": "1234567890",
+                        }
+                    ),
 				"region": forms.Select(
 						attrs={
 							"required" : True,
@@ -183,11 +192,29 @@ class ProfileAlreadyExistsForm(forms.ModelForm):
 		name = self.cleaned_data.get("name")
 
 		if len(name) <= 3:
-			raise forms.ValidationError("Please Enter A Name With More Than 2 Characters")
+			raise forms.ValidationError("Please Enter A Name With More Than 3 Characters")
 		return cleaned_data
 
 
+class ProfileVerifcationForm(forms.Form):
 
+	verification_number = forms.IntegerField(required=True, widget=forms. NumberInput(
+		attrs={"required": True, "class": "validate-required", "placeholder": "Code"}))
+
+
+class ProfileChangePhoneForm(forms.Form):
+
+	phone = forms.CharField(required=True, widget=PhoneNumberPrefixWidget(
+		attrs={"required": True, "class": "validate-required", "placeholder": "1234567890"}))
+
+	def clean(self, *args, **kwargs):
+		cleaned_data = super(ProfileChangePhoneForm, self).clean(*args, **kwargs)
+		
+		phone = self.cleaned_data.get("phone")
+		print(str(phone))
+		if len(str(phone)) > 13:
+			raise forms.ValidationError("Please Enter A phone number with only 10 digits")
+		return cleaned_data
 
 
 
@@ -203,6 +230,7 @@ class ProfileForm(UserCreationForm):
 		fields = [
 			"name",
 			"email",
+			"phone",
 			"picture",
 			"region",
 			"city"
@@ -213,21 +241,30 @@ class ProfileForm(UserCreationForm):
 				"name": forms.TextInput(
 					attrs={
 						"class":"validate-required",
-						"placeholder":"Name",
+						"placeholder":"Full Name",
 						"required": True
 					}
 				),
+				"phone": PhoneNumberPrefixWidget(
+                        attrs={
+                            "required": True,
+                            "class": "validate-required",
+							"placeholder": "1234567890",
+                        }
+                    ),
 				"picture": forms.FileInput(
 					attrs={
 						"onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
-						"class": "form-control m-input",
+						"class": "",
+						"style": "background: #ffffff;border: 0px;"
 					}
 				),
 				"region": forms.Select(
 						attrs={
 							"required" : True,
 							"class":"validate-required",
-						}
+							"onchange": "cityChange(this);"
+						},
 					),
 				"city": forms.Select(
 						attrs={
@@ -260,7 +297,7 @@ class ProfileForm(UserCreationForm):
 		name = self.cleaned_data.get("name")
 
 		if len(name) <= 3:
-			raise forms.ValidationError("Please Enter A Name With More Than 2 Characters")
+			raise forms.ValidationError("Please Enter A Name With More Than 3 Characters")
 		return cleaned_data
 
 

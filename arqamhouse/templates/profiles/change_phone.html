@@ -1,0 +1,122 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}
+Create House
+{% endblock title %}
+
+{% load static %}
+
+
+{# block footer #}
+	{# include "frontend/footer.html" #}
+{# endblock footer #}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script>
+
+    jQuery(document).ready(function ($) {
+        var textToFind = 'Canada +1';
+
+        var dd = document.getElementById('id_phone_0');
+        for (var i = 0; i < dd.options.length; i++) {
+            if (dd.options[i].text === textToFind) {
+                dd.selectedIndex = i;
+                break;
+            }
+        }
+    });
+
+</script>
+{% endblock scripts %}
+
+{% block content %}
+<style>
+    #id_phone_1 {
+        display: inline-block;
+        width: 68%;
+    }
+
+    #id_phone_0 {
+        display: inline-block;
+        width: 30%;
+        margin-right: 2%;
+    }
+</style>
+<section class="text-center" style="padding-top:5rem;">
+    <div class="container" onload="enableVerifyPhoneButton();">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-9 col-12">
+
+                <div class="row justify-content-center" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <a href="{% url 'home' %}"><img id="image-placeholder" src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+                        <br>
+                        <br>
+                        {% if profile.phone %}
+                        {% else %}
+                        <p style="margin-bottom: 0px;">We've improved our security with multi layer protection</p>
+                        {% endif %}
+                        <p>{% if profile.phone %}{% else %}Please{% endif %} {% if profile.phone %}U{% else %}u{% endif %}pdate your phone number</p>
+                    </div>
+                </div>
+                
+
+                <form action="" method="POST" enctype="multipart/form-data" id="verificationForm">{% csrf_token %}
+                    
+                    
+                    {% if form.non_field_errors %}
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-md-10">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.non_field_errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
+                            </div>
+                        </div>
+                    </div>
+                	{% endif %}
+
+                    {% if form.phone.errors %}
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-md-10">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.phone.errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row justify-content-center" style="padding-bottom: 20px;">
+                        <div class="col-md-10">
+                            {{ form.phone }}
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center" style="padding-bottom: 20px;">
+                        <div class="col-md-10">
+                            <button type="submit" class="btn btn--primary">Update</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endblock content %}

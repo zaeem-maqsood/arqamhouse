@@ -1,0 +1,145 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}
+Create House
+{% endblock title %}
+
+{% load static %}
+
+
+{# block footer #}
+	{# include "frontend/footer.html" #}
+{# endblock footer #}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script>
+
+function refreshCode(object) {
+
+    var token = '{{ csrf_token }}';
+
+    const url = "{{ request.path }}";
+
+    let data = {
+        refresh_code: true
+    }
+
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: { 
+            'X-CSRFToken': token,
+            'Content-Type': 'application/json; charset=utf-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        
+    }
+    
+    fetch(url, fetchData)
+        .then(
+            function (response) {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                        response.status);
+                    return;
+                }
+
+                // Examine the text in the response
+                response.json().then(function (data) {
+                    console.log(data)
+                    window.location.reload(false); 
+                });
+            }
+        )
+        .catch(function (err) {
+            console.log('Fetch Error :-S', err);
+        });
+
+}
+</script>
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center" style="padding-top:5rem;">
+    <div class="container" onload="enableVerifyPhoneButton();">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-9 col-12">
+
+                <div class="row justify-content-center" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <a href="{% url 'home' %}"><img id="image-placeholder" src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+                        <br>
+                        <br>
+                        <p>We sent a code to {{ profile.phone }} please enter it below.</p>
+                    </div>
+                </div>
+                
+
+                <form action="" method="POST" enctype="multipart/form-data" id="verificationForm">{% csrf_token %}
+                    
+                    
+                    {% if form.non_field_errors %}
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-10">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.non_field_errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
+                            </div>
+                        </div>
+                    </div>
+                	{% endif %}
+
+                    {% if form.verification_number.errors %}
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-10">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.verification_number.errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert__close">×</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row justify-content-center" style="padding-bottom: 20px;">
+                        <div class="col-md-10">
+                            {{ form.verification_number }}
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center" style="padding-bottom: 20px;">
+                        <div class="col-md-10">
+                            <button type="submit" class="btn btn--primary">Verify</button>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center" style="padding-bottom: 20px;">
+                        <div class="col-8">
+                            <p style="margin-bottom: 5px;">Didn't get the code? <a style="margin-bottom: 10px;margin-top: 0px;" onclick="refreshCode();" href="#">Send again</a></p>
+                            
+                            <p>Not the right number? Change it <a href="{% url 'profiles:change_phone' %}">here</a></p>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endblock content %}

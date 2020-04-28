@@ -18,53 +18,88 @@ Create House
 {% endblock top_page_scripts %}
 
 {% block scripts %}
-
 <script>
-    $("#id_country").change(function () {
-      
-      var url = $("#profileForm").attr("data-regions-url");  // get the url of the `load_cities` view
-      
-      var countryId = $(this).val();  // get the selected country ID from the HTML input
+function cityChange(object) {
 
-      $.ajax({                       // initialize an AJAX request
-        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
-        data: {
-          'country': countryId       // add the country id to the GET parameters
+    var token = '{{ csrf_token }}';
+
+    region_id = object.value;
+
+    console.log(region_id);
+    const url = "{% url 'profiles:ajax_load_cities' %}";
+
+    let data = {
+        region_id: region_id
+    }
+
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: { 
+            'X-CSRFToken': token,
+            'Content-Type': 'application/json; charset=utf-8',
+            'X-Requested-With': 'XMLHttpRequest'
         },
-        success: function (data) {   // `data` is the return of the `load_cities` view function
-            console.log(data)
-          $("#id_region").html(data);  // replace the contents of the city input with the data that came from the server
-        }
-      });
+        
+    }
+    
+    fetch(url, fetchData)
+        .then(
+            function (response) {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                        response.status);
+                    return;
+                }
 
-    });
+                // Examine the text in the response
+                response.json().then(function (data) {
+                    console.log(data)
+                    document.getElementById("id_city").innerHTML = data['html'];
+                });
+            }
+        )
+        .catch(function (err) {
+            console.log('Fetch Error :-S', err);
+        });
+
+}
 </script>
 
+
 <script>
-    $("#id_region").change(function () {
-      
-      var url = $("#profileForm").attr("data-cities-url");  // get the url of the `load_cities` view
-      
-      var regionId = $(this).val();  // get the selected country ID from the HTML input
 
-      $.ajax({                       // initialize an AJAX request
-        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
-        data: {
-          'region': regionId       // add the country id to the GET parameters
-        },
-        success: function (data) {   // `data` is the return of the `load_cities` view function
-            console.log(data)
-          $("#id_city").html(data);  // replace the contents of the city input with the data that came from the server
+    jQuery(document).ready(function ($) {
+        var textToFind = 'Canada +1';
+
+        var dd = document.getElementById('id_phone_0');
+        for (var i = 0; i < dd.options.length; i++) {
+            if (dd.options[i].text === textToFind) {
+                dd.selectedIndex = i;
+                break;
+            }
         }
-      });
-
     });
+
 </script>
 {% endblock scripts %}
 
 {% block content %}
+<style>
+      #id_phone_1 {
+        display: inline-block;
+        width: 68%;
+    }
+
+    #id_phone_0 {
+        display: inline-block;
+        width: 30%;
+        margin-right: 2%;
+    }
+</style>
 <section class="text-center" style="padding-top:5rem;">
-    <div class="container">
+    <div class="container" onload="enableVerifyPhoneButton();">
         <div class="row justify-content-center">
             <div class="col-md-6 offset-md-3">
 
@@ -181,22 +216,24 @@ Create House
                     </div>
 
 
-                    <div class="row" style="padding-bottom: 10px;">
+                    <div class="row" style="padding-bottom: 20px;">
                         <div class="col-md-12">
                         {{ form.password2 }}
                         </div>
                     </div>
 
-                    <hr>
 
-                    <div class="row" style="padding-bottom: 20px;padding-top: 10px;">
+                    <div class="row" style="padding-bottom: 10px;">
                         <div class="col-md-12">
-                        {{ form.region }}
+                            {{ form.phone }}
                         </div>
                     </div>
 
-                    <div class="row" style="padding-bottom: 20px;">
-                        <div class="col-md-12">
+                    <div class="row" style="padding-bottom: 20px;padding-top: 10px;margin: 0px;">
+                        <div class="col-6">
+                        {{ form.region }}
+                        </div>
+                        <div class="col-6">
                             {{ form.city }}
                         </div>
                     </div>
@@ -217,8 +254,6 @@ Create House
                                         <div class="boxed boxed--lg">
                                             <h2>Welcome to Arqam House Inc</h2>
                                             <p>These terms and conditions outline the rules and regulations for the use of Arqam House Inc's Website.</p> <br />
-                                            <span style="text-transform: capitalize;"> Arqam House Inc</span> is located at:<br />
-                                            <address>47 Denny Street Durham Region, Ajax <br />L1Z 0S3 - ON , Canada<br />
                                             </address>
                                             <p>By accessing this website we assume you accept these terms and conditions in full. Do not continue to use Arqam House
                                                 Inc's website
@@ -370,7 +405,7 @@ Create House
                     </div>
 
                     <div class="col-md-12" style="padding-top: 30px;">
-                        <button type="submit" class="btn btn--primary type--uppercase">Create Account</button>
+                        <button type="submit" id="create_account_button" class="btn btn--primary">Create Account</button>
                     </div>
 
                 </form>

@@ -9,6 +9,7 @@ from django.conf import settings
 from django.urls import reverse
 import itertools
 
+from phonenumber_field.modelfields import PhoneNumberField
 from core.utils import strip_non_ascii
 from stdimage import StdImageField
 from cities_light.models import City, Region, Country
@@ -65,6 +66,7 @@ class Profile(AbstractUser):
     
     username = None
     email = models.EmailField(_('email address'), unique=True)
+    phone = PhoneNumberField(blank=True, null=True)
     temp_password = models.CharField(max_length=120, null=True, blank=True)
     name = models.CharField(max_length=120, null=True, blank=False)
     picture = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 150, 'height': 150}}, null=True, blank=True)
@@ -75,6 +77,7 @@ class Profile(AbstractUser):
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=True)
     subscribed_houses = models.ManyToManyField(House, blank=True, related_name="subscribed_houses")
     stripe_customer_id = models.CharField(max_length=200, null=True, blank=True)
+    verified = models.BooleanField(default=False)
     objects = ProfileManager()
     
     USERNAME_FIELD = 'email'

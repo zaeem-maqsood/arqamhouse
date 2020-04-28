@@ -295,7 +295,7 @@ class DonationView(FormView):
         except stripe.error.CardError as e:
             print(e)
             form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
-            return self.render_to_response(self.get_context_data(form=forms))
+            return self.render_to_response(self.get_context_data(form=form))
             
         except stripe.error.RateLimitError as e:
             # Too many requests made to the API too quickly
