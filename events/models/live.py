@@ -4,6 +4,7 @@ from .base import *
 from events.models import Event
 from core.models import TimestampedModel
 from payments.models import ArqamHouseServiceFee
+from profiles.models import Profile
 
 from django.db.models.signals import pre_save, post_save
 
@@ -19,6 +20,7 @@ class EventLive(models.Model):
     session_id = models.CharField(max_length=400, blank=True, null=True)
     broadcast_id = models.CharField(max_length=400, blank=True, null=True)
     facing_mode = models.CharField(max_length=150, choices=roles, blank=True, null=True)
+    live_audience = models.ManyToManyField(Profile, related_name="live_audience", blank=True)
 
     def __str__(self):
         return self.event.title

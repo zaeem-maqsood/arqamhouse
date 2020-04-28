@@ -454,10 +454,17 @@ class LiveEventViewerView(View):
 
 
 
-
-
-
-
+def load_audience(request):
+    json_data = json.loads(request.body)
+    if json_data:
+        print(json_data)
+        slug = json_data['slug']
+        event = get_event(slug)
+        event_live = EventLive.objects.get(event=event)
+        print(event_live)
+        people = event_live.live_audience.all()
+        html = render_to_string('events/live/audience.html', {'people': people})
+        return JsonResponse({'html': html})
 
 
 

@@ -9,11 +9,91 @@ from events.models import EventLiveComment, EventLive, Event, EventLiveFee
 from payments.models import ArqamHouseServiceFee
 
 
+
+class LiveParticipantsView(WebsocketConsumer):
+
+
+    def connect(self):
+        print("did it come here")
+        print(self.scope['url_route']['kwargs']['slug'])
+        self.slug = self.scope['url_route']['kwargs']['slug']
+        self.room_group_name = 'participants_%s' % self.slug
+
+        # Join room group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        self.accept()
+
+    def disconnect(self, close_code):
+        # Leave room group
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    # Receive message from WebSocket
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        
+        user = text_data_json['user']
+        name = text_data_json['name']
+        adding = text_data_json['adding']
+        event_slug = self.scope['url_route']['kwargs']['slug']
+        event = Event.objects.get(slug=event_slug)
+        event_live = EventLive.objects.get(event=event)
+
+        print(user)
+        print(name)
+        print(adding)
+
+        try:
+            profile = Profile.objects.get(email=user)
+            print(profile)
+
+            if adding:
+                event_live.live_audience.add(profile)
+            else:
+                event_live.live_audience.remove(profile)
+
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'participants',
+                    'user': profile.email,
+                    'name': profile.name,
+                    'adding': adding
+                }
+            )
+
+        except Exception as e:
+            print(e)
+
+
+    # Receive message from room group
+    def participants(self, event):
+        user = event['user']
+        name = event['name']
+        adding = event['adding']
+
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({
+            'user': user,
+            'name': name,
+            'adding': adding
+        }))
+
+
+
+
+
+
 class LiveEventFeeConsumer(WebsocketConsumer):
 
     def connect(self):
-        print("did it come here live event fee")
-        print(self.scope['url_route']['kwargs']['slug'])
         self.slug = self.scope['url_route']['kwargs']['slug']
         self.room_group_name = 'live_event_fee_%s' % self.slug
 
@@ -38,7 +118,6 @@ class LiveEventFeeConsumer(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
-        print("We have disconnected from the fee calculation")
 
         event_slug = self.scope['url_route']['kwargs']['slug']
         event = Event.objects.get(slug=event_slug)
@@ -88,12 +167,7 @@ class LiveEventFeeConsumer(WebsocketConsumer):
             event_live_fee.save()
         except Exception as e:
             print(e)
-            print("The event live fee is not")
 
-        print(f"The stream amount is {stream_amount}")
-        print(f"The recording is {recording}")
-        print(f"The broadcasting is {broadcasting}")
-        print(f"The participants is {participants}")
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
@@ -154,8 +228,7 @@ class LiveChatConsumer(WebsocketConsumer):
         user = text_data_json['user']
         name = text_data_json['name']
         private_message = text_data_json['private_message']
-        print(f"The user is {user}")
-        print(f"The user is {name}")
+
 
         event_slug = self.scope['url_route']['kwargs']['slug']
 
