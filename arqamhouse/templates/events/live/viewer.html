@@ -450,7 +450,11 @@ function updateSpotLight() {
 
     chatSocket3.onmessage = function (e) {
         var data = JSON.parse(e.data);
+        console.log("the data is here");
         console.log(data);
+        if (data['refresh_participants']) {
+            participantUpdate(true);
+        }
     };
 
     chatSocket3.onclose = function (e) {
@@ -468,6 +472,7 @@ function updateSpotLight() {
             'user': user,
             'name': name,
             'adding': adding,
+            'refresh_participants': false,
         }));
 
     };

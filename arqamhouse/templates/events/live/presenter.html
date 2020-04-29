@@ -370,12 +370,14 @@
             connectionCount++;
             console.log(connectionCount + ' connections.');
             document.getElementById("viewers").innerHTML = connectionCount
+            refreshParticipants();
 
         },
         connectionDestroyed: function (event) {
             connectionCount--;
             console.log(connectionCount + ' connections.');
             document.getElementById("viewers").innerHTML = connectionCount
+            refreshParticipants();
         },
 
         sessionDisconnected: function sessionDisconnectHandler(event) {
@@ -681,6 +683,18 @@
 
     chatSocket3.onclose = function (e) {
         console.error('Chat socket closed unexpectedly');
+    };
+
+
+    function refreshParticipants() {
+
+        chatSocket3.send(JSON.stringify({
+            'user': null,
+            'name': null,
+            'adding': null,
+            'refresh_participants': true,
+        }));
+
     };
 
 

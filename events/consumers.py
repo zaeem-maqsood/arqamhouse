@@ -29,6 +29,7 @@ class LiveParticipantsView(WebsocketConsumer):
 
     def disconnect(self, close_code):
         # Leave room group
+
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name
@@ -41,6 +42,7 @@ class LiveParticipantsView(WebsocketConsumer):
         user = text_data_json['user']
         name = text_data_json['name']
         adding = text_data_json['adding']
+        refresh_participants = text_data_json['refresh_participants']
         event_slug = self.scope['url_route']['kwargs']['slug']
         event = Event.objects.get(slug=event_slug)
         event_live = EventLive.objects.get(event=event)
@@ -48,6 +50,9 @@ class LiveParticipantsView(WebsocketConsumer):
         print(user)
         print(name)
         print(adding)
+
+        if refresh_participants:
+            event_live.live_audience.clear()
 
         try:
             profile = Profile.objects.get(email=user)
@@ -65,12 +70,25 @@ class LiveParticipantsView(WebsocketConsumer):
                     'type': 'participants',
                     'user': profile.email,
                     'name': profile.name,
-                    'adding': adding
+                    'adding': adding,
+                    'refresh_participants': refresh_participants
                 }
             )
 
         except Exception as e:
             print(e)
+
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'participants',
+                    'user': None,
+                    'name': None,
+                    'adding': None,
+                    'refresh_participants': refresh_participants
+                }
+            )
 
 
     # Receive message from room group
@@ -78,12 +96,14 @@ class LiveParticipantsView(WebsocketConsumer):
         user = event['user']
         name = event['name']
         adding = event['adding']
+        refresh_participants = event['refresh_participants']
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             'user': user,
             'name': name,
-            'adding': adding
+            'adding': adding,
+            'refresh_participants': refresh_participants
         }))
 
 
