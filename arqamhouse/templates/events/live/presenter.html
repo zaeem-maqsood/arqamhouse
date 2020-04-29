@@ -1072,10 +1072,9 @@ function eventLiveFeeCalculations() {
             </div>
         </div>
 
-        <div class="row justify-content-center" id="live-participants">
+        <div class="row justify-content-center overflow-auto" id="live-participants" style="max-height: 400px;">
             {% for audience in event_live.live_audience.all %}
-            <div class="col-lg-2 col-md-4 col-5 text-center" style="background-color: rgba(102, 191, 255, 0.2);padding: 20px;">
-
+            <div class="col-lg-2 col-md-4 col-5 text-center " style="background-color: rgba(102, 191, 255, 0.2);padding: 20px;border-radius: 30px;">
                 <p style="font-size: small;">{{ audience.name }}</p>
             </div>
             {% endfor %}
