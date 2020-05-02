@@ -11,24 +11,34 @@ Arqam House
 {% endblock footer %}
 
 {% block styles %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.8/lottie.min.js">
+
 {% endblock styles %}
 
 {% block top_page_scripts %}
+<script src="https://kit.fontawesome.com/71fc1e3551.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.8/lottie.min.js"></script>
 {% endblock top_page_scripts %}
 
 {% block scripts %}
-
-
 <script>
 
 lottie.loadAnimation({
-	container: element, // the dom element that will contain the animation
+	container: document.getElementById("bm"), // the dom element that will contain the animation
 	renderer: 'svg',
 	loop: true,
 	autoplay: true,
-	path: 'data.json' // the path to the animation json
+	path: "https://assets4.lottiefiles.com/packages/lf20_3TL2tK.json" // the path to the animation json
 });
+
+
+lottie.loadAnimation({
+	container: document.getElementById("bm-bank"), // the dom element that will contain the animation
+	renderer: 'svg',
+	loop: true,
+	autoplay: true,
+	path: "https://res.cloudinary.com/arqamhouse/raw/upload/v1588378522/data_vmnh4c.json" // the path to the animation json
+});
+
 
 </script>
 
@@ -130,19 +140,14 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 								data-typed-strings="Student Associations.,Masjids., Non-Profit Organizations.,Youth Groups.,Small Businesses., Special Causes.,">Muslim Organizations</span>
 						</div>
 						<div class="row">
-							<div class="col-md-4" style="padding-bottom: 30px;">
+							<div class="col-md-6" style="padding-bottom: 30px;">
 								<a class="btn btn--primary btn-block" href="{% url 'profiles:login' %}">
 									<span class="btn__text">Sign In</span>
 								</a>
 							</div>
-							<div class="col-md-4" style="padding-bottom: 30px;">
+							<div class="col-md-6" style="padding-bottom: 30px;">
 								<a class="btn btn-block" href="{% url 'profiles:create' %}">
 									<span class="btn__text">Sign Up</span>
-								</a>
-							</div>
-							<div class="col-md-4" style="padding-bottom: 30px;">
-								<a class="btn btn--primary btn-block" href="{% url 'profiles:login' %}">
-									<span class="btn__text">Find Order</span>
 								</a>
 							</div>
 						</div>
@@ -159,28 +164,186 @@ calculateBuyerTicketCostAndOrganizerTicketValue()
 	<!--end of container-->
 </section>
 
-<section class="text-center" style="padding-bottom: 120px;">
+
+<section class="text-center" style="padding-bottom: 150px;padding-top: 60px;">
 	<div class="container">
+		<div class="row justify-content-center">
+			<div class="col-lg-8 col-md-10 ">
+				<h2 style="color:#4a90e2;">It's all in-house.</h2>
+				<p class="lead">We’ve made a whole bunch of powerful tools and put them all under one roof. We call it a house.</p>
+			</div>
+		</div>
 		<div class="row justify-content-center" style="padding-bottom: 40px;">
 			<div class="col-md-10 col-lg-8">
 				<img alt="Image" src="{% static 'images/homepage1.png' %}" />
-			</div>
-		</div>
-		<div class="row justify-content-center">
-			<div class="col-md-10 col-lg-8">
-				<h3 style="color:#4a90e2;">An event management app that doesn't scare you.</h3>
-				<p>
-					We've created an event management application thats super easy to use. Start creating events and selling tickets with the lowest fee anywhere. 
-				</p>
-				<a class="btn btn--primary" href="{% url 'profiles:create' %}">
-					<span class="btn__text">Get Started</span>
-				</a>
 			</div>
 		</div>
 		<!--end of row-->
 	</div>
 	<!--end of container-->
 </section>
+
+
+<section class="text-center" style="padding-bottom: 60px;">
+	<div class="container">
+		<div class="row justify-content-center" style="padding-bottom: 40px;">
+			<div class="col-lg-6 col-md-10">
+				<div id="bm"></div>
+			</div>
+			<div class="col-lg-6 col-md-10">
+				<h3 style="color:#4a90e2;">Event Management &amp; Ticket Sales</h3>
+				<p>No matter the size, hosting an event takes a considerable amount of time and resources, both of which non-profits and small businesses have very little of.
+					However events help with fundraising, increasing brand awareness, and ultimately giving something back to your followers.
+				</p>
+				<p class="lead">We hope to make things a little simpler.</p>
+			</div>
+		</div>
+
+		<div class="row" style="padding-bottom: 20px;">
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="fas fa-ticket-alt" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Ticket Sales</h4>
+					<p>
+						Create free tickets, paid tickets and even donation tickets. Set limits and track purchases effortlessly.
+					</p>
+					<a href="#">
+						Learn More
+					</a>
+				</div>
+				<!--end feature-->
+			</div>
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="fas fa-redo-alt" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>100% Refunds</h4>
+					<p>
+						Refund attendees with 1-click. We refund the entire order and the processing fee.
+					</p>
+					<a href="#">
+						Learn More
+					</a>
+				</div>
+				<!--end feature-->
+			</div>
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="fas fa-barcode" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Barcode Check-Ins</h4>
+					<p>
+						Start checking in attendees right from your smart phone or tablet.
+					</p>
+					<a href="#">
+						Learn More
+					</a>
+				</div>
+				<!--end feature-->
+			</div>
+
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="fas fa-scroll" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Simple Event Page</h4>
+					<p>
+						We automatically create a simple event page so attendees can purchase tickets and learn more.
+					</p>
+					<a href="#">
+						Learn More
+					</a>
+				</div>
+				<!--end feature-->
+			</div>
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="fas fa-video" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Virtual Event</h4>
+					<p>
+						Require attendees to purchase tickets before gaining entry to your virtual event.
+					</p>
+					<a href="#">
+						Learn More
+					</a>
+					<span class="label">New</span>
+				</div>
+				<!--end feature-->
+			</div>
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="far fa-question-circle" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Custom Questions</h4>
+					<p>
+						Ask attendees cutom questions on checkout to gather more information.
+					</p>
+					<a href="#">
+						Learn More
+					</a>
+				</div>
+				<!--end feature-->
+			</div>
+		</div>
+
+
+	</div>
+</section>
+
+
+
+
+
+<section class="text-center" style="padding-bottom: 120px;">
+	<div class="container">
+		<div class="row justify-content-center" style="padding-bottom: 90px;">
+			<div class="col-md-6">
+				<h3 style="color:#4a90e2;">Donations &amp; Fundraisers</h3>
+				<p>
+					In a digital era, it’s essential to provide donors with the right tools to streamline the giving process. Arqam House
+					lets your organization accept and process donations while helping your donors see the great work their donations will be used for.
+				</p>
+				<a class="btn btn--primary" href="{% url 'profiles:create' %}">
+					<span class="btn__text">Get Started</span>
+				</a>
+			</div>
+			<div class="col-md-6">
+				<div id="bm-bank"></div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-4">
+				<div class="feature feature-6">
+					<i class="fas fa-tasks" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Donation Types</h4>
+					<p>
+						Create multiple donation types for different causes. Donors can choose where their contributions go.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+			<div class="col-md-4">
+				<div class="feature feature-6">
+					<i class="fas fa-receipt" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Tax Deductible Receipts</h4>
+					<p>
+						Choose when to issue receipts to donors. Immediately, at a later date or never. View all donor information from your dashboard.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+			<div class="col-md-4">
+				<div class="feature feature-6">
+					<i class="fas fa-hand-holding-usd" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Public Donations Page</h4>
+					<p>
+						We set up donations page so other donors can see how much has been raised and to get others motivated.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+		</div>
+	</div>
+</section>
+
+
 
 
 <section>
