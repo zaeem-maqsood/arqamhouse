@@ -1,0 +1,465 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Arqam House
+{% endblock title %}
+
+{% block footer %}
+{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+
+{% endblock styles %}
+
+{% block top_page_scripts %}
+<script src="https://kit.fontawesome.com/71fc1e3551.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.8/lottie.min.js"></script>
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script>
+
+lottie.loadAnimation({
+	container: document.getElementById("bm"), // the dom element that will contain the animation
+	renderer: 'svg',
+	loop: true,
+	autoplay: true,
+	path: "https://assets4.lottiefiles.com/packages/lf20_3TL2tK.json" // the path to the animation json
+});
+
+
+lottie.loadAnimation({
+	container: document.getElementById("bm-bank"), // the dom element that will contain the animation
+	renderer: 'svg',
+	loop: true,
+	autoplay: true,
+	path: "https://res.cloudinary.com/arqamhouse/raw/upload/v1588378522/data_vmnh4c.json" // the path to the animation json
+});
+	
+
+
+lottie.loadAnimation({
+	container: document.getElementById("bm-coach"), // the dom element that will contain the animation
+	renderer: 'svg',
+	loop: true,
+	autoplay: true,
+	path: "https://res.cloudinary.com/arqamhouse/raw/upload/v1588444095/data_yfezle.json" // the path to the animation json
+});
+
+
+lottie.loadAnimation({
+	container: document.getElementById("bm-training"), // the dom element that will contain the animation
+	renderer: 'svg',
+	loop: true,
+	autoplay: true,
+	path: "https://res.cloudinary.com/arqamhouse/raw/upload/v1588457120/data_xoqmhq.json" // the path to the animation json
+});
+</script>
+
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+	calculateBuyerTicketCostAndOrganizerTicketValue();
+	calculateDonation();
+    calculateVirtual();
+});
+
+
+function calculateVirtual() {
+
+    // Get the price elements
+    participants = document.getElementById("participants");
+    minutes = document.getElementById("minutes");
+
+    if (participants != null) {
+        participants = participants.value;
+    }
+
+    if (minutes != null) {
+        minutes = minutes.value;
+    }
+
+    total_sub_mins = participants * minutes;
+    document.getElementById("total_subscribed_mins").innerHTML = total_sub_mins;
+
+    sub_total = total_sub_mins * 0.007;
+
+
+
+    record = document.getElementById("record_event");
+    broadcast = document.getElementById("broadcast_event");
+
+    if (record.checked) {
+        console.log("Record checked");
+        record_total = minutes * 0.10;
+    }
+
+    else {
+        record_total = 0.00;
+    }
+
+
+    if (broadcast.checked) {
+        console.log("broadcast checked");
+        broadcast_total = minutes * 0.10;
+    }
+
+    else {
+        broadcast_total = 0.00;
+    }
+
+
+    total = sub_total + record_total + broadcast_total
+    total = total.toFixed(2);
+
+    if (isNaN(total)) {
+        total = 0.00;
+    }
+
+    total = total.toString()
+
+    document.getElementById("total_virtual_cost").innerHTML = "$" + total;
+
+}
+
+
+function calculateDonation() {
+	var price = 0.00;
+	var new_price = 0.00;
+	var buyer_ticket_cost = 0.00;
+	var organizer_ticket_value = 0.00;
+
+	// Get the price elements
+	price = document.getElementById("id_price_2");
+
+
+	// Check and see if price element value is not null
+	if (price != null) {
+		price = price.value;
+	}
+
+	if (price) {
+		new_price = parseFloat(price);
+	}
+
+	// use the regular price
+
+	// Check the value of the "pass fee" checkbox
+
+	buyer_ticket_cost = (new_price + (new_price * 0.04) + 0.30);
+	fee = (new_price * 0.04) + 0.30
+	organizer_ticket_value = new_price;
+
+
+	// Convert to 2 decimal places
+	buyer_ticket_cost = buyer_ticket_cost.toFixed(2);
+	organizer_ticket_value = organizer_ticket_value.toFixed(2);
+	fee = fee.toFixed(2);
+
+	// Set the Values to 0 if there is no input
+	if (isNaN(buyer_ticket_cost)) {
+		buyer_ticket_cost = 0.00;
+	}
+	if (isNaN(organizer_ticket_value)) {
+		organizer_ticket_value = 0.00;
+	}
+	if (isNaN(fee)) {
+		fee = 0.00;
+	}
+
+	// Display Organizer Ticket Value
+	fee = fee.toString()
+	document.getElementById("amount_received_div_2").innerHTML = "$" + fee;
+    
+
+}
+
+
+
+function calculateBuyerTicketCostAndOrganizerTicketValue() {
+var price = 0.00;
+var new_price = 0.00;
+var buyer_ticket_cost = 0.00;
+var organizer_ticket_value = 0.00;
+
+// Get the price elements
+price = document.getElementById("id_price");
+
+
+// Check and see if price element value is not null
+if (price != null) {
+price = price.value;
+}
+
+if (price) {
+new_price = parseFloat(price);
+}
+
+// use the regular price
+
+// Check the value of the "pass fee" checkbox
+
+buyer_ticket_cost = (new_price + (new_price * 0.04) + 0.30);
+fee = (new_price * 0.04) + 0.30
+organizer_ticket_value = new_price;
+
+
+// Convert to 2 decimal places
+buyer_ticket_cost = buyer_ticket_cost.toFixed(2);
+organizer_ticket_value = organizer_ticket_value.toFixed(2);
+fee = fee.toFixed(2);
+
+// Set the Values to 0 if there is no input
+if (isNaN(buyer_ticket_cost)) {
+buyer_ticket_cost = 0.00;
+}
+if (isNaN(organizer_ticket_value)) {
+organizer_ticket_value = 0.00;
+}
+if (isNaN(fee)) {
+	fee = 0.00;
+}
+
+
+// Display Buyer Cost
+buyer_ticket_cost = buyer_ticket_cost.toString()
+document.getElementById("new_price_div").innerHTML = "$" + buyer_ticket_cost;
+
+// Display Organizer Ticket Value
+	fee = fee.toString()
+document.getElementById("amount_received_div").innerHTML = "$" + fee;
+
+
+}
+
+
+$('#id_pass_fee').change(function() {
+calculateBuyerTicketCostAndOrganizerTicketValue();
+});
+
+
+$('#id_price').bind('input', function() {
+calculateBuyerTicketCostAndOrganizerTicketValue();
+});
+
+
+$('#id_price_2').bind('input', function() {
+	calculateDonation();
+});
+
+
+
+$('#participants').bind('input', function() {
+    calculateVirtual();
+});
+
+$('#minutes').bind('input', function() {
+    calculateVirtual();
+});
+
+$('#record_event').change(function() {
+    calculateVirtual();
+});
+
+
+$('#broadcast_event').change(function() {
+    calculateVirtual();
+});
+
+</script>
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center" style="padding-bottom: 110px;padding-top: 80px;">
+	<div class="container">
+		
+		<div class="row" style="padding-bottom: 20px;">
+			<div class="col-lg-8">
+				<a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+			</div>
+		</div>
+
+		<div class="row justify-content-center">
+			<div class="col-lg-8 col-md-10 ">
+				<h2 style="color:#4a90e2;">The lowest fees. Guaranteed.</h2>
+				<p>We offer more which allows us to charge less. Arqam House offers more tools than the competition because of our house first approach, this 
+                    allows us to charge individual services at a much lower price than competitors.
+				</p>
+			</div>
+		</div>
+
+		<div class="row justify-content-center" style="padding-bottom: 40px;">
+			<div class="col-lg-6 col-md-8">
+                <div id="bm-bank"></div>
+			</div>
+		</div>
+
+		<div class="row justify-content-center">
+			<div class="col-lg-4" style="padding-bottom: 10px;">
+				<a class="btn btn--primary btn-block" href="{% url 'profiles:login' %}">
+					<span class="btn__text">Sign In</span>
+				</a>
+			</div>
+			<div class="col-lg-4" style="padding-bottom: 10px;">
+				<a class="btn btn-block" href="{% url 'profiles:create' %}">
+					<span class="btn__text">Sign Up</span>
+				</a>
+			</div>
+		</div>
+
+			
+	</div>
+</section>
+
+
+
+<section style="padding-bottom: 110px;">
+    <div class="container">
+        <div class="row text-center justify-content-center" style="padding-bottom: 40px;">
+            <div class="col-md-10 col-12">
+                <h2 style="color:#4a90e2;margin-bottom: 5px;font-weight: 500;">Donations</h2>
+            </div>
+        </div>
+        <div class="row text-center justify-content-center" style="padding-bottom: 40px;">
+            <div class="col-md-10 col-12">
+                <p style="color:grey;margin-bottom: 5px;">We charge 4% plus a $0.30 base fee on each donation made. <b>Payment processing
+                        fee is included.</b>
+                </p>
+            </div>
+        </div>
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-2 col-md-3 col-sm-4 col-4">
+                <input type="number" name="price" value="30.00" class="" min="1.00" max="3000.00" step="0.30" required=""
+                    id="id_price_2">
+                <p>Donation Amount</p>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-4">
+                <h3 class="m--font-success" id="amount_received_div_2" style="margin-bottom: 0px;">$0.00</h3>
+                <p>Total Fee</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section style="padding-bottom: 180px;">
+    <div class="container">
+        <div class="row text-center justify-content-center" style="padding-bottom: 40px;">
+            <div class="col-md-10 col-12">
+                <h2 style="color:#4a90e2;margin-bottom: 5px;font-weight: 500;">Events</h2>
+            </div>
+        </div>
+
+        <div class="row text-center justify-content-center" style="padding-bottom: 40px;">
+            <div class="col-md-10 col-12">
+                <h3 style="color:#4a90e2;margin-bottom: 5px;">Tickets</h3>
+                <p style="color:grey;margin-bottom: 5px;">We charge 4% plus a $0.30 base fee on each ticket sold. <b>Payment processing fee is included.</b>
+                </p>
+                <p style="color:grey;">Free tickets are free.</p>
+            </div>
+        </div>
+        <div class="row justify-content-center text-center" style="padding-bottom: 120px;">
+            <div class="col-lg-2 col-md-3 col-sm-4 col-4">
+                <input type="number" name="price" value="5.00" class="" min="1.00" max="2000.00" step="0.01" required=""
+                    id="id_price">
+                <p>Ticket Price</p>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-4">
+                <h3 class="m--font-success" id="amount_received_div" style="margin-bottom: 0px;">$0.00</h3>
+                <p>Total Fee</p>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-4">
+                <h3 class="m--font-info" id="new_price_div" style="margin-bottom: 0px;">$0.00</h3>
+                <p>New Ticket Price</p>
+            </div>
+        </div>
+
+        <div class="row text-center justify-content-center" style="padding-bottom: 40px;">
+            <div class="col-md-10 col-12">
+                <h3 style="color:#4a90e2;margin-bottom: 5px;">Virtual Event</h3>
+                <p>Pricing is usage-based per viewed minute.</p>
+            </div>
+        </div>
+
+
+        <div class="row text-center justify-content-center" style="padding-bottom: 80px;">
+            <div class="col-lg-4 col-md-6 col-4" style="padding-bottom: 10px;">
+                <i class="fas fa-video" style="color: #4a90e2;font-size: 3em;margin-bottom: 20px;"></i>
+                <br>
+                <h4 style="margin-bottom: 10px;">
+                    $0.007
+                </h4>
+                <p>Per viewed Minute</p>
+            </div>
+
+            
+            <div class="col-lg-4 col-md-6 col-4" style="padding-bottom: 10px;">
+                <i class="far fa-stop-circle" style="color: #4a90e2;font-size: 3em;margin-bottom: 20px;"></i>
+                <br>
+                <h4 style="margin-bottom: 10px;">
+                    $0.10
+                </h4>
+                <p>Per Minute Recorded</p>
+            </div>
+
+            <div class="col-lg-4 col-md-6 col-4" style="padding-bottom: 10px;">
+                <i class="fas fa-broadcast-tower" style="color: #4a90e2;font-size: 3em;margin-bottom: 20px;"></i>
+                <br>
+                <h4 style="margin-bottom: 10px;">
+                    $0.10
+                </h4>
+                <p>Per Minute Broadcasted</p>
+            </div>
+
+        </div>
+
+        <div class="row text-center justify-content-center" style="padding-bottom: 40px;">
+            <div class="col-md-10 col-12">
+                <p class="lead"> Estimate your cost</p>
+            </div>
+        </div>
+
+        <div class="row justify-content-center text-center" style="padding-bottom: 40px;">
+
+            <div class="col-xl-1 col-lg-2 col-md-3 col-sm-4 col-4" style="padding-bottom: 20px;">
+                <input type="number" name="participants" value="30" class="" min="1" max="3000" step="1" required=""
+                    id="participants">
+                <p>Viewers</p>
+            </div>
+            <div class="col-xl-1 col-lg-2 col-md-3 col-sm-4 col-4" style="padding-bottom: 20px;">
+                <input type="number" name="time" value="60" class="" min="1" max="3000" step="1" required="" id="minutes">
+                <p>Minutes</p>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-4" style="padding-bottom: 20px;">
+                <h3 class="m--font-success" id="total_subscribed_mins" style="margin-bottom: 0px;">0</h3>
+                <p>Total Viewed</p>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6" style="padding-bottom: 20px;">
+            
+                <div class="input-checkbox input-checkbox--switch">
+                    <input id="record_event" type="checkbox" name="agree" />
+                    <label for="checkbox-switch"></label>
+                </div>
+                <p style="margin-bottom: 5px;">Record Event</p>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6" style="padding-bottom: 20px;">
+            
+                <div class="input-checkbox input-checkbox--switch">
+                    <input id="broadcast_event" type="checkbox" name="agree" />
+                    <label for="checkbox-switch"></label>
+                </div>
+                <p style="margin-bottom: 5px;">Broadcast Event</p>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-12" style="padding-bottom: 20px;">
+                <h3 class="m--font-success" id="total_virtual_cost" style="margin-bottom: 0px;">$0.00</h3>
+                <p>Total Cost</p>
+            </div>
+        </div>
+
+
+    </div>
+</section>
+{% endblock content %}

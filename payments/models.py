@@ -225,7 +225,8 @@ def house_payment_post_save_reciever(sender, instance, *args, **kwargs):
 
 
 def arqam_house_service_fee_post_save_reciever(sender, instance, *args, **kwargs):
-    house_balance_update(object_type='arqam_house_service_fee', instance=instance)
+    if instance.amount >= 0.50:
+        house_balance_update(object_type='arqam_house_service_fee', instance=instance)
 
 post_save.connect(transaction_post_save_reciever, sender=Transaction)
 post_save.connect(refund_post_save_reciever, sender=Refund)

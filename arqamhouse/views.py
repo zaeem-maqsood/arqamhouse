@@ -52,6 +52,15 @@ class AboutUsView(View):
 
 
 
+class PricingView(View):
+	template_name = "frontend/pricing.html"
+
+	def get(self, request, *args, **kwargs):
+		context = {}
+		return render(request, self.template_name, context)
+
+
+
 class ReportErrorView(FormView):
 
 	template_name = "static/report_error.html"

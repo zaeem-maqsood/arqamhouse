@@ -175,15 +175,22 @@ class LiveEventFeeConsumer(WebsocketConsumer):
         else:
             archived_mins = 0
 
+        if broadcasting:
+            broadcasted_mins = 2
+        else:
+            broadcasted_mins = 0
+
         try:
             event_live_fee = EventLiveFee.objects.get(event_live=event_live, processed=False)
             
             if event_live_fee.presenters > 1:
                 subscribed_mins = subscribed_mins / event_live_fee.presenters
                 archived_mins = archived_mins / event_live_fee.presenters
+                broadcasted_mins = broadcasted_mins / event_live_fee.presenters
 
             event_live_fee.subscribed_mins = event_live_fee.subscribed_mins + subscribed_mins
             event_live_fee.archived_mins = event_live_fee.archived_mins + archived_mins
+            event_live_fee.broadcasted_mins = event_live_fee.broadcasted_mins + broadcasted_mins
             event_live_fee.save()
         except Exception as e:
             print(e)

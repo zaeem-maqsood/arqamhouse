@@ -98,6 +98,7 @@ class EventLiveFee(TimestampedModel):
     event_live = models.ForeignKey(EventLive, on_delete=models.CASCADE, blank=False, null=False)
     subscribed_mins = models.PositiveSmallIntegerField(blank=True, null=True, default=0)
     archived_mins = models.PositiveSmallIntegerField(blank=True, null=True, default=0)
+    broadcasted_mins = models.PositiveSmallIntegerField(blank=True, null=True, default=0)
     arqam_house_service_fee = models.ForeignKey(ArqamHouseServiceFee, on_delete=models.CASCADE, blank=True, null=True)
     presenters = models.PositiveSmallIntegerField(blank=True, null=True, default=0)
     processed = models.BooleanField(default=False)
@@ -109,9 +110,10 @@ class EventLiveFee(TimestampedModel):
         if self.presenters == 0:
             self.processed = True
             subscribed_mins_fee = 0.007 * self.subscribed_mins
-            archived_mins_fee = 0.09 * self.archived_mins
+            archived_mins_fee = 0.10 * self.archived_mins
+            broadcasted_mins = 0.10 * self.broadcasted_mins
 
-            session_fee = subscribed_mins_fee + archived_mins_fee
+            session_fee = subscribed_mins_fee + archived_mins_fee + broadcasted_mins
             session_fee = decimal.Decimal(session_fee)
 
             if self.event_live.event.house.free_live_video:
