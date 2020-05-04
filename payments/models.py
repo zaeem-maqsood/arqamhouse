@@ -18,7 +18,7 @@ def validate_file_extension(value):
 
 
 def official_document_location(instance, filename):
-    return "bank_direct_deposit_forms/%s/%s/%s" % (instance.house.slug, instance.name, filename)
+    return "bank_direct_deposit_forms/%s/%s" % (instance.house.slug, instance.id)
 
 
 class PayoutSetting(models.Model):

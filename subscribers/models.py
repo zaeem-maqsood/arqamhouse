@@ -1,12 +1,16 @@
+import itertools
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils.text import slugify
 
+from core.utils import strip_non_ascii
 from core.models import TimestampedModel
 from houses.models import House
 
 from events.models import EventOrder, Event, Ticket
+from donations.models import DonationType
 
 # Create your models here.
 
@@ -64,6 +68,62 @@ class Subscriber(TimestampedModel):
         self.update_engagement_score()
         self.update_subscriber_score()
         super().save(*args, **kwargs)
+
+
+
+
+
+
+
+
+class Audience(TimestampedModel):
+    house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
+    name = models.CharField(max_length=150, blank=True, null=True)
+    slug = models.SlugField(max_length=175, unique=False, blank=True)
+    subscribers = models.ManyToManyField(Subscriber, blank=True)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=True, null=True)
+    donation_type = models.ForeignKey(DonationType, on_delete=models.CASCADE, blank=True, null=True)
+
+    def _generate_slug(self):
+        max_length = self._meta.get_field('slug').max_length
+        value = strip_non_ascii(self.name)
+
+        slug_candidate = slug_original = slugify(value, allow_unicode=True)
+        for i in itertools.count(1):
+            if not Audience.objects.filter(slug=slug_candidate, house=self.house).exists():
+                break
+            slug_candidate = '{}-{}'.format(slug_original, i)
+
+        self.slug = slug_candidate
+
+    
+    def _update_slug(self):
+        max_length = self._meta.get_field('slug').max_length
+        value = strip_non_ascii(self.name)
+        updated_slug = slugify(value, allow_unicode=True)
+        if Audience.objects.filter(slug=updated_slug, house=self.house).exists():
+            pass
+        else:
+            self.slug = updated_slug
+
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self._generate_slug()
+        
+        self._update_slug()
+
+        super().save(*args, **kwargs)
+
+
+    def __str__(self):
+        return self.name
+
+
+
+
+
+
 
 
 

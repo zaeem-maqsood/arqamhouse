@@ -21,7 +21,7 @@ from django.urls import path, include
 
 from subscribers.views import (SubscriberListView, SubscriberDetailView, SubscriberCreateView,
                                CampaignListView, CampaignUpdateView, CampaignTrackerView, UnsubscribeFromEmailView,
-                               CampaignCreateView, CampaignDetailView, CampaignContentView)
+                               CampaignCreateView, CampaignDetailView, CampaignContentView, AudienceView, AudienceListView)
 
 app_name = "subscribers"
 
@@ -29,8 +29,13 @@ urlpatterns = [
 
     path('', SubscriberListView.as_view(), name='list'),
     path('campaigns', CampaignListView.as_view(), name='campaign_list'),
+    path('audiences', AudienceListView.as_view(), name='audience_list'),
+
+
     path('create', SubscriberCreateView.as_view(), name='create'),
     path('<slug:slug>', SubscriberDetailView.as_view(), name='detail'),
+
+    path('audience/<slug:slug>', AudienceView.as_view(), name='audience_detail'),
 
     path('campaigns/create', CampaignCreateView.as_view(), name='campaign_create'),
     path('campaigns/create/<slug:slug>', CampaignCreateView.as_view(), name='campaign_create_event'),

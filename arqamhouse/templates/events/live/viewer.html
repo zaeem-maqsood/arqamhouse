@@ -649,16 +649,16 @@ function updateSpotLight() {
         {% else %}
 
         {% if not request.user.is_authenticated %}
-        <div class="row">
+        <div class="row" style="padding-top: 40px;">
             <div class="col-12 text-center">
                 <h3>Please <a href="{% url 'profiles:login' %}?next=/events/{{ event.slug }}/live">login</a> to view the live stream.</h3>
-                <p style="margin-bottom: 5px;">If you purchased a ticket already you would have received an email with your login credentials.</p>
-                <p style="margin-bottom: 5px;">If you did not receive an email or have misplaced it you can <a href="{% url 'password_reset' %}">reset your password.</a></p>
+                <p style="margin-bottom: 5px;">If you purchased a ticket already please <a href="{% url 'profiles:login' %}">login.</a></p>
+                <p style="margin-bottom: 5px;">If your having trouble logging in you can <a href="{% url 'password_reset' %}">reset your password.</a></p>
                 <p style="margin-bottom: 5px;">If you are still having difficulty please <a href="mailto:info@arqamhouse.com?Subject=I%20Cannot%20Login%20"">contact us</a> or <a href="mailto:{{ event.house.email }}?Subject=I%20Cannot%20Login%20">contact the organizer</a></p>
             </div>
         </div>
         {% else %}
-        <div class="row">
+        <div class="row" style="padding-top: 40px;">
             <div class="col-12 text-center">
                 <h3>Please <a href="{{ event.get_landing_view }}">purchase a ticket</a> to view the live stream</h3>
                 <p>If you have already purchased a ticket, please login with the email you used to purchase the ticket.</p>

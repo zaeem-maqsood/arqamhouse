@@ -232,7 +232,7 @@ class HouseContactPageView(DetailView):
 
 
     def send_email(self, name, message, email):
-        house = self.get_house()
+        house = self.get_house(self.kwargs["slug"])
         subject = f"New Message from {name}"
         context = {}
         context["name"] = name

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Subscriber, Campaign
+from .models import Subscriber, Campaign, Audience
 
 
 class SubscriberAdmin(admin.ModelAdmin):
@@ -12,3 +12,4 @@ class SubscriberAdmin(admin.ModelAdmin):
 # Register your models here.
 admin.site.register(Subscriber, SubscriberAdmin)
 admin.site.register(Campaign)
+admin.site.register(Audience)

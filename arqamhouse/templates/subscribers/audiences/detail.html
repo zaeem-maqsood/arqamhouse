@@ -1,0 +1,62 @@
+{% extends "backend/base.html" %}
+{% load tz %}
+{% load static %}
+
+{% block title %}
+Audience | {{ house.name }}
+{% endblock title %}
+
+
+{% block styles %}
+
+{% endblock styles %}
+
+
+{% block scripts %}
+
+{% endblock scripts %}
+
+
+
+{% block content %}
+
+<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+		<div class="kt-portlet kt-portlet--mobile">
+			<div class="kt-portlet__body">
+
+				
+                <div class="row justify-content-center">
+                    <div class="col-md-12">
+                        <h1>{{ audience.name }}</h1>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-md-12">
+                        {% for subscriber in audience.subscribers.all %}
+                        <p>{{ subscriber.profile.name }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+
+			</div>	
+		</div>
+	</div>
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

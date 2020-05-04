@@ -24,7 +24,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from events.mixins import EventSecurityMixin
 from django.contrib import messages
 
-from subscribers.models import Subscriber, Campaign
+from subscribers.models import Subscriber, Campaign, Audience
 from subscribers.forms import AddSubscriberForm
 
 from houses.models import House

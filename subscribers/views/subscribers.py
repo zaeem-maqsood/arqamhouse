@@ -108,7 +108,6 @@ class SubscriberListView(HouseAccountMixin, ListView):
         context = {}
         house = self.get_house()
         subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
-
         context["subscribers_tab"] = True
         context["dashboard_events"] = self.get_events()
         context["subscribers"] = subscribers
