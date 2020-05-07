@@ -23,11 +23,11 @@ class CustomScriptView(View):
 		from django.db.models import Max, Sum, Avg
 		from houses.models import House
 		from events.models import Event, EventOrder
-		from donations.models import Donation
+		from donations.models import Donation, DonationType
 		from subscribers.models import Subscriber, Campaign, Audience
 
 		# # 1. Resave all houses with updated values
-		# houses = House.objects.all()
+		houses = House.objects.all()
 		# for house in houses:
 		# 	donations = Donation.objects.filter(donation_type__house=house)
 		# 	house.donation_score = 0
@@ -105,6 +105,21 @@ class CustomScriptView(View):
 					for event_order in event_orders:
 						try:
 							subscriber = Subscriber.objects.get(profile__email=event_order.email, house=house)
+							audience.subscribers.add(subscriber)
+						except Exception as e:
+							print(e)
+
+			donation_types = DonationType.objects.filter(house=house)
+			for donation_type in donation_types:
+				try:
+					audience = Audience.objects.get(house=house, donation_type=donation_type)
+				except Exception as e:
+					print(e)
+					audience = Audience.objects.create(house=house, name=f"{donation_type.name} audience", donation_type=donation_type)
+					donations = Donation.objects.filter(donation_type=donation_type)
+					for donation in donations:
+						try:
+							subscriber = Subscriber.objects.get(profile__email=donation.email, house=house)
 							audience.subscribers.add(subscriber)
 						except Exception as e:
 							print(e)
