@@ -14,10 +14,12 @@ class AudienceListView(HouseAccountMixin, ListView):
     def get_context_data(self, *args, **kwargs):
         context = {}
         house = self.get_house()
-        audiences = Audience.objects.filter(house=house)
+        active_audiences = Audience.objects.filter(Q(house=house, event__active=True, donation_type__isnull=True) | Q(house=house, donation_type__deleted=False, event__isnull=True))
+        past_audiences = Audience.objects.filter(Q(house=house, event__active=False, donation_type__isnull=True) | Q(house=house, donation_type__deleted=True, event__isnull=True))
         context["subscribers_tab"] = True
         context["dashboard_events"] = self.get_events()
-        context["audiences"] = audiences
+        context["active_audiences"] = active_audiences
+        context["past_audiences"] = past_audiences
         context["house"] = house
         return context
 
@@ -52,7 +54,7 @@ class AudienceListView(HouseAccountMixin, ListView):
         html = render_to_string('subscribers/subscribers-dynamic-table-body.html', {'subscribers': subscribers, 'request':request})
         return HttpResponse(html)
 
-        
+
 
 
 class AudienceView(HouseAccountMixin, View):
@@ -66,21 +68,15 @@ class AudienceView(HouseAccountMixin, View):
         except:
             raise Http404
 
-    
-    def update_audience(self, audience):
-        if audience.event:
-            event_orders = EventOrder.objects.filter(event=audience.event)
-            for event_order in event_orders:
-                subscriber = Subscriber.objects.get(house=audience.house, profile__email=event_order.email)
-                audience.subscribers.add(subscriber)
-
 
     def get(self, request, *args, **kwargs):
         context = {}
         house = self.get_house()
         audience = self.get_audience(house)
-        self.update_audience(audience)
+        subscribers = audience.subscribers
+        subscribers = subscribers.filter(unsubscribed=False)
 
+        context["subscribers"] = subscribers
         context["audience"] = audience
         context["subscribers_tab"] = True
         context["house"] = house

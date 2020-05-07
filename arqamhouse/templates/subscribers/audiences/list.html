@@ -20,118 +20,177 @@ Audience | {{ house.name }}
 
 {% block content %}
 
-<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
+<div class="row align-items-center h-100" style="padding: 1rem 0px 3rem 0px;">
     <div class="col-lg-10 offset-lg-1 col-md-12 col-12">
-        
+    
+        <div class="row text-center" style="padding-bottom: 20px;">
+            <div class="col-lg-12" style="padding-top:10px;">
+                <a href="{% url 'subscribers:list' %}" class="btn btn-primary btn-block">
+                    View all subscribers
+                </a>
+            </div>
+        </div>
+            
+        {% if active_audiences %}
+        <div class="row">
+            {% for audience in active_audiences %}
+            {% if audience.event %}
+            <div class="col-lg-4 col-md-4 col-6" style="padding-top:10px;">
+                <div class="kt-portlet kt-portlet--mobile">
+                    <div class="kt-portlet__body" style="height: 250px;">
+                        <div class="row text-center">
+                            <div class="col-12">
+                                <a class="dashboard-links" href="{{ audience.get_detail_view }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 4em;height: 4em;"
+                                        viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                            <rect x="0" y="0" width="24" height="24" />
+                                            <path
+                                                d="M3,10.0500091 L3,8 C3,7.44771525 3.44771525,7 4,7 L9,7 L9,9 C9,9.55228475 9.44771525,10 10,10 C10.5522847,10 11,9.55228475 11,9 L11,7 L21,7 C21.5522847,7 22,7.44771525 22,8 L22,10.0500091 C20.8588798,10.2816442 20,11.290521 20,12.5 C20,13.709479 20.8588798,14.7183558 22,14.9499909 L22,17 C22,17.5522847 21.5522847,18 21,18 L11,18 L11,16 C11,15.4477153 10.5522847,15 10,15 C9.44771525,15 9,15.4477153 9,16 L9,18 L4,18 C3.44771525,18 3,17.5522847 3,17 L3,14.9499909 C4.14112016,14.7183558 5,13.709479 5,12.5 C5,11.290521 4.14112016,10.2816442 3,10.0500091 Z M10,11 C9.44771525,11 9,11.4477153 9,12 L9,13 C9,13.5522847 9.44771525,14 10,14 C10.5522847,14 11,13.5522847 11,13 L11,12 C11,11.4477153 10.5522847,11 10,11 Z"
+                                                fill="#000000" opacity="0.3"
+                                                transform="translate(12.500000, 12.500000) rotate(-45.000000) translate(-12.500000, -12.500000) " />
+                                        </g>
+                                    </svg>
+                                    <p style="padding-top: 20px;">{{ audience.name }}</p>
+                                </a>
+                                <p style="font-size: small;">Subscribers who purchased tickets for <a href="{{ audience.event.get_event_dashboard }}">{{ audience.event.title }}</a> event.</p>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% if audience.donation_type %}
+            <div class="col-lg-4 col-md-4 col-6" style="padding-top:10px;">
+                <div class="kt-portlet kt-portlet--mobile">
+                    <div class="kt-portlet__body" style="height: 250px;">
+                        <div class="row text-center">
+                            <div class="col-12">
+                                <a class="dashboard-links" href="{{ audience.get_detail_view }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 4em;height: 4em;"
+                                        viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                            <rect x="0" y="0" width="24" height="24" />
+                                            <path
+                                                d="M4,6 L20,6 C20.5522847,6 21,6.44771525 21,7 L21,8 C21,8.55228475 20.5522847,9 20,9 L4,9 C3.44771525,9 3,8.55228475 3,8 L3,7 C3,6.44771525 3.44771525,6 4,6 Z M5,11 L10,11 C10.5522847,11 11,11.4477153 11,12 L11,19 C11,19.5522847 10.5522847,20 10,20 L5,20 C4.44771525,20 4,19.5522847 4,19 L4,12 C4,11.4477153 4.44771525,11 5,11 Z M14,11 L19,11 C19.5522847,11 20,11.4477153 20,12 L20,19 C20,19.5522847 19.5522847,20 19,20 L14,20 C13.4477153,20 13,19.5522847 13,19 L13,12 C13,11.4477153 13.4477153,11 14,11 Z"
+                                                fill="#000000" />
+                                            <path
+                                                d="M14.4452998,2.16794971 C14.9048285,1.86159725 15.5256978,1.98577112 15.8320503,2.4452998 C16.1384028,2.90482849 16.0142289,3.52569784 15.5547002,3.83205029 L12,6.20185043 L8.4452998,3.83205029 C7.98577112,3.52569784 7.86159725,2.90482849 8.16794971,2.4452998 C8.47430216,1.98577112 9.09517151,1.86159725 9.5547002,2.16794971 L12,3.79814957 L14.4452998,2.16794971 Z"
+                                                fill="#000000" fill-rule="nonzero" opacity="0.3" />
+                                        </g>
+                                    </svg>
+                                    <p style="padding-top: 20px;">{{ audience.name }}</p>
+                                </a>
+                                <p style="font-size: small;">Subscribers who donated under
+                                        <a href="{{ audience.donation_type.get_update_url }}">{{ audience.donation_type.name }}</a> donation type.</p>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="row" style="padding-bottom: 10px;">
+            <div class="col-md-12">
+                <hr>
+            </div>
+        </div>
+
 
         <div class="row">
-            <div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
+            {% for audience in past_audiences %}
+            {% if audience.event %}
+            <div class="col-lg-4 col-md-4 col-6" style="padding-top:10px;">
                 <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body">
+                    <div class="kt-portlet__body" style="height: 250px;">
                         <div class="row text-center">
                             <div class="col-12">
-                                <a class="dashboard-links" href="{% url 'payments:list' %}">
+                                <a class="dashboard-links" href="{{ audience.get_detail_view }}">
                                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        style="width: 3em;height: 3em;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                                        style="width: 4em;height: 4em;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
                                         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                                             <rect x="0" y="0" width="24" height="24" />
                                             <path
-                                                d="M2,6 L21,6 C21.5522847,6 22,6.44771525 22,7 L22,17 C22,17.5522847 21.5522847,18 21,18 L2,18 C1.44771525,18 1,17.5522847 1,17 L1,7 C1,6.44771525 1.44771525,6 2,6 Z M11.5,16 C13.709139,16 15.5,14.209139 15.5,12 C15.5,9.790861 13.709139,8 11.5,8 C9.290861,8 7.5,9.790861 7.5,12 C7.5,14.209139 9.290861,16 11.5,16 Z"
+                                                d="M3,10.0500091 L3,8 C3,7.44771525 3.44771525,7 4,7 L9,7 L9,9 C9,9.55228475 9.44771525,10 10,10 C10.5522847,10 11,9.55228475 11,9 L11,7 L21,7 C21.5522847,7 22,7.44771525 22,8 L22,10.0500091 C20.8588798,10.2816442 20,11.290521 20,12.5 C20,13.709479 20.8588798,14.7183558 22,14.9499909 L22,17 C22,17.5522847 21.5522847,18 21,18 L11,18 L11,16 C11,15.4477153 10.5522847,15 10,15 C9.44771525,15 9,15.4477153 9,16 L9,18 L4,18 C3.44771525,18 3,17.5522847 3,17 L3,14.9499909 C4.14112016,14.7183558 5,13.709479 5,12.5 C5,11.290521 4.14112016,10.2816442 3,10.0500091 Z M10,11 C9.44771525,11 9,11.4477153 9,12 L9,13 C9,13.5522847 9.44771525,14 10,14 C10.5522847,14 11,13.5522847 11,13 L11,12 C11,11.4477153 10.5522847,11 10,11 Z"
                                                 fill="#000000" opacity="0.3"
-                                                transform="translate(11.500000, 12.000000) rotate(-345.000000) translate(-11.500000, -12.000000) " />
-                                            <path
-                                                d="M2,6 L21,6 C21.5522847,6 22,6.44771525 22,7 L22,17 C22,17.5522847 21.5522847,18 21,18 L2,18 C1.44771525,18 1,17.5522847 1,17 L1,7 C1,6.44771525 1.44771525,6 2,6 Z M11.5,16 C13.709139,16 15.5,14.209139 15.5,12 C15.5,9.790861 13.709139,8 11.5,8 C9.290861,8 7.5,9.790861 7.5,12 C7.5,14.209139 9.290861,16 11.5,16 Z M11.5,14 C12.6045695,14 13.5,13.1045695 13.5,12 C13.5,10.8954305 12.6045695,10 11.5,10 C10.3954305,10 9.5,10.8954305 9.5,12 C9.5,13.1045695 10.3954305,14 11.5,14 Z"
-                                                fill="#000000" />
+                                                transform="translate(12.500000, 12.500000) rotate(-45.000000) translate(-12.500000, -12.500000) " />
                                         </g>
                                     </svg>
-                                    <p style="padding-top: 10px;">Payments</p>
+                                    <p style="padding-top: 20px;">{{ audience.name }}</p>
                                 </a>
+                                <p style="font-size: small;">Subscribers who purchased tickets for <a
+                                        href="{{ audience.event.get_event_dashboard }}">{{ audience.event.title }}</a> event.</p>
+            
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        
-            <div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
+            {% endif %}
+            {% if audience.donation_type %}
+            <div class="col-lg-4 col-md-4 col-6" style="padding-top:10px;">
                 <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body">
+                    <div class="kt-portlet__body" style="height: 250px;">
                         <div class="row text-center">
                             <div class="col-12">
-                                <a class="dashboard-links" href="{% url 'houses:manage' %}">
+                                <a class="dashboard-links" href="{{ audience.get_detail_view }}">
                                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        style="width: 3em;height: 3em;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
-                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                            <polygon points="0 0 24 0 24 24 0 24" />
-                                            <path
-                                                d="M18,8 L16,8 C15.4477153,8 15,7.55228475 15,7 C15,6.44771525 15.4477153,6 16,6 L18,6 L18,4 C18,3.44771525 18.4477153,3 19,3 C19.5522847,3 20,3.44771525 20,4 L20,6 L22,6 C22.5522847,6 23,6.44771525 23,7 C23,7.55228475 22.5522847,8 22,8 L20,8 L20,10 C20,10.5522847 19.5522847,11 19,11 C18.4477153,11 18,10.5522847 18,10 L18,8 Z M9,11 C6.790861,11 5,9.209139 5,7 C5,4.790861 6.790861,3 9,3 C11.209139,3 13,4.790861 13,7 C13,9.209139 11.209139,11 9,11 Z"
-                                                fill="#000000" fill-rule="nonzero" opacity="0.3" />
-                                            <path
-                                                d="M0.00065168429,20.1992055 C0.388258525,15.4265159 4.26191235,13 8.98334134,13 C13.7712164,13 17.7048837,15.2931929 17.9979143,20.2 C18.0095879,20.3954741 17.9979143,21 17.2466999,21 C13.541124,21 8.03472472,21 0.727502227,21 C0.476712155,21 -0.0204617505,20.45918 0.00065168429,20.1992055 Z"
-                                                fill="#000000" fill-rule="nonzero" />
-                                        </g>
-                                    </svg>
-                                    <p style="padding-top: 10px;">House Users</p>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
-                <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body">
-                        <div class="row text-center">
-                            <div class="col-12">
-                                <a class="dashboard-links" href="{% url 'houses:update' %}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        style="width: 3em;height: 3em;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
-                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                            <rect opacity="0.300000012" x="0" y="0" width="24" height="24" />
-                                            <polygon fill="#000000" fill-rule="nonzero" opacity="0.3"
-                                                points="7 4.89473684 7 21 5 21 5 3 11 3 11 4.89473684" />
-                                            <path
-                                                d="M10.1782982,2.24743315 L18.1782982,3.6970464 C18.6540619,3.78325557 19,4.19751166 19,4.68102291 L19,19.3190064 C19,19.8025177 18.6540619,20.2167738 18.1782982,20.3029829 L10.1782982,21.7525962 C9.63486295,21.8510675 9.11449486,21.4903531 9.0160235,20.9469179 C9.00536265,20.8880837 9,20.8284119 9,20.7686197 L9,3.23140966 C9,2.67912491 9.44771525,2.23140966 10,2.23140966 C10.0597922,2.23140966 10.119464,2.2367723 10.1782982,2.24743315 Z M11.9166667,12.9060229 C12.6070226,12.9060229 13.1666667,12.2975724 13.1666667,11.5470105 C13.1666667,10.7964487 12.6070226,10.1879981 11.9166667,10.1879981 C11.2263107,10.1879981 10.6666667,10.7964487 10.6666667,11.5470105 C10.6666667,12.2975724 11.2263107,12.9060229 11.9166667,12.9060229 Z"
-                                                fill="#000000" />
-                                        </g>
-                                    </svg>
-                                    <p style="padding-top: 10px;">Switch House</p>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="col-lg-3 col-md-4 col-6" style="padding-top:10px;">
-                <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body">
-                        <div class="row text-center">
-                            <div class="col-12">
-                                <a class="dashboard-links" href="{% url 'houses:support_info' %}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        style="width: 3em;height: 3em;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                                        style="width: 4em;height: 4em;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
                                         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                                             <rect x="0" y="0" width="24" height="24" />
                                             <path
-                                                d="M5,9 L19,9 C20.1045695,9 21,9.8954305 21,11 L21,20 C21,21.1045695 20.1045695,22 19,22 L5,22 C3.8954305,22 3,21.1045695 3,20 L3,11 C3,9.8954305 3.8954305,9 5,9 Z M18.1444251,10.8396467 L12,14.1481833 L5.85557487,10.8396467 C5.4908718,10.6432681 5.03602525,10.7797221 4.83964668,11.1444251 C4.6432681,11.5091282 4.77972206,11.9639747 5.14442513,12.1603533 L11.6444251,15.6603533 C11.8664074,15.7798822 12.1335926,15.7798822 12.3555749,15.6603533 L18.8555749,12.1603533 C19.2202779,11.9639747 19.3567319,11.5091282 19.1603533,11.1444251 C18.9639747,10.7797221 18.5091282,10.6432681 18.1444251,10.8396467 Z"
+                                                d="M4,6 L20,6 C20.5522847,6 21,6.44771525 21,7 L21,8 C21,8.55228475 20.5522847,9 20,9 L4,9 C3.44771525,9 3,8.55228475 3,8 L3,7 C3,6.44771525 3.44771525,6 4,6 Z M5,11 L10,11 C10.5522847,11 11,11.4477153 11,12 L11,19 C11,19.5522847 10.5522847,20 10,20 L5,20 C4.44771525,20 4,19.5522847 4,19 L4,12 C4,11.4477153 4.44771525,11 5,11 Z M14,11 L19,11 C19.5522847,11 20,11.4477153 20,12 L20,19 C20,19.5522847 19.5522847,20 19,20 L14,20 C13.4477153,20 13,19.5522847 13,19 L13,12 C13,11.4477153 13.4477153,11 14,11 Z"
                                                 fill="#000000" />
                                             <path
-                                                d="M11.1288761,0.733697713 L11.1288761,2.69017121 L9.12120481,2.69017121 C8.84506244,2.69017121 8.62120481,2.91402884 8.62120481,3.19017121 L8.62120481,4.21346991 C8.62120481,4.48961229 8.84506244,4.71346991 9.12120481,4.71346991 L11.1288761,4.71346991 L11.1288761,6.66994341 C11.1288761,6.94608579 11.3527337,7.16994341 11.6288761,7.16994341 C11.7471877,7.16994341 11.8616664,7.12798964 11.951961,7.05154023 L15.4576222,4.08341738 C15.6683723,3.90498251 15.6945689,3.58948575 15.5161341,3.37873564 C15.4982803,3.35764848 15.4787093,3.33807751 15.4576222,3.32022374 L11.951961,0.352100892 C11.7412109,0.173666017 11.4257142,0.199862688 11.2472793,0.410612793 C11.1708299,0.500907473 11.1288761,0.615386087 11.1288761,0.733697713 Z"
-                                                fill="#000000" fill-rule="nonzero" opacity="0.3"
-                                                transform="translate(11.959697, 3.661508) rotate(-270.000000) translate(-11.959697, -3.661508) " />
+                                                d="M14.4452998,2.16794971 C14.9048285,1.86159725 15.5256978,1.98577112 15.8320503,2.4452998 C16.1384028,2.90482849 16.0142289,3.52569784 15.5547002,3.83205029 L12,6.20185043 L8.4452998,3.83205029 C7.98577112,3.52569784 7.86159725,2.90482849 8.16794971,2.4452998 C8.47430216,1.98577112 9.09517151,1.86159725 9.5547002,2.16794971 L12,3.79814957 L14.4452998,2.16794971 Z"
+                                                fill="#000000" fill-rule="nonzero" opacity="0.3" />
                                         </g>
                                     </svg>
-                                    <p style="padding-top: 10px;">Communication</p>
+                                    <p style="padding-top: 20px;">{{ audience.name }}</p>
                                 </a>
+                                <p style="font-size: small;">Subscribers who donated under
+                                    <a href="{{ audience.donation_type.get_update_url }}">{{ audience.donation_type.name }}</a>
+                                    donation type.</p>
+            
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        
-        
+            {% endif %}
+            {% endfor %}
         </div>
+
+
+        {% else %}
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+                <div class="row justify-content-center text-center" style="padding-bottom:30px;">
+                    <div class="col-12">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                            style="width: 150px;height: 150px;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                <rect x="0" y="0" width="24" height="24" />
+                                <path
+                                    d="M3.95709826,8.41510662 L11.47855,3.81866389 C11.7986624,3.62303967 12.2013376,3.62303967 12.52145,3.81866389 L20.0429,8.41510557 C20.6374094,8.77841684 21,9.42493654 21,10.1216692 L21,19.0000642 C21,20.1046337 20.1045695,21.0000642 19,21.0000642 L4.99998155,21.0000673 C3.89541205,21.0000673 2.99998155,20.1046368 2.99998155,19.0000673 C2.99998155,19.0000663 2.99998155,19.0000652 2.99998155,19.0000642 L2.99999828,10.1216672 C2.99999935,9.42493561 3.36258984,8.77841732 3.95709826,8.41510662 Z"
+                                    fill="#000000" opacity="0.3" />
+                                <path
+                                    d="M13.8,12 C13.1562,12 12.4033,12.7298529 12,13.2 C11.5967,12.7298529 10.8438,12 10.2,12 C9.0604,12 8.4,12.8888719 8.4,14.0201635 C8.4,15.2733878 9.6,16.6 12,18 C14.4,16.6 15.6,15.3 15.6,14.1 C15.6,12.9687084 14.9396,12 13.8,12 Z"
+                                    fill="#000000" opacity="0.3" />
+                            </g>
+                        </svg>
+                        <br>
+                        <h3 style="font-weight: 300;">No Audiences Yet!</h3>
+                        <p>Audiences are automatically created for you when you create and event or setup a donation type.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
     </div>
 </div>

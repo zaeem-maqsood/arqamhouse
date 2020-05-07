@@ -68,14 +68,11 @@ Donations
 								</thead>
 								<tbody id="dynamic">
 									{% for donation_type in donation_types %}
-                                        {% if donation_type.general_donation %}
-                                        {% else %}
                                         <tr>
                                             <td><a href="{{ donation_type.get_update_url }}">{{ donation_type.name|title }}</a></td>
                                             <td>{% if donation_type.pass_fee %}Yes{% else %}No{% endif %}</td>
                                             <td>{% if donation_type.issue_receipts %}Yes{% else %}No{% endif %}</td>
                                         </tr>
-                                        {% endif %}
 									{% endfor %}
 								</tbody>
 							</table>

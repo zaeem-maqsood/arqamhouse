@@ -136,7 +136,9 @@ class HouseHomePageView(DetailView):
                     subscriber.unsubscribed = False
                     subscriber.save()
                 except:
-                    subscriber = Subscriber.objects.create(profile=profile, house=house, events_total=1, attendance_total=1)
+                    subscriber = Subscriber.objects.create(
+                        profile=profile, house=event.house, total_events_since_subscribed=0, event_attendance=0, total_campaigns_since_subscribed=0,
+                        campaign_views=0, times_donated=0, highest_amount_donated=decimal.Decimal('0.00'))
 
                 html = render_to_string('houses/unsubscribe.html')
 
@@ -147,7 +149,9 @@ class HouseHomePageView(DetailView):
                     subscriber.unsubscribed = True
                     subscriber.save()
                 except:
-                    subscriber = Subscriber.objects.create(profile=profile, house=house, events_total=1, attendance_total=1, unsubscribed=True)
+                    subscriber = Subscriber.objects.create(
+                        profile=profile, house=event.house, total_events_since_subscribed=0, event_attendance=0, total_campaigns_since_subscribed=0,
+                        campaign_views=0, times_donated=0, highest_amount_donated=decimal.Decimal('0.00'), unsubscribed=True)
                 html = render_to_string('houses/subscribe.html')
 
             return JsonResponse({'html': html})

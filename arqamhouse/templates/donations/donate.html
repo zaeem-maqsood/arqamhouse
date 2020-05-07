@@ -187,17 +187,38 @@ function stripeTokenHandler(token) {
 
 <script>
 
-    function calculateAmount() {
+function showAddressAndFee(object) {
 
-        donation_type_element = document.getElementById("id_donation_type");
-        console.log("COMING HERE");
-        
-        {% for donation_type in donation_types %}
+    donation_type_id = object.value;
+    console.log(donation_type_id);
 
-            {% if donation_type.pass_fee %}
-                console.log("Is it even coming here");
+    {% for donation_type in donation_types %}
+        {% if donation_type.collect_address %}
+
+            if (donation_type_id == '{{ donation_type.id }}') {
+                document.getElementById("address_area").style.display = 'flex';
+                document.getElementById("autocomplete").required = true;
+                document.getElementById("id_postal_code").required = true;
+            }
+
+        {% else %}
+
+            if (donation_type_id == '{{ donation_type.id }}') {
+                document.getElementById("address_area").style.display = 'none';
+                document.getElementById("autocomplete").required = false;
+                document.getElementById("id_postal_code").required = false;
+            }
+
+        {% endif %}
+
+
+        {% if donation_type.pass_fee %}
+
+            if (donation_type_id == '{{ donation_type.id }}') {
+                document.getElementById("fee_p").style.display = 'flex';
+                donation_type_element = document.getElementById("id_donation_type");
                 document.getElementById("donation_type_name").innerHTML = donation_type_element.options[donation_type_element.selectedIndex].text;
-
+                
                 var fee = 0.00;
                 var amount = document.getElementById("id_amount");
 
@@ -224,7 +245,12 @@ function stripeTokenHandler(token) {
                 document.getElementById("fee_amount").innerHTML = "$" + donor_fee;
                 document.getElementById("donate_amount").innerHTML = "$" + total_donation_amount;
 
-            {% else %}
+            }
+
+        {% else %}
+
+            if (donation_type_id == '{{ donation_type.id }}') {
+                document.getElementById("fee_p").style.display = 'none';
 
                 var amount = document.getElementById("id_amount");
 
@@ -238,101 +264,15 @@ function stripeTokenHandler(token) {
 
                 document.getElementById("donate_amount").innerHTML = "$" + new_amount;
 
+            }
 
-            {% endif %}
+        {% endif %}
+    {% endfor %}
 
-        {% endfor %}
-
-    }
-</script>
-
-
-<script>
-
-    function showAddressAndFee(object) {
-
-        donation_type_id = object.value;
-        console.log(donation_type_id);
-
-        {% for donation_type in donation_types %}
-            {% if donation_type.collect_address %}
-
-                if (donation_type_id == '{{ donation_type.id }}') {
-                    document.getElementById("address_area").style.display = 'flex';
-                    document.getElementById("autocomplete").required = true;
-                    document.getElementById("id_postal_code").required = true;
-                }
-
-            {% else %}
-
-                if (donation_type_id == '{{ donation_type.id }}') {
-                    document.getElementById("address_area").style.display = 'none';
-                    document.getElementById("autocomplete").required = false;
-                    document.getElementById("id_postal_code").required = false;
-                }
-
-            {% endif %}
+}
 
 
-            {% if donation_type.pass_fee %}
-
-                if (donation_type_id == '{{ donation_type.id }}') {
-                    document.getElementById("fee_p").style.display = 'flex';
-                    donation_type_element = document.getElementById("id_donation_type");
-                    document.getElementById("donation_type_name").innerHTML = donation_type_element.options[donation_type_element.selectedIndex].text;
-                    
-                    var fee = 0.00;
-                    var amount = document.getElementById("id_amount");
-
-                    if (amount != null) {
-                        amount = amount.value;
-                    }
-
-                    if (amount) {
-                        new_amount = parseFloat(amount);
-                    }
-
-                    donor_fee = (new_amount * 0.04) + 0.30;
-                    donor_fee = donor_fee.toFixed(2);
-
-                    if (isNaN(donor_fee)) {
-                        donor_fee = 0.00;
-                    }
-
-                    total_donation_amount = new_amount + (new_amount * 0.04) + 0.30;
-                    total_donation_amount = total_donation_amount.toFixed(2);
-
-                    donor_fee = donor_fee.toString()
-                    total_donation_amount = total_donation_amount.toString()
-                    document.getElementById("fee_amount").innerHTML = "$" + donor_fee;
-                    document.getElementById("donate_amount").innerHTML = "$" + total_donation_amount;
-
-                }
-
-            {% else %}
-
-                if (donation_type_id == '{{ donation_type.id }}') {
-                    document.getElementById("fee_p").style.display = 'none';
-
-                    var amount = document.getElementById("id_amount");
-
-                    if (amount != null) {
-                        amount = amount.value;
-                    }
-
-                    if (amount) {
-                        new_amount = parseFloat(amount);
-                    }
-
-                    document.getElementById("donate_amount").innerHTML = "$" + new_amount;
-
-                }
-
-            {% endif %}
-        {% endfor %}
-
-    }
-
+window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
 </script>
 
 
@@ -357,7 +297,7 @@ function stripeTokenHandler(token) {
 <section>
     <div class="container">
 
-        <form id="donationForm" method="POST">{% csrf_token %}
+        <form id="donationForm" method="POST" >{% csrf_token %}
 
             {% if house.logo %}
             <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
@@ -468,10 +408,9 @@ function stripeTokenHandler(token) {
 
                     <div class="row" style="padding-bottom: 10px;display: none;" id="fee_p">
                         <div class="col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 5px;" class="lead">Fee | <span id="fee_amount"></span> </p>
+                            <p style="margin-bottom: 5px;" class="lead">Fee | <span style="color: #4a90e2;" id="fee_amount"></span> </p>
                             <p style="margin-bottom: 5px;font-size: 10px;line-height: 1.5;color: #4a90e2;">{{ house.name }} has requested
-                                it's donors pay the payment processing fees for '<span id="donation_type_name"></span>' donations. If you do
-                                not wish to pay the processing fee please select 'General Donation' from 'Donation Type'.</p>
+                                it's donors pay the payment processing fees for '<span id="donation_type_name"></span>' donations.</p>
                         </div>
                     </div>
 

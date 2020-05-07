@@ -56,7 +56,7 @@ from events.models import (Event, AttendeeCommonQuestions, EventQuestion, Ticket
 from questions.models import Question
 from payments.models import Transaction, Refund, HouseBalance, ArqamHouseServiceFee, HouseBalanceLog
 from profiles.models import Profile
-from subscribers.models import Subscriber, Campaign
+from subscribers.models import Subscriber, Campaign, Audience
 
 # Forms
 from events.forms import (EventForm, EventCheckoutForm, AttendeeForm, TicketsToCartForm, CheckinForm, DiscountForm,

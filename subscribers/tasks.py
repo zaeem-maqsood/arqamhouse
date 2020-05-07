@@ -1,6 +1,8 @@
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 
+
+from houses.models import House
 from subscribers.models import Subscriber, Campaign
 # Sending mail
 from django.core import mail
@@ -45,4 +47,18 @@ def send_campaign_emails(campaign_id):
         email = EmailMultiAlternatives(subject=subject, body=text_content, from_email=from_email, to=to)
         email.attach_alternative(html_content, "text/html")
         email.send()
+    return "Done"
+
+
+
+
+@shared_task
+def update_all_subscribers_who_have_donated(house_id):
+    house = House.objects.get(id=house_id)
+    subscribers = Subscriber.objects.filter(house=house)
+
+    for subscriber in subscribers:
+        if subscriber.amount_donated:
+            subscriber.save()
+    
     return "Done"

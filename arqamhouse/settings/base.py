@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'channels',
     'phonenumber_field',
     'stdimage',
+    'froala_editor',
 
     # First Party Apps
     'houses',
@@ -213,8 +214,8 @@ PLATFORM_FEE = 4.0
 PLATFORM_BASE_FEE = 0.30
 
 
-FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'colors', 'emoticons',
-                         'font_family', 'link', 'lists', 'paragraph_format', 'paragraph_style', 'image', 'font_size')
+FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'colors', 'emoticons', 'file',
+                         'font_family', 'link', 'lists', 'paragraph_format', 'paragraph_style', 'image', 'image_upload', 'font_size')
 
 
 FROALA_EDITOR_OPTIONS = {

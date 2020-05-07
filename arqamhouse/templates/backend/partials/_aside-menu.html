@@ -127,7 +127,7 @@
                 <i class="kt-menu__section-icon flaticon-more-v2"></i>
             </li>
             <li class="kt-menu__item {% if subscribers_tab %}kt-menu__item--open{% endif %}" aria-haspopup="true">
-                <a href="{% url 'subscribers:list' %}" class="kt-menu__link ">
+                <a href="{% url 'subscribers:audience_list' %}" class="kt-menu__link ">
                     <span class="kt-menu__link-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px"
                             viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
@@ -142,7 +142,7 @@
                             </g>
                         </svg>
                     </span>
-                    <span class="kt-menu__link-text">Subscribers</span>
+                    <span class="kt-menu__link-text">Audiences</span>
                 </a>
             </li>
             <li class="kt-menu__item {% if campaigns_tab %}kt-menu__item--open{% endif %}" aria-haspopup="true">

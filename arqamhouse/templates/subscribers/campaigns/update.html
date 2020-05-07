@@ -9,6 +9,7 @@ Subscribers | {{ house.name }}
 
 
 {% block styles %}
+{{ form.media }}
 <link href="https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/css/froala_editor.pkgd.min.css" rel="stylesheet"
     type="text/css" />
 {% endblock styles %}
@@ -24,62 +25,90 @@ Subscribers | {{ house.name }}
 
 {% block content %}
 
-<div class="row align-items-center h-100"style="padding: 3rem 0px 3rem 0px;">
-	<div class="col-lg-8 offset-lg-2 col-md-12 col-12">
+<div class="row justify-content-center h-100"style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-8 col-md-12 col-12">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
 				<div class="row" style="padding-bottom:20px;">
 					<div class="col-lg-12">
-						<h3>{% if event %}Event{% endif %} Campaign <span style="font-size: 0.8em;font-weight: 200;">| {{ campaign.name }}</span></h3>
-                        {% if event %}
-                        <p style="margin-bottom: 0px;">This campaign will only be sent to the {{ subscribers.count }} subscribers who attended <a href="{{ event.get_landing_view }}">{{ event }}</a></p>
+                        {% if campaign.audience %}
+                        <h4>Audience Specific Campaign | <span style="font-size: 0.8em;font-weight: 200;"><a href="{{ audience.get_detail_view }}">{{ audience.name }}</a></span></h4>
                         {% else %}
-                        <p style="margin-bottom: 0px;">This campaign will be sent to <span style="color: #4599d5;">{{ subscribers.count }}</span> subscribers.</p>
+                        <h3>Generic Campaign</h3>
+                        {% endif %}
+
+                        {% if campaign.audience.event %}
+                        <p style="margin-bottom: 0px;">This campaign is targeted towards anyone who purchased a ticket for <a
+                                href="{{ audience.get_detail_view }}">{{ audience.event.title }}</a> as of {{ campaign.created_at }}.</p>
+                        {% endif %}
+                        
+                        {% if campaign.audience.donation_type %}
+                        <p style="margin-bottom: 0px;">This campaign is targeted towards anyone who donated to donation type <a
+                                href="{{ audience.get_detail_view }}">{{ audience.donation_type.name }}</a> as of {{ campaign.created_at }}</p>
+                        {% endif %}
+                        
+                        {% if subscribers.count > 1 %}
+                        <p style="margin-bottom: 0px;">It will be sent to all <span
+                                style="color: #4599d5;">{{ subscribers.count }}</span> of your
+                            subscribers.</p>
+                        {% else %}
+                        <p style="margin-bottom: 0px;">It will be sent to your one and only subscriber.</p>
+                        {% endif %}
+                        
+                        {% if campaign.audience %}
+                        <p style="margin-bottom: 0px;">View audience <a href="{{ audience.get_detail_view }}">here.</a></p>
                         {% endif %}
                         
 					</div>
 				</div>
 
-                <form method="POST" id="checkoutForm" enctype="multipart/form-data" onchange="update_content()">{% csrf_token %}
+                <form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
                     <div class="row" style="padding-bottom: 30px;">
-                        <div class="col-md-8">
-                            <p style="margin-bottom: 5px;">Name</p>
+                        <div class="col-md-6">
+                            <p style="margin-bottom: 5px;">Campaign Name</p>
                             {{ form.name }}
                         </div>
                     </div>
 
                     <div class="row" style="padding-bottom: 30px;">
-                        <div class="col-md-8">
-                            <p style="margin-bottom: 5px;">Subject</p>
+                        <div class="col-md-6">
+                            <p style="margin-bottom: 5px;">Email Subject</p>
                             {{ form.subject }}
                         </div>
                     </div>
 
-                    {{ form.media }}
-                    <div class="row" style="padding-bottom: 50px;">
-                        <div class="col-md-12" style="max-width: 640px;">
-                            <p style="margin-bottom: 5px;">Content</p>
+                    
+                    <div class="row justify-content-center" style="padding-bottom: 30px;">
+                        <div class="col-md-12">
+                            <p style="margin-bottom: 5px;">Email Content</p>
                             {{ form.content }}
                         </div>
                     </div>
 
-                    <div class="row" style="padding-bottom: 50px;">
-                        <div class="col-md-12" style="max-width: 640px;">
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
                             <p style="margin-bottom: 5px;">Test Email</p>
                             {{ form.test_email }}
                         </div>
                     </div>
 
-
-                    <div class="row" style="padding-bottom:20px;">
-
-                        <div class="col-lg-4" style="padding-bottom: 20px;">
-                            <button type="submit" name="save" value='true' class="btn btn-primary btn-block">Save Campaign</button>
-                        </div>
-
+                    <div class="row" style="padding-bottom: 10px;">
                         <div class="col-lg-4" style="padding-bottom: 20px;">
                             <button type="submit" name="test" value='true' class="btn btn-info btn-block">Send Test Email</button>
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-lg-12">
+                            <hr>
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="padding-bottom:20px;">
+                        <div class="col-lg-4" style="padding-bottom: 20px;">
+                            <button type="submit" name="save" value='true' class="btn btn-primary btn-block">Save Campaign</button>
                         </div>
 
                         <div class="col-lg-4" style="padding-bottom: 20px;">
@@ -96,8 +125,8 @@ Subscribers | {{ house.name }}
                                         <div class="modal-body">
                                             <h3>Last Chance</h3>
                                             <br>
-                                            <p>We will deliver your campaign <strong>{{ campaign.name }}</strong> to all <strong>{{ subscribers.count }}</strong> of your subscribers.</p>
-                                            <p>Please make sure you have sent yourself a test email and everything looks good. You will not be able to edit this campaign after you have sent it.</p>
+                                            <p>We will deliver your campaign <strong>{{ campaign.name }}</strong> to {% if subscribers.count > 1 %}all{% endif %} <strong>{{ subscribers.count }}</strong> of your subscribers.</p>
+                                            <p>Please make sure you have sent yourself a test email and you are satisfeid with it. You will not be able to edit this campaign after you have sent it.</p>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -106,6 +135,11 @@ Subscribers | {{ house.name }}
                                     </div>
                                 </div>
                             </div>
+
+                        </div>
+
+                        <div class="col-lg-4" style="padding-bottom: 20px;">
+                            <button type="submit" id="delete" name="delete" value='true' class="btn btn-danger btn-block">Delete Campaign</button>
                         </div>
                     </div>
 
@@ -116,7 +150,7 @@ Subscribers | {{ house.name }}
 
                             <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample"
                                 aria-expanded="false" aria-controls="collapseExample">
-                                View {{ subscribers.count }} Subscribers
+                                View {{ subscribers.count }} Subscriber{% if subscribers.count > 1 %}s{% endif %}
                             </button>
 
                             <div class="collapse" id="collapseExample" style="padding-top: 30px;">

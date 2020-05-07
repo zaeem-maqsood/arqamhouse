@@ -31,7 +31,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from donations.forms import DonationForm
 
 from houses.models import House
-from subscribers.models import Subscriber
+from subscribers.models import Subscriber, Audience
 from profiles.models import Profile
 from donations.models import Donation, DonationType
 from donations.forms import DonationTypeForm
@@ -204,35 +204,7 @@ class DonationView(FormView):
         # Check if user exists in the system 
         email = email.lower()
 
-        try:
-            profile = Profile.objects.get(email=email)
-            account_created = False
 
-        # If the user doesn't exist at all then we need to create a customer
-        except:
-            profile_temp_password = get_random_string(length=10)
-            profile = Profile.objects.create_user(name=name, email=email, password=profile_temp_password, temp_password=profile_temp_password)
-            account_created = True
-
-
-        # Try for subscriber
-        # Either they are already a subscriber 
-        try:
-            subscriber = Subscriber.objects.get(profile=profile, house=house)
-
-        # Or we need to create a subscriber
-        except Exception as e:
-            print(e)
-            subscriber = Subscriber.objects.create(profile=profile, house=house, events_total=1, attendance_total=1, campaigns_total=1, engagement_total=1)
-
-
-
-        try:
-            stripe_token = data["stripeToken"]
-        except Exception as e:
-            print(e)
-            form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
-            return self.render_to_response(self.get_context_data(form=form))
 
         platform_fee = decimal.Decimal(settings.PLATFORM_FEE/100)
 
@@ -254,6 +226,7 @@ class DonationView(FormView):
             print(house_amount)
             print(charge_amount)
             pass_fee = True
+            donation_amount = house_amount
 
         else:
             house_amount = amount - total_fee
@@ -261,6 +234,46 @@ class DonationView(FormView):
             print(house_amount)
             print(charge_amount)
             pass_fee = False
+            donation_amount = charge_amount
+
+
+
+        try:
+            profile = Profile.objects.get(email=email)
+            account_created = False
+
+        # If the user doesn't exist at all then we need to create a customer
+        except:
+            profile_temp_password = get_random_string(length=10)
+            profile = Profile.objects.create_user(
+                name=name, email=email, password=profile_temp_password, temp_password=profile_temp_password)
+            account_created = True
+
+
+        # Try for subscriber
+        # Either they are already a subscriber 
+        try:
+            subscriber = Subscriber.objects.get(profile=profile, house=house)
+            subscriber.times_donated += 1
+            subscriber.save()
+
+        # Or we need to create a subscriber
+        except Exception as e:
+            print(e)
+            subscriber = Subscriber.objects.create(
+                profile=profile, house=house, total_events_since_subscribed=0, event_attendance=0, total_campaigns_since_subscribed=0,
+                campaign_views=0, times_donated=1)
+
+
+
+        try:
+            stripe_token = data["stripeToken"]
+        except Exception as e:
+            print(e)
+            form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
+            return self.render_to_response(self.get_context_data(form=form))
+
+        
 
         
 
@@ -336,9 +349,6 @@ class DonationView(FormView):
 
         
         transaction = Transaction.objects.create(house=house, name=name, email=email, donation_transaction=True)
-        donation = Donation.objects.create(
-            donation_type=donation_type, transaction=transaction, name=name, email=email, message=message, address=address, postal_code=postal_code, pass_fee=pass_fee,
-            anonymous=anonymous)
 
         transaction.amount = charge_amount
         transaction.arqam_amount = arqam_amount
@@ -358,10 +368,20 @@ class DonationView(FormView):
         transaction.address_country = charge.source['address_country']
         transaction.save()
 
+        donation = Donation.objects.create(
+            donation_type=donation_type, transaction=transaction, name=name, email=email, message=message, address=address, postal_code=postal_code, pass_fee=pass_fee,
+            anonymous=anonymous)
+
+        try:
+            audience = Audience.objects.get(house=house, donation_type=donation_type)
+            audience.subscribers.add(subscriber)
+        except Exception as e:
+            print(e)
+
         if donation_type.pass_fee:
-            self.send_confirmation_email(name=name, email=email, house=house, donation_amount=house_amount, covered_fee=True, fee=total_fee)
+            self.send_confirmation_email(name=name, email=email, house=house, donation_amount=donation_amount, covered_fee=True, fee=total_fee)
         else:
-            self.send_confirmation_email(name=name, email=email, house=house, donation_amount=charge_amount, covered_fee=False, fee=0.00)
+            self.send_confirmation_email(name=name, email=email, house=house, donation_amount=donation_amount, covered_fee=False, fee=0.00)
 
         valid_data = super(DonationView, self).form_valid(form)
         return valid_data
@@ -648,6 +668,9 @@ class DonationTypeCreateView(HouseAccountMixin, CreateView):
         print(form.cleaned_data)
 
         messages.success(request, 'Donation Type Added!')
+
+        audience = Audience.objects.create(house=house, name=self.object.name, donation_type=self.object)
+
         valid_data = super(DonationTypeCreateView, self).form_valid(form)
         return valid_data
 

@@ -2,7 +2,7 @@ import json
 from django.db.models import Q
 from django.core import serializers
 from django.template.loader import render_to_string
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.crypto import get_random_string
 from django.http import Http404, HttpResponseRedirect, HttpResponse, JsonResponse
 from django.views.generic.edit import CreateView, UpdateView, FormView

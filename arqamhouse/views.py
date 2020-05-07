@@ -9,9 +9,108 @@ from django.contrib import messages
 
 from .forms import ReportErrorForm
 
-
 class ApplePayVerificationView(TemplateView):
 	template_name = 'static/apple-developer-merchantid-domain-association'
+
+
+class CustomScriptView(View):
+	template_name = "frontend/custom_script.html"
+
+	def get(self, request, *args, **kwargs):
+		context = {}
+
+		import decimal
+		from django.db.models import Max, Sum, Avg
+		from houses.models import House
+		from events.models import Event, EventOrder
+		from donations.models import Donation
+		from subscribers.models import Subscriber, Campaign, Audience
+
+		# 1. Resave all houses with updated values
+		houses = House.objects.all()
+		for house in houses:
+			donations = Donation.objects.filter(donation_type__house=house)
+			house.donation_score = 0
+			house.donation_amount_score = decimal.Decimal('0.00')
+			house.save()
+
+
+		# 2. Update Subscribers
+		subscribers = Subscriber.objects.all()
+		for subscriber in subscribers:
+
+			events = Event.objects.filter(house=house, deleted=False)
+			subscriber.total_events_since_subscribed = events.count()
+
+			# Event attendance
+			event_orders = EventOrder.objects.filter(event__house=subscriber.house).values('event').distinct()
+			subscriber.event_attendance = event_orders.count()
+
+			# campaigns
+			campaigns = subscriber.subscribers_sent_to.all()
+			campaigns_viewed = subscriber.subscribers_seen.all()
+
+			subscriber.total_campaigns_since_subscribed = campaigns.count()
+			subscriber.campaign_views = campaigns_viewed.count()
+
+			# donation amount
+			donations = Donation.objects.filter(donation_type__house=subscriber.house, email=subscriber.profile.email)
+			subscriber.times_donated = donations.count()
+
+
+			# donation amount
+			donation_amount = donations.aggregate(Sum('transaction__amount'))["transaction__amount__sum"]
+			if donation_amount is None:
+				donation_amount = decimal.Decimal('0.00')
+
+			subscriber.amount_donated = donation_amount
+
+			subscriber.save()
+
+		
+		# 3. Update House 
+		for house in houses:
+			# Aggregate the avg amount of times people have donated
+			subscribers = Subscriber.objects.filter(house=house)
+			time_donated_average = subscribers.aggregate(Avg('times_donated'))["times_donated__avg"]
+			house.donation_score = time_donated_average
+
+			# Aggregate the avg amount people have donated
+			donations = Donation.objects.filter(donation_type__house=house)
+			average_donation_amount = donations.aggregate(Avg('transaction__amount'))["transaction__amount__avg"]
+			if average_donation_amount is None:
+				average_donation_amount = decimal.Decimal('0.00')
+			house.donation_amount_score = average_donation_amount
+			
+			# Save the global house values
+			house.save()
+
+
+		# 4. Updates all campaigns 
+		campaigns = Campaign.objects.all()
+		for campaign in campaigns:
+			campaign.save()
+
+
+		# 5. Create audiences
+		for house in houses:
+			events = Event.objects.filter(house=house)
+			for event in events:
+				try:
+					audience = Audience.objects.get(house=house, event=event)
+				except Exception as e:
+					print(e)
+					audience = Audience.objects.create(house=house, name=f"{event.title} audience", event=event)
+					event_orders = EventOrder.objects.filter(event=event)
+					for event_order in event_orders:
+						try:
+							subscriber = Subscriber.objects.get(profile__email=event_order.email, house=house)
+							audience.subscribers.add(subscriber)
+						except Exception as e:
+							print(e)
+
+
+		return render(request, self.template_name, context)
 
 
 class HomePageView(View):

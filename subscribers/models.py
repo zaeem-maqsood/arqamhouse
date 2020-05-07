@@ -1,4 +1,5 @@
 import itertools
+import decimal
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -25,18 +26,19 @@ class Subscriber(TimestampedModel):
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
     engagement = models.CharField(max_length=150, choices=engagement_types, blank=True, null=True)
 
-    # Campaign Scores out of 100
-    engagement_score = models.PositiveIntegerField(blank=True, null=True, default=0)
-    engagement_total = models.PositiveIntegerField(blank=True, null=True, default=0)
-    campaigns_total = models.PositiveIntegerField(blank=True, null=True, default=0)
+    total_events_since_subscribed = models.PositiveIntegerField(blank=True, null=True, default=0)
+    total_campaigns_since_subscribed = models.PositiveIntegerField(blank=True, null=True, default=0)
 
-    # Subscriber score out of 100
-    attendance_score = models.PositiveIntegerField(blank=True, null=True, default=0)
-    attendance_total = models.PositiveIntegerField(blank=True, null=True, default=0)
-    events_total = models.PositiveIntegerField(blank=True, null=True, default=0)
+    campaign_views = models.PositiveIntegerField(blank=True, null=True, default=0)
+    event_attendance = models.PositiveIntegerField(blank=True, null=True, default=0)
+    times_donated = models.PositiveIntegerField(blank=True, null=True, default=0)
+    amount_donated = models.DecimalField(blank=True, null=True, max_digits=9, decimal_places=2, default=decimal.Decimal('0.00'))
 
-    # Total subscriber score out of 100
-    subscriber_score = models.PositiveIntegerField(blank=True, null=True, default=0)
+
+    campaign_view_score = models.PositiveIntegerField(blank=True, null=True, default=100)
+    event_score = models.PositiveIntegerField(blank=True, null=True, default=100)
+    donation_score = models.PositiveIntegerField(null=True, blank=True, default=100)
+    donation_above_average = models.BooleanField(default=False)
     
     events = models.ManyToManyField(Event, blank=True)
     unsubscribed = models.BooleanField(default=False) 
@@ -49,24 +51,33 @@ class Subscriber(TimestampedModel):
         view_name = "subscribers:detail"
         return reverse(view_name, kwargs={"slug": self.profile.slug})
 
-    def update_subscriber_score(self):
-        attendance_score = self.attendance_score * 0.70
-        engagement_score = self.engagement_score * 0.30
-        self.subscriber_score = attendance_score + engagement_score
-    
+    def update_scores(self):
+        try:
+            self.campaign_view_score = (self.campaign_views / self.total_campaigns_since_subscribed) * 100
+        except:
+            self.campaign_view_score = 100
 
-    def update_attendance_score(self):
-        if self.events_total > 0:
-            self.attendance_score = (self.attendance_total / self.events_total) * 100
+        try:
+            self.event_score = (self.event_attendance / self.total_events_since_subscribed) * 100
+        except:
+            self.event_score = 100
 
-    def update_engagement_score(self):
-        if self.campaigns_total > 0:
-            self.engagement_score = (self.engagement_total / self.campaigns_total) * 100
+        try:
+            self.donation_score = (self.times_donated / self.house.donation_score) * 100
+        except:
+            self.donation_score = 100
+
+        try:
+            if self.amount_donated >= self.house.donation_amount_score:
+                self.donation_above_average = True
+            else:
+                self.donation_above_average = False
+        except Exception as e: 
+            print(e)
+            self.donation_above_average = True
 
     def save(self, *args, **kwargs):
-        self.update_attendance_score()
-        self.update_engagement_score()
-        self.update_subscriber_score()
+        self.update_scores()
         super().save(*args, **kwargs)
 
 
@@ -120,6 +131,16 @@ class Audience(TimestampedModel):
         return self.name
 
 
+    def get_detail_view(self):
+        view_name = "subscribers:audience_detail"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+
+    def create_campaign_view(self):
+        view_name = "subscribers:campaign_create_audience"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+
 
 
 
@@ -129,8 +150,9 @@ class Audience(TimestampedModel):
 
 class Campaign(TimestampedModel):
     name = models.CharField(max_length=100, blank=True, null=True)
+    slug = models.SlugField(max_length=200, unique=False, blank=True)
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=True, null=True)
+    audience = models.ForeignKey(Audience, on_delete=models.CASCADE, blank=True, null=True)
     subscribers_sent_to = models.ManyToManyField(Subscriber, related_name="subscribers_sent_to", blank=True)
     subscribers_seen = models.ManyToManyField(Subscriber, related_name="subscribers_seen", blank=True)
     # Total number of people the campaign was sent to
@@ -143,6 +165,30 @@ class Campaign(TimestampedModel):
     plain_content = models.TextField(blank=True, null=True)
     subject = models.CharField(max_length=100, blank=True, null=True)
     draft = models.BooleanField(default=True)
+    deleted = models.BooleanField(default=False)
+
+
+    def _generate_slug(self):
+        max_length = self._meta.get_field('slug').max_length
+        value = strip_non_ascii(self.name)
+
+        slug_candidate = slug_original = slugify(value, allow_unicode=True)
+        for i in itertools.count(1):
+            if not Campaign.objects.filter(slug=slug_candidate, house=self.house).exists():
+                break
+            slug_candidate = '{}-{}'.format(slug_original, i)
+
+        self.slug = slug_candidate
+
+
+    def _update_slug(self):
+        max_length = self._meta.get_field('slug').max_length
+        value = strip_non_ascii(self.name)
+        updated_slug = slugify(value, allow_unicode=True)
+        if Campaign.objects.filter(slug=updated_slug, house=self.house).exists():
+            pass
+        else:
+            self.slug = updated_slug    
 
     def __str__(self):
         return "%s" % (self.name)
@@ -160,19 +206,24 @@ class Campaign(TimestampedModel):
     def save(self, *args, **kwargs):
 
         if self.pk:
+            self._update_slug()
             self.update_total_and_seen()
             self.update_score()
+
+        if not self.pk:
+            self._generate_slug()
+
         super().save(*args, **kwargs)
 
 
     def get_update_view(self):
         view_name = "subscribers:campaign_update"
-        return reverse(view_name, kwargs={"pk": self.id})
+        return reverse(view_name, kwargs={"slug": self.slug})
 
     def get_detail_view(self):
         view_name = "subscribers:campaign_detail"
-        return reverse(view_name, kwargs={"pk": self.id})
+        return reverse(view_name, kwargs={"slug": self.slug})
 
     def get_detail_content_view(self):
         view_name = "subscribers:campaign_detail_content"
-        return reverse(view_name, kwargs={"pk": self.id})
+        return reverse(view_name, kwargs={"slug": self.slug})

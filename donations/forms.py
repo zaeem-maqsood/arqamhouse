@@ -38,7 +38,7 @@ class DonationTypeForm(forms.ModelForm):
 class DonationForm(forms.ModelForm):
 
     amount = forms.DecimalField(widget=forms.NumberInput(attrs={"class": "validate-required", "min": "5.00", "max": "5000.00",
-                                                                "step": "1.00", "value": "20.00", "required": True, "onchange": "calculateAmount();"}))
+                                                                "step": "1.00", "value": "20.00", "required": True, "onchange": "showAddressAndFee(document.getElementById('id_donation_type'));"}))
 
     def __init__(self, house, *args, **kwargs):
         super(DonationForm, self).__init__(*args, **kwargs)

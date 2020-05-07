@@ -38,10 +38,10 @@ urlpatterns = [
     path('audience/<slug:slug>', AudienceView.as_view(), name='audience_detail'),
 
     path('campaigns/create', CampaignCreateView.as_view(), name='campaign_create'),
-    path('campaigns/create/<slug:slug>', CampaignCreateView.as_view(), name='campaign_create_event'),
-    path('campaigns/update/<int:pk>', CampaignUpdateView.as_view(), name='campaign_update'),
-    path('campaigns/details/<int:pk>', CampaignDetailView.as_view(), name='campaign_detail'),
-    path('campaigns/detail/<int:pk>/content', CampaignContentView.as_view(), name='campaign_detail_content'),
+    path('campaigns/create/audience/<slug:slug>', CampaignCreateView.as_view(), name='campaign_create_audience'),
+    path('campaigns/update/<slug:slug>', CampaignUpdateView.as_view(), name='campaign_update'),
+    path('campaigns/details/<slug:slug>', CampaignDetailView.as_view(), name='campaign_detail'),
+    path('campaigns/detail/<slug:slug>/content', CampaignContentView.as_view(), name='campaign_detail_content'),
     path('campaigns/tracker', CampaignTrackerView.as_view(), name='campaign_tracker'),
     path('campaigns/unsubscribe-from-email', UnsubscribeFromEmailView.as_view(), name='campaign_unsubscribe_from_email'),
 ]

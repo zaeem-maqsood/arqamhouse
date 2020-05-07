@@ -506,19 +506,26 @@ class EventCheckoutView(FormView):
             subscriber = Subscriber.objects.get(profile=profile, house=event.house)
             event_order = EventOrder.objects.filter(event=event, email=email).exists()
             if not event_order:
-                subscriber.attendance_total = subscriber.attendance_total + 1
+                subscriber.event_attendance = subscriber.event_attendance + 1
                 subscriber.events.add(event)
-                if subscriber.attendance_total > subscriber.events_total:
-                    subscriber.events_total += 1
                 subscriber.save()
 
         # Or we need to create a subscriber
         except Exception as e:
             print(e)
-            subscriber = Subscriber.objects.create(profile=profile, house=event.house, events_total=1, attendance_total=1)
+            subscriber = Subscriber.objects.create(
+                profile=profile, house=event.house, total_events_since_subscribed=1, event_attendance=1, total_campaigns_since_subscribed=0, 
+                campaign_views=0, times_donated=0, amount_donated=decimal.Decimal('0.00'))
             subscriber.events.add(event)
 
 
+
+        # Add the subscriber to the audience 
+        try:
+            audience = Audience.objects.get(house=event.house, event=event)
+            audience.subscribers.add(subscriber)
+        except Exception as e:
+            print(e)
 
         # =================================== SECOND CHECK (if payment required) =======================================
         # Only get the Stripe Token if payment enabled
@@ -951,6 +958,8 @@ class EventCreateView(HouseAccountMixin, CreateView):
         self.object = form.save()
         self.object.active = True
         self.object.save()
+
+        audience = Audience.objects.create(house=house, name=self.object.title, event=self.object)
 
         messages.success(request, 'Event Created!')
 

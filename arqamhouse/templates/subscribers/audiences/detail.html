@@ -19,26 +19,100 @@ Audience | {{ house.name }}
 
 
 {% block content %}
-
-<div class="row align-items-center h-100" style="padding: 3rem 0px 3rem 0px;">
-	<div class="col-lg-10 offset-lg-1 col-md-12 col-12">
+<style>
+.circular--portrait img {
+  object-fit: cover;
+  width:60px;
+  height:60px;
+  border-radius: 50%;
+}
+</style>
+<div class="row justify-content-center h-100" style="padding: 3rem 0px 3rem 0px;">
+	<div class="col-lg-8 col-md-12 col-12">
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
-				
-                <div class="row justify-content-center">
+				{% if audience.event %}
+                <div class="row justify-content-center" style="padding-bottom: 20px;">
                     <div class="col-md-12">
-                        <h1>{{ audience.name }}</h1>
+                        <h4>{{ audience.event.title }} <span style="font-size: 0.7em;font-weight: 300;">| Audience</span></h4>
+                        <p>Subscribers who have purchased tickets for <a href="{{ audience.event.get_event_dashboard }}">{{ audience.event.title }}.</a></p>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if audience.donation_type %}
+                <div class="row justify-content-center" style="padding-bottom: 20px;">
+                    <div class="col-md-12">
+                        <h4>{{ audience.donation_type.name }} <span style="font-size: 0.7em;font-weight: 300;">| Audience</span></h4>
+                        <p>Subscribers who have donated to <a
+                                href="{{ audience.event.get_event_dashboard }}">{{ audience.donation_type.name }}.</a></p>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if subscribers %}
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-md-12">
+                        <a href="{{ audience.create_campaign_view }}" class="btn btn-block btn-primary">Email Subscribers</a>
                     </div>
                 </div>
 
-                <div class="row justify-content-center">
-                    <div class="col-md-12">
-                        {% for subscriber in audience.subscribers.all %}
-                        <p>{{ subscriber.profile.name }}</p>
-                        {% endfor %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center">
+                        <tbody id="dynamic">
+                            {% for subscriber in subscribers %}
+                            <tr>
+                                <td style="height: 100px;" class="align-middle">
+                                    {% if subscriber.profile.picture %}
+                                    <div class="circular--portrait">
+                                        <a href="{{ subscriber.get_absolute_url }}"><img
+                                            src="{{ subscriber.profile.picture.thumbnail.url }}"
+                                            style="max-width: 50px;max-height: 50px;border-radius: 100px;"></a>
+                                    </div>
+                                    {% else %}
+                                    <a href="{{ subscriber.get_absolute_url }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                            style="width: 60px;height: 60px;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect x="0" y="0" width="50" height="50" />
+                                                <circle fill="#4a90e2" opacity="0.3" cx="12" cy="12" r="10" />
+                                                <path
+                                                    d="M12,11 C10.8954305,11 10,10.1045695 10,9 C10,7.8954305 10.8954305,7 12,7 C13.1045695,7 14,7.8954305 14,9 C14,10.1045695 13.1045695,11 12,11 Z M7.00036205,16.4995035 C7.21569918,13.5165724 9.36772908,12 11.9907452,12 C14.6506758,12 16.8360465,13.4332455 16.9988413,16.5 C17.0053266,16.6221713 16.9988413,17 16.5815,17 L7.4041679,17 C7.26484009,17 6.98863236,16.6619875 7.00036205,16.4995035 Z"
+                                                    fill="#000000" opacity="0.3" />
+                                            </g>
+                                        </svg>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle"><a
+                                        href="{{ subscriber.get_absolute_url }}">{{ subscriber.profile.name|title }}</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="row justify-content-center text-center" style="padding-bottom:30px;">
+                    <div class="col-12">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                            style="width: 150px;height: 150px;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                <rect x="0" y="0" width="24" height="24" />
+                                <path
+                                    d="M3.95709826,8.41510662 L11.47855,3.81866389 C11.7986624,3.62303967 12.2013376,3.62303967 12.52145,3.81866389 L20.0429,8.41510557 C20.6374094,8.77841684 21,9.42493654 21,10.1216692 L21,19.0000642 C21,20.1046337 20.1045695,21.0000642 19,21.0000642 L4.99998155,21.0000673 C3.89541205,21.0000673 2.99998155,20.1046368 2.99998155,19.0000673 C2.99998155,19.0000663 2.99998155,19.0000652 2.99998155,19.0000642 L2.99999828,10.1216672 C2.99999935,9.42493561 3.36258984,8.77841732 3.95709826,8.41510662 Z"
+                                    fill="#000000" opacity="0.3" />
+                                <path
+                                    d="M13.8,12 C13.1562,12 12.4033,12.7298529 12,13.2 C11.5967,12.7298529 10.8438,12 10.2,12 C9.0604,12 8.4,12.8888719 8.4,14.0201635 C8.4,15.2733878 9.6,16.6 12,18 C14.4,16.6 15.6,15.3 15.6,14.1 C15.6,12.9687084 14.9396,12 13.8,12 Z"
+                                    fill="#000000" opacity="0.3" />
+                            </g>
+                        </svg>
+                        <br>
+                        <h3 style="font-weight: 300;">No Subscribers Yet!</h3>
+                        <p>There are no subscribers in this audience yet. We'll automatically add subscribers for you.</p>
                     </div>
                 </div>
+                {% endif %}
 
 
 			</div>	

@@ -16,7 +16,7 @@ class AddSubscriberForm(forms.Form):
 class GenericCampaignForm(forms.ModelForm):
 
 	content = forms.CharField(required=True, widget=FroalaEditor(options={
-	                          'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True, 'useClasses': False, 'charCounterMax': 700 }))
+	                          'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True, 'useClasses': False, 'charCounterMax': 2000 }))
 
 	
 	test_email = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"class": "form-control m-input", "placeholder": "email@domain.com"}), required=False)

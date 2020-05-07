@@ -128,8 +128,10 @@ class Event(TimestampedModel):
         return reverse(view_name, kwargs={"slug": self.slug})
 
     def get_create_event_campaign_view(self):
-        view_name = "subscribers:campaign_create_event"
-        return reverse(view_name, kwargs={"slug": self.slug})
+        from subscribers.models import Audience
+        audience = Audience.objects.get(house=self.house, event=self)
+        view_name = "subscribers:campaign_create_audience"
+        return reverse(view_name, kwargs={"slug": audience.slug})
 
     def get_send_to_subscribers_view(self):
         view_name = "events:send_to_subscribers"

@@ -1,4 +1,5 @@
 import itertools
+import decimal
 from django.db import models
 from django.utils.text import slugify
 from django.db.models.signals import pre_save, post_save
@@ -79,6 +80,8 @@ class House(TimestampedModel):
     free_live_video = models.BooleanField(default=False)
     allow_donations = models.BooleanField(default=False)
     issue_tax_deductible_receipts = models.BooleanField(default=False)
+    donation_score = models.PositiveIntegerField(null=True, blank=True, default=0)
+    donation_amount_score = models.DecimalField(blank=True, null=True, max_digits=9, decimal_places=2, default=decimal.Decimal('0.00'))
 
     def __str__(self):
         return str(self.name)

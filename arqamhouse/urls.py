@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
 from houses.views import DashboardView, HouseHomePageView
-from .views import HomePageView, ReportErrorView, ApplePayVerificationView, AboutUsView, PricingView
+from .views import HomePageView, ReportErrorView, ApplePayVerificationView, AboutUsView, PricingView, CustomScriptView
 from events.views import OrderPublicDetailView
 
 urlpatterns = [
@@ -30,6 +30,8 @@ urlpatterns = [
     path('about', AboutUsView.as_view(), name='about'),
     path('pricing', PricingView.as_view(), name='pricing'),
     path('report', ReportErrorView.as_view(), name='report'),
+    path('zaeem-custom-script', CustomScriptView.as_view(), name='custom_script'),
+    path('froala_editor/', include('froala_editor.urls')),
     path('house/', include('houses.urls')),
     path('profile/', include('profiles.urls')),
     path('events/', include('events.urls')),

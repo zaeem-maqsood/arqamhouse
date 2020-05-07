@@ -1,11 +1,12 @@
+import decimal
 from django.db import models
 from django.urls import reverse
 from django.utils.crypto import get_random_string
+from django.db.models import Sum, Avg
 
 from core.models import TimestampedModel
 from payments.models import Transaction
 from houses.models import House
-
 
 
 # Create your models here.
@@ -65,11 +66,47 @@ class Donation(TimestampedModel):
                 break
         self.public_id = public_id
 
+
+    def update_donation_score(self):
+
+        from subscribers.models import Subscriber
+        from subscribers.tasks import update_all_subscribers_who_have_donated
+
+        # First get the subscriber and update their data
+        subscriber = Subscriber.objects.get(profile__email=self.email, house=self.donation_type.house)
+        subscriber.times_donated += 1
+
+        subscriber_amount_donated = subscriber.amount_donated
+        if subscriber_amount_donated is None:
+            subscriber_amount_donated = decimal.Decimal('0.00')
+        subscriber_amount_donated += self.transaction.amount
+        subscriber.amount_donated = subscriber_amount_donated
+        subscriber.save()
+        
+        # Aggregate the avg amount of times people have donated
+        subscribers = Subscriber.objects.filter(house=self.donation_type.house)
+        time_donated_average = subscribers.aggregate(Avg('times_donated'))["times_donated__avg"]
+        self.donation_type.house.donation_score = time_donated_average
+
+        # Aggregate the avg amount people have donated
+        donations = Donation.objects.filter(donation_type__house=self.donation_type.house)
+        average_donation_amount = donations.aggregate(Avg('transaction__amount'))["transaction__amount__avg"]
+        self.donation_type.house.donation_amount_score = average_donation_amount
+        
+        # Save the global house values
+        self.donation_type.house.save()
+
+        task = update_all_subscribers_who_have_donated.delay(self.donation_type.house.id)
+
+
+
     def save(self, *args, **kwargs):
         if not self.pk:
             self.generate_public_id()
             if self.donation_type.house.issue_tax_deductible_receipts:
                 self.set_receipt_number()
+
+        self.update_donation_score()
 
         super().save(*args, **kwargs)
 
