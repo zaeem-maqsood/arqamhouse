@@ -180,16 +180,6 @@ class Campaign(TimestampedModel):
 
         self.slug = slug_candidate
 
-
-    def _update_slug(self):
-        max_length = self._meta.get_field('slug').max_length
-        value = strip_non_ascii(self.name)
-        updated_slug = slugify(value, allow_unicode=True)
-        if Campaign.objects.filter(slug=updated_slug, house=self.house).exists():
-            pass
-        else:
-            self.slug = updated_slug    
-
     def __str__(self):
         return "%s" % (self.name)
 
@@ -206,7 +196,6 @@ class Campaign(TimestampedModel):
     def save(self, *args, **kwargs):
 
         if self.pk:
-            self._update_slug()
             self.update_total_and_seen()
             self.update_score()
 

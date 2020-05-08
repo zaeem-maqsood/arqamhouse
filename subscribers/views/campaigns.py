@@ -173,13 +173,13 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
 
         elif "nuke" in data:
 
-            if self.object.event:
-                subscribers = Subscriber.objects.filter(house=house, unsubscribed=False, events=self.object.event)
+            if self.object.audience:
+                subscribers = self.object.audience.subscribers.all()
             else:
                 subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
 
             for subscriber in subscribers:
-                subscriber.campaigns_total += 1
+                subscriber.total_campaigns_since_subscribed += 1
                 subscriber.save()
 
             subscribers = list(subscribers)
