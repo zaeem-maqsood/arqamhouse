@@ -234,10 +234,10 @@ class CampaignCreateView(HouseAccountMixin, CreateView):
         view_name = "subscribers:campaign_list"
         return reverse(view_name)
 
-    def get_audience(self):
+    def get_audience(self, house):
         audience_slug = self.kwargs['slug']
         try:
-            audience = Audience.objects.get(slug=audience_slug)
+            audience = Audience.objects.get(slug=audience_slug, house=house)
             return audience
         except Exception as e:
             print(e)
@@ -251,7 +251,7 @@ class CampaignCreateView(HouseAccountMixin, CreateView):
         form = self.get_form()
 
         if 'slug' in self.kwargs:
-            audience = self.get_audience()
+            audience = self.get_audience(house)
             subscribers = audience.subscribers.all()
             context["audience"] = audience
 
