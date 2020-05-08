@@ -293,7 +293,7 @@ class CampaignCreateView(HouseAccountMixin, CreateView):
         self.object.save()
 
         if 'slug' in self.kwargs:
-            audience = self.get_audience()
+            audience = self.get_audience(house)
             self.object.audience = audience
 
         self.object.save()
