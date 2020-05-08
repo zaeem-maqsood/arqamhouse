@@ -8,7 +8,50 @@ Audience | {{ house.name }}
 
 
 {% block styles %}
+<style>
 
+.portlet-height {
+    height: inherit;
+}
+
+@media only screen and (min-width: 576px) {
+
+    .portlet-height {
+        height: inherit;
+    }
+
+}
+
+
+@media (min-width: 768px) {
+
+    .portlet-height {
+        height: 250px;
+    }
+
+
+}
+
+
+@media (min-width: 992px) {
+
+    .portlet-height {
+        height: 250px;
+    }
+
+
+}
+
+
+@media (min-width: 1200px) {
+
+    .portlet-height {
+        height: 250px;
+    }
+
+}
+
+</style>
 {% endblock styles %}
 
 
@@ -35,9 +78,9 @@ Audience | {{ house.name }}
         <div class="row">
             {% for audience in active_audiences %}
             {% if audience.event %}
-            <div class="col-lg-4 col-md-4 col-6" style="padding-top:10px;">
+            <div class="col-lg-4 col-md-4 col-12" style="padding-top:10px;">
                 <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body" style="height: 250px;">
+                    <div class="kt-portlet__body portlet-height">
                         <div class="row text-center">
                             <div class="col-12">
                                 <a class="dashboard-links" href="{{ audience.get_detail_view }}">
@@ -62,9 +105,9 @@ Audience | {{ house.name }}
             </div>
             {% endif %}
             {% if audience.donation_type %}
-            <div class="col-lg-4 col-md-4 col-6" style="padding-top:10px;">
+            <div class="col-lg-4 col-md-4 col-12" style="padding-top:10px;">
                 <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body" style="height: 250px;">
+                    <div class="kt-portlet__body portlet-height">
                         <div class="row text-center">
                             <div class="col-12">
                                 <a class="dashboard-links" href="{{ audience.get_detail_view }}">
@@ -104,9 +147,9 @@ Audience | {{ house.name }}
         <div class="row">
             {% for audience in past_audiences %}
             {% if audience.event %}
-            <div class="col-lg-4 col-md-4 col-6" style="padding-top:10px;">
+            <div class="col-lg-4 col-md-4 col-12" style="padding-top:10px;">
                 <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body" style="height: 250px;">
+                    <div class="kt-portlet__body portlet-height">
                         <div class="row text-center">
                             <div class="col-12">
                                 <a class="dashboard-links" href="{{ audience.get_detail_view }}">
@@ -132,9 +175,9 @@ Audience | {{ house.name }}
             </div>
             {% endif %}
             {% if audience.donation_type %}
-            <div class="col-lg-4 col-md-4 col-6" style="padding-top:10px;">
+            <div class="col-lg-4 col-md-4 col-12" style="padding-top:10px;">
                 <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body" style="height: 250px;">
+                    <div class="kt-portlet__body portlet-height">
                         <div class="row text-center">
                             <div class="col-12">
                                 <a class="dashboard-links" href="{{ audience.get_detail_view }}">

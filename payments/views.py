@@ -168,6 +168,7 @@ class InvoiceView(HouseAccountMixin, View):
 		context["dashboard_events"] = self.get_events()
 		context["year"] = requested_year
 		context["month"] = requested_month
+		context["statements_tab"] = True
 
 		if 'pdf_statement' in self.request.GET:
 			return self.view_pdf_statement(context)
@@ -225,6 +226,7 @@ class InvoiceMonthView(HouseAccountMixin, View):
 		context["house"] = self.get_house()
 		context["dashboard_events"] = self.get_events()
 		context["months"] = months
+		context["statements_tab"] = True
 
 		return render(request, self.template_name, context)
 
@@ -262,6 +264,7 @@ class InvoiceYearView(HouseAccountMixin, View):
 		context["house"] = self.get_house()
 		context["dashboard_events"] = self.get_events()
 		context["years"] = years
+		context["statements_tab"] = True
 
 		return render(request, self.template_name, context)
 
@@ -315,6 +318,7 @@ class UpdateBankTransferView(HouseAccountMixin, CreateView):
 		context["dashboard_events"] = self.get_events()
 		context["house"] = self.get_house()
 		context["update"] = True
+		context["payout_methods_tab"] = True
 		return context
 
 
@@ -364,6 +368,7 @@ class AddBankTransferView(HouseAccountMixin, CreateView):
 		context["form"] = form
 		context["dashboard_events"] = self.get_events()
 		context["house"] = self.get_house()
+		context["payout_methods_tab"] = True
 		return context
 
 
@@ -391,6 +396,7 @@ class PayoutSettingsListView(HouseAccountMixin, View):
 		context["payout_settings"] = payout_settings
 		context["dashboard_events"] = self.get_events()
 		context["house"] = self.get_house()
+		context["payout_methods_tab"] = True
 		return context
 
 
@@ -499,6 +505,7 @@ class PayoutView(HouseAccountMixin, FormView):
 		context["total"] = total
 		context["dashboard_events"] = self.get_events()
 		context["house"] = self.get_house()
+		context["payout_tab"] = True
 		return context
 
 
@@ -575,6 +582,7 @@ class PaymentListView(HouseAccountMixin, View):
 		context["house_balance_logs"] = house_balance_logs
 		context["dashboard_events"] = self.get_events()
 		context["house"] = self.get_house()
+		context["payout_list"] = True
 		return context
 
 
@@ -599,6 +607,7 @@ class AddFundsView(HouseAccountMixin, FormView):
 		context["form"] = form
 		context["house"] = self.get_house()
 		context["dashboard_events"] = self.get_events()
+		context["payout_tab"] = True
 		return context
 
 	

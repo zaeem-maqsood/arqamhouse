@@ -199,7 +199,7 @@
                 </h4>
                 <i class="kt-menu__section-icon flaticon-more-v2"></i> 
             </li>
-                <li class="kt-menu__item " aria-haspopup="true" >
+                <li class="kt-menu__item {% if payout_list %}kt-menu__item--open{% endif %}" aria-haspopup="true" >
                     <a href="{% url 'payments:list' %}" class="kt-menu__link ">
                         <span class="kt-menu__link-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
@@ -214,7 +214,7 @@
                         <span class="kt-menu__link-text">Payments</span>
                     </a>
                 </li>
-                <li class="kt-menu__item " aria-haspopup="true" >
+                <li class="kt-menu__item {% if payout_tab %}kt-menu__item--open{% endif %}" aria-haspopup="true" >
                     <a href="{% url 'payments:payout' %}" class="kt-menu__link ">
                         <span class="kt-menu__link-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
@@ -229,7 +229,7 @@
                         <span class="kt-menu__link-text">Payout</span>
                     </a>
                 </li>
-                <li class="kt-menu__item " aria-haspopup="true">
+                <li class="kt-menu__item {% if payout_methods_tab %}kt-menu__item--open{% endif %}" aria-haspopup="true">
                     <a href="{% url 'payments:payout_settings_list' %}" class="kt-menu__link ">
                         <span class="kt-menu__link-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px"
@@ -253,7 +253,7 @@
                         <span class="kt-menu__link-text">Payout Methods</span>
                     </a>
                 </li>
-                <li class="kt-menu__item " aria-haspopup="true">
+                <li class="kt-menu__item {% if statements_tab %}kt-menu__item--open{% endif %}" aria-haspopup="true">
                     <a href="{% url 'payments:invoice_year' %}" class="kt-menu__link ">
                         <span class="kt-menu__link-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px"

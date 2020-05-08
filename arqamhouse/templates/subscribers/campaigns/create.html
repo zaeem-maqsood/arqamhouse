@@ -30,7 +30,7 @@ Subscribers | {{ house.name }}
 
 				<div class="row" style="padding-bottom:20px;">
 					<div class="col-lg-12">
-						<h3>Create {% if audience %}Audience Specific{% endif %} Campaign</h3>
+						<h3>Create Campaign</h3>
                         
                         {% if audience.event %}
                         <p style="margin-bottom: 0px;">This campaign is targeted towards anyone who purchased a ticket for <a href="{{ audience.get_detail_view }}">{{ audience.event.title }}.</a></p>
@@ -86,7 +86,7 @@ Subscribers | {{ house.name }}
 
 
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-md-6 col-12">
                 
                         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample"
                             aria-expanded="false" aria-controls="collapseExample">

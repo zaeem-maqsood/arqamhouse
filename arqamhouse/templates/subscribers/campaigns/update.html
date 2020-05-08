@@ -33,7 +33,7 @@ Subscribers | {{ house.name }}
 				<div class="row" style="padding-bottom:20px;">
 					<div class="col-lg-12">
                         {% if campaign.audience %}
-                        <h4>Audience Specific Campaign | <span style="font-size: 0.8em;font-weight: 200;"><a href="{{ audience.get_detail_view }}">{{ audience.name }}</a></span></h4>
+                        <h4>Campaign | <span style="font-size: 0.8em;font-weight: 200;"><a href="{{ audience.get_detail_view }}">{{ audience.name }}</a></span></h4>
                         {% else %}
                         <h3>Generic Campaign</h3>
                         {% endif %}
@@ -146,7 +146,7 @@ Subscribers | {{ house.name }}
 
                     
                     <div class="row" id="subscribers">
-                        <div class="col-6">
+                        <div class="col-md-6 col-12">
 
                             <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample"
                                 aria-expanded="false" aria-controls="collapseExample">
