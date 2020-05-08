@@ -49,7 +49,7 @@ Subscribers | {{ house.name }}
                         {% endif %}
                         
                         {% if subscribers.count > 1 %}
-                        <p style="margin-bottom: 0px;">It will be sent to all <span
+                        <p style="margin-bottom: 0px;">This campaign will be sent to all <span
                                 style="color: #4599d5;">{{ subscribers.count }}</span> of your
                             subscribers.</p>
                         {% else %}
@@ -64,6 +64,13 @@ Subscribers | {{ house.name }}
 				</div>
 
                 <form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-6">
+                            <p style="margin-bottom: 5px;">Campaign Name</p>
+                            {{ form.name }}
+                        </div>
+                    </div>
+
                     <div class="row" style="padding-bottom: 30px;">
                         <div class="col-md-6">
                             <p style="margin-bottom: 5px;">Email Subject</p>
