@@ -69,7 +69,7 @@ class Profile(AbstractUser):
     phone = PhoneNumberField(blank=True, null=True)
     temp_password = models.CharField(max_length=120, null=True, blank=True)
     name = models.CharField(max_length=120, null=True, blank=False)
-    picture = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 150, 'height': 150}}, null=True, blank=True)
+    picture = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 350, 'height': 350}}, null=True, blank=True)
     slug = models.SlugField(unique = False, blank=True)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=False, null=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=False, null=True)

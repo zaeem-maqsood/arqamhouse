@@ -70,10 +70,7 @@ class DonationPublicListView(View):
     
             sales_sum = 0
             for donation in donations_for_day:
-                if donation.pass_fee:
-                    sales_sum += donation.transaction.house_amount
-                else:
-                    sales_sum += donation.transaction.amount
+                sales_sum += donation.amount
                 
 
             sales_label.append('{0:.2f}'.format(sales_sum))
@@ -370,7 +367,7 @@ class DonationView(FormView):
 
         donation = Donation.objects.create(
             donation_type=donation_type, transaction=transaction, name=name, email=email, message=message, address=address, postal_code=postal_code, pass_fee=pass_fee,
-            anonymous=anonymous)
+            anonymous=anonymous, amount=donation_amount)
 
         try:
             audience = Audience.objects.get(house=house, donation_type=donation_type)

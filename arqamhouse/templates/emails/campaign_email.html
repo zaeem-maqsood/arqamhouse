@@ -242,7 +242,11 @@
   <table class="module" role="module" data-type="text" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="70ad5022-7409-42d9-8850-78e66b2cc881" data-mc-module-version="2019-10-22">
     <tbody>
       <tr>
-        <td style="padding:18px 0px 18px 0px; line-height:22px; text-align:inherit;" height="100%" valign="top" bgcolor="" role="module-content"><div><div style="font-family: inherit; text-align: center;color: gray;">This email was sent from <a href="http://www.arqamhouse.com{{ house.get_home_page_url }}">{{ house.name }}</a> on behalf of <a href="https://www.arqamhouse.com">arqamhouse.com</a> because you are subscribed to <a href="http://www.arqamhouse.com{{ house.get_home_page_url }}">{{ house.name }}</a>. If you wish to unsubscribe please click <a href="https://www.arqamhouse.com{% url 'subscribers:campaign_unsubscribe_from_email' %}?subscriber_id={{ subscriber.id }}">here</a>.</div>
+        <td style="padding:18px 0px 18px 0px; line-height:22px; text-align:inherit;" height="100%" valign="top" bgcolor="" role="module-content"><div>
+          <div style="font-family: inherit; text-align: center;color: gray;">
+          This email was sent from <a href="http://www.arqamhouse.com{{ house.get_home_page_url }}">{{ house.name }}</a>. 
+          If you wish to <a
+            href="https://www.arqamhouse.com{% url 'subscribers:campaign_unsubscribe_from_email' %}?subscriber_id={{ subscriber.id }}">unsubscribe</a> please click <a href="https://www.arqamhouse.com{% url 'subscribers:campaign_unsubscribe_from_email' %}?subscriber_id={{ subscriber.id }}">here</a>.</div>
 <div></div></div></td>
       </tr>
     </tbody>
@@ -258,16 +262,6 @@
         </tr>
     </tbody>
 </table>
-  
-  <table class="wrapper" role="module" data-type="image" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="aa1f6455-1265-4b72-8f0c-c5455e399784">
-    <tbody>
-      <tr>
-        <td style="font-size:6px; line-height:10px; padding:0px 0px 0px 0px;" valign="top" align="center">
-          <img class="max-width" border="0" style="display:block; color:#000000; text-decoration:none; font-family:Helvetica, arial, sans-serif; font-size:16px; max-width:15% !important; width:15%; height:auto !important;" width="116" alt="" data-proportionally-constrained="true" data-responsive="true" src="http://cdn.mcauto-images-production.sendgrid.net/ebf0fe49753c1d03/1b665185-d3c1-423f-9a66-35bace41939b/1500x750.png">
-        </td>
-      </tr>
-    </tbody>
-  </table>
   
   
   <table class="module" role="module" data-type="spacer" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="589ee7fd-e5da-49a2-b0b5-690b34fff50b.1.1">

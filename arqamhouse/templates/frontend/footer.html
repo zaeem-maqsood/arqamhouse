@@ -1,9 +1,14 @@
 {% load static %}
 <footer class="text-center space--sm footer-5 bg--secondary  ">
     <div class="container">
+        <div class="row" style="padding-bottom: 20px;">
+            <div class="col-md-12">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 3em;"></a>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-12">
-                <div class="heading-block">
+                <div class="heading-block" style="margin-bottom: 30px;">
                     <ul class="list-inline list--hover">
                         <li>
                             <a href="{% url 'report' %}">
@@ -25,11 +30,6 @@
                 <div>
                     <ul class="social-list list-inline list--hover">
                         <li>
-                            <a href="https://www.arqamhouse.com">
-                                <i class="socicon socicon-google icon icon--xs"></i>
-                            </a>
-                        </li>
-                        <li>
                             <a href="https://twitter.com/arqam_house">
                                 <i class="socicon socicon-twitter icon icon--xs"></i>
                             </a>
@@ -40,7 +40,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#">
+                            <a href="https://www.instagram.com/officialarqamhouse/">
                                 <i class="socicon socicon-instagram icon icon--xs"></i>
                             </a>
                         </li>

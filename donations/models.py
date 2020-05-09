@@ -37,6 +37,7 @@ class Donation(TimestampedModel):
     address = models.CharField(max_length=200, null=True, blank=True)
     postal_code = models.CharField(max_length=6, null=True, blank=True)
     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, blank=False, null=False)
+    amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     issue_receipt = models.BooleanField(default=False)
     receipt_number = models.PositiveIntegerField(null=True, blank=True, default=0)
     public_id = models.CharField(max_length=150, null=True, blank=True)

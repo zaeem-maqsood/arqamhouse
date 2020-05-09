@@ -29,6 +29,7 @@ from .forms import ProfileForm, LoginForm, ProfileUpdateForm, ProfileChangePassw
 from .mixins import ProfileMixin
 from cities_light.models import City, Region, Country
 from events.models import Event, EventOrder
+from donations.models import Donation
 
 
 class PasswordChangeView(ProfileMixin, FormView):
@@ -100,7 +101,7 @@ def load_regions(request):
 
 
 class UserOrdersView(ProfileMixin, View):
-    template_name = "profiles/orders.html"
+    template_name = "profiles/tickets.html"
 
     def get(self, request, *args, **kwargs):
         context = {}
@@ -112,6 +113,26 @@ class UserOrdersView(ProfileMixin, View):
         orders = EventOrder.objects.filter(email=profile.email).order_by("-created_at")
         print(orders)
         context["orders"] = orders
+        context["profile"] = profile
+        return render(request, self.template_name, context)
+
+
+
+
+class UserDonationsView(ProfileMixin, View):
+    template_name = "profiles/donations.html"
+
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        profile = self.get_profile()
+
+        if not profile.verified:
+            return redirect('profiles:verification')
+
+        donations = Donation.objects.filter(email=profile.email).order_by("-created_at")
+        print(donations)
+        context["donations"] = donations
         context["profile"] = profile
         return render(request, self.template_name, context)
 
@@ -134,6 +155,38 @@ class UserSubscribersView(ProfileMixin, View):
         context["subscribers"] = subscribers
         context["profile"] = profile
         return render(request, self.template_name, context)
+
+
+
+
+class UserMenuPage(ProfileMixin, View):
+    template_name = "profiles/menu.html"
+
+    def check_for_house(self, profile):
+        try:
+            house = profile.house
+            return house
+        except Exception as e:
+            print(e)
+            print("Did it come here")
+            return None
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        profile = self.get_profile()
+        if not profile.verified:
+            return redirect('profiles:verification')
+
+        house = self.check_for_house(profile)
+        context["house"] = house
+        context["profile"] = profile
+        return render(request, self.template_name, context)
+
+
+
+
+
+
 
 
 

@@ -13,23 +13,32 @@ Profile Dashboard
 
 {% block styles %}
 <style>
+
+    .circular--portrait img {
+    object-fit: cover;
+    width:100px;
+    height:100px;
+    border-radius: 50%;
+    }
+
     #button-font-size {
         font-size: 10px;
     }
 
-    @media (min-width: 768px) {
+    .small-tables {
+        font-size: 10px;
+    } 
 
-        #button-font-size {
+   @media (min-width: 768px) {
+
+       #button-font-size {
             font-size: 12px;
         }
-    }
 
-    .circular--portrait img {
-        object-fit: cover;
-        width:100px;
-        height:100px;
-        border-radius: 50%;
-    }
+        .small-tables {
+            font-size: 1em;
+        } 
+   } 
 </style>
 {% endblock styles %}
 
@@ -42,6 +51,8 @@ Profile Dashboard
 {% block content %}
 <section class="text-center" style="padding-top: 30px;">
     <div class="container" style="padding-bottom: 60px;">
+
+
         <div class="row" style="padding-bottom: 20px;">
             <div class="col-md-12 col-lg-9">
 
@@ -66,13 +77,13 @@ Profile Dashboard
                         </a>
                     </div>
                 </div>
-                
+                        
                 <div class="row" style="padding-top: 10px;">
                     <div class="col-md-12">
-                        <p style="margin-bottom: 5px;color: gray;" class="lead">Subscriptions</p>
+                        <p style="margin-bottom: 5px;color: gray;" class="lead">Tickets</p>
                     </div>
                 </div>
-                
+
                 <div class="row justify-content-center" style="padding-top: 20px;padding-bottom: 20px;">
                     <div class="col-md-10" style="padding-bottom: 20px;">
                         <a class="btn btn--primary btn-block" href="{% url 'profiles:menu' %}">
@@ -83,48 +94,36 @@ Profile Dashboard
 
 
 
-                {% if subscribers %}
-                <div class="row" style="padding-bottom: 20px;">
+                <div class="row text-left" style="padding-bottom: 20px;">
                     <div class="col-md-12">
-                        <p>You're subscribed to {{ subscribers.count }} house{% if subscribers.count > 1 %}s{% endif %}!</p>
-                    </div>
-                </div>
-  
-                <div class="row" style="padding-bottom: 20px;">
-                    {% for subscriber in subscribers %}
-                    <div class="col-md-6">
-                        <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
-                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 10px;border-radius: 10px;margin-bottom: 20px;">
-                            <div class="row justify-content-center" style="min-height: 75px;">
 
-                                {% if subscriber.house.logo %}
-                                <div class="col-lg-10 col-md-10 col-sm-10 col-10" style="align-self: center;">
-                                    <a href="{{ subscriber.house.get_home_page_url }}">
-                                        <img style="padding: 5px;max-height:80px;" src="{{ subscriber.house.logo.url }}">
-                                    </a>
-                                </div>
-                                {% else %}
-                                <div class="{% if subscriber.house.logo %}col-lg-7 col-md-7 col-sm-7 col-6{% else %}col-lg-12 col-md-12 col-sm-10 col-10{% endif %}" style="align-self: center;">
-                                    <h3 id="updates_title" style="margin-bottom: 0px; text-align: center;{% if not subscriber.house.logo %}padding-left:10px;{% endif %}">
-                                        <a style="text-decoration: none;font-weight: 400;" href="{{ subscriber.house.get_home_page_url }}">{{ subscriber.house.name }}</a>
-                                    </h3>
-                                </div>
-                                {% endif %}
+                        {% if orders %}
 
-                            </div>
-                        </div>
+                        <table class="border--round table--alternate-row text-center">
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Tickets</th>
+                                    <th class="d-md-table-cell d-none">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td><a class="small-tables" href="{{ order.get_public_order_view }}">{{ order.event }}</a></td>
+                                    <td><p class="small-tables" >{{ order.attendee_set.all.count }}</p></td>
+                                    <td class="d-md-table-cell d-none"><p class="small-tables" >{{ order.created_at|localtime }}</p></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        {% else %}
+                            <p class="lead">No Orders yet!</p>
+                        {% endif %}
                         
                     </div>
-                    {% endfor %}
                 </div>
-
-                {% else %}
-                <div class="row" style="padding-bottom: 20px;">
-                    <div class="col-md-12">
-                        <h3>No subscribers yet! subscribe to a house to get started.</h3>
-                    </div>
-                </div>
-                {% endif %}
 
 
             </div>

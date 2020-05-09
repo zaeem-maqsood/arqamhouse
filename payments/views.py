@@ -20,6 +20,11 @@ from django.core import mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
+from urllib.parse import urlparse
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Alignment
+from twilio.rest import Client
 from twilio.rest import Client
 
 from weasyprint import HTML, CSS
@@ -27,8 +32,10 @@ from django.db.models import Sum
 
 from houses.mixins import HouseAccountMixin
 from houses.models import HouseUser
+from donations.models import Donation
+from profiles.models import Profile
 from .models import Payout, Transaction, Refund, HousePayment, HouseBalance, HouseBalanceLog, PayoutSetting
-from events.models import EventRefundRequest
+from events.models import EventRefundRequest, EventOrder, EventOrderRefund
 from .forms import AddFundsForm, PayoutForm, AddBankTransferForm
 
 
@@ -49,6 +56,177 @@ class InvoiceView(HouseAccountMixin, View):
 
 		pdf_file = HTML(string=pdf_content).write_pdf(
 			response, stylesheets=[pdf_css])
+		return response
+
+
+	def export_to_excel(self, house, year, month, house_balance_logs_month):
+
+		response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',)
+		response['Content-Disposition'] = 'attachment; filename={house}_statement_{year}_{month}.xlsx'.format(house=house.slug, year=year, month=month)
+		workbook = Workbook()
+
+		# Get active worksheet/tab
+		worksheet = workbook.active
+		worksheet.title = f'{month} {year} Statement'
+
+		TWO_PLACES = decimal.Decimal("0.01")
+
+		# Define the titles for columns
+		columns = ['Number', 'Date', 'Description', 'Name', 'Email', 'Phone', 'Address',
+                    'Postal Code', 'Gross Amount', 'Fee', 'Net Amount', 'Tax - Donation Amount']
+		row_num = 1
+
+		# Assign the titles for each cell of the header
+		for col_num, column_title in enumerate(columns, 1):
+			cell = worksheet.cell(row=row_num, column=col_num)
+			cell.value = column_title
+
+		# Iterate through all house_balance_logs_month
+		counter = 0
+		for house_balance in house_balance_logs_month:
+			row_num += 1
+
+			# Define the data for each cell in the row
+			row = []
+
+			row.append(counter)
+
+			row.append((house_balance.created_at).strftime("%d/%m/%Y"))
+
+			if house_balance.transaction:
+				if house_balance.transaction.donation_transaction:
+					donation = Donation.objects.get(donation_type__house=house, transaction=house_balance.transaction)
+					profile = Profile.objects.get(email=donation.email)
+					row.append("Donation")
+					row.append(donation.name)
+					row.append(donation.email)
+					if profile.phone:
+						row.append(str(profile.phone))
+					else:
+						row.append("-----")
+
+					if donation.address:
+						row.append(donation.address)
+					else:
+						row.append("-----")
+					
+					if donation.postal_code:
+						row.append(donation.postal_code)
+					else:
+						row.append("-----")
+					
+					
+				else:
+					event_order = EventOrder.objects.get(transaction=house_balance.transaction)
+					profile = Profile.objects.get(email=event_order.email)
+					row.append("Payment")
+					row.append(event_order.name)
+					row.append(event_order.email)
+					if profile.phone:
+						row.append(str(profile.phone))
+					else:
+						row.append("-----")
+
+					row.append("-----")
+					row.append("-----")
+
+				# Gross, Fee and Net
+				row.append((house_balance.transaction.amount).quantize(TWO_PLACES))
+				total_fee = (house_balance.transaction.stripe_amount + house_balance.transaction.arqam_amount).quantize(TWO_PLACES)
+				row.append(total_fee)
+				row.append((house_balance.transaction.house_amount).quantize(TWO_PLACES))
+
+				# Donation Amount
+				if house_balance.transaction.donation_transaction:
+					donation = Donation.objects.get(donation_type__house=house, transaction=house_balance.transaction)
+					row.append(donation.amount)
+				else:
+					row.append("-----")
+
+
+			if house_balance.house_payment:
+				row.append("Added Funds")
+				row.append("-----")
+				row.append("-----")
+				row.append("-----")
+				row.append("-----")
+				row.append("-----")
+				row.append((house_balance.house_payment.transaction.amount).quantize(TWO_PLACES))
+				total_fee = (house_balance.house_payment.transaction.stripe_amount + house_balance.house_payment.transaction.arqam_amount).quantize(TWO_PLACES)
+				row.append(total_fee)
+				row.append((house_balance.house_payment.transaction.house_amount).quantize(TWO_PLACES))
+				row.append("-----")
+
+
+			if house_balance.refund:
+				event_order_refund = EventOrderRefund.objects.get(refund=refund)
+				profile = Profile.objects.get(email=event_order_refund.order.email)
+				row.append("Refund")
+				row.append(event_order_refund.order.name)
+				row.append(event_order_refund.order.email)
+
+				if profile.phone:
+					row.append(str(profile.phone))
+				else:
+					row.append("-----")
+				
+				row.append("-----")
+				row.append("-----")
+
+				row.append((-house_balance.refund.amount).quantize(TWO_PLACES))
+				row.append((house_balance.refund.fee()).quantize(TWO_PLACES))
+				row.append((-house_balance.refund.house_amount).quantize(TWO_PLACES))
+				row.append("-----")
+
+
+			if house_balance.payout:
+				row.append("Payout")
+				row.append("-----")
+				row.append("-----")
+				row.append("-----")
+				row.append("-----")
+				row.append("-----")
+				row.append((house_balance.payout.amount).quantize(TWO_PLACES))
+				row.append(0.00)
+				row.append((house_balance.payout.amount).quantize(TWO_PLACES))
+				row.append("-----")
+			
+
+			if house_balance.arqam_house_service_fee:
+				if house_balance.arqam_house_service_fee.live_video:
+					row.append("Virtual Event Fee")
+
+				row.append("-----")
+				row.append("-----")
+				row.append("-----")
+				row.append("-----")
+				row.append("-----")
+
+				row.append((-house_balance.arqam_house_service_fee.amount).quantize(TWO_PLACES))
+				row.append(0.00)
+				row.append((-house_balance.arqam_house_service_fee.amount).quantize(TWO_PLACES))
+
+				row.append("-----")
+
+
+
+			# Assign the data for each cell of the row
+			for col_num, cell_value in enumerate(row, 1):
+				wrapped_alignment = Alignment(vertical='center', wrap_text=True)
+				cell = worksheet.cell(row=row_num, column=col_num)
+				cell.value = cell_value
+				cell.alignment = wrapped_alignment
+
+			counter += 1
+
+		# Change column widths
+		for x in range(1, 13):
+			column_letter = get_column_letter(x)
+			column_dimensions = worksheet.column_dimensions[column_letter]
+			column_dimensions.width = 25
+
+		workbook.save(response)
+
 		return response
 
 
@@ -78,7 +256,7 @@ class InvoiceView(HouseAccountMixin, View):
 		house_balance_logs_month = house_balance_logs.filter(created_at__month=month_list.index(requested_month)+1, created_at__year=requested_year)
 
 		# ----------------- Payments
-		payments = house_balance_logs_month.filter(transaction__isnull=False)
+		payments = house_balance_logs_month.filter(transaction__isnull=False, transaction__donation_transaction=False)
 		context["payments"] = payments
 		if payments:
 			payment_gross_amount = payments.aggregate(Sum('transaction__amount'))["transaction__amount__sum"]
@@ -94,6 +272,24 @@ class InvoiceView(HouseAccountMixin, View):
 		context["payment_gross_amount"] = payment_gross_amount
 		context["payment_total_amount"] = payment_total_amount
 		context["payment_total_fees"] = payment_total_fees
+
+		# ----------------- Donations
+		donations = house_balance_logs_month.filter(transaction__isnull=False, transaction__donation_transaction=True)
+		context["donations"] = donations
+		if donations:
+			donation_gross_amount = donations.aggregate(Sum('transaction__amount'))["transaction__amount__sum"]
+			donations_total_amount = donations.aggregate(Sum('transaction__house_amount'))["transaction__house_amount__sum"]
+			donation_stripe_fees = donations.aggregate(Sum('transaction__stripe_amount'))["transaction__stripe_amount__sum"]
+			donation_arqam_fees = donations.aggregate(Sum('transaction__arqam_amount'))["transaction__arqam_amount__sum"]
+			donation_total_fees = donation_stripe_fees + donation_arqam_fees
+		else:
+			donation_gross_amount = 0
+			donations_total_amount = 0
+			donation_total_fees = 0
+
+		context["donation_gross_amount"] = donation_gross_amount
+		context["donation_total_amount"] = donations_total_amount
+		context["donation_total_fees"] = donation_total_fees
 
 		# ------------------- Huouse Added Payments
 		house_payments = house_balance_logs_month.filter(house_payment__isnull=False)
@@ -132,6 +328,17 @@ class InvoiceView(HouseAccountMixin, View):
 		context["refund_house_amount"] = refund_house_amount
 		context["refund_total_fees"] = refund_total_fees
 
+
+		# ------------------- Arqam House Services
+		services = house_balance_logs_month.filter(arqam_house_service_fee__isnull=False)
+		context["services"] = services
+		if services:
+			service_gross_amount = services.aggregate(Sum('arqam_house_service_fee__amount'))["arqam_house_service_fee__amount__sum"]
+		else:
+			service_gross_amount = 0
+
+		context["service_gross_amount"] = service_gross_amount
+
 		# -------------------- Payouts
 		payouts = house_balance_logs_month.filter(payout__isnull=False)
 		context["payouts"] = payouts
@@ -152,10 +359,9 @@ class InvoiceView(HouseAccountMixin, View):
 			print(e)
 			previous_month_last_house_balance = 0
 
-		gross_activity = payment_gross_amount + house_payments_gross_amount - refund_gross_amount
-		total_fees = payment_total_fees + house_payments_total_fees - refund_total_fees
-		net_activity = payment_total_amount + house_payments_total_amount - refund_house_amount
-		total_fees = payment_total_fees + house_payments_total_fees - refund_total_fees
+		gross_activity = payment_gross_amount + house_payments_gross_amount - refund_gross_amount - service_gross_amount
+		total_fees = payment_total_fees + house_payments_total_fees - refund_total_fees + service_gross_amount
+		net_activity = payment_total_amount + house_payments_total_amount - refund_house_amount - service_gross_amount
 		end_of_month_balance = previous_month_last_house_balance + net_activity - payout_gross_amount
 
 		context["previous_month_last_house_balance"] = previous_month_last_house_balance
@@ -172,6 +378,9 @@ class InvoiceView(HouseAccountMixin, View):
 
 		if 'pdf_statement' in self.request.GET:
 			return self.view_pdf_statement(context)
+
+		if 'export_to_excel' in self.request.GET:
+			return self.export_to_excel(house, requested_year, requested_month, house_balance_logs_month)
 
 		return render(request, self.template_name, context)
 

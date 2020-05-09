@@ -6,13 +6,14 @@ from django.urls import path, include
 
 from .views import (ProfileUpdateView, ProfileCreateView, LoginView, LogoutView,
                     load_cities, load_regions, UserDashboardView, activate_account, UserOrdersView, PasswordChangeView,
-                    UserSubscribersView, VerificationView, ChangePhoneNumberView)
+                    UserSubscribersView, VerificationView, ChangePhoneNumberView, UserMenuPage, UserDonationsView)
 
 
 app_name="profiles"
 
 urlpatterns = [
 
+	path('menu', UserMenuPage.as_view(), name='menu'),
 	path('dashboard', UserDashboardView.as_view(), name='dashboard'),
 	path('login', LoginView.as_view(), name='login'),
 	path('verification/', VerificationView.as_view(), name='verification'),
@@ -20,7 +21,8 @@ urlpatterns = [
 	path('logout', LogoutView.as_view(), name='logout'),
 	path('new', ProfileCreateView.as_view(), name='create'),
 
-	path('orders', UserOrdersView.as_view(), name='orders'),
+	path('donations', UserDonationsView.as_view(), name='donations'),
+	path('tickets', UserOrdersView.as_view(), name='tickets'),
 	path('subscribers', UserSubscribersView.as_view(), name='subscribers'),
 
 	path('change-password/', PasswordChangeView.as_view(), name='change_password'),

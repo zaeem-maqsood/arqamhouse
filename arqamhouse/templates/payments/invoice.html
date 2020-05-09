@@ -38,13 +38,6 @@ color: #7396b0;
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
 
-                        <!-- <div class="row" style="padding-bottom: 30px;">
-                            <div class="col-md-12">
-                                <img src="{% static 'images/logo.png' %}" style="max-height: 5em;">
-                                <p>Powerful tools made simple.</p>
-                            </div>
-                        </div> -->
-
                         <form method="GET">
                         <div class="row" style="padding-bottom: 30px;">
                             <div class="col-md-8">
@@ -52,6 +45,7 @@ color: #7396b0;
                                 <p style="margin-bottom: 0px;">Statment Month</p>
                             </div>
                             <div class="col-md-4">
+                                <button value="submit" class="btn btn-primary btn-block" name="export_to_excel" value="export_to_excel">Export To Excel</button>
                                 <button value="submit" class="btn btn-primary btn-block" name="pdf_statement" value="pdf_statement">PDF Statement</button>
                             </div>
                         </div>
@@ -89,6 +83,46 @@ color: #7396b0;
                                         <td style="font-size: 1.3em;">${{ payment_gross_amount|floatformat:2 }}</td>
                                         <td style="font-size: 1.3em;">{% if payment_total_fees != 0 %}-{% endif %}${{ payment_total_fees|floatformat:2 }}</td>
                                         <td style="font-size: 1.3em;">${{ payment_total_amount|floatformat:2 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+
+
+                        <div class="row" style="padding-bottom: 10px;">
+                            <div class="col-md-12">
+                                <h5 style="margin-bottom: 0px;">Donations</h5>
+                            </div>
+                        </div>
+                        <div class="table-responsive" style="padding-bottom: 30px;">
+                            <table class="table table-bordered table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Gross Amount</th>
+                                        <th>Fee</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dynamic">
+                                    {% if donations %}
+                                    {% for donation in donations %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>${{ donation.transaction.amount }}</td>
+                                        <td>-${{ donation.transaction.fee }}</td>
+                                        <td>${{ donation.transaction.house_amount }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                    <tr style="background-color: #c1e5ff;">
+                                        <td style="font-size: 1.3em;">{{ donations.count }}</td>
+                                        <td style="font-size: 1.3em;">${{ donation_gross_amount|floatformat:2 }}</td>
+                                        <td style="font-size: 1.3em;">
+                                            {% if donation_total_fees != 0 %}-{% endif %}${{ donation_total_fees|floatformat:2 }}</td>
+                                        <td style="font-size: 1.3em;">${{ donation_total_amount|floatformat:2 }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -174,6 +208,45 @@ color: #7396b0;
 
                         <div class="row" style="padding-bottom: 10px;">
                             <div class="col-md-12">
+                                <h5 style="margin-bottom: 0px;">Services</h5>
+                            </div>
+                        </div>
+                        <div class="table-responsive" style="padding-bottom: 30px;">
+                            <table class="table table-bordered table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Service</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dynamic">
+                                    {% if services %}
+                                    {% for service in services %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        {% if service.arqam_house_service_fee.live_video %}
+                                        <td>Virtual Event</td>
+                                        {% else %}
+                                        <td>Other</td>
+                                        {% endif %}
+                                        <td>${{ service.arqam_house_service_fee.amount }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                    <tr style="background-color: #c1e5ff;">
+                                        <td style="font-size: 1.3em;">{{ services.count }}</td>
+                                        <td>----</td>
+                                        <td style="font-size: 1.3em;">${{ service_gross_amount|floatformat:2 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+
+                        <div class="row" style="padding-bottom: 10px;">
+                            <div class="col-md-12">
                                 <h5 style="margin-bottom: 0px;">Payouts</h5>
                             </div>
                         </div>
@@ -217,7 +290,7 @@ color: #7396b0;
                                     </tr>
                                     <tr>
                                         <td>Total Fees</td>
-                                        <td>{% if total_fees != 0 %}-{% endif %}${{ total_fees|floatformat:2 }}</td>
+                                        <td>${{ total_fees|floatformat:2 }}</td>
                                     </tr>
                                     <tr style="background-color: #c1e5ff;">
                                         <td style="font-size: 1.3em;">Net Activity</td>
