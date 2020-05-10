@@ -168,7 +168,11 @@
             {% else %}
             <td>Other</td>
             {% endif %}
+            {% if service.arqam_house_service_fee.free %}
+            <td>$0.00</td>
+            {% else %}
             <td>${{ service.arqam_house_service_fee.amount }}</td>
+            {% endif %}
         </tr>
         {% endfor %}
         {% endif %}
