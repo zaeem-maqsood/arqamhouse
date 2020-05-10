@@ -332,10 +332,15 @@ class InvoiceView(HouseAccountMixin, View):
 		# ------------------- Arqam House Services
 		services = house_balance_logs_month.filter(arqam_house_service_fee__isnull=False)
 		context["services"] = services
-		if services:
-			service_gross_amount = services.aggregate(Sum('arqam_house_service_fee__amount'))["arqam_house_service_fee__amount__sum"]
-		else:
-			service_gross_amount = 0
+		service_gross_amount = 0
+		for service in services:
+			if not service.arqam_house_service_fee.free:
+				service_gross_amount += service.arqam_house_service_fee.amount
+
+		# if services:
+		# 	service_gross_amount = services.aggregate(Sum('arqam_house_service_fee__amount'))["arqam_house_service_fee__amount__sum"]
+		# else:
+		# 	service_gross_amount = 0
 
 		context["service_gross_amount"] = service_gross_amount
 
