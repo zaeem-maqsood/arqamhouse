@@ -202,9 +202,17 @@ class InvoiceView(HouseAccountMixin, View):
 				row.append("-----")
 				row.append("-----")
 
-				row.append((-house_balance.arqam_house_service_fee.amount).quantize(TWO_PLACES))
+				if house_balance.arqam_house_service_fee.free:
+					row.append(0.00)
+				else:
+					row.append((-house_balance.arqam_house_service_fee.amount).quantize(TWO_PLACES))
+
 				row.append(0.00)
-				row.append((-house_balance.arqam_house_service_fee.amount).quantize(TWO_PLACES))
+				
+				if house_balance.arqam_house_service_fee.free:
+					row.append(0.00)
+				else:
+					row.append((-house_balance.arqam_house_service_fee.amount).quantize(TWO_PLACES))
 
 				row.append("-----")
 
