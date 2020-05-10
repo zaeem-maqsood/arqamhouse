@@ -133,7 +133,7 @@ class InvoiceView(HouseAccountMixin, View):
 				# Gross, Fee and Net
 				row.append((house_balance.transaction.amount).quantize(TWO_PLACES))
 				total_fee = (house_balance.transaction.stripe_amount + house_balance.transaction.arqam_amount).quantize(TWO_PLACES)
-				row.append(total_fee)
+				row.append(-total_fee)
 				row.append((house_balance.transaction.house_amount).quantize(TWO_PLACES))
 
 				# Donation Amount
@@ -153,7 +153,7 @@ class InvoiceView(HouseAccountMixin, View):
 				row.append("-----")
 				row.append((house_balance.house_payment.transaction.amount).quantize(TWO_PLACES))
 				total_fee = (house_balance.house_payment.transaction.stripe_amount + house_balance.house_payment.transaction.arqam_amount).quantize(TWO_PLACES)
-				row.append(total_fee)
+				row.append(-total_fee)
 				row.append((house_balance.house_payment.transaction.house_amount).quantize(TWO_PLACES))
 				row.append("-----")
 
@@ -173,9 +173,9 @@ class InvoiceView(HouseAccountMixin, View):
 				row.append("-----")
 				row.append("-----")
 
-				row.append((-house_balance.refund.amount).quantize(TWO_PLACES))
+				row.append(-(house_balance.refund.amount).quantize(TWO_PLACES))
 				row.append((house_balance.refund.fee()).quantize(TWO_PLACES))
-				row.append((-house_balance.refund.house_amount).quantize(TWO_PLACES))
+				row.append(-(house_balance.refund.house_amount).quantize(TWO_PLACES))
 				row.append("-----")
 
 
@@ -186,9 +186,9 @@ class InvoiceView(HouseAccountMixin, View):
 				row.append("-----")
 				row.append("-----")
 				row.append("-----")
-				row.append((house_balance.payout.amount).quantize(TWO_PLACES))
+				row.append(-(house_balance.payout.amount).quantize(TWO_PLACES))
 				row.append(0.00)
-				row.append((house_balance.payout.amount).quantize(TWO_PLACES))
+				row.append(-(house_balance.payout.amount).quantize(TWO_PLACES))
 				row.append("-----")
 			
 
