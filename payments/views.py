@@ -373,7 +373,7 @@ class InvoiceView(HouseAccountMixin, View):
 			previous_month_last_house_balance = 0
 
 		gross_activity = payment_gross_amount + house_payments_gross_amount + donation_gross_amount - refund_gross_amount - service_gross_amount
-		total_fees = payment_total_fees + house_payments_total_fees + service_gross_amount - refund_total_fees  - donation_total_fees
+		total_fees = payment_total_fees + house_payments_total_fees + service_gross_amount - refund_total_fees  + donation_total_fees
 		net_activity = payment_total_amount + house_payments_total_amount + donations_total_amount - refund_house_amount - service_gross_amount
 		end_of_month_balance = previous_month_last_house_balance + net_activity - payout_gross_amount
 
