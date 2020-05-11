@@ -40,13 +40,15 @@ color: #7396b0;
 
                         <form method="GET">
                         <div class="row" style="padding-bottom: 30px;">
-                            <div class="col-md-8">
+                            <div class="col-md-4" style="padding-bottom: 20px;">
                                 <h4 style="margin-bottom: 0px;">{{ month }}, {{ year }}</h4>
                                 <p style="margin-bottom: 0px;">Statment Month</p>
                             </div>
+                            <div class="col-md-4" style="padding-bottom: 20px;">
+                                <button value="submit" class="btn btn-primary btn-block" name="export_to_excel" value="export_to_excel">Excel</button>
+                            </div>
                             <div class="col-md-4">
-                                <button value="submit" class="btn btn-primary btn-block" name="export_to_excel" value="export_to_excel">Export To Excel</button>
-                                <button value="submit" class="btn btn-primary btn-block" name="pdf_statement" value="pdf_statement">PDF Statement</button>
+                                <button value="submit" class="btn btn-primary btn-block" name="pdf_statement" value="pdf_statement">PDF</button>
                             </div>
                         </div>
                         </form>

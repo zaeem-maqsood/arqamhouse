@@ -55,7 +55,7 @@ Create House
 
                 <div class="row justify-content-center" style="padding-bottom: 20px;">
                     <div class="col-md-12">
-                        <a href="{% url 'home' %}"><img id="image-placeholder" src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+                        <a href="{% url 'profiles:dashboard' %}"><img id="image-placeholder" src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
                         <br>
                         <br>
                         {% if profile.phone %}
@@ -99,6 +99,12 @@ Create House
                         </div>
                     </div>
                     {% endif %}
+
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-md-12">
+                            <p style="margin-bottom: 5px;">Current | {{ profile.phone }}</p>
+                        </div>
+                    </div>
 
                     <div class="row justify-content-center" style="padding-bottom: 20px;">
                         <div class="col-md-10">

@@ -616,7 +616,7 @@ class ProfileUpdateView(HouseAccountMixin, UpdateView):
     template_name = "profiles/profile_update.html"
 
     def get_success_url(self):
-        view_name = "profiles:update"
+        view_name = "profiles:menu"
         return reverse(view_name)
 
 
@@ -639,7 +639,6 @@ class ProfileUpdateView(HouseAccountMixin, UpdateView):
         self.object = self.get_profile()
         form = self.get_form()
         if form.is_valid():
-            messages.success(request, 'Profile Updated!')
             return self.form_valid(form)
         else:
             return self.form_invalid(form, request)

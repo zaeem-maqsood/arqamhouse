@@ -37,41 +37,32 @@ class ProfileUpdateForm(forms.ModelForm):
 	class Meta():
 		model = Profile
 		fields = [
-			"name",
 			"picture",
 			"region",
 			"city"
 		]
 
 		widgets = {
-				"name": forms.TextInput(
-					attrs={
-						"class": "form-control m-input",
-						"placeholder": "Name",
-										"required": True
-					}
-				),
 
 				"picture": forms.FileInput(
 					attrs={
 						"onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
 						"class": "form-control m-input dropzone",
+						"style": "background: #ffffff;border: 0px;"
 					}
 				),
-
-
 				"region": forms.Select(
-					attrs={
-						"required": True,
-						"class": "form-control m-input",
-					}
+						attrs={
+							"required" : True,
+							"class":"validate-required",
+							"onchange": "cityChange(this);"
+						},
 				),
-				
 				"city": forms.Select(
-					attrs={
-						"required": True,
-						"class": "form-control m-input",
-					}
+						attrs={
+							"required" : True,
+							"class":"validate-required",
+						}
 				),
 			}
 
@@ -99,17 +90,12 @@ class ProfileUpdateForm(forms.ModelForm):
 
 			if error:
 				raise forms.ValidationError('Only .jpg .png or .jpeg files are accepted.')
-			return logo
+			return picture
 		else:
-			return logo
+			return picture
 
 	def clean(self, *args, **kwargs):
 		cleaned_data = super(ProfileUpdateForm, self).clean(*args, **kwargs)
-		name = self.cleaned_data.get("name")
-
-		if len(name) <= 3:
-			raise forms.ValidationError(
-				"Please Enter A Name With More Than 2 Characters")
 		return cleaned_data
 
 
@@ -146,6 +132,7 @@ class ProfileAlreadyExistsForm(forms.ModelForm):
 					attrs={
 						"onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
 						"class": "validate-required",
+						"style": "background: #ffffff;border: 0px;"
 					}
 				),
 				"phone": PhoneNumberPrefixWidget(
@@ -154,19 +141,21 @@ class ProfileAlreadyExistsForm(forms.ModelForm):
                             "class": "validate-required",
 							"placeholder": "1234567890",
                         }
-                    ),
+				),
+
 				"region": forms.Select(
 						attrs={
 							"required" : True,
 							"class":"validate-required",
-						}
-					),
+							"onchange": "cityChange(this);"
+						},
+				),
 				"city": forms.Select(
 						attrs={
 							"required" : True,
 							"class":"validate-required",
 						}
-					),
+				),
 			}
 
 
