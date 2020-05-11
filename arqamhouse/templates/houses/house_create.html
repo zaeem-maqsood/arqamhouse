@@ -19,6 +19,54 @@ Create House
 {% block scripts %}
 
 <script>
+function cityChange(object) {
+
+    var token = '{{ csrf_token }}';
+
+    region_id = object.value;
+
+    console.log(region_id);
+    const url = "{% url 'profiles:ajax_load_cities' %}";
+
+    let data = {
+        region_id: region_id
+    }
+
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: { 
+            'X-CSRFToken': token,
+            'Content-Type': 'application/json; charset=utf-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        
+    }
+    
+    fetch(url, fetchData)
+        .then(
+            function (response) {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                        response.status);
+                    return;
+                }
+
+                // Examine the text in the response
+                response.json().then(function (data) {
+                    console.log(data)
+                    document.getElementById("id_city").innerHTML = data['html'];
+                });
+            }
+        )
+        .catch(function (err) {
+            console.log('Fetch Error :-S', err);
+        });
+
+}
+</script>
+<script>
 
 jQuery(document).ready(function ($) {
     updateCountdown();
@@ -33,48 +81,6 @@ $('#id_name').bind('input propertychange', function () {
 
 </script>
 
-<script>
-    $("#id_country").change(function () {
-      
-      var url = $("#profileForm").attr("data-regions-url");  // get the url of the `load_cities` view
-      
-      var countryId = $(this).val();  // get the selected country ID from the HTML input
-
-      $.ajax({                       // initialize an AJAX request
-        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
-        data: {
-          'country': countryId       // add the country id to the GET parameters
-        },
-        success: function (data) {   // `data` is the return of the `load_cities` view function
-            console.log(data)
-          $("#id_region").html(data);  // replace the contents of the city input with the data that came from the server
-        }
-      });
-
-    });
-</script>
-
-<script>
-    $("#id_region").change(function () {
-      
-      var url = $("#profileForm").attr("data-cities-url");  // get the url of the `load_cities` view
-      
-      var regionId = $(this).val();  // get the selected country ID from the HTML input
-
-      $.ajax({                       // initialize an AJAX request
-        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
-        data: {
-          'region': regionId       // add the country id to the GET parameters
-        },
-        success: function (data) {   // `data` is the return of the `load_cities` view function
-            console.log(data)
-          $("#id_city").html(data);  // replace the contents of the city input with the data that came from the server
-        }
-      });
-
-    });
-</script>
-
 {% endblock scripts %}
 
 {% block content %}
@@ -86,9 +92,10 @@ $('#id_name').bind('input propertychange', function () {
                 <div class="row" style="padding-bottom: 30px;">
                     <div class="col-md-12">
                         <img id="image-placeholder" src="{% static 'images/logo.png' %}" style="max-height: 6em;">
-                        <p class="lead" style="font-weight: 300;">
+                        <p class="lead" style="font-weight: 300;margin-bottom: 10px;">
                             House Name| <span style="font-weight: 600;" id="output">Arqam House</span>
                         </p>
+                        <p style="font-size: 12px;">Your house name is your organizations name.</p>
                     </div>
                 </div>
 

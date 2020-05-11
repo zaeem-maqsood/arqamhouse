@@ -186,6 +186,8 @@ Subscribers | {{ house.name }}
                                     <div class="kt-timeline-v2__item-text kt-padding-top-5">
                                     {% if item.content %}
                                         Viewed <a href="#">{{ item.name }}</a> on {{ item.created_at|localtime }}
+                                    {% elif item.donation_type %}
+                                        Donated ${{ item.donation_amount }} for donation type <a href="{{ item.get_donation_view }}">{{ item.donation_type }}</a> on {{ item.created_at|localtime }}.
                                     {% else %}
                                         Recieved {{ item.attendee_set.all.count }} ticket{% if item.attendee_set.all.count > 1 %}s{% endif %} for <a href="{{ item.event.get_landing_view }}">{{ item.event.title }}</a> on {{ item.created_at|localtime }}
                                     {% endif %}

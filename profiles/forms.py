@@ -73,8 +73,11 @@ class ProfileUpdateForm(forms.ModelForm):
 		self.fields['city'].empty_label = "City"
 		self.fields['region'].empty_label = "Region"
 
-		self.fields['region'].queryset = self.instance.country.region_set.order_by('name')
-		self.fields['city'].queryset = self.instance.region.city_set.order_by('name')
+		self.fields['city'].queryset = City.objects.all()
+		self.fields['region'].queryset = Region.objects.all()
+
+		self.fields['region'].initial = Region.objects.get(name="Ontario")
+		self.fields['city'].initial = City.objects.get(name="Toronto")
 
 		self.fields["region"].label_from_instance = lambda obj: "%s" % obj.name
 		self.fields["city"].label_from_instance = lambda obj: "%s" % obj.name

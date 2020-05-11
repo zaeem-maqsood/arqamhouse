@@ -324,6 +324,8 @@ class ProfileCreateView(FormView):
                 profile.set_password(password1)
                 profile.temp_password = None
                 profile.phone = phone
+                profile.region = region
+                profile.city = city
                 profile.save()
 
             login(request, profile)
@@ -622,8 +624,8 @@ class ProfileUpdateView(HouseAccountMixin, UpdateView):
 
     def get_context_data(self, request, *args, **kwargs):
         context = {}
-        form = self.get_form()
         profile = self.get_profile()
+        form = self.get_form()
         context["profile"] = profile
         context["form"] = form
         return context

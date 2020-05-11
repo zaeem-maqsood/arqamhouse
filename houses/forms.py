@@ -388,7 +388,8 @@ class HouseForm(forms.ModelForm):
             "logo": forms.FileInput(
                     attrs={
                         "onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
-                                            "class": "form-control m-input dropzone",
+                        "class": "form-control m-input dropzone",
+                        "style": "background: #ffffff;border: 0px;"
                     }
                 ),
 
@@ -396,6 +397,7 @@ class HouseForm(forms.ModelForm):
                     attrs={
                         "required" : True,
                         "class":"validate-required",
+                        "onchange": "cityChange(this);"
                     }
                 ),
             "city": forms.Select(

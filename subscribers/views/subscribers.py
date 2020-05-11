@@ -77,11 +77,11 @@ class SubscriberDetailView(HouseAccountMixin, View):
         house = self.get_house()
         subscriber = Subscriber.objects.get(profile__slug=slug, house=house)
         seen_campaigns = Campaign.objects.filter(subscribers_seen=subscriber).order_by("created_at")
-        print(seen_campaigns)
+        donations = Donation.objects.filter(donation_type__house=house, email=subscriber.profile.email)
         orders = EventOrder.objects.filter(email=subscriber.profile.email, event__house=house).order_by("created_at")
         attendees = Attendee.objects.filter(order__in=orders).count()
 
-        result_list = sorted(chain(seen_campaigns, orders), key=attrgetter('created_at'))
+        result_list = sorted(chain(seen_campaigns, orders, donations), key=attrgetter('created_at'))
         result_list.reverse()
 
         context["subscribers_tab"] = True

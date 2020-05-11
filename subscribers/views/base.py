@@ -27,6 +27,7 @@ from django.contrib import messages
 from subscribers.models import Subscriber, Campaign, Audience
 from subscribers.forms import AddSubscriberForm
 
+from donations.models import Donation
 from houses.models import House
 from profiles.models import Profile
 from django.contrib.auth.models import User
