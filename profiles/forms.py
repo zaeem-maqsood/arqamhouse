@@ -191,7 +191,16 @@ class ProfileAlreadyExistsForm(forms.ModelForm):
 class ProfileVerifcationForm(forms.Form):
 
 	verification_number = forms.IntegerField(required=True, widget=forms. NumberInput(
-		attrs={"required": True, "class": "validate-required", "placeholder": "Code"}))
+		attrs={"required": True, "class": "validate-required", "placeholder": "Code", "max": "999999"}))
+
+	
+	def clean(self, *args, **kwargs):
+		cleaned_data = super(ProfileVerifcationForm, self).clean(*args, **kwargs)
+		
+		verification_number = self.cleaned_data.get("verification_number")
+		if len(str(verification_number)) > 6 or len(str(verification_number)) < 6:
+			raise forms.ValidationError("The code must be 6 digits")
+		return cleaned_data
 
 
 class ProfileChangePhoneForm(forms.Form):

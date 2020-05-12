@@ -431,12 +431,17 @@ class VerificationView(ProfileMixin, FormView):
         auth_token = settings.AUTH_TOKEN
         client = Client(account_sid, auth_token)
         service_id = "VAc350a17577cac4548f9dc591cbc1e950"
-        verification_check = client.verify.services(service_id).verification_checks.create(to=str(profile.phone), code=str(verification_number))
-        print(verification_check.status)
+        try:
+            verification_check = client.verify.services(service_id).verification_checks.create(to=str(profile.phone), code=str(verification_number))
+            print(verification_check.status)
 
-        if verification_check.status == 'approved':
-            profile.verified = True
-            profile.save()
+            if verification_check.status == 'approved':
+                profile.verified = True
+                profile.save()
+        except Exception as e:
+            print(e)
+            form.add_error(None, "There was an issue with your code. Please try again.")
+            return self.render_to_response(self.get_context_data(form=form))
 
         valid_data = super(VerificationView, self).form_valid(form)
         return valid_data

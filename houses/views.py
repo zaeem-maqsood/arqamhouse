@@ -533,7 +533,10 @@ class HouseUserDetailView(HouseAccountMixin, UpdateView):
         print(data)
         if 'Remove' in data:
             house_user_id = data["Remove"]
-            house_user_to_remove = HouseUser.objects.get(id=house_user_id).delete()
+            house_user_to_remove = HouseUser.objects.get(id=house_user_id)
+            house_user_to_remove.profile.house = None
+            house_user_to_remove.profile.save()
+            house_user_to_remove.delete()
             messages.info(request, 'User removed from house.')
             return HttpResponseRedirect(self.get_success_url())
 
