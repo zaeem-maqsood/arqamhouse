@@ -26,6 +26,13 @@ from django.contrib.auth import authenticate, login
 from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponsePermanentRedirect, JsonResponse
 from django.template.loader import render_to_string
 
+from django.utils.safestring import mark_safe
+from django.utils.text import slugify
+from django.utils.html import strip_tags
+from django.core import mail
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.validators import validate_email
+
 from twilio.rest import Client
 
 from .mixins import HouseAccountMixin, HouseLandingMixin
@@ -164,15 +171,13 @@ class HouseHomePageView(DetailView):
 
 
 
-
-
-
-
-
-
-class HouseContactPageView(DetailView):
+class HouseContactPageView(FormView):
     model = House
     template_name = "houses/house_contact.html"
+
+    def get_success_url(self):
+        view_name = "house_contact"
+        return reverse(view_name, kwargs={"slug": self.kwargs["slug"]})
 
     def get_house(self, slug):
         try:
@@ -225,7 +230,7 @@ class HouseContactPageView(DetailView):
         name = form.cleaned_data["name"]
         message = form.cleaned_data["message"]
         email = form.cleaned_data["email"]
-        self.send_email(name, message, email)
+        mail = self.send_email(name, message, email)
         messages.success(request, 'Message Sent!')
         valid_data = super(HouseContactPageView, self).form_valid(form)
         return valid_data
