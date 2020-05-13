@@ -96,7 +96,7 @@ Subscribers | {{ house.name }}
                     </div>
                     <div class="col-6">
                         <p class="lead">Viewed</p>
-                        {% if campaign.subscribers_seen.all.count > 1 %}
+                        {% if campaign.subscribers_seen.all.count >= 1 %}
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover text-center">
                                 <tbody id="dynamic">

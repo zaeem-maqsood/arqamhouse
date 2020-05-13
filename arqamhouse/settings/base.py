@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'questions',
     'subscribers',
     'donations',
+    'memberships',
 
 ]
 
