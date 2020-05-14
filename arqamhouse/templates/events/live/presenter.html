@@ -301,6 +301,15 @@
     });
 
 
+    publisher.on({
+        streamDestroyed: function (event) {
+            if (event.reason === 'networkDisconnected') {
+                console.log('Your publisher lost its connection. Please check your internet connection and try publishing again.');
+                window.location.reload(true);
+            }
+        }
+    });
+
 
     function shareScreen(object) {
 

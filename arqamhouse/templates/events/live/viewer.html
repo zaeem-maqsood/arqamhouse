@@ -143,7 +143,7 @@ Live | {{ event.title|safe }}
     // Subscribe to a newly created stream
     session.on('streamCreated', function (event) {
 
-        session.subscribe(event.stream, 'subscriber', {
+        var subscriber = session.subscribe(event.stream, 'subscriber', {
             insertMode: 'after',
             width: '100%',
             height: '100%',
@@ -205,6 +205,10 @@ Live | {{ event.title|safe }}
         checkStreamAmount();
         updateSpotLight();
     });
+
+
+    
+
 
 
     function checkStreamAmount() {
