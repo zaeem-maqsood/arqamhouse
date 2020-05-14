@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 
+from subscribers.models import Subscriber
 from events.models import Event
 # Sending mail 
 from django.core import mail
@@ -44,3 +45,14 @@ def send_test_email(event, message, email):
 	send_mail(subject, plain_message, from_email, to,
 				html_message=html_message, fail_silently=True)
 	return "Done"
+
+
+
+@shared_task
+def add_1_to_all_subscribers_total_events_subscribed_to(event_id):
+	event = Event.objects.get(id=event_id)
+	house =  event.house
+	subscribers = Subscriber.objects.filter(house=house)
+	for subscriber in subscribers:
+		subscriber.total_events_since_subscribed += 1
+		subscriber.save()

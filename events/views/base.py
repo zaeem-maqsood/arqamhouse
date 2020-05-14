@@ -44,7 +44,7 @@ from events.mixins import EventSecurityMixin, EventMixin
 from houses.mixins import HouseAccountMixin
 
 # Tasks
-from events.tasks import send_test_email
+from events.tasks import send_test_email, add_1_to_all_subscribers_total_events_subscribed_to
 from subscribers.tasks import send_campaign_emails
 
 # Models

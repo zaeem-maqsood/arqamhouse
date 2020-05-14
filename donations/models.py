@@ -75,7 +75,6 @@ class Donation(TimestampedModel):
 
         # First get the subscriber and update their data
         subscriber = Subscriber.objects.get(profile__email=self.email, house=self.donation_type.house)
-        subscriber.times_donated += 1
 
         subscriber_amount_donated = subscriber.amount_donated
         if subscriber_amount_donated is None:

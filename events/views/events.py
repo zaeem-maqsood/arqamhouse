@@ -19,9 +19,6 @@ class EventSendToSubscribersView(HouseAccountMixin, RedirectView):
             # Update all of the subscribers scores -----------------------
             subscribers = Subscriber.objects.filter(house=event.house)
             print(subscribers)
-            for subscriber in subscribers:
-                subscriber.events_total += 1
-                subscriber.save()
 
             if event.image: 
                 content = CONTENT
@@ -960,6 +957,8 @@ class EventCreateView(HouseAccountMixin, CreateView):
         self.object.save()
 
         audience = Audience.objects.create(house=house, name=self.object.title, event=self.object)
+
+        task = add_1_to_all_subscribers_total_events_subscribed_to.delay(self.object.id)
 
         messages.success(request, 'Event Created!')
 

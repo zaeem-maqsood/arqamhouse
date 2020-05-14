@@ -51,7 +51,7 @@ def send_campaign_emails(campaign_id):
 
 
 
-
+# In donation models
 @shared_task
 def update_all_subscribers_who_have_donated(house_id):
     house = House.objects.get(id=house_id)
