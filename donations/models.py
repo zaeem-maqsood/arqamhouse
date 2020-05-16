@@ -82,19 +82,6 @@ class Donation(TimestampedModel):
         subscriber_amount_donated += self.transaction.amount
         subscriber.amount_donated = subscriber_amount_donated
         subscriber.save()
-        
-        # Aggregate the avg amount of times people have donated
-        subscribers = Subscriber.objects.filter(house=self.donation_type.house)
-        time_donated_average = subscribers.aggregate(Avg('times_donated'))["times_donated__avg"]
-        self.donation_type.house.donation_score = time_donated_average
-
-        # Aggregate the avg amount people have donated
-        donations = Donation.objects.filter(donation_type__house=self.donation_type.house)
-        average_donation_amount = donations.aggregate(Avg('transaction__amount'))["transaction__amount__avg"]
-        self.donation_type.house.donation_amount_score = average_donation_amount
-        
-        # Save the global house values
-        self.donation_type.house.save()
 
         task = update_all_subscribers_who_have_donated.delay(self.donation_type.house.id)
 

@@ -1,0 +1,24 @@
+{% for donation in donations %}
+<div class="col-10" style="padding-bottom: 40px;">
+    <div class="row text-center">
+        <div class="col-md-4" style="align-self: center;padding-bottom: 20px;">
+            <p style="color: rgb(67, 153, 213);margin-bottom: 0px;font-size: 2.2em;">
+                ${% if donation.pass_fee %}{{ donation.transaction.house_amount }}{% else %}{{ donation.transaction.amount }}{% endif %}
+            </p>
+        </div>
+        <div class="col-md-8" id="donation-body">
+            <p style="margin-bottom: 0px;">
+                <span style="font-size: small;font-style: italic;">donated by </span>
+                <span
+                    style="color: rgb(67, 153, 213);">{% if donation.anonymous %}Anonymous{% else %}{{ donation.name }}{% endif %}</span>
+                <span style="font-size: small;font-style: italic;">to {{ donation.donation_type.name }}</span>
+            </p>
+            {% if donation.message %}
+            <p style="font-size: 0.8em;">
+                {{ donation.message }}
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endfor %}

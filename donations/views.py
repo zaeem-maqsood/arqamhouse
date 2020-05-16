@@ -97,13 +97,107 @@ class DonationPublicListView(View):
         slug = self.kwargs['slug']
         house = self.get_house()
 
-        donations = Donation.objects.filter(donation_type__house=house).order_by('-created_at')[:30]
+        donations = Donation.objects.filter(donation_type__house=house).order_by('-created_at')[:50]
         graph_data = self.graph_data(house)
         context["graph_data"] = graph_data
 
         context["donations"] = donations
         context["house"] = house
         return context
+
+
+
+
+
+
+
+class DonationPublicListLiveView(View):
+    template_name = "donations/public-list-live.html"
+
+    def get(self, request, *args, **kwargs):
+
+        house = self.get_house()
+        if not house.allow_donations:
+            view_name = "home_page"
+            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": house.slug}))
+
+        return render(request, self.template_name, self.get_context_data())
+
+    def graph_data(self, house):
+        from django.utils.timezone import localdate
+        donations = Donation.objects.filter(donation_type__house=house)
+        this_minute = timezone.localtime(timezone.now())
+        minute_label = []
+        sales_label = []
+        total = 0
+
+        for x in range(10):
+            ten_minutes_earlier = this_minute - timedelta(minutes=x)
+            print(ten_minutes_earlier.year)
+            print(ten_minutes_earlier.month)
+            print(ten_minutes_earlier.day)
+            print(ten_minutes_earlier.hour)
+            print(ten_minutes_earlier.minute)
+
+            donations_for_ten_minutes = donations.filter(transaction__created_at__minute=ten_minutes_earlier.minute,
+                                                         transaction__created_at__hour=ten_minutes_earlier.hour, transaction__created_at__day=ten_minutes_earlier.day,
+                                                         transaction__created_at__month=ten_minutes_earlier.month, transaction__created_at__year=ten_minutes_earlier.year)
+            print(donations_for_ten_minutes)
+            sales_sum = 0
+            for donation in donations_for_ten_minutes:
+                sales_sum += donation.amount
+
+            sales_label.append('{0:.2f}'.format(sales_sum))
+            # minute_label.append("%s:%s" % (ten_minutes_earlier.hour, ten_minutes_earlier.minute))
+            minute_label.append(ten_minutes_earlier.strftime("%I:%M"))
+
+            total += sales_sum
+
+        sales_label = list(reversed(sales_label))
+        minute_label = list(reversed(minute_label))
+
+        graph_data = {'sales_label': sales_label,
+                      'minute_label': minute_label, 'total': total}
+        return graph_data
+
+    def get_house(self):
+        try:
+            house = House.objects.get(slug=self.kwargs['slug'])
+            return house
+        except Exception as e:
+            print(e)
+            raise Http404
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+        slug = self.kwargs['slug']
+        house = self.get_house()
+
+        donations = Donation.objects.filter(donation_type__house=house).order_by('-created_at')[:50]
+        graph_data = self.graph_data(house)
+        context["graph_data"] = graph_data
+
+        context["donations"] = donations
+        context["house"] = house
+        return context
+
+
+    def post(self, request, *args, **kwargs):
+        slug = self.kwargs['slug']
+        house = self.get_house()
+        graph_data = self.graph_data(house)
+        print(graph_data)
+        donations = Donation.objects.filter(donation_type__house=house).order_by('-created_at')[:50]
+        html = render_to_string('donations/public-list-live-dynamic-body.html', {'donations': donations})
+
+        graph_data["html"] = html
+
+        json_data = json.loads(request.body)
+        if json_data:
+            print(json_data)
+            
+            return JsonResponse(graph_data)
+
 
 
 

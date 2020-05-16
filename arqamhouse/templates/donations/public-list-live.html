@@ -47,6 +47,18 @@ Donate | {{ house.name }}
     
 }
 
+
+.blinking{
+    animation:blinkingText 2.2s infinite;
+}
+@keyframes blinkingText{
+    0%{     color: rgb(215, 56, 56);    }
+    49%{    color: rgb(215, 56, 56); }
+    60%{    color: transparent; }
+    99%{    color:transparent;  }
+    100%{   color: rgb(215, 56, 56);    }
+}
+
 </style>
 {% endblock styles %}
 
@@ -64,7 +76,7 @@ Donate | {{ house.name }}
 	    type: 'line',
 	    aspectRatio: 2,
 	    data: {
-	        labels: {{ graph_data.day_label|safe }},
+	        labels: {{ graph_data.minute_label|safe }},
 	        datasets: [{
 	            label: 'Sales ($)',
 	            data: {{ graph_data.sales_label|safe }},
@@ -98,7 +110,7 @@ Donate | {{ house.name }}
 					label: function(item) {
 						label = (Math.round(item.yLabel * 100) / 100).toFixed(2);
 						label = label.toString();
-						label = " $ " + label
+						label = " $" + label
 						return label
 					},
 				},
@@ -160,6 +172,61 @@ Donate | {{ house.name }}
 	});
 
 </script>
+
+
+<script>
+
+setInterval(updateGraph, 10000);
+
+function updateGraph() {
+
+    var token = '{{ csrf_token }}';
+    const url = '{{ request.path }}';
+
+    let data = {
+        update: true
+    }
+
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: { 
+            'X-CSRFToken': token,
+            'Content-Type': 'application/json; charset=utf-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        
+    }
+    
+    fetch(url, fetchData)
+        .then(
+            function (response) {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                        response.status);
+                    return;
+                }
+
+                // Examine the text in the response
+                response.json().then(function (data) {
+                    myChart2.data.datasets[0].data = data["sales_label"];
+                    myChart2.data.labels = data["minute_label"];
+                    myChart2.update();
+
+                    document.getElementById("dynamic").innerHTML = data["html"];
+
+                });
+            }
+        )
+        .catch(function (err) {
+            console.log('Fetch Error :-S', err);
+        });
+
+}
+
+</script>
+
 {% endblock scripts %}
 
 
@@ -187,7 +254,7 @@ Donate | {{ house.name }}
 
                     <div class="row justify-content-center" style="padding-top: 40px;padding-bottom: 30px;">
                         <div class="col-5">
-                            <h4 style="color: grey;margin-bottom: 2px;font-size: 1.5em">Donations</h4>
+                            <h4 style="color: grey;margin-bottom: 2px;font-size: 1.5em"><span style="margin-bottom: 0px;" class="blinking">Live Donations</span></h4>
                         </div>
                         <div class="col-5">
                             <h4 style="color: rgb(121, 180, 123);font-size: 1.5em;margin-bottom: 2px;text-align: right;" >${{ graph_data.total }}</h4>
@@ -200,13 +267,13 @@ Donate | {{ house.name }}
                         </div>
                     </div>
 
-					<div class="row justify-content-center text-center">
-						<div class="col-md-10 col-10" style="padding-bottom: 30px;">
-							<a href="{{ house.get_public_donations_live_url }}">
-								Live Donations
-							</a>
-						</div>
-					</div>
+                    <div class="row justify-content-center text-center">
+                        <div class="col-md-10 col-10" style="padding-bottom: 30px;">
+                            <a href="{{ house.get_public_donations_url }}">
+                                Donations
+                            </a>
+                        </div>
+                    </div>
 
 
                     <div class="row justify-content-center text-center">
@@ -219,7 +286,7 @@ Donate | {{ house.name }}
 
 
                     
-                    <div class="row justify-content-center">
+                    <div class="row justify-content-center" id="dynamic">
                         {% for donation in donations %}
                         <div class="col-10" style="padding-bottom: 40px;">
                             <div class="row text-center">

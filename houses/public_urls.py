@@ -21,7 +21,7 @@ from django.urls import path, include
 
 from .views import (HouseHomePageView, HouseContactPageView)
 
-from donations.views import DonationView, DonationPublicListView
+from donations.views import DonationView, DonationPublicListView, DonationPublicListLiveView
 
 from .urls import urlpatterns
 
@@ -30,6 +30,7 @@ urlpatterns += [
     path('', HouseHomePageView.as_view(), name='home_page'),
     path('donate', DonationView.as_view(), name='donate'),
     path('donations', DonationPublicListView.as_view(), name='public_donations'),
+    path('donations/live', DonationPublicListLiveView.as_view(), name='public_donations_live'),
     path('contact', HouseContactPageView.as_view(), name='house_contact'),
 
 ]
