@@ -1,0 +1,76 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+{% load tz %}
+
+{% block title %}
+Edit Dashboard 
+{% endblock title %}
+
+{% block footer %}
+	{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+<link href="https://cdn.jsdelivr.net/npm/froala-editor@3.1.0/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css" />
+{% endblock styles %}
+
+{% block top_page_scripts %}
+
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script type="text/javascript"
+    src="https://cdn.jsdelivr.net/npm/froala-editor@3.1.0/js/froala_editor.pkgd.min.js"></script>
+<script>
+    new FroalaEditor('#edit', {
+        key: "{{ froala_key }}",
+        attribution: false,
+
+        imageUploadToS3: {
+            bucket: 'arqam',
+            // Your bucket region.
+            region: 's3-us-east-1',
+            keyStart: 'uploads/',
+            params: {
+                // If you are using Amazon Signature V4, the followings should be used instead.
+                "X-Amz-Credential": "...",
+                "X-Amz-Algorithm": "AWS4-HMAC-SHA256",
+                "X-Amz-Date": "...",
+                Policy: "...", //
+                "X-Amz-Signature": "", // computed in backend
+            }
+        }
+
+    })
+</script>
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center" style="padding-top: 30px;">
+    <div class="container" style="padding-bottom: 60px;">
+        <div class="row" style="padding-bottom: 20px;">
+            <div class="col-md-12 col-lg-9">
+                
+                <div class="row" style="padding-top: 10px;">
+                    <div class="col-md-12">
+                        <h2 style="margin-bottom: 5px;color: #4990e2;font-weight: 600;">Edit Post</h2>
+                    </div>
+                </div>
+            
+                <div class="row" style="padding-top: 10px;">
+                    <div class="col-md-12">
+                        <form>
+                            <textarea id="edit" name="content"></textarea>
+                        </form>
+                    </div>
+                </div>
+                    
+
+            </div>
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endblock content %}

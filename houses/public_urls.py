@@ -22,6 +22,7 @@ from django.urls import path, include
 from .views import (HouseHomePageView, HouseContactPageView)
 
 from donations.views import DonationView, DonationPublicListView, DonationPublicListLiveView
+from posts.views import EditPostView
 
 from .urls import urlpatterns
 
@@ -32,5 +33,6 @@ urlpatterns += [
     path('donations', DonationPublicListView.as_view(), name='public_donations'),
     path('donations/live', DonationPublicListLiveView.as_view(), name='public_donations_live'),
     path('contact', HouseContactPageView.as_view(), name='house_contact'),
+    path('blog/<int:post_number>/edit', EditPostView.as_view(), name='edit_post'),
 
 ]

@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'subscribers',
     'donations',
     'memberships',
+    'posts',
 
 ]
 
@@ -215,8 +216,8 @@ PLATFORM_FEE = 4.0
 PLATFORM_BASE_FEE = 0.30
 
 
-FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'colors', 'emoticons', 'file',
-                         'font_family', 'link', 'lists', 'paragraph_format', 'paragraph_style', 'image', 'image_upload', 'font_size')
+FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'colors', 'emoticons', 'file', 'image', 'image_manager',
+                         'font_family', 'link', 'lists', 'paragraph_format', 'paragraph_style', 'font_size')
 
 
 FROALA_EDITOR_OPTIONS = {

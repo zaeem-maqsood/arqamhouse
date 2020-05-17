@@ -88,7 +88,6 @@ class CampaignDetailView(HouseAccountMixin, View):
 
 class CampaignUpdateView(HouseAccountMixin, UpdateView):
     model = Campaign
-    form_class = GenericCampaignForm
     template_name = "subscribers/campaigns/update.html"
 
     def get_success_url(self):
@@ -105,7 +104,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         house = self.get_house()
 
         subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
-        form = self.get_form()
+        form = GenericCampaignForm(house=house)
 
         if self.object.audience:
             audience = self.object.audience
@@ -135,7 +134,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         data = request.POST
 
         self.object = self.get_campaign()
-        form = self.get_form()
+        form = GenericCampaignForm(data=data, house=house)
 
         if form.is_valid():
             return self.form_valid(form, request)
@@ -227,7 +226,6 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
 
 class CampaignCreateView(HouseAccountMixin, CreateView):
     model = Campaign
-    form_class = GenericCampaignForm
     template_name = "subscribers/campaigns/create.html"
 
     def get_success_url(self):
@@ -248,7 +246,7 @@ class CampaignCreateView(HouseAccountMixin, CreateView):
         house = self.get_house()
         subscribers = Subscriber.objects.filter(house=house)
 
-        form = self.get_form()
+        form = GenericCampaignForm(house=house)
 
         if 'slug' in self.kwargs:
             audience = self.get_audience(house)
@@ -274,7 +272,7 @@ class CampaignCreateView(HouseAccountMixin, CreateView):
     def post(self, request, *args, **kwargs):
         data = request.POST
 
-        form = self.get_form()
+        form = GenericCampaignForm(data=data, house=house)
         if form.is_valid():
             return self.form_valid(form, request)
         else:
