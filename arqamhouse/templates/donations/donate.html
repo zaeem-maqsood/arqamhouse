@@ -198,7 +198,6 @@ function showAddressAndFee(object) {
             if (donation_type_id == '{{ donation_type.id }}') {
                 document.getElementById("address_area").style.display = 'flex';
                 document.getElementById("autocomplete").required = true;
-                document.getElementById("id_postal_code").required = true;
             }
 
         {% else %}
@@ -206,7 +205,6 @@ function showAddressAndFee(object) {
             if (donation_type_id == '{{ donation_type.id }}') {
                 document.getElementById("address_area").style.display = 'none';
                 document.getElementById("autocomplete").required = false;
-                document.getElementById("id_postal_code").required = false;
             }
 
         {% endif %}
@@ -362,20 +360,6 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
                     </div>
                     {% endif %}
 
-                    {% if form.postal_code.errors %}
-                    <div class="row" style="padding-bottom: 20px;">
-                        <div class="col-md-12">
-                            <div class="alert bg--error">
-                                <div class="alert__body">
-                                    {% for error in form.postal_code.errors %}
-                                    <span>{{ error|escape }}</span>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-xl-10 col-lg-9 col-md-9 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Donation Type</p>
@@ -416,13 +400,9 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
 
 
                     <div class="row" style="padding-bottom: 10px;display: none;" id="address_area">
-                        <div class="col-md-8 col-sm-8 col-12" style="padding-bottom: 10px;">
+                        <div class="col-md-12 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Address</p>
                             {{ form.address }}
-                        </div>
-                        <div class="col-md-4 col-sm-4 col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Postal Code</p>
-                            {{ form.postal_code }}
                         </div>
                     </div>
 

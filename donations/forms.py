@@ -48,7 +48,6 @@ class DonationForm(forms.ModelForm):
         self.fields["donation_type"] = forms.ModelChoiceField(queryset=donation_types, empty_label=None, widget=forms.Select(
             attrs={"class": "validate-required", "onchange": "showAddressAndFee(this);"}), required=True, initial=DonationType.objects.get(house=house, general_donation=True))
         self.fields["address"] = forms.CharField(label="Address", widget=forms.TextInput(attrs={"class":"validate-required", "autocomplete": "off", "placeholder": "123 Main Street", "id": "autocomplete"}), required=False)
-        self.fields["postal_code"] = forms.CharField(label="Postal Code", widget=forms.TextInput(attrs={"class":"validate-required", "autocomplete": "off", "placeholder": "L1P8QM"}), required=False)
 
 
     class Meta:

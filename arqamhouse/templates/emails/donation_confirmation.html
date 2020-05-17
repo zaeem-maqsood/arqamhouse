@@ -227,7 +227,7 @@
     <tbody>
       <tr>
         <td style="padding:18px 0px 18px 0px; line-height:15px; text-align:inherit;" height="100%" valign="top" bgcolor="" role="module-content"><div><div style="font-family: inherit; text-align: center"><span style="font-size: 11px">Please note that this is not a receipt. {{ house.name }} is responsible for issuing any tax-deductible receipts. Contact them </span><a href="https://www.arqam.house{{ house.get_contact_url }}"><span style="font-size: 11px">here</span></a><span style="font-size: 11px">.&nbsp;</span></div>
-<div style="font-family: inherit; text-align: center"><span style="font-size: 11px">This email confirms that you have donated {{ donation_amount }} to {{ house.name }} and have received nothing in return.&nbsp;</span></div>
+<div style="font-family: inherit; text-align: center"><span style="font-size: 11px">This email confirms that you have donated ${{ donation_amount }} to {{ house.name }} and have received nothing in return.&nbsp;</span></div>
 <div style="font-family: inherit; text-align: center"><span style="font-size: 11px">To view your donations and more</span>,<span style="font-size: 11px"> please register for an account at </span><a href="https://www.arqamhouse.com"><span style="font-size: 11px">Arqam House</span></a><span style="font-size: 11px">.</span></div><div></div></div></td>
       </tr>
     </tbody>
@@ -242,7 +242,10 @@
         </td>
       </tr>
     </tbody>
-  </table></td>
+  </table>
+  
+  
+  </td>
                                       </tr>
                                     </table>
                                     <!--[if mso]>

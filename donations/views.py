@@ -283,10 +283,8 @@ class DonationView(FormView):
 
         if donation_type.collect_address:
             address = form.cleaned_data.get("address")
-            postal_code = form.cleaned_data.get("postal_code")
         else:
             address = None
-            postal_code = None
 
 
         stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -398,7 +396,18 @@ class DonationView(FormView):
             
         except stripe.error.CardError as e:
             print(e)
-            form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
+            print(e.error.code)
+            print(e.error.message)
+            print(e.error.type)
+            print(e.error.param)
+            error_message = e.error.message
+            if e.error.code == "incorrect_zip":
+                error_message = "The postal code your provided failed validation. Please make sure your postal code is correct and try again."
+
+            if e.error.code == "card_declined":
+                error_message = "The card you provided was declined. Please use another payment method."
+
+            form.add_error("amount", f"{error_message}")
             return self.render_to_response(self.get_context_data(form=form))
             
         except stripe.error.RateLimitError as e:
@@ -460,7 +469,7 @@ class DonationView(FormView):
         transaction.save()
 
         donation = Donation.objects.create(
-            donation_type=donation_type, transaction=transaction, name=name, email=email, message=message, address=address, postal_code=postal_code, pass_fee=pass_fee,
+            donation_type=donation_type, transaction=transaction, name=name, email=email, message=message, address=address, postal_code=charge.source['address_zip'], pass_fee=pass_fee,
             anonymous=anonymous, amount=donation_amount)
 
         try:
