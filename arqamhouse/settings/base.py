@@ -216,7 +216,7 @@ PLATFORM_FEE = 4.0
 PLATFORM_BASE_FEE = 0.30
 
 
-FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'colors', 'emoticons', 'file', 'image', 'image_manager',
+FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'colors', 'emoticons', 'file', 'image',
                          'font_family', 'link', 'lists', 'paragraph_format', 'paragraph_style', 'font_size')
 
 
