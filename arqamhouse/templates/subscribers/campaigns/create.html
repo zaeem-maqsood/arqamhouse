@@ -54,7 +54,7 @@ Subscribers | {{ house.name }}
 					</div>
 				</div>
 
-                <form method="POST" id="checkoutForm" enctype="multipart/form-data" onchange="update_content()">{% csrf_token %}
+                <form method="POST" id="checkoutForm" enctype="multipart/form-data">{% csrf_token %}
                     <div class="row" style="padding-bottom: 20px;">
                         <div class="col-md-6">
                             <p style="margin-bottom: 5px;">Campaign Name</p>

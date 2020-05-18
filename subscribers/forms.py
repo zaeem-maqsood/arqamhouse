@@ -6,7 +6,7 @@ from django.conf import settings
 import boto3
 from botocore.client import Config
 
-from froala_editor.widgets import FroalaEditor
+from core.widgets import ArqamFroalaEditor
 
 
 class AddSubscriberForm(forms.Form):
@@ -23,13 +23,18 @@ class GenericCampaignForm(forms.ModelForm):
     def __init__(self, house, *args, **kwargs):
         super(GenericCampaignForm, self).__init__(*args, **kwargs)
 
-        s3_client = boto3.client('s3', 'ca-central-1', config=Config(signature_version='s3v4'),
-                                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
-        response = s3_client.generate_presigned_url('get_object', Params={
-                                                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME, 'Key': f'media/uploads/froala_editor/images/{house.slug}'}, ExpiresIn=3600)
+        # s3_client = boto3.client('s3')
+        # # for key in s3_client.list_objects(Bucket='arqam')['Contents']:
+        # #     print(key['Key'])
+        # for key in s3_client.list_objects(Bucket='arqam', Prefix=f'media/uploads/froala_editor/images/{house.slug}')['Contents']:
+        #     print(key['Key'])
 
-        self.fields["content"] = forms.CharField(required=True, widget=FroalaEditor(options={
-            'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True, 'useClasses': False, 'charCounterMax': 2000, 'imageManagerLoadURL': response}, house=house))
+        # location_url = s3_client.list_objects(Bucket='arqam', Prefix=f'media/uploads/froala_editor/images/{house.slug}')['Contents']
+        # print(location_url)
+            
+
+        self.fields["content"] = forms.CharField(required=True, widget=ArqamFroalaEditor(options={
+            'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True, 'useClasses': False, 'charCounterMax': 2000, 'imageManagerLoadURL': "https://arqam.s3.ca-central-1.amazonaws.com/media/uploads/froala_editor/images/arqam-house/"}, house=house))
 
     
     test_email = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"class": "form-control m-input", "placeholder": "email@domain.com"}), required=False)

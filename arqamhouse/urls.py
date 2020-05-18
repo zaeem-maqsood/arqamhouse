@@ -31,7 +31,7 @@ urlpatterns = [
     path('pricing', PricingView.as_view(), name='pricing'),
     path('report', ReportErrorView.as_view(), name='report'),
     path('zaeem-custom-script', CustomScriptView.as_view(), name='custom_script'),
-    path('froala_editor/', include('froala_editor.urls')),
+    path('froala_editor/', include('core.urls')),
     path('house/', include('houses.urls')),
     path('profile/', include('profiles.urls')),
     path('events/', include('events.urls')),
