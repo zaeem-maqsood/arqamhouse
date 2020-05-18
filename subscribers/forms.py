@@ -34,7 +34,7 @@ class GenericCampaignForm(forms.ModelForm):
             
 
         self.fields["content"] = forms.CharField(required=True, widget=ArqamFroalaEditor(options={
-            'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True, 'useClasses': False, 'charCounterMax': 2000, 'imageManagerLoadURL': "https://arqam.s3.ca-central-1.amazonaws.com/media/uploads/froala_editor/images/arqam-house/"}, house=house))
+            'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True, 'useClasses': False, 'charCounterMax': 2000, 'imageManagerLoadURL': "https://arqam.s3.ca-central-1.amazonaws.com/media/uploads/froala_editor/images/arqam-house"}, house=house))
 
     
     test_email = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"class": "form-control m-input", "placeholder": "email@domain.com"}), required=False)
