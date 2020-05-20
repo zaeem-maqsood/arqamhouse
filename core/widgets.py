@@ -77,11 +77,16 @@ class ArqamFroalaEditor(widgets.Textarea):
         if self.theme:
             options['theme'] = self.theme
 
+        options["events"] = {"contentChanged": 'contentChangedPlaceholder'}
+                
+
         json_options = json.dumps(options)
         if getattr(settings, 'FROALA_JS_COOKIE', False):
             json_options = json_options.replace('"csrftokenplaceholder"', 'Cookies.get("csrftoken")')
         else:
             json_options = json_options.replace('"csrftokenplaceholder"', 'getCookie("csrftoken")')
+
+        json_options = json_options.replace('"contentChangedPlaceholder"', 'function() {contentUpdated(this);}')
         return json_options
 
     def render(self, name, value, attrs=None, renderer=None):
@@ -94,7 +99,7 @@ class ArqamFroalaEditor(widgets.Textarea):
 
         str = """
         <script>
-            new FroalaEditor('#%s',%s)
+            var froala_editor_django = new FroalaEditor('#%s',%s)
         </script>""" % (el_id, options)
         return str
 

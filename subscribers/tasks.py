@@ -54,26 +54,3 @@ def send_campaign_emails(campaign_id):
 
 
 
-# In donation models
-@shared_task
-def update_all_subscribers_who_have_donated(house_id):
-
-    house = House.objects.get(id=house_id)
-    subscribers = Subscriber.objects.filter(house=house)
-
-     # Aggregate the avg amount of times people have donated
-    time_donated_average = subscribers.aggregate(Avg('times_donated'))["times_donated__avg"]
-    house.donation_score = time_donated_average
-
-    # Aggregate the avg amount people have donated
-    donations = Donation.objects.filter(donation_type__house=house)
-    average_donation_amount = donations.aggregate(Avg('transaction__amount'))["transaction__amount__avg"]
-    house.donation_amount_score = average_donation_amount
-
-    house.save()
-
-    for subscriber in subscribers:
-        if subscriber.amount_donated:
-            subscriber.save()
-    
-    return "Done"

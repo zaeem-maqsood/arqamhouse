@@ -12,7 +12,7 @@ Edit Dashboard
 {% endblock footer %}
 
 {% block styles %}
-<link href="https://cdn.jsdelivr.net/npm/froala-editor@3.1.0/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css" />
+
 {% endblock styles %}
 
 {% block top_page_scripts %}
@@ -20,29 +20,64 @@ Edit Dashboard
 {% endblock top_page_scripts %}
 
 {% block scripts %}
-<script type="text/javascript"
-    src="https://cdn.jsdelivr.net/npm/froala-editor@3.1.0/js/froala_editor.pkgd.min.js"></script>
 <script>
-    new FroalaEditor('#edit', {
-        key: "{{ froala_key }}",
-        attribution: false,
 
-        imageUploadToS3: {
-            bucket: 'arqam',
-            // Your bucket region.
-            region: 's3-us-east-1',
-            keyStart: 'uploads/',
-            params: {
-                // If you are using Amazon Signature V4, the followings should be used instead.
-                "X-Amz-Credential": "...",
-                "X-Amz-Algorithm": "AWS4-HMAC-SHA256",
-                "X-Amz-Date": "...",
-                Policy: "...", //
-                "X-Amz-Signature": "", // computed in backend
+
+
+// setInterval(contentUpdated, 5000);
+
+function contentUpdated(object) {
+
+    console.log("IS it coming here")
+    console.log(object)
+
+    editor_html = froala_editor_django.html.get(true);
+    console.log(editor_html)
+
+
+    var token = '{{ csrf_token }}';
+
+    const url = '{{ request.path }}';
+
+    let data = {
+       "editor_html": editor_html
+    }
+
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: { 
+            'X-CSRFToken': token,
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        
+    }
+
+
+    fetch(url, fetchData)
+        .then(
+            function (response) {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                        response.status);
+                    return;
+                }
+
+                // Examine the text in the response
+                response.json().then(function (data) {
+                    
+                    console.log(data)
+                });
             }
-        }
+        )
+        .catch(function (err) {
+            console.log('Fetch Error :-S', err);
+        });
 
-    })
+}
+
 </script>
 {% endblock scripts %}
 
@@ -52,19 +87,40 @@ Edit Dashboard
         <div class="row" style="padding-bottom: 20px;">
             <div class="col-md-12 col-lg-9">
                 
-                <div class="row" style="padding-top: 10px;">
-                    <div class="col-md-12">
-                        <h2 style="margin-bottom: 5px;color: #4990e2;font-weight: 600;">Edit Post</h2>
+                <div class="row" style="padding-top:30px;padding-bottom: 20px;">
+                    <div class="col-lg-12 col-md-6 col-8">
+                        {% if house.logo %}
+                        <a href="{{ house.get_home_page_url }}">
+                            <img style="margin-bottom: 10px;max-height: 150px;max-width: 150px;" src="{{ house.logo.url }}">
+                        </a>
+                
+                        {% else %}
+                        <h4 style="color: grey;margin-bottom: 10px;">{{ house.name }}</h4>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <form method="POST" id="post_form" enctype="multipart/form-data">{% csrf_token %}
+                <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="col-12">
+                        {{ form.name }}
                     </div>
                 </div>
             
-                <div class="row" style="padding-top: 10px;">
-                    <div class="col-md-12">
-                        <form>
-                            <textarea id="edit" name="content"></textarea>
-                        </form>
+
+                {{ form.media }}
+                <div class="row justify-content-center" style="padding-bottom: 50px;">
+                    <div class="col-12">
+                        {{ form.content }}
                     </div>
                 </div>
+
+                <div class="row" style="padding-bottom:40px;">
+                    <div class="col-lg-12">
+                        <button type="submit" name="save" value='true' id="post_save" class="btn btn-primary btn-block">Post</button>
+                    </div>
+                </div>
+                </form>
                     
 
             </div>

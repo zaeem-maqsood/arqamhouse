@@ -25,8 +25,8 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from events.mixins import EventSecurityMixin
 from django.contrib import messages
 
-from subscribers.models import Subscriber, Campaign, Audience
-from subscribers.forms import AddSubscriberForm
+from posts.models import Post
+from posts.forms import PostForm
 
 from donations.models import Donation
 from houses.models import House
@@ -34,26 +34,73 @@ from profiles.models import Profile
 from django.contrib.auth.models import User
 from events.models import EventOrder, Attendee, Event, Ticket, EventCart, EventCartItem
 
-import boto3
-from botocore.client import Config
-
 
 
 # Create your views here.
 class EditPostView(HouseAccountMixin, FormView):
     template_name = "posts/edit_post.html"
 
+    def get_success_url(self):
+        view_name = "edit_post"
+        return reverse(view_name, kwargs={"slug": self.kwargs['slug'], "post_number": self.kwargs["post_number"]})
+
     def get(self, request, *args, **kwargs):
         self.object = None
-        return self.render_to_response(self.get_context_data(request=request))
+        house = self.get_house()
+        post = self.get_post(house)
+        form = PostForm(house=house, instance=post)
+        return self.render_to_response(self.get_context_data(form=form, request=request))
 
-    def get_context_data(self, request, *args, **kwargs):
+
+    def get_post(self, house):
+        post_number = self.kwargs['post_number']
+        try:
+            post = Post.objects.get(post_number=int(post_number), house=house)
+            return post
+        except Exception as e:
+            print(e)
+            raise Http404
+
+
+    def get_context_data(self, form, request, *args, **kwargs):
         context = {}
-        froala_key = settings.FROALA_EDITOR_OPTIONS["key"]
-
-        s3_client = boto3.client('s3', 'ca-central-1', config=Config(signature_version='s3v4'),
-                                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
-        print(s3_client)
-        context["froala_key"] = froala_key
+        house = self.get_house()
+        post = self.get_post(house)
+        context["house"] = house
+        context["form"] = form
         return context
 
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        house = self.get_house()
+        post = self.get_post(house)
+
+        form = PostForm(data=data, house=house, instance=post)
+        if form.is_valid():
+            return self.form_valid(form, request)
+        else:
+            return self.form_invalid(form, request)
+
+
+    def form_valid(self, form, request):
+        data = request.POST
+        house = self.get_house()
+
+        json_data = json.loads(request.body)
+        print(json_data)
+        print("it came to the post")
+        if json_data:
+            content = json_data['editor_html']
+            self.object.content = content
+        else:
+            self.object = form.save(commit=False)
+
+        self.object.save()
+        messages.success(request, 'Post Created Successfully!')
+        valid_data = super(EditPostView, self).form_valid(form)
+        return valid_data
+
+    def form_invalid(self, form, request):
+        print(form.errors)
+        return self.render_to_response(self.get_context_data(form=form, request=request))

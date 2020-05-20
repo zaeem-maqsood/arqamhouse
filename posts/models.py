@@ -63,3 +63,8 @@ class Post(TimestampedModel):
 
     def __str__(self):
         return self.name
+
+
+    def get_edit_view(self):
+        view_name = "edit_post"
+        return reverse(view_name, kwargs={"slug": self.house.slug, "post_number": self.post_number})

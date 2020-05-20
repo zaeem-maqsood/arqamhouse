@@ -71,7 +71,6 @@ class Donation(TimestampedModel):
     def update_donation_score(self):
 
         from subscribers.models import Subscriber
-        from subscribers.tasks import update_all_subscribers_who_have_donated
 
         # First get the subscriber and update their data
         subscriber = Subscriber.objects.get(profile__email=self.email, house=self.donation_type.house)
@@ -79,11 +78,9 @@ class Donation(TimestampedModel):
         subscriber_amount_donated = subscriber.amount_donated
         if subscriber_amount_donated is None:
             subscriber_amount_donated = decimal.Decimal('0.00')
-        subscriber_amount_donated += self.transaction.amount
+        subscriber_amount_donated += self.amount
         subscriber.amount_donated = subscriber_amount_donated
         subscriber.save()
-
-        task = update_all_subscribers_who_have_donated.delay(self.donation_type.house.id)
 
 
 

@@ -3,9 +3,6 @@ from .models import Subscriber, Campaign
 
 from django.conf import settings
 
-import boto3
-from botocore.client import Config
-
 from core.widgets import ArqamFroalaEditor
 
 
