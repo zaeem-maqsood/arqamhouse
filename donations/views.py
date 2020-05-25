@@ -344,7 +344,6 @@ class DonationView(FormView):
         try:
             subscriber = Subscriber.objects.get(profile=profile, house=house)
             subscriber.times_donated += 1
-            subscriber.save()
 
         # Or we need to create a subscriber
         except Exception as e:
@@ -377,7 +376,7 @@ class DonationView(FormView):
 
             # Charge the card
             charge = stripe.Charge.create(
-                        amount = int(charge_amount * 100),
+                        amount = int(round(charge_amount, 2) * 100),
                         currency = 'cad',
                         description = self.get_charge_descriptor(house),
                         customer = customer.id,
@@ -471,6 +470,14 @@ class DonationView(FormView):
         donation = Donation.objects.create(
             donation_type=donation_type, transaction=transaction, name=name, email=email, message=message, address=address, postal_code=charge.source['address_zip'], pass_fee=pass_fee,
             anonymous=anonymous, amount=donation_amount)
+
+
+        subscriber_amount_donated = subscriber.amount_donated
+        if subscriber_amount_donated is None:
+            subscriber_amount_donated = decimal.Decimal('0.00')
+        subscriber_amount_donated += donation.amount
+        subscriber.amount_donated = subscriber_amount_donated
+        subscriber.save()
 
         try:
             audience = Audience.objects.get(house=house, donation_type=donation_type)
@@ -568,6 +575,11 @@ class DonationDetailView(HouseAccountMixin, View):
             donation.refund_reason = "Refunded by house."
             donation.refund = refund
             donation.save()
+
+            subscriber = Subscriber.objects.get(profile__email=donation.email, house=house)
+            subscriber.times_donated -= 1
+            subscriber.amount_donated = subscriber.amount_donated - donation.amount
+            subscriber.save()
 
         return render(request, self.template_name, self.get_context_data())
 

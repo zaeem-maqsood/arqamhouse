@@ -34,12 +34,9 @@ class Subscriber(TimestampedModel):
     times_donated = models.PositiveIntegerField(blank=True, null=True, default=0)
     amount_donated = models.DecimalField(blank=True, null=True, max_digits=9, decimal_places=2, default=decimal.Decimal('0.00'))
 
-
     campaign_view_score = models.PositiveIntegerField(blank=True, null=True, default=100)
     event_score = models.PositiveIntegerField(blank=True, null=True, default=100)
-    donation_score = models.PositiveIntegerField(null=True, blank=True, default=100)
-    donation_above_average = models.BooleanField(default=False)
-    
+
     events = models.ManyToManyField(Event, blank=True)
     unsubscribed = models.BooleanField(default=False) 
     
@@ -62,19 +59,6 @@ class Subscriber(TimestampedModel):
         except:
             self.event_score = 100
 
-        try:
-            self.donation_score = (self.times_donated / self.house.donation_score) * 100
-        except:
-            self.donation_score = 100
-
-        try:
-            if self.amount_donated >= self.house.donation_amount_score:
-                self.donation_above_average = True
-            else:
-                self.donation_above_average = False
-        except Exception as e: 
-            print(e)
-            self.donation_above_average = True
 
     def save(self, *args, **kwargs):
         self.update_scores()

@@ -71,29 +71,11 @@ class Donation(TimestampedModel):
         self.public_id = public_id
 
 
-    def update_donation_score(self):
-
-        from subscribers.models import Subscriber
-
-        # First get the subscriber and update their data
-        subscriber = Subscriber.objects.get(profile__email=self.email, house=self.donation_type.house)
-
-        subscriber_amount_donated = subscriber.amount_donated
-        if subscriber_amount_donated is None:
-            subscriber_amount_donated = decimal.Decimal('0.00')
-        subscriber_amount_donated += self.amount
-        subscriber.amount_donated = subscriber_amount_donated
-        subscriber.save()
-
-
-
     def save(self, *args, **kwargs):
         if not self.pk:
             self.generate_public_id()
             if self.donation_type.house.issue_tax_deductible_receipts:
                 self.set_receipt_number()
-
-        self.update_donation_score()
 
         super().save(*args, **kwargs)
 
