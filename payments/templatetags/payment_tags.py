@@ -33,7 +33,7 @@ def get_type(instance):
     if instance.arqam_house_service_fee:
         if instance.arqam_house_service_fee.live_video:
             event_live_fee = EventLiveFee.objects.get(arqam_house_service_fee=instance.arqam_house_service_fee)
-            return f"Virtual Event Fee <ul style='margin-bottom: 0px;'><li>Subscribed Mins: {event_live_fee.subscribed_mins}</li><li> Archived Mins: {event_live_fee.archived_mins}</li></ul><a href='#' style='font-size: 10px;'>More Info</a>"
+            return f"Virtual Event Fee <ul style='margin-bottom: 0px;'><li>Subscribed Mins: {event_live_fee.subscribed_mins}</li><li> Recorded Mins: {event_live_fee.archived_mins}</li><li>Broadcasted Mins: {event_live_fee.broadcasted_mins}</li></ul><a href='https://www.arqamhouse.com/pricing' style='font-size: 10px;'>More Info</a>"
 
 
 

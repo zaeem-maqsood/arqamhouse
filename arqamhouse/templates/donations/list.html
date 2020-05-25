@@ -116,7 +116,7 @@ jQuery(document).ready(function() {
 									<tr>
 										<td><a href="{{ donation.get_donation_view }}">{{ donation.name|title }}</a></td>
 										<td>$ {% if donation.transaction.house_amount %}{{ donation.transaction.house_amount }}{% else %}0.00{% endif %}</td>
-										<td>{{ donation.donation_type }}</td>
+										<td>{% if donation.refunded %}<span style="color: red;">Refunded - {{ donation.refund_reason }}</span>{% else %}{{ donation.donation_type }}{% endif %}</td>
 										<td class="d-none d-sm-none d-md-table-cell">{{ donation.created_at|localtime }}</td>
 									</tr>
 									{% endfor %}

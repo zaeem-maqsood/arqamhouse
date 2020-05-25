@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-Testing
+Virtual Event
 {% endblock title %}
 
 
@@ -183,23 +183,22 @@ Testing
 <div class="row justify-content-center" style="padding: 3rem 0px 3rem 0px;">
     <div class="col-lg-10 col-md-12 col-12">
 
+        <div class="alert alert-info" role="alert">
+            <p>We at Arqam House feel honoured to have been able to help all of our houses enjoy free virtual events in the month of
+            Ramadan. We are continuing to provide an extension on free virtual events for houses that are struggling through this
+            pandemic by request. Pricing for live video can be found <a href="{% url 'pricing' %}" style="color: lightblue;">here</a>. 
+            Please contact us at <a href="mailto:info@arqamhouse.com" style="color: lightblue;">info@arqamhouse.com</a> for any questions you may have regarding this change.</p>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 20px;">
+            <div class="col-md-12">
+                <a class="btn btn-success btn-block blinking" href="{{ event.get_live_event_presenter_view }}"
+                    style="font-size: 20px;">Go Live</a>
+            </div>
+        </div>
+
         <div class="kt-portlet kt-portlet--mobile">
             <div class="kt-portlet__body" style="margin:20px;">
-
-                <div class="row justify-content-center" style="padding-bottom: 30px;">
-                    <div class="col-md-12">
-                        <h2>Virtual Event</h2>
-                        <p>Adjust your virtual event settings here.</p>
-                    </div>
-                </div>
-
-                <div class="row justify-content-center" style="padding-bottom: 50px;">
-                    <div class="col-md-12">
-                        <h4>Go To Virtual Event</h4>
-                        <p>Click the button to go to the virtual event.</p>
-                        <a class="btn btn-info btn-block blinking" href="{{ event.get_live_event_presenter_view }}">Go To Virtual Event</a>
-                    </div>
-                </div>
 
                 <div class="row justify-content-center" style="padding-bottom: 30px;">
                     <div class="col-md-12">

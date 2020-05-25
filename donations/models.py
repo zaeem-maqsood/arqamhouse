@@ -5,7 +5,7 @@ from django.utils.crypto import get_random_string
 from django.db.models import Sum, Avg
 
 from core.models import TimestampedModel
-from payments.models import Transaction
+from payments.models import Transaction, Refund
 from houses.models import House
 
 
@@ -43,6 +43,9 @@ class Donation(TimestampedModel):
     public_id = models.CharField(max_length=150, null=True, blank=True)
     pass_fee = models.BooleanField(default=False)
     anonymous = models.BooleanField(default=False)
+    refunded = models.BooleanField(default=False)
+    refund_reason = models.TextField(blank=True, null=True)
+    refund = models.ForeignKey(Refund, on_delete=models.CASCADE, blank=True, null=True)
 
 
     def __str__(self):

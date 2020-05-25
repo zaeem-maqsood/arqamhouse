@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-Donation Types | {{ house.name }}
+Donation by {{ donation.name }}
 {% endblock title %}
 
 
@@ -22,6 +22,15 @@ Donation Types | {{ house.name }}
 
 <div class="row justify-content-center h-100"style="padding: 3rem 0px 3rem 0px;">
 	<div class="col-lg-6 col-md-12 col-12">
+
+        {% if donation.refunded %}
+        <div class="alert alert-danger" role="alert" style="display: block;background-color: indianred;border: 1px solid indianred;">
+            <h4>Donation Refunded</h4>
+            <p>{{ donation.refund_reason }}</p>
+        </div>
+        {% endif %}
+
+
 		<div class="kt-portlet kt-portlet--mobile">
 			<div class="kt-portlet__body">
 
@@ -104,7 +113,7 @@ Donation Types | {{ house.name }}
                     </div>
                 </div>
 
-                <div class="row" style="padding-bottom: 10px;">
+                <div class="row" style="padding-bottom: 70px;">
                     <div class="col-12">
                         <h5 style="margin-bottom: 5px;">Total Received</h5>
                         <p style="margin-bottom: 5px;">${{ donation.transaction.house_amount }}</p>
@@ -115,6 +124,17 @@ Donation Types | {{ house.name }}
                         {% endif %}
                     </div>
                 </div>
+
+                {% if donation.refunded %}
+                {% else %}
+                <form method="POST" enctype="multipart/form-data">{% csrf_token %}
+                <div class="row" style="padding-bottom: 10px;">
+                    <div class="col-12">
+                        <button name="refund" id="refund" class="btn btn-danger gtn-block" type="submit">Refund Donor</button>
+                    </div>
+                </div>
+                </form>
+                {% endif %}
 
 			</div>
 					

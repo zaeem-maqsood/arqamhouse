@@ -98,6 +98,7 @@ class Refund(models.Model):
     house_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     partial_refund = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now, null=True)
+    donation_refund = models.BooleanField(default=False)
 
     def __str__(self):
         return (self.transaction.house.name)

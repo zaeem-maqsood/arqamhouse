@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-Testing
+Virtual Event Comments
 {% endblock title %}
 
 
@@ -91,8 +91,8 @@ Testing
                         <h4>{{ event.title }} comments</h4>
                         <p>View/delete comments from your virtual event here.</p>
                     </div>
-                    <div class="col-3">
-                        <button class="btn btn-danger pull-right" onclick="ajaxDeleteAllComments(this);" value="{{ comment.id }}">Delete all</button>
+                    <div class="col-md-3">
+                        <button class="btn btn-danger btn-block pull-right" onclick="ajaxDeleteAllComments(this);" value="{{ comment.id }}">Delete all</button>
                     </div>
                 </div>
 

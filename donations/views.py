@@ -35,7 +35,7 @@ from subscribers.models import Subscriber, Audience
 from profiles.models import Profile
 from donations.models import Donation, DonationType
 from donations.forms import DonationTypeForm
-from payments.models import Transaction
+from payments.models import Transaction, Refund
 
 
 # Create your views here.
@@ -549,6 +549,27 @@ class DonationDetailView(HouseAccountMixin, View):
         context["donation_tab"] = True
         context["dashboard_events"] = self.get_events()
         return context
+
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        print(data)
+        house = self.get_house()
+        donation = self.get_donation()
+
+        if 'refund' in data:
+            refund = Refund.objects.create(transaction=donation.transaction, amount=donation.transaction.amount, house_amount=donation.transaction.house_amount, donation_refund=True)
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+            response = stripe.Refund.create(charge=donation.transaction.payment_id, amount=int(donation.transaction.amount*100))
+            print("It is coming here")
+            print(response)
+            messages.success(request, "Refund Sent!")
+            donation.refunded = True
+            donation.refund_reason = "Refunded by house."
+            donation.refund = refund
+            donation.save()
+
+        return render(request, self.template_name, self.get_context_data())
 
 
 
