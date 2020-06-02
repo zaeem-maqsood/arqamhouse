@@ -1,0 +1,198 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Arqam House
+{% endblock title %}
+
+{% block footer %}
+{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+
+{% endblock styles %}
+
+{% block top_page_scripts %}
+<script src="https://kit.fontawesome.com/71fc1e3551.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.8/lottie.min.js"></script>
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script>
+lottie.loadAnimation({
+	container: document.getElementById("bm-bank"), // the dom element that will contain the animation
+	renderer: 'svg',
+	loop: true,
+	autoplay: true,
+	path: "https://res.cloudinary.com/arqamhouse/raw/upload/v1588378522/data_vmnh4c.json" // the path to the animation json
+});
+
+</script>
+
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+	calculateDonation();
+});
+
+
+
+function calculateDonation() {
+	var price = 0.00;
+	var new_price = 0.00;
+	var buyer_ticket_cost = 0.00;
+	var organizer_ticket_value = 0.00;
+
+	// Get the price elements
+	price = document.getElementById("id_price_2");
+
+
+	// Check and see if price element value is not null
+	if (price != null) {
+		price = price.value;
+	}
+
+	if (price) {
+		new_price = parseFloat(price);
+	}
+
+	// use the regular price
+
+	// Check the value of the "pass fee" checkbox
+
+	buyer_ticket_cost = (new_price + (new_price * 0.04) + 0.30);
+	fee = (new_price * 0.04) + 0.30
+	organizer_ticket_value = new_price;
+
+
+	// Convert to 2 decimal places
+	buyer_ticket_cost = buyer_ticket_cost.toFixed(2);
+	organizer_ticket_value = organizer_ticket_value.toFixed(2);
+	fee = fee.toFixed(2);
+
+	// Set the Values to 0 if there is no input
+	if (isNaN(buyer_ticket_cost)) {
+		buyer_ticket_cost = 0.00;
+	}
+	if (isNaN(organizer_ticket_value)) {
+		organizer_ticket_value = 0.00;
+	}
+	if (isNaN(fee)) {
+		fee = 0.00;
+	}
+
+	// Display Organizer Ticket Value
+	fee = fee.toString()
+	document.getElementById("amount_received_div_2").innerHTML = "$" + fee;
+
+
+}
+
+
+$('#id_price_2').bind('input', function() {
+	calculateDonation();
+});
+
+</script>
+{% endblock scripts %}
+
+{% block content %}
+
+<section class="text-center" style="padding-bottom: 50px;">
+	<div class="container">
+
+        <div class="row" style="padding-bottom: 20px;">
+            <div class="col-lg-8">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+            </div>
+        </div>
+
+
+		<div class="row justify-content-center" style="padding-bottom: 90px;">
+			<div class="col-md-10" style="padding-bottom: 10px;">
+				<h3 style="color:#4a90e2;font-weight: 500;">Donations &amp; Fundraisers</h3>
+				<p>
+					In a digital era, it’s essential to provide donors with the right tools to streamline the giving process. Arqam House
+					lets your organization accept and process donations while helping your donors see the great work their donations will be used for.
+				</p>
+				<a class="btn btn--primary" href="{% url 'profiles:create' %}">
+					<span class="btn__text">Get Started</span>
+				</a>
+			</div>
+		</div>
+
+        <div class="row justify-content-center" style="padding-bottom: 90px;">
+			<div class="col-md-6">
+				<div id="bm-bank"></div>
+			</div>
+            <div class="col-md-6">
+                <div class="row text-center justify-content-center" style="padding-bottom: 40px;">
+                    <div class="col-md-10 col-12">
+                        <p class="lead" style="color:#4a90e2;margin-bottom: 5px;">The lowest fee. Guaranteed.</p>
+                        <p style="color:grey;margin-bottom: 5px;">See how much we charge. <b>Payment processing included.</b>
+                        </p>
+                    </div>
+                </div>
+                <div class="row justify-content-center text-center" style="padding-bottom: 40px;">
+                    <div class="col-lg-4 col-md-6 col-sm-6 col-6">
+                        <input type="number" name="price" value="5.00" class="" min="1.00" max="2000.00" step="1.00" required=""
+                            id="id_price_2">
+                        <p>Donation Amount</p>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-6 col-6">
+                        <h3 class="m--font-success" id="amount_received_div_2" style="margin-bottom: 0px;">$0.00</h3>
+                        <p>Total Fee</p>
+                    </div>
+                </div>
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-12" style="padding-bottom: 10px;">
+                        <a class="btn btn--primary btn--lg" href="{% url 'pricing' %}">
+                            <span class="btn__text">View Pricing</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+		</div>
+
+		<div class="row" style="padding-bottom: 20px;">
+			<div class="col-md-4">
+				<div class="feature feature-6">
+					<i class="fas fa-tasks" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Donation Types</h4>
+					<p>
+						Create multiple donation types for different causes. Donors can choose where their contributions go.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+			<div class="col-md-4">
+				<div class="feature feature-6">
+					<i class="fas fa-receipt" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Tax Deductible Receipts</h4>
+					<p>
+						Choose when to issue receipts to donors. Immediately, at a later date or never. View all donor information from your dashboard.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+			<div class="col-md-4">
+				<div class="feature feature-6">
+					<i class="fas fa-hand-holding-usd" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Public Donations Page</h4>
+					<p>
+						We set up a donations page so other donors can see how much has been raised and to get others motivated.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+		</div>
+
+		
+	</div>
+</section>
+
+{% endblock content %}

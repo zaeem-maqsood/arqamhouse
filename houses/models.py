@@ -124,6 +124,10 @@ class House(TimestampedModel):
         view_name = "public_donations_live"
         return reverse(view_name, kwargs={"slug": self.slug})
 
+    def get_gift_donation_list_url(self):
+        view_name = "gift_donations"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
     def get_donate_url(self):
         view_name = "donate"
         return reverse(view_name, kwargs={"slug": self.slug})

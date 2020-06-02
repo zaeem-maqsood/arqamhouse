@@ -1,0 +1,247 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Arqam House
+{% endblock title %}
+
+{% block footer %}
+{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+
+{% endblock styles %}
+
+{% block top_page_scripts %}
+<script src="https://kit.fontawesome.com/71fc1e3551.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.8/lottie.min.js"></script>
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script>
+
+
+lottie.loadAnimation({
+	container: document.getElementById("bm-coach"), // the dom element that will contain the animation
+	renderer: 'svg',
+	loop: true,
+	autoplay: true,
+	path: "https://res.cloudinary.com/arqamhouse/raw/upload/v1588444095/data_yfezle.json" // the path to the animation json
+});
+
+</script>
+
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+	calculateBuyerTicketCostAndOrganizerTicketValue();
+});
+
+function calculateBuyerTicketCostAndOrganizerTicketValue() {
+var price = 0.00;
+var new_price = 0.00;
+var buyer_ticket_cost = 0.00;
+var organizer_ticket_value = 0.00;
+
+// Get the price elements
+price = document.getElementById("id_price");
+
+
+// Check and see if price element value is not null
+if (price != null) {
+price = price.value;
+}
+
+if (price) {
+new_price = parseFloat(price);
+}
+
+// use the regular price
+
+// Check the value of the "pass fee" checkbox
+
+buyer_ticket_cost = (new_price + (new_price * 0.04) + 0.30);
+fee = (new_price * 0.04) + 0.30
+organizer_ticket_value = new_price;
+
+
+// Convert to 2 decimal places
+buyer_ticket_cost = buyer_ticket_cost.toFixed(2);
+organizer_ticket_value = organizer_ticket_value.toFixed(2);
+fee = fee.toFixed(2);
+
+// Set the Values to 0 if there is no input
+if (isNaN(buyer_ticket_cost)) {
+buyer_ticket_cost = 0.00;
+}
+if (isNaN(organizer_ticket_value)) {
+organizer_ticket_value = 0.00;
+}
+if (isNaN(fee)) {
+	fee = 0.00;
+}
+
+
+// Display Buyer Cost
+buyer_ticket_cost = buyer_ticket_cost.toString()
+document.getElementById("new_price_div").innerHTML = "$" + buyer_ticket_cost;
+
+// Display Organizer Ticket Value
+	fee = fee.toString()
+document.getElementById("amount_received_div").innerHTML = "$" + fee;
+
+
+}
+
+
+$('#id_pass_fee').change(function() {
+calculateBuyerTicketCostAndOrganizerTicketValue();
+});
+
+
+$('#id_price').bind('input', function() {
+calculateBuyerTicketCostAndOrganizerTicketValue();
+});
+
+
+
+</script>
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center" style="padding-bottom: 30px;">
+	<div class="container">
+
+        <div class="row" style="padding-bottom: 20px;">
+            <div class="col-lg-8">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 90px;">
+            <div class="col-lg-10 col-md-10">
+                <h3 style="color:#4a90e2;font-weight: 500;">Event Management &amp; Ticket Sales</h3>
+                <p>No matter the size, hosting an event takes a considerable amount of time and resources, both of which
+                    non-profits and small businesses have very little of. However, events help with fundraising, increasing
+                    brand awareness, and ultimately giving something back to your followers.
+                </p>
+                <a class="btn btn--primary" href="{% url 'profiles:create' %}">
+                    <span class="btn__text">Get Started</span>
+                </a>
+            </div>
+        </div>
+
+
+        <div class="row justify-content-center" style="padding-bottom: 80px;">
+            <div class="col-lg-6 col-md-10">
+                <div id="bm-coach"></div>
+            </div>
+
+            <div class="col-lg-6 col-md-10">
+                <div class="row text-center justify-content-center" style="padding-bottom: 40px;">
+                    <div class="col-md-10 col-12">
+                        <p class="lead" style="color:#4a90e2;margin-bottom: 5px;">The lowest fee. Guaranteed.</p>
+                        <p style="color:grey;margin-bottom: 5px;">See how much we charge. <b>Payment processing included.</b></p>
+                        <p style="color:grey;">Free tickets are free.</p>
+                    </div>
+                </div>
+            
+                <div class="row justify-content-center text-center" style="padding-bottom: 40px;">
+                    <div class="col-lg-4 col-md-3 col-sm-4 col-4">
+                        <input type="number" name="price" value="5.00" class="" min="1.00" max="2000.00" step="0.01" required=""
+                            id="id_price">
+                        <p>Ticket Price</p>
+                    </div>
+                    <div class="col-lg-4 col-md-3 col-sm-4 col-4">
+                        <h3 class="m--font-success" id="amount_received_div" style="margin-bottom: 0px;">$0.00</h3>
+                        <p>Total Fee</p>
+                    </div>
+                    <div class="col-lg-4 col-md-3 col-sm-4 col-4">
+                        <h3 class="m--font-info" id="new_price_div" style="margin-bottom: 0px;">$0.00</h3>
+                        <p>New Ticket Price</p>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center text-center">
+                    <div class="col-12">
+                        <a class="btn btn--primary btn--lg" href="{% url 'pricing' %}">
+                            <span class="btn__text">View Pricing</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+
+		<div class="row" style="padding-bottom: 20px;">
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="fas fa-ticket-alt" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Ticket Sales</h4>
+					<p>
+						Create free tickets, paid tickets and even donation tickets. Set limits and track purchases effortlessly.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="fas fa-redo-alt" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>100% Refunds</h4>
+					<p>
+						Refund attendees with 1-click. We refund the entire order and the processing fee.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="fas fa-barcode" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Barcode Check-Ins</h4>
+					<p>
+						Start checking in attendees right from your smart phone or tablet.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="fas fa-scroll" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Simple Event Page</h4>
+					<p>
+						We automatically create a simple event page so attendees can purchase tickets and learn more.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="fas fa-video" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Virtual Event</h4>
+					<p>
+						Host a virtual event and require a ticket purchase before allowing entry.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="far fa-question-circle" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Custom Questions</h4>
+					<p>
+						Gather all the information you need from your attendees by creating custom questions.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+		</div>
+
+
+	</div>
+</section>
+
+{% endblock content %}

@@ -1,0 +1,580 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+{% load checkout_form_tags %}
+
+{% block title %}
+Donate a gift to {{ house.name }}
+{% endblock title %}
+
+{% block styles %}
+<style>
+iframe {
+    width: 100%;
+    min-height: 0px;
+    border: none;
+}
+</style>
+
+
+{% endblock styles %}
+
+{% block top_page_scripts %}
+<script src="https://js.stripe.com/v3/"></script>
+
+{% endblock top_page_scripts %}
+
+
+{% block scripts %}
+<script>
+
+var stripe = Stripe('{{ public_key }}');
+var paymentRequest = stripe.paymentRequest({
+    country: 'CA',
+    currency: 'cad',
+    total: {
+        label: 'Donation for {{ house.name }}',
+        amount: 1000,
+    },
+    requestPayerName: true,
+    requestPayerEmail: true,
+});
+
+
+var elements = stripe.elements();
+var prButton = elements.create('paymentRequestButton', {
+    paymentRequest: paymentRequest,
+    style: {
+        paymentRequestButton: {
+            type: 'donate',
+            // One of 'default', 'book', 'buy', or 'donate'
+            // Defaults to 'default'
+
+            theme: 'light-outline',
+            // One of 'dark', 'light', or 'light-outline'
+            // Defaults to 'dark'
+
+            height: '40px'
+            // Defaults to '40px'. The width is always '100%'.
+        },
+    },
+});
+
+// Check the availability of the Payment Request API first.
+paymentRequest.canMakePayment().then(function (result) {
+    if (result) {
+        prButton.mount('#payment-request-button');
+        document.getElementById('card-element').style.display = 'none';
+        document.getElementById('checkout-button').style.display = 'none';
+
+    } else {
+        document.getElementById('payment-request-button').style.display = 'none';
+
+    }
+});
+
+
+prButton.on('click', function (ev) {
+    console.log(document.getElementById("donate_amount"));
+    var amount = document.getElementById("donate_amount").innerHTML;
+    console.log(amount);
+    amount = amount.replace(/\$/g, '');
+    amount = parseFloat(amount);
+
+    paymentRequest.update({
+        total: {
+            label: '{{ house.name }} Donation',
+            amount: amount * 100,
+        },
+    });
+});
+
+paymentRequest.on('token', function (ev) {
+    // Send the token to your server to charge it!
+    var csrf_token = '{{csrf_token}}';
+    console.log(JSON.stringify({ stripeToken: ev.token.id }))
+
+    var form = document.getElementById('donationForm');
+    var hiddenInput = document.createElement('input');
+    hiddenInput.setAttribute('type', 'hidden');
+    hiddenInput.setAttribute('name', 'stripeToken');
+    hiddenInput.setAttribute('value', ev.token.id);
+    form.appendChild(hiddenInput);
+
+    // Submit the form
+    form.submit();
+    document.getElementById('customButton').disabled = true;
+});
+
+
+
+
+
+</script>
+
+
+<script>
+var stripe = Stripe('{{ public_key }}');
+var elements = stripe.elements();
+
+// Custom styling can be passed to options when creating an Element.
+var style = {
+  base: {
+    color: '#303238',
+    color: "#32325d",
+    fontSmoothing: 'antialiased',
+    '::placeholder': {
+      color: '#ccc',
+    },
+  },
+  invalid: {
+    color: '#e5424d',
+    ':focus': {
+      color: '#303238',
+    },
+  },
+};
+
+// Create an instance of the card Element.
+var card = elements.create('card',  {style: style});
+
+// Add an instance of the card Element into the `card-element` <div>.
+card.mount('#card-element');
+
+card.addEventListener('change', function(event) {
+  var displayError = document.getElementById('card-errors');
+  if (event.error) {
+    displayError.textContent = event.error.message;
+    console.log(event.error.message)
+  } else {
+    displayError.textContent = '';
+  }
+});
+
+
+var form = document.getElementById('donationForm');
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  stripe.createToken(card).then(function(result) {
+    if (result.error) {
+      // Inform the customer that there was an error.
+      var errorElement = document.getElementById('card-errors');
+      errorElement.textContent = result.error.message;
+    } else {
+      // Send the token to your server.
+      stripeTokenHandler(result.token);
+    }
+  });
+});
+
+
+function stripeTokenHandler(token) {
+  // Insert the token ID into the form so it gets submitted to the server
+  var form = document.getElementById('donationForm');
+  var hiddenInput = document.createElement('input');
+  hiddenInput.setAttribute('type', 'hidden');
+  hiddenInput.setAttribute('name', 'stripeToken');
+  hiddenInput.setAttribute('value', token.id);
+  form.appendChild(hiddenInput);
+
+  // Submit the form
+  form.submit();
+  document.getElementById('customButton').disabled = true;
+}
+
+</script>
+
+
+<script>
+
+function showAddressAndFee(object) {
+
+    donation_type_id = object.value;
+    console.log(donation_type_id);
+
+    {% for donation_type in donation_types %}
+        {% if donation_type.collect_address %}
+
+            if (donation_type_id == '{{ donation_type.id }}') {
+                document.getElementById("address_area").style.display = 'flex';
+                document.getElementById("autocomplete").required = true;
+            }
+
+        {% else %}
+
+            if (donation_type_id == '{{ donation_type.id }}') {
+                document.getElementById("address_area").style.display = 'none';
+                document.getElementById("autocomplete").required = false;
+            }
+
+        {% endif %}
+
+
+        {% if donation_type.pass_fee %}
+
+            if (donation_type_id == '{{ donation_type.id }}') {
+                document.getElementById("fee_p").style.display = 'flex';
+                donation_type_element = document.getElementById("id_donation_type");
+                document.getElementById("donation_type_name").innerHTML = donation_type_element.options[donation_type_element.selectedIndex].text;
+                
+                var fee = 0.00;
+                var gift_item_amount = parseFloat('{{ gift_donation_item.amount }}');
+                var amount = document.getElementById("id_amount");
+                console.log(gift_item_amount);
+                console.log(amount)
+
+                if (amount != null) {
+                    amount = amount.value;
+                }
+
+                if (amount) {
+                    new_amount = parseFloat(amount) + gift_item_amount;
+                }
+
+                donor_fee = (new_amount * 0.04) + 0.30;
+                donor_fee = donor_fee.toFixed(2);
+
+                if (isNaN(donor_fee)) {
+                    donor_fee = 0.00;
+                }
+
+                total_donation_amount = new_amount + (new_amount * 0.04) + 0.30;
+                total_donation_amount = total_donation_amount.toFixed(2);
+
+                donor_fee = donor_fee.toString()
+                total_donation_amount = total_donation_amount.toString()
+                document.getElementById("fee_amount").innerHTML = "$" + donor_fee;
+                document.getElementById("donate_amount").innerHTML = "$" + total_donation_amount;
+
+            }
+
+        {% else %}
+
+            if (donation_type_id == '{{ donation_type.id }}') {
+                document.getElementById("fee_p").style.display = 'none';
+
+                var gift_item_amount = parseFloat('{{ gift_donation_item.amount }}');
+                console.log(gift_item_amount);
+                var amount = document.getElementById("id_amount");
+
+                console.log(amount)
+
+                if (amount != null) {
+                    amount = amount.value;
+                }
+
+                if (amount) {
+                    new_amount = parseFloat(amount) + gift_item_amount;
+                }
+
+                document.getElementById("donate_amount").innerHTML = "$" + new_amount;
+
+            }
+
+        {% endif %}
+    {% endfor %}
+
+}
+
+
+window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
+</script>
+
+
+<script type="text/javascript">
+
+    function initMap() {
+
+        var input = document.getElementById('autocomplete');
+        var autocomplete = new google.maps.places.Autocomplete(input, { types: ['address'] });
+
+        var input2 = document.getElementById('autocomplete2');
+        var autocomplete2 = new google.maps.places.Autocomplete(input2, { types: ['address'] });
+
+    }
+</script>
+
+<script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnTiJMXoPzVLoo-ztKaRyCrjAocA0K3pQ&libraries=places&callback=initMap"></script>
+
+{% endblock scripts %}
+
+
+
+{% block content %}
+<section style="padding-top: 60px;">
+    <div class="container">
+
+        <form id="donationForm" method="POST" >{% csrf_token %}
+
+            {% if house.logo %}
+            <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+                <div class="col-lg-8 col-md-10 col-sm-12 col-10">
+            
+                    <a href="{{ house.get_home_page_url }}">
+                        <img src="{{ house.logo.url }}" style="max-height: 4em;">
+                    </a>
+            
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
+                <div class="col-lg-8 col-md-10 col-sm-12 col-10">
+                    <h5 style="color: grey;margin-bottom: 0px;">Gift a donation to someone special for {{ house.name }}</h5>
+                    <a class="btn btn--sm btn--primary" href="{{ house.get_gift_donation_list_url }}"
+                        style="margin-top: 10px;">
+                        <span class="btn__text">More Gift Donations</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="row justify-content-center" style="padding-bottom: 30px;">
+                <div class="col-lg-8 col-md-10 col-sm-12 col-10" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 40px;border-radius: 15px;">
+
+                    {% if form.non_field_errors %}
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.non_field_errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.amount.errors %}
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.amount.errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.address.errors %}
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    {% for error in form.address.errors %}
+                                    <span>{{ error|escape }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    <div class="row justify-content-around" style="padding-bottom: 10px;">
+                        <div class="col-sm-12 col-md-12 col-lg-12">
+                            <h5 style="text-align: center;">{{ gift_donation_item.name }}</h5>
+                            <div class="slider border--round boxed--border" data-paging="true" data-arrows="false" style="margin-bottom: 10px;">
+                                <ul class="slides">
+                                    {% if gift_donation_item.image_1 %}
+                                    <li>
+                                        <img alt="Image" src="{{ gift_donation_item.image_1.url }}" />
+                                    </li>
+                                    {% endif %}
+                                    {% if gift_donation_item.image_2 %}
+                                    <li>
+                                        <img alt="Image" src="{{ gift_donation_item.image_2.url }}" />
+                                    </li>
+                                    {% endif %}
+                                    {% if gift_donation_item.image_3 %}
+                                    <li>
+                                        <img alt="Image" src="{{ gift_donation_item.image_3.url }}" />
+                                    </li>
+                                    {% endif %}
+                                    {% if gift_donation_item.image_4 %}
+                                    <li>
+                                        <img alt="Image" src="{{ gift_donation_item.image_4.url }}" />
+                                    </li>
+                                    {% endif %}
+                                    {% if gift_donation_item.image_5 %}
+                                    <li>
+                                        <img alt="Image" src="{{ gift_donation_item.image_5.url }}" />
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            <!--end slider-->
+                        </div>
+                    </div>
+                    <div class="row justify-content-around" style="padding-bottom: 40px;">
+                        <div class="col-sm-12 col-md-12 col-lg-12">
+                            
+                            <p style="font-size: small;">
+                                {{ gift_donation_item.description }}
+                            </p>
+                            <h3>${{ gift_donation_item.amount }}</h3>
+                            <h5 style="margin-bottom:0px;">Dimensions</h5>
+                            <p>3.5”W X 3.0”H X 3.0”D</p>
+                        </div>
+                    </div>
+                    <!--end of row-->
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-xl-9 col-lg-9 col-md-9 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Donation Type</p>
+                            {{ form.donation_type }}
+                        </div>
+                        <div class="col-xl-3 col-lg-3 col-md-3 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Amount</p>
+                            {{ form.amount }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-12" style="padding-bottom: 10px;">
+                            <h4 style="margin-bottom: 0px;">Your Information</h4>
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-md-4 col-sm-6 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Full Name</p>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Email</p>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-3 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Hide Name</p>
+                            <div class="input-checkbox input-checkbox--switch">
+                                {{ form.anonymous }}
+                                <label for="checkbox-switch"></label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="padding-bottom: 30px;display: none;" id="address_area">
+                        <div class="col-md-12 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Address</p>
+                            {{ form.address }}
+                        </div>
+                    </div>
+
+
+
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-12" style="padding-bottom: 10px;">
+                            <h4 style="margin-bottom: 0px;">Recipient Information</h4>
+                        </div>
+                    </div>
+                    
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-md-4 col-sm-6 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Full Name</p>
+                            {{ form.recipient_name }}
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Email</p>
+                            {{ form.recipient_email }}
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-3 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Send E-Card</p>
+                            <div class="input-checkbox input-checkbox--switch">
+                                {{ form.send_e_card }}
+                                <label for="checkbox-switch"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-9 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Recipient Address</p>
+                            {{ form.recipient_address }}
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Postal Code</p>
+                            {{ form.recipient_postal_code }}
+                        </div>
+                    </div>
+
+
+
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Message to {{ house.name }} <span style="font-size: 0.7em;">Optional</span></p>
+                            {{ form.message }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Message to recipient <span style="font-size: 0.7em;">Optional</span></p>
+                            {{ form.message_to_recipient }}
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="padding-bottom: 30px;display: none;" id="fee_p">
+                        <div class="col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 5px;" class="lead">Fee | <span style="color: #4a90e2;" id="fee_amount"></span> </p>
+                            <p style="margin-bottom: 5px;font-size: 10px;line-height: 1.5;color: #4a90e2;">{{ house.name }} has requested
+                                it's donors pay the payment processing fees for '<span id="donation_type_name"></span>' donations.</p>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center" style="padding-bottom: 40px;">
+                        <div class="col-md-12">
+
+                            
+                            <div id="card-element">
+                                <!-- A Stripe Element will be inserted here. -->
+                            </div>
+                        
+                            <!-- Used to display Element errors. -->
+                            <div id="card-errors" role="alert" style="color: #e5424d;"></div>
+
+                            
+                            <div id="payment-request-button">
+                                <!-- A Stripe Element will be inserted here. -->
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="row justify-content-center" id="checkout-button">
+                        <div class="col-md-12">
+                            <button id="customButton" type="submit" class="btn btn--primary">Donate <span id="donate_amount">$20</span></button>
+                        </div>
+                    </div>
+            
+                </div>
+            </div>
+
+            <div class="row justify-content-center" style="padding-bottom: 10px;">
+                <div class="col-lg-8 col-md-10 col-sm-12 col-10">
+                    <p style="font-size: 12px;margin-bottom: 0px;line-height: 1.5;"><span
+                            style="color: #4a90e2;font-weight: 800;">Receipts |</span> If {{ house.name }} chooses to provide a tax deductible receipt they may contact you through the email provided.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10 col-sm-12 col-10">
+                    <p style="font-size: 12px;line-height: 1.5;"><span style="color: #4a90e2;font-weight: 800;">Refunds |</span>
+                        Please note there are no refunds on donations. If you choose to donate to {{ house.name }} you accept that
+                        no refunds will be issued. You also accept you are receiving nothing in exchange for this donation.</p>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</section>
+{% endblock content %}

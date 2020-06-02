@@ -20,13 +20,19 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
 from houses.views import DashboardView, HouseHomePageView
-from .views import HomePageView, ReportErrorView, ApplePayVerificationView, AboutUsView, PricingView, CustomScriptView
+from .views import (HomePageView, ReportErrorView, ApplePayVerificationView, AboutUsView, PricingView, CustomScriptView,
+                    EventInfoView, DonationInfoView, SubscriberInfoView, CampaignInfoView, FindHouseView)
 from events.views import OrderPublicDetailView
 
 urlpatterns = [
 
     path('', HomePageView.as_view(), name='home'),
     path('zaeem/', admin.site.urls),
+    path('events', EventInfoView.as_view(), name='event_info'),
+    path('donations-info', DonationInfoView.as_view(), name='donation_info'),
+    path('subscribers-info', SubscriberInfoView.as_view(), name='subscriber_info'),
+    path('campaigns-info', CampaignInfoView.as_view(), name='campaign_info'),
+    path('house', FindHouseView.as_view(), name='find_house'),
     path('about', AboutUsView.as_view(), name='about'),
     path('pricing', PricingView.as_view(), name='pricing'),
     path('report', ReportErrorView.as_view(), name='report'),

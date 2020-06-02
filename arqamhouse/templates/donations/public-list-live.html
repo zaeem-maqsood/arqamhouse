@@ -215,6 +215,7 @@ function updateGraph() {
                     myChart2.update();
 
                     document.getElementById("dynamic").innerHTML = data["html"];
+                    document.getElementById("total_donations").innerHTML = "$" + data["total_donations"]
 
                 });
             }
@@ -254,10 +255,10 @@ function updateGraph() {
 
                     <div class="row justify-content-center" style="padding-top: 40px;padding-bottom: 30px;">
                         <div class="col-5">
-                            <h4 style="color: grey;margin-bottom: 2px;font-size: 1.5em"><span style="margin-bottom: 0px;" class="blinking">Live Donations</span></h4>
+                            <h4 style="color: grey;margin-bottom: 2px;font-size: 1.5em"><span style="margin-bottom: 0px;" class="blinking">Live</span></h4>
                         </div>
                         <div class="col-5">
-                            <h4 style="color: rgb(121, 180, 123);font-size: 1.5em;margin-bottom: 2px;text-align: right;" >${{ graph_data.total }}</h4>
+                            <h4 style="color: rgb(121, 180, 123);font-size: 1.5em;margin-bottom: 2px;text-align: right;" id="total_donations" >${{ graph_data.total }}</h4>
                         </div>
                     </div>
 
@@ -270,33 +271,54 @@ function updateGraph() {
                     <div class="row justify-content-center text-center">
                         <div class="col-md-10 col-10" style="padding-bottom: 30px;">
                             <a href="{{ house.get_public_donations_url }}">
-                                Donations
+                                10-Day Donations
                             </a>
                         </div>
                     </div>
 
 
                     <div class="row justify-content-center text-center">
-                        <div class="col-md-10 col-10" style="padding-bottom: 50px;">
+                        <div class="col-md-5 col-5" style="padding-bottom: 50px;">
                             <a class="btn btn--primary btn-block" href="{{ house.get_donate_url }}">
                                 <span class="btn__text">Donate</span>
+                            </a>
+                        </div>
+                        <div class="col-md-5 col-5" style="padding-bottom: 50px;">
+                            <a class="btn btn--primary btn-block" href="{{ house.get_gift_donation_list_url }}">
+                                <span class="btn__text">Gift a donation</span>
                             </a>
                         </div>
                     </div>
 
 
                     
-                    <div class="row justify-content-center" id="dynamic">
-                        {% for donation in donations %}
+                    <div class="row justify-content-center">
                         <div class="col-10" style="padding-bottom: 40px;">
-                            <div class="row text-center">
-                                <div class="col-md-4" style="align-self: center;padding-bottom: 20px;"><p style="color: rgb(67, 153, 213);margin-bottom: 0px;font-size: 2.2em;">${% if donation.pass_fee %}{{ donation.transaction.house_amount }}{% else %}{{ donation.transaction.amount }}{% endif %}</p></div>
-                                <div class="col-md-8" id="donation-body">
-                                    <p style="margin-bottom: 0px;">
-                                        <span style="font-size: small;font-style: italic;">donated by </span>
-                                        <span style="color: rgb(67, 153, 213);">{% if donation.anonymous %}Anonymous{% else %}{{ donation.name }}{% endif %}</span>
-                                        <span style="font-size: small;font-style: italic;">to {{ donation.donation_type.name }}</span>
+                            {% for donation in donations %}
+                            <div class="row text-center"
+                                style="padding-top: 20px; padding-bottom: 20px;{% if donation.gift_donation_item %}background-color: #eafaff;{% endif %}">
+                                <div class="col-md-4" style="align-self: center;padding-bottom: 20px;">
+                                    <p style="color: rgb(67, 153, 213);margin-bottom: 0px;font-size: 2.2em;">
+                                        ${% if donation.pass_fee %}{{ donation.transaction.house_amount }}{% else %}{{ donation.transaction.amount }}{% endif %}
                                     </p>
+                                </div>
+                                <div class="col-md-8" id="donation-body">
+                                    {% if donation.gift_donation_item %}
+                                    <p style="margin-bottom: 0px;color: #ea4f96;">Gifted Donation <i class="fas fa-heart"></i></p>
+                                    <p style="margin-bottom: 0px;">
+                                        Donated by
+                                        <span
+                                            style="color: rgb(67, 153, 213);">{% if donation.anonymous %}Someone{% else %}{{ donation.name }}{% endif %}</span>
+                                        as a gift to
+                                        <span style="color: rgb(67, 153, 213);">{{ donation.recipient_name }}</span>
+                                    </p>
+                                    {% else %}
+                                    <p style="margin-bottom: 0px;">
+                                        <span style="font-size: small;">Donated by </span>
+                                        <span
+                                            style="color: rgb(67, 153, 213);">{% if donation.anonymous %}Anonymous{% else %}{{ donation.name }}{% endif %}</span>
+                                    </p>
+                                    {% endif %}
                                     {% if donation.message %}
                                     <p style="font-size: 0.8em;">
                                         {{ donation.message }}
@@ -304,8 +326,8 @@ function updateGraph() {
                                     {% endif %}
                                 </div>
                             </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
                     </div>
                     
 

@@ -32,25 +32,6 @@ lottie.loadAnimation({
 
 
 lottie.loadAnimation({
-	container: document.getElementById("bm-bank"), // the dom element that will contain the animation
-	renderer: 'svg',
-	loop: true,
-	autoplay: true,
-	path: "https://res.cloudinary.com/arqamhouse/raw/upload/v1588378522/data_vmnh4c.json" // the path to the animation json
-});
-	
-
-
-lottie.loadAnimation({
-	container: document.getElementById("bm-coach"), // the dom element that will contain the animation
-	renderer: 'svg',
-	loop: true,
-	autoplay: true,
-	path: "https://res.cloudinary.com/arqamhouse/raw/upload/v1588444095/data_yfezle.json" // the path to the animation json
-});
-
-
-lottie.loadAnimation({
 	container: document.getElementById("bm-training"), // the dom element that will contain the animation
 	renderer: 'svg',
 	loop: true,
@@ -59,144 +40,10 @@ lottie.loadAnimation({
 });
 </script>
 
-
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-	calculateBuyerTicketCostAndOrganizerTicketValue();
-	calculateDonation();
-});
-
-
-
-function calculateDonation() {
-	var price = 0.00;
-	var new_price = 0.00;
-	var buyer_ticket_cost = 0.00;
-	var organizer_ticket_value = 0.00;
-
-	// Get the price elements
-	price = document.getElementById("id_price_2");
-
-
-	// Check and see if price element value is not null
-	if (price != null) {
-		price = price.value;
-	}
-
-	if (price) {
-		new_price = parseFloat(price);
-	}
-
-	// use the regular price
-
-	// Check the value of the "pass fee" checkbox
-
-	buyer_ticket_cost = (new_price + (new_price * 0.04) + 0.30);
-	fee = (new_price * 0.04) + 0.30
-	organizer_ticket_value = new_price;
-
-
-	// Convert to 2 decimal places
-	buyer_ticket_cost = buyer_ticket_cost.toFixed(2);
-	organizer_ticket_value = organizer_ticket_value.toFixed(2);
-	fee = fee.toFixed(2);
-
-	// Set the Values to 0 if there is no input
-	if (isNaN(buyer_ticket_cost)) {
-		buyer_ticket_cost = 0.00;
-	}
-	if (isNaN(organizer_ticket_value)) {
-		organizer_ticket_value = 0.00;
-	}
-	if (isNaN(fee)) {
-		fee = 0.00;
-	}
-
-	// Display Organizer Ticket Value
-	fee = fee.toString()
-	document.getElementById("amount_received_div_2").innerHTML = "$" + fee;
-
-
-}
-
-
-
-function calculateBuyerTicketCostAndOrganizerTicketValue() {
-var price = 0.00;
-var new_price = 0.00;
-var buyer_ticket_cost = 0.00;
-var organizer_ticket_value = 0.00;
-
-// Get the price elements
-price = document.getElementById("id_price");
-
-
-// Check and see if price element value is not null
-if (price != null) {
-price = price.value;
-}
-
-if (price) {
-new_price = parseFloat(price);
-}
-
-// use the regular price
-
-// Check the value of the "pass fee" checkbox
-
-buyer_ticket_cost = (new_price + (new_price * 0.04) + 0.30);
-fee = (new_price * 0.04) + 0.30
-organizer_ticket_value = new_price;
-
-
-// Convert to 2 decimal places
-buyer_ticket_cost = buyer_ticket_cost.toFixed(2);
-organizer_ticket_value = organizer_ticket_value.toFixed(2);
-fee = fee.toFixed(2);
-
-// Set the Values to 0 if there is no input
-if (isNaN(buyer_ticket_cost)) {
-buyer_ticket_cost = 0.00;
-}
-if (isNaN(organizer_ticket_value)) {
-organizer_ticket_value = 0.00;
-}
-if (isNaN(fee)) {
-	fee = 0.00;
-}
-
-
-// Display Buyer Cost
-buyer_ticket_cost = buyer_ticket_cost.toString()
-document.getElementById("new_price_div").innerHTML = "$" + buyer_ticket_cost;
-
-// Display Organizer Ticket Value
-	fee = fee.toString()
-document.getElementById("amount_received_div").innerHTML = "$" + fee;
-
-
-}
-
-
-$('#id_pass_fee').change(function() {
-calculateBuyerTicketCostAndOrganizerTicketValue();
-});
-
-
-$('#id_price').bind('input', function() {
-calculateBuyerTicketCostAndOrganizerTicketValue();
-});
-
-
-$('#id_price_2').bind('input', function() {
-	calculateDonation();
-});
-
-</script>
 {% endblock scripts %}
 
 {% block content %}
-<section class="text-center" style="padding-bottom: 160px;padding-top: 80px;">
+<section class="text-center" style="padding-bottom: 100px;padding-top: 80px;">
 	<div class="container">
 		
 		<div class="row" style="padding-bottom: 20px;">
@@ -207,15 +54,7 @@ $('#id_price_2').bind('input', function() {
 
 		<div class="row justify-content-center">
 			<div class="col-lg-8 col-md-10 ">
-				<h2 style="color:#4a90e2;">Powerful tools made simple</h2>
-				<p>We’ve made a whole bunch of powerful tools and put them all under one roof. We call it a house.
-				</p>
-			</div>
-		</div>
-
-		<div class="row justify-content-center" style="padding-bottom: 40px;">
-			<div class="col-lg-8 col-md-10">
-				<img alt="Image" src="{% static 'images/homepage1.png' %}" />
+				<h3 style="color:#4a90e2;">Powerful tools made simple</h3>
 			</div>
 		</div>
 
@@ -231,14 +70,19 @@ $('#id_price_2').bind('input', function() {
 		</div>
 
 		<div class="row justify-content-center">
-			<div class="col-lg-4" style="padding-bottom: 10px;">
+			<div class="col-lg-3" style="padding-bottom: 10px;">
 				<a class="btn btn--primary btn-block" href="{% url 'profiles:login' %}">
 					<span class="btn__text">Sign In</span>
 				</a>
 			</div>
-			<div class="col-lg-4" style="padding-bottom: 10px;">
+			<div class="col-lg-3" style="padding-bottom: 10px;">
 				<a class="btn btn-block" href="{% url 'profiles:create' %}">
 					<span class="btn__text">Sign Up</span>
+				</a>
+			</div>
+			<div class="col-lg-3" style="padding-bottom: 10px;">
+				<a class="btn btn--primary-1 btn-block" href="{% url 'find_house' %}">
+					<span class="btn__text">Find A House</span>
 				</a>
 			</div>
 		</div>
@@ -248,387 +92,91 @@ $('#id_price_2').bind('input', function() {
 </section>
 
 
-<section class="text-center" style="padding-bottom: 30px;">
+
+<section style="padding-bottom: 20px;">
 	<div class="container">
-		<div class="row justify-content-center" style="padding-bottom: 40px;">
-			<div class="col-lg-6 col-md-10">
-				<div id="bm-coach"></div>
-			</div>
-			<div class="col-lg-6 col-md-10">
-				<h3 style="color:#4a90e2;font-weight: 500;">Event Management &amp; Ticket Sales</h3>
-				<p>No matter the size, hosting an event takes a considerable amount of time and resources, both of which non-profits and small businesses have very little of. However, events help with fundraising, increasing brand awareness, and ultimately giving something back to your followers.
-				</p>
-				<a class="btn btn--primary" href="{% url 'profiles:create' %}">
-					<span class="btn__text">Get Started</span>
-				</a>
-			</div>
-		</div>
-
-		<div class="row" style="padding-bottom: 20px;">
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
-					<i class="fas fa-ticket-alt" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Ticket Sales</h4>
-					<p>
-						Create free tickets, paid tickets and even donation tickets. Set limits and track purchases effortlessly.
-					</p>
-					<a href="#">
-						Learn More
-					</a>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="feature feature--featured feature-5 boxed boxed--lg boxed--border">
+					<i class="far fa-calendar-alt" style="font-size: 3em;color: #295d9a;"></i>
+					<div class="feature__body">
+						<a href="{% url 'event_info' %}">
+						<h5 style="font-size: 20px;">Events &amp; Ticket Sales</h5>
+						</a>
+						<p style="min-height: 0px;">
+							Events help with fundraising, increasing brand awareness, and giving something back to your followers.
+						</p>
+						<a href="{% url 'event_info' %}">Learn More</a>
+					</div>
 				</div>
-				<!--end feature-->
-			</div>
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
-					<i class="fas fa-redo-alt" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>100% Refunds</h4>
-					<p>
-						Refund attendees with 1-click. We refund the entire order and the processing fee.
-					</p>
-					<a href="#">
-						Learn More
-					</a>
-				</div>
-				<!--end feature-->
-			</div>
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
-					<i class="fas fa-barcode" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Barcode Check-Ins</h4>
-					<p>
-						Start checking in attendees right from your smart phone or tablet.
-					</p>
-					<a href="#">
-						Learn More
-					</a>
-				</div>
-				<!--end feature-->
-			</div>
-
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
-					<i class="fas fa-scroll" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Simple Event Page</h4>
-					<p>
-						We automatically create a simple event page so attendees can purchase tickets and learn more.
-					</p>
-					<a href="#">
-						Learn More
-					</a>
-				</div>
-				<!--end feature-->
-			</div>
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
-					<i class="fas fa-video" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Virtual Event</h4>
-					<p>
-						Require attendees to purchase tickets before gaining entry to your virtual event.
-						<span style="font-size: small;">Additional charges - <a href="{% url 'pricing' %}">learn more</a></span>
-					</p>
-					
-					<a href="#">
-						Learn More
-					</a>
-					<span class="label">New</span>
-				</div>
-				<!--end feature-->
-			</div>
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
-					<i class="far fa-question-circle" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Custom Questions</h4>
-					<p>
-						Gather all the information you need from your attendees by creating custom questions.
-					</p>
-					<a href="#">
-						Learn More
-					</a>
-				</div>
-				<!--end feature-->
-			</div>
-		</div>
-
-		
-		<div class="row" style="padding-bottom: 20px;">
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<a class="btn btn--primary btn--lg" href="{% url 'pricing' %}">
-					<span class="btn__text">View Pricing</span>
-				</a>
-			</div>
-		</div>
-
-
-	</div>
-</section>
-
-
-
-
-
-<section style="padding-bottom: 180px;">
-	<div class="container">
-		<div class="row text-center justify-content-center" style="padding-bottom: 40px;">
-			<div class="col-md-10 col-12">
-				<h3 style="color:#4a90e2;margin-bottom: 5px;">The lowest fee. Guaranteed.</h3>
-				<p style="color:grey;margin-bottom: 5px;">See how much we charge. <b>Payment processing included.</b></p>
-				<p style="color:grey;">Free tickets are free.</p>
-			</div>
-		</div>
-		<div class="row justify-content-center text-center">
-			<div class="col-lg-2 col-md-3 col-sm-4 col-4">
-				<input type="number" name="price" value="5.00" class="" min="1.00" max="2000.00" step="0.01" required=""
-					id="id_price">
-				<p>Ticket Price</p>
-			</div>
-			<div class="col-lg-2 col-md-3 col-sm-4 col-4">
-				<h3 class="m--font-success" id="amount_received_div" style="margin-bottom: 0px;">$0.00</h3>
-				<p>Total Fee</p>
-			</div>
-			<div class="col-lg-2 col-md-3 col-sm-4 col-4">
-				<h3 class="m--font-info" id="new_price_div" style="margin-bottom: 0px;">$0.00</h3>
-				<p>New Ticket Price</p>
-			</div>
-		</div>
-	</div>
-</section>
-
-
-
-
-
-<section class="text-center" style="padding-bottom: 50px;">
-	<div class="container">
-		<div class="row justify-content-center" style="padding-bottom: 90px;">
-			<div class="col-md-6" style="padding-bottom: 10px;">
-				<h3 style="color:#4a90e2;font-weight: 500;">Donations &amp; Fundraisers</h3>
-				<p>
-					In a digital era, it’s essential to provide donors with the right tools to streamline the giving process. Arqam House
-					lets your organization accept and process donations while helping your donors see the great work their donations will be used for.
-				</p>
-				<a class="btn btn--primary" href="{% url 'profiles:create' %}">
-					<span class="btn__text">Get Started</span>
-				</a>
 			</div>
 			<div class="col-md-6">
-				<div id="bm-bank"></div>
-			</div>
-		</div>
-
-		<div class="row" style="padding-bottom: 20px;">
-			<div class="col-md-4">
-				<div class="feature feature-6">
-					<i class="fas fa-tasks" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Donation Types</h4>
-					<p>
-						Create multiple donation types for different causes. Donors can choose where their contributions go.
-					</p>
+				<div class="feature feature--featured feature-5 boxed boxed--lg boxed--border">
+					<i class="fas fa-hand-holding-usd" style="font-size: 3em;color: #295d9a;"></i>
+					<div class="feature__body">
+						<a href="{% url 'donation_info' %}">
+						<h5 style="font-size: 20px;">Donations &amp; Fundraisers</h5>
+						</a>
+						<p style="min-height: 0px;">
+							Accept and process donations while helping your donors see the great work their
+							donations will be used for
+						</p>
+						<a href="{% url 'donation_info' %}">Learn More</a>
+					</div>
 				</div>
-				<!--end feature-->
-			</div>
-			<div class="col-md-4">
-				<div class="feature feature-6">
-					<i class="fas fa-receipt" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Tax Deductible Receipts</h4>
-					<p>
-						Choose when to issue receipts to donors. Immediately, at a later date or never. View all donor information from your dashboard.
-					</p>
-				</div>
-				<!--end feature-->
-			</div>
-			<div class="col-md-4">
-				<div class="feature feature-6">
-					<i class="fas fa-hand-holding-usd" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Public Donations Page</h4>
-					<p>
-						We set up a donations page so other donors can see how much has been raised and to get others motivated.
-					</p>
-				</div>
-				<!--end feature-->
-			</div>
-		</div>
-
-		<div class="row" style="padding-bottom: 20px;">
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<a class="btn btn--primary btn--lg" href="{% url 'pricing' %}">
-					<span class="btn__text">View Pricing</span>
-				</a>
-			</div>
-		</div>
-	</div>
-</section>
-
-
-
-<section style="padding-bottom: 180px;">
-	<div class="container">
-		<div class="row text-center justify-content-center" style="padding-bottom: 40px;">
-			<div class="col-md-10 col-12">
-				<h3 style="color:#4a90e2;margin-bottom: 5px;">The lowest fee. Guaranteed.</h3>
-				<p style="color:grey;margin-bottom: 5px;">See how much we charge. <b>Payment processing included.</b>
-				</p>
-			</div>
-		</div>
-		<div class="row justify-content-center text-center">
-			<div class="col-lg-2 col-md-3 col-sm-4 col-4">
-				<input type="number" name="price" value="5.00" class="" min="1.00" max="2000.00" step="0.01" required=""
-					id="id_price_2">
-				<p>Donation Amount</p>
-			</div>
-			<div class="col-lg-2 col-md-3 col-sm-4 col-4">
-				<h3 class="m--font-success" id="amount_received_div_2" style="margin-bottom: 0px;">$0.00</h3>
-				<p>Total Fee</p>
-			</div>
-		</div>
-	</div>
-</section>
-
-
-
-
-<section class="text-center" style="padding-bottom: 120px;">
-	<div class="container">
-		<div class="row justify-content-center" style="padding-bottom: 90px;">
-			<div class="col-md-6">
-				<div id="bm-training"></div>
-			</div>
-			<div class="col-md-6" style="padding-bottom: 10px;">
-				<h3 style="color:#4a90e2;font-weight: 500;">Campaigns</h3>
-				<p>
-					Communicating with customers is essential for any non-profit or small business. 
-					We have built email campaigns, SMS alerts, and Mailchimp integrations right into Arqam House 
-					to help make sure to can stay connected.
-				</p>
-				<a class="btn btn--primary" href="{% url 'profiles:create' %}">
-					<span class="btn__text">Get Started</span>
-				</a>
-			</div>
-		</div>
-
-		<div class="row" style="padding-bottom: 20px;">
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
-					<i class="far fa-envelope" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Email Campaigns</h4>
-					<p>
-						Connect with Mailchimp, user our light weight built-in email campaign system or export emails into your own system.
-					</p>
-					<a href="#">
-						Learn More
-					</a>
-				</div>
-				<!--end feature-->
-			</div>
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
-					<i class="far fa-comment-dots" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>SMS Messages</h4>
-					<p>
-						Sometimes you need to send urgent reminders or important live updates, good old fashioned SMS messages are great for that.
-					</p>
-					<a href="#">
-						Learn More
-					</a>
-				</div>
-				<!--end feature-->
-			</div>
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
-					<i class="fas fa-eye" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Campaign Analytics</h4>
-					<p>
-						We've set up smart tracking on campaigns to allow you to see who's viewed and interacted with your campaign.
-					</p>
-					<a href="#">
-						Learn More
-					</a>
-					<span class="label">New</span>
-				</div>
-				<!--end feature-->
-			</div>
-		</div>
-
-	</div>
-</section>
-
-
-
-
-
-<section class="text-center" style="padding-bottom: 120px;">
-	<div class="container">
-		<div class="row justify-content-center" style="padding-bottom: 90px;">
-			<div class="col-md-6" style="padding-bottom: 30px;">
-				<h3 style="color:#4a90e2;font-weight: 500;">Subscribers</h3>
-				<p>
-					Subscribers are your attendees, customers, donors, and guests. They are what allows you to do all the great things you do.
-					Not all subscribers are the same however. Arqam House gives you the ability to understand the differences between your subscribers.
-					Who donates regularly? Who attended that last event? Who viewed that last campaign? 
-				</p>
-				<a class="btn btn--primary" href="{% url 'profiles:create' %}">
-					<span class="btn__text">Get Started</span>
-				</a>
 			</div>
 			<div class="col-md-6">
-				<div id="bm"></div>
+				<div class="feature feature--featured feature-5 boxed boxed--lg boxed--border">
+					<i class="fas fa-paper-plane" style="font-size: 3em;color: #295d9a;"></i>
+					<div class="feature__body">
+						<a href="{% url 'campaign_info' %}">
+							<h5 style="font-size: 20px;">Campaigns</h5>
+						</a>
+						<p style="min-height: 0px;">
+							We have built email campaigns, SMS alerts, and Mailchimp integrations
+							to help make sure you stay connected.
+						</p>
+						<a href="{% url 'campaign_info' %}">Learn More</a>
+					</div>
+				</div>
 			</div>
+			<div class="col-md-6">
+				<div class="feature feature--featured feature-5 boxed boxed--lg boxed--border">
+					<i class="fas fa-user-plus" style="font-size: 3em;color: #295d9a;"></i>
+					<div class="feature__body">
+						<a href="{% url 'subscriber_info' %}">
+						<h5 style="font-size: 20px;">Subscribers</h5>
+						</a>
+						<p style="min-height: 0px;">
+							Subscribers are your attendees, customers, donors, and guests. They are what allow you to do all the great things you
+							do.
+						</p>
+						<a href="{% url 'subscriber_info' %}">Learn More</a>
+					</div>
+				</div>
+			</div>
+			
 		</div>
-
-		<div class="row" style="padding-bottom: 20px;">
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
-					<i class="fas fa-users" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Audiences</h4>
-					<p>
-						Not all subscribers are equal. We automatically sort your subscribers based off of their interactions with
-						your house.
-					</p>
-					<a href="#">
-						Learn More
-					</a>
-				</div>
-				<!--end feature-->
-			</div>
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
-					<i class="far fa-star" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Subscriber Score</h4>
-					<p>
-						We automatically grade your attendees based off of how many events they attend, when they donate, and how engaged they are.
-					</p>
-					<a href="#">
-						Learn More
-					</a>
-				</div>
-				<!--end feature-->
-			</div>
-			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
-				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
-					<i class="fas fa-clipboard-list" style="color: #4a90e2;font-size: 3em;"></i>
-					<h4>Subscriber Activity</h4>
-					<p>
-						Get a complete overview of how all of your subscribers interact with your house. 
-					</p>
-					<a href="#">
-						Learn More
-					</a>
-				</div>
-				<!--end feature-->
-			</div>
-		</div>
+		<!--end of row-->
 	</div>
+	<!--end of container-->
 </section>
-
-
 
 
 <section class="text-center">
 	<div class="container">
 
+		<div class="row justify-content-center" style="padding-bottom: 100px;">
+			<div class="col-lg-8 col-md-10">
+				<img alt="Image" src="{% static 'images/homepage1.png' %}" />
+				<p>We’ve made a whole bunch of powerful tools and put them all under one roof. We call it a house.
+				</p>
+				<a href="{% url 'profiles:create' %}">Get Started &raquo;</a>
+			</div>
+		</div>
+
 		<div class="row justify-content-center">
 			
-
-				
 			<div class="col-md-4 col-10">
 				<img alt="Image" src="{% static 'images/homepage2.png' %}" />
 			</div>
@@ -641,8 +189,6 @@ $('#id_price_2').bind('input', function() {
 				<a href="{% url 'profiles:create' %}">Get Started &raquo;</a>
 				
 			</div>
-				
-
 			
 		</div>
 

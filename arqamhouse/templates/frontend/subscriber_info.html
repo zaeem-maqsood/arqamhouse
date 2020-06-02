@@ -1,0 +1,105 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Arqam House
+{% endblock title %}
+
+{% block footer %}
+{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+
+{% endblock styles %}
+
+{% block top_page_scripts %}
+<script src="https://kit.fontawesome.com/71fc1e3551.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.8/lottie.min.js"></script>
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script>
+
+lottie.loadAnimation({
+	container: document.getElementById("bm"), // the dom element that will contain the animation
+	renderer: 'svg',
+	loop: true,
+	autoplay: true,
+	path: "https://assets4.lottiefiles.com/packages/lf20_3TL2tK.json" // the path to the animation json
+});
+</script>
+
+{% endblock scripts %}
+
+{% block content %}
+
+<section class="text-center" style="padding-bottom: 120px;">
+	<div class="container">
+
+        <div class="row" style="padding-bottom: 20px;">
+            <div class="col-lg-8">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+            </div>
+        </div>
+
+
+		<div class="row justify-content-center" style="padding-bottom: 90px;">
+			<div class="col-md-10" style="padding-bottom: 30px;">
+				<h3 style="color:#4a90e2;font-weight: 500;">Subscribers</h3>
+				<p>
+					Subscribers are your attendees, customers, donors, and guests. They are what allows you to do all the great things you do.
+					Not all subscribers are the same however. Arqam House gives you the ability to understand the differences between your subscribers.
+					Who donates regularly? Who attended that last event? Who viewed that last campaign? Now you'll know.
+				</p>
+				<a class="btn btn--primary" href="{% url 'profiles:create' %}">
+					<span class="btn__text">Get Started</span>
+				</a>
+			</div>
+		</div>
+
+
+        <div class="row justify-content-center" style="padding-bottom: 90px;">
+			<div class="col-md-6">
+				<div id="bm"></div>
+			</div>
+		</div>
+
+		<div class="row" style="padding-bottom: 20px;">
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="fas fa-users" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Audiences</h4>
+					<p>
+						Not all subscribers are equal. We automatically sort your subscribers based off of their interactions with
+						your house.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+            <div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+                <div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+                    <i class="fas fa-clipboard-list" style="color: #4a90e2;font-size: 3em;"></i>
+                    <h4>Subscriber Activity</h4>
+                    <p>
+                        Get a complete overview of how all of your subscribers interact with your house.
+                    </p>
+                </div>
+                <!--end feature-->
+            </div>
+			<div class="col-lg-4 col-md-6" style="padding-bottom: 10px;">
+				<div class="feature feature-3 boxed boxed--lg boxed--border text-center">
+					<i class="far fa-star" style="color: #4a90e2;font-size: 3em;"></i>
+					<h4>Subscriber Score</h4>
+					<p>
+						We automatically grade your attendees based off of how many events they attend, when they donate, and how engaged they are.
+					</p>
+				</div>
+				<!--end feature-->
+			</div>
+			
+		</div>
+	</div>
+</section>
+{% endblock content %}
