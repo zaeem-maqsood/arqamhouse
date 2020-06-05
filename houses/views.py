@@ -152,9 +152,9 @@ class HouseHomePageView(DetailView):
         context = {}
         house = self.get_house(kwargs["slug"])
         active_events = self.get_active_events(house)
-        donation_types = DonationType.objects.filter(house=house, deleted=False)[:2]
-        recordings = EventLiveArchive.objects.filter(event_live__event__house=house, event_live__event__allow_non_ticket_archive_viewers=True)[:2]
-
+        donation_types = DonationType.objects.filter(house=house, deleted=False).order_by("-updated_at")[:2]
+        recordings = EventLiveArchive.objects.filter(event_live__event__house=house, event_live__event__allow_non_ticket_archive_viewers=True).order_by("-updated_at")[:2]
+ 
         result_list = sorted(chain(active_events, donation_types, recordings), key=attrgetter('updated_at'))
         result_list.reverse()
         print(result_list)
