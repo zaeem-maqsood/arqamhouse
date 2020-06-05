@@ -19,7 +19,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import (HouseHomePageView, HouseContactPageView)
+from .views import (HouseHomePageView,
+                    HouseContactPageView, AllArchivedListView, HouseEventsListView)
 
 from donations.views import DonationView, DonationPublicListView, DonationPublicListLiveView, DonationGiftView, DonationGiftListView
 from posts.views import EditPostView
@@ -34,6 +35,8 @@ urlpatterns += [
     path('gift-donation/<int:pk>', DonationGiftView.as_view(), name='gift_donate'),
     path('donations', DonationPublicListView.as_view(), name='public_donations'),
     path('donations/live', DonationPublicListLiveView.as_view(), name='public_donations_live'),
+    path('recordings', AllArchivedListView.as_view(), name='house_recordings'),
+    path('events', HouseEventsListView.as_view(), name='house_events'),
     path('contact', HouseContactPageView.as_view(), name='house_contact'),
     path('blog/<int:post_number>/edit', EditPostView.as_view(), name='edit_post'),
 

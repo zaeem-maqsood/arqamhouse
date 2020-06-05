@@ -19,24 +19,79 @@ Resources | {{ event.title|safe }}
 {% endblock page_description %}
 
 {% block styles %}
+<style>
+.logo_responsive {
+    max-height: 70px;
+}
 
+#title_responsive {
+    font-size: 12px;
+}
+
+@media only screen and (min-width: 576px) {
+
+
+}
+
+
+@media (min-width: 768px) {
+
+    .logo_responsive {
+        max-height: 80px;
+    }
+
+    #title_responsive {
+        font-size: 1.3em;
+    }
+
+}
+
+
+@media (min-width: 992px) {
+
+
+}
+
+
+@media (min-width: 1200px) {
+
+
+}
+</style>
 {% endblock styles %}
 
 {% block top_page_scripts %}
+<script src="https://kit.fontawesome.com/71fc1e3551.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.8/lottie.min.js"></script>
 {% endblock top_page_scripts %}
 
 {% block scripts %}
+<script>
+
+lottie.loadAnimation({
+    container: document.getElementById("no-content"), // the dom element that will contain the animation
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    path: "https://assets7.lottiefiles.com/packages/lf20_fR7ohS.json" // the path to the animation json
+});
+
+</script>
 {% endblock scripts %}
 
 {% block content %}
 <section style="padding-top: 3em;padding-bottom:0px;">
     <div class="container">
 
-
-        
-        <div class="row justify-content-center" style="padding-bottom: 30px;">
+        <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
             <div class="col-sm-12 col-10" style="padding: 0px;">
-                <a href="{{ event.get_landing_view }}" class="btn btn--primary-1 btn-block" style="color: white;">{{ event.title }}</a>
+                {% if house.logo %}
+                <a href="{{ house.get_home_page_url }}">
+                    <img class="logo_responsive" src="{{ house.logo.url }}">
+                </a>
+                {% endif %}
+                <p class="lear" style="margin-bottom: 0px;">{{ house.name }}</p>
+                <a href="{{ event.get_landing_view }}" style="font-size: 1.5em;display: block;">Resources for {{ event.title }}</a>
             </div>
         </div>
 
@@ -77,14 +132,14 @@ Resources | {{ event.title|safe }}
                     id="homepage_updates">
                     <div class="row justify-content-center">
                         {% if resource.image %}
-                        <div class="col-lg-3 col-md-4 col-sm-4 col-4">
+                        <div class="col-lg-4 col-md-5 col-sm-5 col-5">
                             <a href="{{ resource.get_absolute_url }}">
-                                <img style="padding: 10px;" src="{{ resource.image.url }}">
+                                <img src="{{ resource.image.url }}" style="max-height: 150px;">
                             </a>
                         </div>
                         {% endif %}
                         <div
-                            class="{% if resource.image %}col-lg-9 col-md-8 col-sm-8 col-8{% else %}col-lg-12 col-md-12 col-sm-12 col-11{% endif %}">
+                            class="{% if resource.image %}col-lg-8 col-md-7 col-sm-7 col-7{% else %}col-lg-12 col-md-12 col-sm-12 col-11{% endif %}">
                             <p class="lead" id="updates_title"
                                 style="margin-bottom: 0px; text-align: left;{% if not resource.image %}padding-left:10px;{% endif %}">
                                 <a style="text-decoration: none;" href="{{ resource.get_absolute_url }}">{{ resource.name }}</a>
@@ -107,14 +162,18 @@ Resources | {{ event.title|safe }}
         </div>
         {% else %}
 
-        {% if is_owner %}
-        {% else %}
+        
         <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
-            <div class="col-sm-12 col-10" style="padding: 0px;">
-                <h3>No event resources yet, check back later.</h3>
+            <div class="col-md-10">
+                <div class="row justify-content-center">
+                    <div class="col-4">
+                        <div id="no-content"></div>
+                    </div>
+                </div>
+                <p class="lead" style="color:#b2b2b2;">No event resources yet! Check back later.</p>
             </div>
         </div>
-        {% endif %}
+        
 
         {% endif %}
 

@@ -2,6 +2,7 @@
 
 {% load static %}
 {% load tz %}
+{% load homepage_tags %}
 
 {% block title %}
 {{ house.name }} | Home Page
@@ -10,102 +11,138 @@
 {% block styles %}
 <style>
 
-#homepage_links_p {
-    text-align: right;
-}
-
-#homepage_links_a {
-    float: right;
-}
-
-
-#homepage_updates {
-      margin: 20px
-  }
-
-
-#updates_host_and_start {
-      padding-top: 10px;
-  }
 
 #homepage_first {
-    border-right: 1px solid #c1c1c1;
+    /* border-right: 1px solid #c1c1c1; */
+}
+
+.logo_responsive {
+    max-height: 80px;
+}
+
+.navigation_text {
+    font-size: 10px;
+    margin-top: 0px;
+}
+
+.navigation_icon {
+    font-size: 1.3em;
+}
+
+
+.responsive_description {
+    font-size: 8px;
+}
+
+.responsive_title {
+    font-size: 15px;
+}
+
+.responsive_navigation {
+    padding:10px 0px;
+}
+
+.responsive_navigation_col {
+    padding-right: 5px;
+    padding-left: 5px;
+
+}
+
+.responsive_button {
+    padding: 5px;
+    font-size: 10px;
 }
 
 
 
-@media only screen and (max-width: 1000px) {
+/* iPhone SE */
+@media only screen and (min-width: 460px) {
 
-  #homepage_first {
-    border-right: 0px;
-  }       
+    .responsive_description {
+        font-size: 1em;
+    }
 
-  #homepage_links_p {
-    text-align: center;
-  }
-
-  #homepage_links_a {
-    float: none;
-  }
-
-  #homepage_section {
-      padding-top: 10px;
-  }
+    .responsive_title {
+        font-size: 1.3rem;
+    }
 
 }
 
 
 
 
-@media only screen and (max-width: 750px) {
+@media only screen and (min-width: 576px) {
 
-  #homepage_first {
-    border-right: 0px;
-    padding-bottom: 30px;
-  }       
-
-  #homepage_links_p {
-    text-align: center;
-  }
-
-  #homepage_links_a {
-    float: none;
-  }
-
-  #homepage_section {
-      padding-top: 10px;
-  }
-
-  #homepage_updates {
-      margin: 0px
-  }
-
-  #updates_title {
-      font-size: 12px;
-  }
-
-  #updates_host {
-      font-size: 10px;
-  }
-
-  #updates_description {
-      font-size: 10px;
-  }
-
-  #updates_host_and_start {
-      margin: 0px;
-      padding-top: 0px;
-  }
 
 }
+
+
+@media (min-width: 768px) {
+
+    .navigation_text {
+        font-size: 1em;
+        margin-top: 5px;
+    }
+
+    .navigation_icon {
+        font-size: 2em;
+    }
+
+    .logo_responsive {
+        max-height: 150px;
+    }
+
+    .responsive_navigation {
+        padding: 20px;
+    }
+
+    .responsive_navigation_col {
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+
+    .responsive_button {
+        padding: 10;
+        font-size: inherit;
+    }
+
+}
+
+
+@media (min-width: 992px) {
+
+
+}
+
+
+@media (min-width: 1200px) {
+
+
+}
+
+
 
 </style>
 {% endblock styles %}
 
 {% block top_page_scripts %}
+<script src="https://kit.fontawesome.com/71fc1e3551.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.8/lottie.min.js"></script>
 {% endblock top_page_scripts %}
 
+
 {% block scripts %}
+
+<script>
+
+lottie.loadAnimation({
+    container: document.getElementById("no-content"), // the dom element that will contain the animation
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    path: "https://assets6.lottiefiles.com/packages/lf20_itiuSd/home.json" // the path to the animation json
+});
+</script>
 
 <script>
 
@@ -170,20 +207,20 @@ function Subscribe(boolean) {
 {% endblock scripts %}
 
 {% block content %}
-<section class="text-center" id="homepage_section">
+<section id="homepage_section" style="padding-top: 40px;">
     <div class="container" style="padding-bottom: 60px;">
-        <div class="row" style="padding-bottom: 20px;">
+        <div class="row justify-content-center" style="padding-bottom: 20px;">
             <div class="col-md-12 col-lg-10">
 
 
                 <div class="row" style="padding-bottom: 40px;">
                     <div class="col-lg-3" id="homepage_first">
                         
-                        <div class="row" style="padding-top:30px;padding-bottom: 20px;">
-                            <div class="col-lg-12 col-md-6 col-8">
+                        <div class="row text-center">
+                            <div class="col-lg-12 col-md-12 col-12">
                                 {% if house.logo %}
                                 <a href="{{ house.get_home_page_url }}">
-                                    <img style="margin-bottom: 10px;max-height: 150px;" src="{{ house.logo.url }}">
+                                    <img style="margin-bottom: 10px;" class="logo_responsive" src="{{ house.logo.url }}">
                                 </a>
                                 
                                 {% else %}
@@ -200,45 +237,31 @@ function Subscribe(boolean) {
                             </div>
                         </div>
 
-                        {% if owner %}
-                        <div class="row justify-content-center" style="padding-bottom:30px;">
-                            <div class="col-lg-12 col-md-6 col-sm-6 col-6">
-                                <a id="homepage_links_a" class="btn btn--sm btn--primary-2 btn-block" href="{% url 'houses:dashboard' %}"
-                                    style="margin-top: 10px;">
-                                    <span class="btn__text">Dashboard</span>
-                                </a>            
-                            </div>
 
-                            {% if house.allow_donations %}
-                            <div class="col-lg-12 col-md-6 col-sm-6 col-6">
-                                <a id="homepage_links_a" class="btn btn--sm btn--primary btn-block" href="{{ house.get_public_donations_url }}"
-                                    style="margin-top: 10px;">
-                                    <span class="btn__text">Donations</span>
-                                </a>
-                            </div>
-                            {% endif %}
 
-                            <div class="col-lg-12 col-md-6 col-sm-6 col-6">
-                                <a id="homepage_links_a" class="btn btn--sm btn--primary btn-block" href="{{ house.get_contact_url }}"
-                                    style="margin-top: 10px;">
-                                    <span class="btn__text">Contact</span>
-                                </a>
-                            </div>
 
-                        </div>
-
-                        {% else %}
-                            <div class="row justify-content-center" style="padding-bottom:30px;">
-                                <div class="col-lg-12 col-md-6 col-sm-6 col-6" id="subscriber_switch">
+                        <div class="row text-center" style="padding-bottom:30px;padding: 10px;">
+                            {% if owner %}
+                                <div class="col-12" style="padding-bottom: 20px;">
+                                    <a id="homepage_links_a" class="btn btn--sm btn--primary-2 btn-block" href="{% url 'houses:dashboard' %}"
+                                        style="margin-top: 10px;">
+                                        <span class="btn__text">Dashboard</span>
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="col-12" id="subscriber_switch" style="padding-bottom: 20px;">
                                     {% if not request.user.is_authenticated %}
-                                        <a id="homepage_links_a" class="btn btn--sm btn-block" style="margin-top: 10px;" href="{% url 'profiles:login' %}?next=/house/{{ house.slug }}">
+                                        <a id="homepage_links_a" class="btn btn--sm btn-block" style="margin-top: 10px;"
+                                            href="{% url 'profiles:login' %}?next=/{{ house.slug }}">
                                             <span class="btn__text" id="inner_button">
                                                 Subscribe</span>
                                         </a>
                                     {% else %}
                                         {% if subscribed %}
-                                        <a id="homepage_links_a" class="btn btn--sm btn--primary-2 btn-block" onclick="Subscribe(false);" style="margin-top: 10px;">
-                                            <span class="btn__text" id="inner_button"><i class="fa fa-check" style="color: white;font-size: 1em;"></i> Subscribed</span>
+                                        <a id="homepage_links_a" class="btn btn--sm btn--primary-2 btn-block" onclick="Subscribe(false);"
+                                            style="margin-top: 10px;">
+                                            <span class="btn__text" id="inner_button"><i class="fa fa-check" style="color: white;font-size: 1em;"></i>
+                                                Subscribed</span>
                                         </a>
                                         {% else %}
                                         <a id="homepage_links_a" class="btn btn--sm btn-block" onclick="Subscribe(true);" style="margin-top: 10px;">
@@ -247,146 +270,177 @@ function Subscribe(boolean) {
                                         {% endif %}
                                     {% endif %}
                                 </div>
+                            {% endif %}
 
-                                {% if house.allow_donations %}
-                                <div class="col-lg-12 col-md-6 col-sm-6 col-6">
-                                    <a id="homepage_links_a" class="btn btn--sm btn--primary btn-block" href="{{ house.get_public_donations_url }}"
-                                        style="margin-top: 10px;">
-                                        <span class="btn__text">Donate</span>
+                            {% if house.allow_donations %}
+                                <div class="col-lg-12 col-md-4 col-sm-4 col-4 responsive_navigation_col">
+                                    <div style="box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 30px;border-radius: 15px;margin-bottom: 20px;" class="responsive_navigation">
+                                        <a href="{{ house.get_public_donations_url }}">
+                                        <i class="far fa-heart navigation_icon" style="color: #4a90e2;"></i>
+                                        <p class="navigation_text">Donate</p>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if active_events %}
+                            <div class="col-lg-12 col-md-4 col-sm-4 col-4 responsive_navigation_col">
+                                <div style="box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 30px;border-radius: 15px;margin-bottom: 20px;" class="responsive_navigation">
+                                    <a href="{{ house.get_events_url }}">
+                                        <i class="far fa-calendar-alt navigation_icon" style="color: #4a90e2;"></i>
+                                        <p class="navigation_text">Events</p>
                                     </a>
                                 </div>
-                                {% endif %}
-
-                                <div class="col-lg-12 col-md-6 col-sm-6 col-6">
-                                    <a id="homepage_links_a" class="btn btn--sm btn--primary-1 btn-block" href="{{ house.get_contact_url }}"
-                                        style="margin-top: 10px;">
-                                        <span class="btn__text">Contact</span>
-                                    </a>
-                                </div>
-
                             </div>
-                        {% endif %}
+                            {% endif %}
+
+                            {% if recordings %}
+                            <div class="col-lg-12 col-md-4 col-sm-4 col-4 responsive_navigation_col">
+                                <div style="box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 30px;border-radius: 15px;margin-bottom: 20px;" class="responsive_navigation">
+                                    <a href="{{ house.get_recordings_url }}">
+                                        <i class="fas fa-video navigation_icon" style="color: #4a90e2;"></i>
+                                        <p class="navigation_text">Recordings</p>
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- <div class="col-lg-12 col-md-4 col-sm-4 col-4">
+                                <div style="box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 30px;padding: 20px;border-radius: 15px;margin-bottom: 20px;">
+                                    <a href="{{ house.get_contact_url }}">
+                                        <i class="fas fa-blog navigation_icon" style="color: #4a90e2;"></i>
+                                        <p style="margin-top: 5px;" class="navigation_text">Blog</p>
+                                    </a>
+                                </div>
+                            </div> -->
+
+                            
+                            <div class="col-lg-12 col-md-4 col-sm-4 col-4 responsive_navigation_col">
+                                <div style="box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 30px;border-radius: 15px;margin-bottom: 20px;" class="responsive_navigation">
+                                    <a href="{{ house.get_contact_url }}">
+                                        <i class="far fa-comment navigation_icon" style="color: #4a90e2;"></i>
+                                        <p class="navigation_text">Contact</p>
+                                    </a>
+                                </div>
+                            </div>
+                            
+
+                        </div>
                         
 
                     </div>
 
                     <div class="col-lg-9">
 
-                        {% if active_events or past_events %}
+                        {% if result_list %}
+
+                            <div class="row text-center" style="padding-bottom: 30px;">
+                                <div class="col-12">
+                                    <p class="lead" style="color: #acacac;">Updates</p>
+                                </div>
+                            </div>
+
+                            {% for item in result_list %}
+                            <div class="row">
+                                <div class="col-12">
+                                    <div style="box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 30px;padding: 20px;border-radius: 15px;margin-bottom: 20px;">
+                                        
+                                        {% if item.title %}
+                                        <div class="row text-center">
+                                            <div class="col-12">
+                                                <a href="{{ item.get_landing_view }}" style="text-decoration: none;color: #4a90e2;margin-bottom: 5px;"
+                                                    class="lead responsive_title">{{ item.title }}</a>
+                                                <hr style="margin: 10px 0px;">
+                                            </div>
+                                        </div>
+                                        <div class="row text-center">
+                                            {% if item.image %}
+                                                <div class="col-lg-4 col-4">
+                                                    <a href="{{ item.get_landing_view }}">
+                                                        <img style="padding: 10px;max-height: 200px;" src="{{ item.image.url }}">
+                                                    </a>
+                                                </div>
+                                            {% endif %}
+                                            <div class="{% if item.image %}col-lg-8 col-8{% else %}col-lg-12{% endif %}" style="align-self: center;">
+                                                {% if item.description %}
+                                                <p style="text-align: left;line-height: normal;" class="responsive_description">
+                                                    {{ item.description|striptags|truncatechars:250 }}</p>
+                                                {% else %}
+                                                <p style="text-align: left;line-height: normal;" class="responsive_description">Learn more about this event by heading over to the event page.
+                                                    </p>
+                                                {% endif %}
+                                                <p style="margin-bottom: 0px;text-align: left;color: #4a90e2;" class="responsive_description">{{ item.start|localtime|date:"D N jS, f a" }}</p>
+                                            </div>
+                                            
+                                        </div>
+                                        
+
+                                        {% elif item.event_live %}
+                                        <div class="row text-center" style="padding-bottom: 10px;">
+                                            <div class="col-md-12">
+                                                <a href="{{ item.get_absolute_url }}" style="text-decoration: none;color: #4a90e2;margin-bottom: 5px;"
+                                                    class="lead responsive_title">{{ item.name }}</a>
+                                                <hr style="margin: 10px 0px;">
+                                            </div>
+                                        </div>
+                                        <div class="row justify-content-center" style="padding-bottom: 30px;">
+                                            <div class="col-lg-10 col-sm-12 col-12">
+                                                <div class="video-cover border--round">
+                                                    {% if house.logo %}
+                                                    <div class="background-image-holder">
+                                                        <img alt="image" src="{{ house.logo.url }}" />
+                                                    </div>
+                                                    {% endif %}
+                                                    <div class="video-play-icon video-play-icon--sm"></div>
+                                                    <video controls>
+                                                        <source src="{% get_archive_url item %}" type="video/mp4">
+                                                    </video>
+                                                </div>
+                                                <!--end video cover-->
+                                            </div>
+                                        </div>
+                                        
+                                        
+
+
+                                        {% else %}
+                                        <div class="row text-center" style="padding-bottom: 20px;">
+                                            <div class="col-md-12">
+                                                <p style="margin-bottom: 0px;" class="lead responsive_title"> Donate to <span style="color:#4a90e2">{{ item.name }}</span></p>
+                                                <p style="margin-bottom: 0px;" class="responsive_description">Amount raised so far <span style="color:#4a90e2">${% get_total_donation_amount item %}</span></p>
+                                                <p style="margin-bottom: 0px;line-height: 1.8;" class="responsive_description"><i class="fas fa-heart" style="color: #e24a82;"></i> <span style="color:#4a90e2">{% get_last_donor item %}</span>, thank you for your donation!</p>
+                                            </div>
+                                        </div>
+                                        <div class="row justify-content-center text-center">
+                                            <div class="col-lg-4 col-sm-4  col-6">
+                                                <a href="{{ house.get_donate_url }}" class="btn btn--primary btn-block responsive_button">
+                                                    <span class="btn__text">Donate</span>
+                                                </a>
+                                            </div>
+                                            <div class="col-lg-4 col-sm-4 col-6">
+                                                <a href="{{  house.get_gift_donation_list_url }}" class="btn btn--primary btn-block responsive_button">
+                                                    <span class="btn__text">Gift a donation</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
                         {% else %}
-                        <div class="row" style="padding-bottom: 30px;">
-                            <div class="col-md-12">
-                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 50px; height: 50px;"
-                                    viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
-                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                        <rect x="0" y="0" width="24" height="24" />
-                                        <rect fill="#000000" x="3" y="2" width="15" height="5" rx="1" />
-                                        <rect fill="#000000" x="9" y="12" width="4" height="10" rx="1" />
-                                        <path
-                                            d="M12,12 L10,12 L10,11 C10,9.8954305 10.8954305,9 12,9 L19,9 L19,5.5 L18,5.5 L18,3.5 L19,3.5 C20.1045695,3.5 21,4.3954305 21,5.5 L21,9 C21,10.1045695 20.1045695,11 19,11 L12,11 L12,12 Z"
-                                            fill="#000000" fill-rule="nonzero" opacity="0.3" />
-                                    </g>
-                                </svg>
-                                <p class="lead" style="color:#b2b2b2;">We've got nothing yet but you can always subscribe so you can be alerted when we do!</p>
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        {% if active_events %}
-                        <div class="row" style="padding-bottom: 30px;">
-                            <div class="col-md-12">
-                                <p class="lead" style="color:#b2b2b2;">Upcoming Events</p>
-                            </div>
-                        </div>
-                        {% for event in active_events %}
-                        <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
-                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px;border-radius: 10px;margin-bottom: 10px;" id="homepage_updates">
-                            <div class="row">
-                                {% if event.image %}
-                                <div class="col-lg-3 col-md-3 col-4">
-                                    <a href="{{ event.get_landing_view }}">
-                                    <img style="padding: 10px;" {% if event.image %} src="{{ event.image.url }}" {% else %}
-                                        src="{% static 'images/event_flyer_placeholder.jpg' %}" {% endif %}>
-                                    </a>
-                                </div>
-                                {% endif %}
-                                <div class="{% if event.image %}col-lg-9 col-md-9 col-sm-8 col-8{% else %}col-lg-12 col-md-12 col-sm-12 col-12{% endif %}">
-                                    <p class="lead" id="updates_title" style="margin-bottom: 0px; text-align: left;{% if not event.image %}padding-left:10px;{% endif %}"><a style="text-decoration: none;"
-                                            href="{{ event.get_landing_view }}">{{ event.title }}</a></p>
-                                    <hr style="margin-top: 0px;margin-bottom:5px;">
-                                    <div class="row" id="updates_host_and_start" style="padding-bottom: 10px;{% if not event.image %}padding: 10px 0 0 10px;{% endif %}">
-                                        <div class="col-12">
-                                            {% if event.description %}
-                                            <p id="updates_description" style="text-align: left;line-height: normal;">{{ event.description|striptags|truncatechars:180 }}</p>
-                                            {% else %}
-                                            <p id="updates_description" style="text-align: left;">Learn more by heading over to the event page.</p">
-                                            {% endif %}
-                                        </div>
+                        <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
+                            <div class="col-md-10">
+                                <div class="row justify-content-center">
+                                    <div class="col-4">
+                                        <div id="no-content"></div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row" style="padding:10px;padding-bottom: 0px;">
-                                <div class="col-lg-6 col-md-6 col-6">
-                                    <a id="updates_host" class="pull-left" style="text-decoration: none;font-weight: 400;margin-bottom: 0px;"
-                                        href="{{ event.house.get_home_page_url }}">{{ event.house.name }}</a>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-6">
-                                    <p id="updates_host" class="pull-right" style="margin-bottom: 0px;">
-                                        {{ event.start|localtime|date:"D N jS, f a" }}</p>
-                                </div>
+                                <p class="lead" style="color:#b2b2b2;">We've just moved in. But you can always subscribe so you'll be alerted when were ready for guests!</p>
                             </div>
                         </div>
-                        {% endfor %}
                         {% endif %}
 
-
-                        {% if past_events %}
-                        <div class="row" style="padding-bottom: 20px; {% if active_events %}padding-top: 30px;{% endif %}">
-                            <div class="col-md-12">
-                                <p class="lead" style="color:#b2b2b2;">Past Events</p>
-                            </div>
-                        </div>
-                        {% for event in past_events %}
-                        <div class="boxed boxed--border bg--secondary boxed--lg box-shadow"
-                            style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);padding: 20px;border-radius: 10px;margin-bottom: 10px;" id="homepage_updates">
-                            <div class="row">
-                                {% if event.image %}
-                                <div class="col-lg-3 col-md-3 col-4">
-                                    <a href="{{ event.get_landing_view }}">
-                                        <img style="padding: 10px;" {% if event.image %} src="{{ event.image.url }}" {% else %}
-                                            src="{% static 'images/event_flyer_placeholder.jpg' %}" {% endif %}>
-                                    </a>
-                                </div>
-                                {% endif %}
-                                <div class="{% if event.image %}col-lg-9 col-md-9 col-sm-8 col-8{% else %}col-lg-12 col-md-12 col-sm-12 col-12{% endif %}">
-                                    <p class="lead" id="updates_title" style="margin-bottom: 0px; text-align: left;{% if not event.image %}padding-left:10px;{% endif %}"><a
-                                            style="text-decoration: none;" href="{{ event.get_landing_view }}">{{ event.title }}</a></p>
-                                    <hr style="margin-top: 0px;margin-bottom:5px;">
-                                    <div class="row" id="updates_host_and_start" style="padding-bottom: 10px;{% if not event.image %}padding: 10px 0 0 10px;{% endif %}">
-                                        <div class="col-12">
-                                            {% if event.description %}
-                                            <p id="updates_description" style="text-align: left;line-height: normal;">
-                                                {{ event.description|striptags|truncatechars:150 }}</p>
-                                            {% else %}
-                                            <p id="updates_description" style="text-align: left;">Learn more by heading over to the event page.</p>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row" style="padding:10px;padding-bottom: 0px;">
-                                <div class="col-lg-6 col-md-6 col-6">
-                                    <a id="updates_host" class="pull-left" style="text-decoration: none;font-weight: 400;margin-bottom: 0px;"
-                                        href="{{ event.house.get_home_page_url }}">{{ event.house.name }}</a>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-6">
-                                    <p id="updates_host" class="pull-right" style="margin-bottom: 0px;">
-                                        {{ event.start|localtime|date:"D N jS, f a" }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                        {% endif %}
 
                     </div>
                 </div>

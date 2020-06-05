@@ -3,187 +3,187 @@ from .base import *
 from events.models import Event, AttendeeCommonQuestions, EventCart, EventCartItem
 from core.constants import genders
 
-from froala_editor.widgets import FroalaEditor
+from core.widgets import ArqamFroalaEditor
 
 
 
 class EventCheckoutForm(forms.Form):
 
-	def __init__(self, event, cart, *args, **kwargs):
-		
-		super(EventCheckoutForm, self).__init__(*args, **kwargs)
+    def __init__(self, event, cart, *args, **kwargs):
+        
+        super(EventCheckoutForm, self).__init__(*args, **kwargs)
 
-		self.fields["email"] = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"class":"validate-required"}), required=True)
-		if cart.total == 0.00:
-			self.fields["name"] = forms.CharField(label="Name", widget=forms.TextInput(attrs={"class":"validate-required"}), required=True)
+        self.fields["email"] = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"class":"validate-required"}), required=True)
+        if cart.total == 0.00:
+            self.fields["name"] = forms.CharField(label="Name", widget=forms.TextInput(attrs={"class":"validate-required"}), required=True)
 
-		event_questions = EventQuestion.objects.filter(event=event, deleted=False, approved=True).order_by('order')
-		for question in event_questions:
-			if question.simple_question:
-				self.fields["%s_eventquestion" % (question.id)] = forms.CharField(label=str(question.title), widget=forms.TextInput(attrs={"class":"validate-required"}), required=question.required)
-			elif question.paragraph_question:
-				self.fields["%s_eventquestion" % (question.id)] = forms.CharField(label=str(question.title), widget=forms.Textarea(attrs={"class":"validate-required", "rows": "4"}), required=question.required)
-			elif question.multiple_choice_question:
-				options = EventQuestionMultipleChoiceOption.objects.filter(event_question=question, deleted=False)
-				choices_for_question = []
-				for option in options:
-					sub_list = []
-					sub_list.append(option.title)
-					sub_list.append(option.title)
-					choices_for_question.append(sub_list)
-				print(choices_for_question)
-				self.fields["%s_eventquestion" % (question.id)] = forms.ChoiceField(label=str(question.title), widget=forms.Select(attrs={"class":""}), required=question.required, choices=choices_for_question)
+        event_questions = EventQuestion.objects.filter(event=event, deleted=False, approved=True).order_by('order')
+        for question in event_questions:
+            if question.simple_question:
+                self.fields["%s_eventquestion" % (question.id)] = forms.CharField(label=str(question.title), widget=forms.TextInput(attrs={"class":"validate-required"}), required=question.required)
+            elif question.paragraph_question:
+                self.fields["%s_eventquestion" % (question.id)] = forms.CharField(label=str(question.title), widget=forms.Textarea(attrs={"class":"validate-required", "rows": "4"}), required=question.required)
+            elif question.multiple_choice_question:
+                options = EventQuestionMultipleChoiceOption.objects.filter(event_question=question, deleted=False)
+                choices_for_question = []
+                for option in options:
+                    sub_list = []
+                    sub_list.append(option.title)
+                    sub_list.append(option.title)
+                    choices_for_question.append(sub_list)
+                print(choices_for_question)
+                self.fields["%s_eventquestion" % (question.id)] = forms.ChoiceField(label=str(question.title), widget=forms.Select(attrs={"class":""}), required=question.required, choices=choices_for_question)
 
 
-		cart_items = EventCartItem.objects.filter(event_cart=cart)
-		for cart_item in cart_items:
+        cart_items = EventCartItem.objects.filter(event_cart=cart)
+        for cart_item in cart_items:
 
-			for x in range(cart_item.quantity):
+            for x in range(cart_item.quantity):
 
-				attendee_general_questions = AttendeeGeneralQuestions.objects.get(event=event)
+                attendee_general_questions = AttendeeGeneralQuestions.objects.get(event=event)
 
-				self.fields["%s_%s_name" % (x, cart_item.id)] = forms.CharField(label="Name", widget=forms.TextInput(attrs={"class":"validate-required", "placeholder":"Full Name"}), required=True)
-				
-				if attendee_general_questions.gender:
-					self.fields["%s_%s_gender" % (x, cart_item.id)] = forms.ChoiceField(label="Gender", widget=forms.RadioSelect(attrs={"class":""}), choices=genders)
-				
-				if attendee_general_questions.email:
-					self.fields["%s_%s_email" % (x, cart_item.id)] = forms.EmailField(label="Email", widget=forms.TextInput(attrs={"class":"validate-required", "placeholder":"you@somedomain.com"}), required=attendee_general_questions.email_required)
+                self.fields["%s_%s_name" % (x, cart_item.id)] = forms.CharField(label="Name", widget=forms.TextInput(attrs={"class":"validate-required", "placeholder":"Full Name"}), required=True)
+                
+                if attendee_general_questions.gender:
+                    self.fields["%s_%s_gender" % (x, cart_item.id)] = forms.ChoiceField(label="Gender", widget=forms.RadioSelect(attrs={"class":""}), choices=genders)
+                
+                if attendee_general_questions.email:
+                    self.fields["%s_%s_email" % (x, cart_item.id)] = forms.EmailField(label="Email", widget=forms.TextInput(attrs={"class":"validate-required", "placeholder":"you@somedomain.com"}), required=attendee_general_questions.email_required)
 
-				ticket_questions = TicketQuestion.objects.filter(event=event, ticket=cart_item.ticket, deleted=False, approved=True).order_by('order')
-				for question in ticket_questions:
-					if question.simple_question:
-						self.fields["%s_%s_%s_ticketquestion" % (question.id, x, cart_item.id)] = forms.CharField(label=str(question.title), widget=forms.TextInput(attrs={"class":"validate-required"}), required=question.required)
-					elif question.paragraph_question:
-						self.fields["%s_%s_%s_ticketquestion" % (question.id, x, cart_item.id)] = forms.CharField(label=str(question.title), widget=forms.Textarea(attrs={"class":"validate-required", "rows": "4"}), required=question.required)
-					else:
-						options = TicketQuestionMultipleChoiceOption.objects.filter(ticket_question=question, deleted=False)
-						choices_for_question = []
-						for option in options:
-							sub_list = []
-							sub_list.append(option.title)
-							sub_list.append(option.title)
-							choices_for_question.append(sub_list)
-						self.fields["%s_%s_%s_ticketquestion" % (question.id, x, cart_item.id)] = forms.ChoiceField(label=str(question.title), widget=forms.Select(attrs={"class":""}), required=question.required, choices=choices_for_question)
+                ticket_questions = TicketQuestion.objects.filter(event=event, ticket=cart_item.ticket, deleted=False, approved=True).order_by('order')
+                for question in ticket_questions:
+                    if question.simple_question:
+                        self.fields["%s_%s_%s_ticketquestion" % (question.id, x, cart_item.id)] = forms.CharField(label=str(question.title), widget=forms.TextInput(attrs={"class":"validate-required"}), required=question.required)
+                    elif question.paragraph_question:
+                        self.fields["%s_%s_%s_ticketquestion" % (question.id, x, cart_item.id)] = forms.CharField(label=str(question.title), widget=forms.Textarea(attrs={"class":"validate-required", "rows": "4"}), required=question.required)
+                    else:
+                        options = TicketQuestionMultipleChoiceOption.objects.filter(ticket_question=question, deleted=False)
+                        choices_for_question = []
+                        for option in options:
+                            sub_list = []
+                            sub_list.append(option.title)
+                            sub_list.append(option.title)
+                            choices_for_question.append(sub_list)
+                        self.fields["%s_%s_%s_ticketquestion" % (question.id, x, cart_item.id)] = forms.ChoiceField(label=str(question.title), widget=forms.Select(attrs={"class":""}), required=question.required, choices=choices_for_question)
 
 
 
 
 class EventMainForm(forms.ModelForm):
-	start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"],  required=True, widget=forms.DateTimeInput(
-		attrs={"class": "form-control m-input", "placeholder": "Start", "autocomplete": "off", "onchange": "endDateTime(this)"}))
-	end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], required=True,  widget=forms.DateTimeInput(
-		attrs={"class": "form-control m-input", "placeholder": "End", "autocomplete": "off"}))
+    start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"],  required=True, widget=forms.DateTimeInput(
+        attrs={"class": "form-control m-input", "placeholder": "Start", "autocomplete": "off", "onchange": "endDateTime(this)"}))
+    end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], required=True,  widget=forms.DateTimeInput(
+        attrs={"class": "form-control m-input", "placeholder": "End", "autocomplete": "off"}))
 
-	class Meta:
-		model = Event
-		fields = [
-			"title", "start", "end"
-		]
-
-
-		widgets = {
-
-				"title": forms.TextInput(
-						attrs={
-							"class":"form-control m-input message",
-							"placeholder":"My Awesome Event",
-							"required": True,
-							"maxlength": '100',
-						}
-					),
-			}
+    class Meta:
+        model = Event
+        fields = [
+            "title", "start", "end"
+        ]
 
 
-	def clean_end(self):
-		start = self.cleaned_data.get('start')
-		end = self.cleaned_data.get('end')
+        widgets = {
 
-		if start and end:
-			today = timezone.now()
-			if start and end and start >= end:
-				print("Did it even come here")
-				raise forms.ValidationError('The start date cannot be after the end date')
-			
-			if end <= today:
-				raise forms.ValidationError(
-					'Please change the end date of your event to be after today!')
-			
-			
-		return end
+                "title": forms.TextInput(
+                        attrs={
+                            "class":"form-control m-input message",
+                            "placeholder":"My Awesome Event",
+                            "required": True,
+                            "maxlength": '100',
+                        }
+                    ),
+            }
+
+
+    def clean_end(self):
+        start = self.cleaned_data.get('start')
+        end = self.cleaned_data.get('end')
+
+        if start and end:
+            today = timezone.now()
+            if start and end and start >= end:
+                print("Did it even come here")
+                raise forms.ValidationError('The start date cannot be after the end date')
+            
+            if end <= today:
+                raise forms.ValidationError(
+                    'Please change the end date of your event to be after today!')
+            
+            
+        return end
 
 
 class EventURLForm(forms.ModelForm):
 
-	class Meta:
-		model = Event
-		fields = [
-			"url",
-		]
+    class Meta:
+        model = Event
+        fields = [
+            "url",
+        ]
 
-		widgets = {
+        widgets = {
                     "url": forms.TextInput(
-						attrs={
-							"class":"form-control m-input",
-							"placeholder":"my-awesome-event",
-							"onkeyup": "ValidateURL(this);"
-						}
-					),
+                        attrs={
+                            "class":"form-control m-input",
+                            "placeholder":"my-awesome-event",
+                            "onkeyup": "ValidateURL(this);"
+                        }
+                    ),
                 }
 
 
 class EventVenueForm(forms.ModelForm):
 
-	class Meta:
-		model = Event
-		fields = [
-			"venue_name", "venue_address",
-		]
+    class Meta:
+        model = Event
+        fields = [
+            "venue_name", "venue_address",
+        ]
 
-		widgets = {
+        widgets = {
 
                     "venue_name": forms.TextInput(
                         attrs={
                             "class": "form-control m-input",
-							"placeholder": "Venue",
+                            "placeholder": "Venue",
                         }
                     ),
 
-					"venue_address": forms.TextInput(
+                    "venue_address": forms.TextInput(
                         attrs={
                             "autocomplete": "off",
                             "class": "form-control m-input",
-							"placeholder": "123 Main Street",
-							"id": "autocomplete",
+                            "placeholder": "123 Main Street",
+                            "id": "autocomplete",
                         }
                     ),
                 }
 
-	def clean(self, *args, **kwargs):
-		cleaned_data = super(EventVenueForm, self).clean(*args, **kwargs)
-		venue_name = self.cleaned_data.get('venue_name')
-		venue_address = self.cleaned_data.get('venue_address')
+    def clean(self, *args, **kwargs):
+        cleaned_data = super(EventVenueForm, self).clean(*args, **kwargs)
+        venue_name = self.cleaned_data.get('venue_name')
+        venue_address = self.cleaned_data.get('venue_address')
 
-		if venue_name and not venue_address:		
-			raise forms.ValidationError(f'Please enter the address for {venue_name}')
+        if venue_name and not venue_address:		
+            raise forms.ValidationError(f'Please enter the address for {venue_name}')
 
-		if venue_address and not venue_name:
-			raise forms.ValidationError('Please enter a name for this address')
-			
-		return cleaned_data
+        if venue_address and not venue_name:
+            raise forms.ValidationError('Please enter a name for this address')
+            
+        return cleaned_data
 
 
 
 
 class EventImageForm(forms.ModelForm):
 
-	class Meta:
-		model = Event
-		fields = [
-			"image",
-		]
+    class Meta:
+        model = Event
+        fields = [
+            "image",
+        ]
 
-		widgets = {
+        widgets = {
 
                     "image": forms.FileInput(
                         attrs={
@@ -196,109 +196,119 @@ class EventImageForm(forms.ModelForm):
 
 class EventDescriptionForm(forms.ModelForm):
 
-	description = forms.CharField(required=False, widget=FroalaEditor(options={'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True}))
+    def __init__(self, house, *args, **kwargs):
+        super(EventDescriptionForm, self).__init__(*args, **kwargs)
 
-	class Meta:
-		model = Event
-		fields = [
-			"description",
-		]
+        self.fields["description"] = forms.CharField(required=True, widget=ArqamFroalaEditor(options={
+            'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True, 'useClasses': False}, house=house))
 
 
-	
+    class Meta:
+        model = Event
+        fields = [
+            "description",
+        ]
+
+
+    
 
 
 
 class EventForm(forms.ModelForm):
 
-	start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"],  required=True, widget=forms.DateTimeInput(
-		attrs={"class": "form-control m-input", "placeholder": "Start", "autocomplete": "off", "onchange": "endDateTime(this)"}))
-	end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], required=True,  widget=forms.DateTimeInput(
-		attrs={"class": "form-control m-input", "placeholder": "End", "autocomplete": "off"}))
+    def __init__(self, house, *args, **kwargs):
+        super(EventForm, self).__init__(*args, **kwargs)
 
-	description = forms.CharField(required=False, widget=FroalaEditor(options={'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True}))
+        self.fields["description"] = forms.CharField(required=True, widget=ArqamFroalaEditor(options={
+            'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True, 'useClasses': False}, house=house))
 
-	class Meta:
-		model = Event
-		fields = [
-			"title", "url", "venue_name", "venue_address", "description", "start", "end", "image"
-		]
+    start = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"],  required=True, widget=forms.DateTimeInput(
+        attrs={"class": "form-control m-input", "placeholder": "Start", "autocomplete": "off", "onchange": "endDateTime(this)"}))
+    end = forms.DateTimeField(input_formats=["%m/%d/%Y %I:%M %p"], required=True,  widget=forms.DateTimeInput(
+        attrs={"class": "form-control m-input", "placeholder": "End", "autocomplete": "off"}))
 
 
-		widgets = {
-
-				"title": forms.TextInput(
-						attrs={
-							"class":"form-control m-input message",
-							"placeholder":"My Awesome Event",
-							"required": True,
-							"maxlength": '100',
-						}
-					),
-
-				"url": forms.TextInput(
-						attrs={
-							"class":"form-control m-input",
-							"placeholder":"my-awesome-event",
-							"onkeyup": "ValidateURL(this);"
-						}
-					),
-
-				"venue_name": forms.TextInput(
-						attrs={
-							"class":"form-control m-input",
-							"placeholder":"Venue",
-						}
-					),
-
-				"venue_address": forms.TextInput(
-						attrs={
-							"autocomplete": "off",
-							"class":"form-control m-input",
-							"placeholder":"123 Main Street",
-							"id":"autocomplete",
-						}
-					),
-
-				"image": forms.FileInput(
-						attrs={
-							"onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
-							"class":"form-control m-input dropzone",
-						}
-					),
-			}
+    class Meta:
+        model = Event
+        fields = [
+            "title", "url", "venue_name", "venue_address", "description", "start", "end", "image"
+        ]
 
 
+        widgets = {
 
-	def clean_image(self):
-		image = self.cleaned_data.get('image')
-		if image:
-			image_extensions = ['.jpg', '.png', '.JPG', '.PNG', '.JPEG', '.jpeg']
-			error = True
-			for extension in image_extensions:
-				if image.name.lower().endswith(extension) or image.name != self.instance.slug:
-					error = False
+                "title": forms.TextInput(
+                        attrs={
+                            "class":"form-control m-input message",
+                            "placeholder":"My Awesome Event",
+                            "required": True,
+                            "maxlength": '100',
+                        }
+                    ),
 
-			if error:
-				raise forms.ValidationError('Only .jpg .png or .jpeg files are accepted.')
-			return image
-		else:
-			return image
+                "url": forms.TextInput(
+                        attrs={
+                            "class":"form-control m-input",
+                            "placeholder":"my-awesome-event",
+                            "onkeyup": "ValidateURL(this);"
+                        }
+                    ),
+
+                "venue_name": forms.TextInput(
+                        attrs={
+                            "class":"form-control m-input",
+                            "placeholder":"Venue",
+                        }
+                    ),
+
+                "venue_address": forms.TextInput(
+                        attrs={
+                            "autocomplete": "off",
+                            "class":"form-control m-input",
+                            "placeholder":"123 Main Street",
+                            "id":"autocomplete",
+                        }
+                    ),
+
+                "image": forms.FileInput(
+                        attrs={
+                            "onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
+                            "class":"form-control m-input dropzone",
+                        }
+                    ),
+            }
 
 
-	def clean_end(self):
-		start = self.cleaned_data.get('start')
-		end = self.cleaned_data.get('end')
 
-		if start and end:
-			today = timezone.now()
-			if start and end and start >= end:
-				print("Did it even come here")		
-				raise forms.ValidationError('The start date cannot be after the end date')
-			elif end <= today:
-				raise forms.ValidationError('Please change the end date of your event to be after today!')
-			else:
-				return end
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if image:
+            image_extensions = ['.jpg', '.png', '.JPG', '.PNG', '.JPEG', '.jpeg']
+            error = True
+            for extension in image_extensions:
+                if image.name.lower().endswith(extension) or image.name != self.instance.slug:
+                    error = False
+
+            if error:
+                raise forms.ValidationError('Only .jpg .png or .jpeg files are accepted.')
+            return image
+        else:
+            return image
+
+
+    def clean_end(self):
+        start = self.cleaned_data.get('start')
+        end = self.cleaned_data.get('end')
+
+        if start and end:
+            today = timezone.now()
+            if start and end and start >= end:
+                print("Did it even come here")		
+                raise forms.ValidationError('The start date cannot be after the end date')
+            elif end <= today:
+                raise forms.ValidationError('Please change the end date of your event to be after today!')
+            else:
+                return end
 
 
 

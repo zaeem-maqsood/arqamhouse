@@ -50,6 +50,24 @@ Live | {{ event.title|safe }}
         height: 210px !important;
     }
 
+    .option_icon {
+        font-size: 1.5em;
+    }
+
+    .option_text {
+        font-size: 8px;
+    }
+
+    .responsive_navigation_col {
+        padding-right: 5px;
+        padding-left: 5px;
+
+    }
+
+    .logo_responsive {
+        max-height: 70px;
+    }
+
 
     @media only screen and (min-width: 576px) {
 
@@ -72,6 +90,23 @@ Live | {{ event.title|safe }}
 
         .spotlight-height {
             height: 405px !important;
+        }
+
+        .option_icon {
+            font-size: 2em;
+        }
+
+        .option_text {
+            font-size: 1em;
+        }
+
+        .responsive_navigation_col {
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+
+        .logo_responsive {
+            max-height: 80px;
         }
 
 
@@ -490,28 +525,57 @@ function updateSpotLight() {
 {% endblock scripts %}
 
 {% block content %}
-<section class="" style="padding-top: 10px;padding-bottom: 10px;">
+<section style="padding-top: 3em;padding-bottom: 10px;">
     <div class="container">
-        <div class="row justify-content-center text-center" style="padding-top:5px;padding-bottom:5px;">
-            {% if event.house.logo %}
-            <div class="col-sm-3 col-6">
-                <a href="{{ event.house.get_home_page_url }}">
-                    <img src="{{ event.house.logo.url }}"
-                        style="max-height: 3em;margin-bottom:5px;">
+
+        <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+            <div class="col-sm-12 col-10">
+                {% if house.logo %}
+                <a href="{{ house.get_home_page_url }}">
+                    <img class="logo_responsive" src="{{ house.logo.url }}">
                 </a>
-                
+                {% endif %}
+                <p class="lear" style="margin-bottom: 0px;">{{ house.name }}</p>
             </div>
-            <div class="col-md-9 col-10 align-self-center" style="padding: 0px;">
-                <a href="{{ event.get_landing_view }}" class="btn btn--primary-1 btn-block"
-                    style="color: white;">{{ event.title }}</a>
+        </div>
+
+        <div class="row text-center justify-content-center">
+            <div class="col-lg-3 col-md-4 col-4 responsive_navigation_col">
+                <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 40px;padding: 20px;border-radius: 15px;margin-bottom: 10px;">
+                    <a href="{{ event.get_landing_view }}" id="record_button" class="bg--green-button">
+                        <i class="far fa-calendar-alt option_icon" id="recording_icon"></i>
+                        <p style="margin-top: 0px;margin-bottom: 0px;" id="recording_text" class="option_text">Event</p>
+                    </a>
+                </div>
             </div>
-            {% else %}
-            <div class="col-md-12 align-self-center" style="padding: 0px;">
-                <a href="{{ event.get_landing_view }}" class="btn btn--primary-1 btn-block"
-                    style="color: white;">{{ event.title }}</a>
+            <div class="col-lg-3 col-md-4 col-4 responsive_navigation_col">
+                <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 40px;padding: 20px;border-radius: 15px;margin-bottom: 10px;">
+                    <a href="{{ event.get_resources_view }}" target="_blank">
+                        <i class="far fa-file-alt option_icon" style="color: #4a90e2;"></i>
+                        <p style="margin-top: 0px;margin-bottom: 0px;" class="option_text">Resources</p>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-4 responsive_navigation_col">
+                <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 40px;padding: 20px;border-radius: 15px;margin-bottom: 10px;">
+                    <a href="{{ event.get_archives_view }}" target="_blank">
+                        <i class="fas fa-archive option_icon" style="color: #4a90e2;"></i>
+                        <p style="margin-top: 0px;margin-bottom: 0px;" class="option_text">Recordings</p>
+                    </a>
+                </div>
+            </div>
+            {% if event.house.allow_donations %}
+            <div class="col-lg-3 col-md-4 col-4 responsive_navigation_col">
+                <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 40px;padding: 20px;border-radius: 15px;margin-bottom: 10px;">
+                    <a href="{{ event.house.get_public_donations_url }}" target="_blank">
+                        <i class="far fa-heart option_icon" style="color: #4a90e2;"></i>
+                        <p style="margin-top: 0px;margin-bottom: 0px;" class="option_text">Donate</p>
+                    </a>
+                </div>
             </div>
             {% endif %}
         </div>
+
     </div>
 </section>
 <section style="padding-top: 1em;padding-bottom:0px;">
@@ -611,38 +675,13 @@ function updateSpotLight() {
                         </div>
                         {% endif %}
 
-                        <div class="row justify-content-center" style="padding-bottom: 10px;">
-                            <div class="col-md-12 col-10">
-                                <a id="chat-message-submit" href="{{ event.get_resources_view }}" target="_blank" class="btn btn--primary-1 btn-block"><span
-                                        class="btn__text">Event Resources</span></a>
-                            </div>
-                        </div>
-
-                        {% if event.allow_non_ticket_archive_viewers %}
-                        <div class="row justify-content-center" style="padding-bottom: 10px;">
-                            <div class="col-md-12 col-10">
-                                <a id="chat-message-submit" href="{{ event.get_archives_view }}" target="_blank"
-                                    class="btn btn--primary-1 btn-block"><span class="btn__text">Archives</span></a>
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        {% if event.house.allow_donations %}
-                        <div class="row justify-content-center" style="padding-bottom: 10px;">
-                            <div class="col-md-12 col-10">
-                                <a id="chat-message-submit" href="{{ event.house.get_public_donations_url }}" style="background: #319c9c;border-color: #319c9c;" target="_blank"
-                                    class="btn btn--primary-1 btn-block"><span class="btn__text">Donate</span></a>
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        <div class="row justify-content-center" style="padding-top: 50px;">
+                        <!-- <div class="row justify-content-center" style="padding-top: 50px;">
                             <div class="col-12 text-center">
                                 <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}"
                                         style="max-height: 3em;margin-bottom:0px;"></a>
                                 <p style="font-size: 8px;">Powered by Arqam House</p>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
 

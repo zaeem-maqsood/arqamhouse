@@ -42,10 +42,10 @@ class FindHouseView(View):
         if json_data:
             search_terms = json_data["search"].split()
             print(json_data)
-            default_house = House.objects.filter(slug="arqam-house")
+            all_houses = None
 
             if json_data["search"] == '':
-                houses = default_house
+                houses = None
             else:
                 for search_term in search_terms:
                     houses = House.objects.all().filter(Q(name__icontains=search_term))

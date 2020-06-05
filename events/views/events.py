@@ -1035,7 +1035,7 @@ class EventDescriptionView(HouseAccountMixin, EventSecurityMixin, UserPassesTest
         slug = kwargs['slug']
         self.object = self.get_event(slug)
         data = request.GET
-        form = EventDescriptionForm(instance=self.object)
+        form = EventDescriptionForm(instance=self.object, house=self.object.house)
         return self.render_to_response(self.get_context_data(form=form))
 
     def post(self, request, *args, **kwargs):
@@ -1043,7 +1043,7 @@ class EventDescriptionView(HouseAccountMixin, EventSecurityMixin, UserPassesTest
         self.object = self.get_event(slug)
         data = request.POST
 
-        form = self.get_form()
+        form = EventDescriptionForm(data=data, instance=self.object, house=self.object.house)
         if form.is_valid():
             return self.form_valid(form, request)
         else:

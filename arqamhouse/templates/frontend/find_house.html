@@ -25,7 +25,6 @@ function GetHouses(object) {
     var token = '{{ csrf_token }}';
 
     var search = object.value;
-    console.log(search)
 
     const url = "{{ request.path }}";
 
@@ -56,7 +55,6 @@ function GetHouses(object) {
 
                 // Examine the text in the response
                 response.json().then(function (data) {
-                    console.log(data)
                     document.getElementById("dynamic").innerHTML = data['html'];
                 });
             }
@@ -66,6 +64,10 @@ function GetHouses(object) {
         });
 
 }
+
+window.onload = function () {
+    document.getElementById("house_search").value = '';
+};
 </script>
 
 {% endblock scripts %}
@@ -94,26 +96,11 @@ function GetHouses(object) {
                     style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);border-radius: 10px;margin-bottom: 20px;padding: 20px;">
                     
                         <div class="row" style="padding-bottom: 5px;padding-left: 10px;padding-right: 10px;">
-                            {% if default_house.logo %}
-                            <div class="col-lg-4 col-md-4 col-sm-6 col-6">
-                                <a href="{{ default_house.get_home_page_url }}">
-                                    <img src="{{ default_house.logo.url }}">
-                                </a>
-                                
-                                <p style="font-size: 1.2rem;margin-top: 10px;">{{ default_house.name }}</p>
-                            </div>
-                            {% endif %}
                             
-                            <div class="col-lg-8 col-md-8 col-sm-6 col-6" style="text-align: right;align-self: center;">
-                                <p class="lead" style="margin-bottom: 0px;">23</p>
-                                <p style="font-size: 0.5rem;">Subscribers</p>
+                            <div class="col-12" style="text-align: center;">
+                                <p class="lead" style="margin-bottom: 0px;">Find a house by typing in the search bar.</p>
                             </div>
                             
-                        </div>
-                        <div class="row" style="padding-left: 10px;padding-right: 10px;";">
-                            <div class="col-3">
-                                
-                            </div>
                         </div>
                     
                 </div>

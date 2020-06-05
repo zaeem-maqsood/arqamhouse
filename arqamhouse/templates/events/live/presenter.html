@@ -10,27 +10,39 @@
 <style>
 
     .blinking{
-        animation:blinkingText 1.2s infinite;
+        animation:blinkingText 2.0s infinite;
     }
     @keyframes blinkingText{
-        0%{     color: #fff;    }
-        49%{    color: #fff; }
+        0%{     color: #e34a65;    }
+        49%{    color: #e34a65; }
         60%{    color: transparent; }
         99%{    color:transparent;  }
-        100%{   color: #fff;    }
+        100%{   color: #e34a65;    }
+    }
+
+    .option_icon {
+        font-size: 1.5em;
+    }
+
+    .option_text {
+        font-size: 8px;
     }
 
 
     .bg--googleplus {
-        background: #fc8080;
+        color: #fc8080;
     }
 
     .bg--green-button {
-        background: #44b682;
+        color: #4a90e2;
     }
 
     .bg--blue-button {
-        background: #44abb6;
+        color: #4a90e2;
+    }
+
+    .bg--dark-red {
+        color: #e34a65;
     }
 
 
@@ -68,6 +80,12 @@
         height: 225px;
     }
 
+    .responsive_navigation_col {
+        padding-right: 5px;
+        padding-left: 5px;
+
+    }
+
 
     @media only screen and (min-width: 576px) {
 
@@ -98,6 +116,19 @@
 
         #screen-share {
             height: 225px;
+        }
+
+        .option_icon {
+            font-size: 2em;
+        }
+
+        .option_text {
+            font-size: 1em;
+        }
+
+        .responsive_navigation_col {
+            padding-right: 15px;
+            padding-left: 15px;
         }
 
     }
@@ -644,6 +675,7 @@
 
     chatSocket3.onmessage = function (e) {
         var data = JSON.parse(e.data);
+
         console.log("The viewers are");
         console.log(data);
 
@@ -722,11 +754,10 @@ function toggleRecord(object) {
 
     var token = '{{ csrf_token }}';
 
-
-    if (object.innerHTML == "Start Recording") {
-        object.innerHTML = "Recording..."
-        object.classList.add('blinking');
-        object.classList.add('bg--pinterest');
+    if (object.classList.contains('bg--green-button')) {
+        document.getElementById("recording_text").innerHTML = "Recording"
+        document.getElementById("recording_icon").classList.add('blinking');
+        object.classList.add('bg--dark-red');
         object.classList.remove('bg--green-button');
         record = true;
         // 5400000
@@ -736,14 +767,16 @@ function toggleRecord(object) {
         timeleft = timeleft - 1;
         
     } else {
-        object.classList.remove('blinking');
-        object.classList.remove('bg--pinterest'); 
-        object.innerHTML = "Start Recording"
+        document.getElementById("recording_icon").classList.remove('blinking');
+        object.classList.remove('bg--dark-red'); 
+        document.getElementById("recording_text").innerHTML = "Record"
         object.classList.add('bg--green-button');
         console.log("It came block")
         record = false;
         resetTimer();
     }
+
+    changeButtonStates();
 
     console.log(record);
     const url = '{{ request.path }}';
@@ -801,20 +834,22 @@ function toggleBroadcast(object) {
     var token = '{{ csrf_token }}';
 
 
-    if (object.innerHTML == "Broadcast") {
-        object.innerHTML = "Broadcasting..."
-        object.classList.add('blinking');
-        object.classList.add('bg--pinterest');
+    if (object.classList.contains('bg--blue-button')) {
+        document.getElementById("broadcast_text").innerHTML = "Broadcasting"
+        document.getElementById("broadcast_icon").classList.add('blinking');
+        object.classList.add('bg--dark-red');
         object.classList.remove('bg--blue-button');
         broadcast = true;
     } else {
-        object.classList.remove('blinking');
-        object.classList.remove('bg--pinterest'); 
-        object.innerHTML = "Broadcast"
+        document.getElementById("broadcast_icon").classList.remove('blinking');
+        object.classList.remove('bg--dark-red');
+        document.getElementById("broadcast_text").innerHTML = "Broadcast"
         object.classList.add('bg--blue-button');
         console.log("It came block")
         broadcast = false;
     }
+
+    changeButtonStates();
 
     console.log(broadcast);
     const url = '{{ request.path }}';
@@ -909,11 +944,202 @@ function eventLiveFeeCalculations() {
 
 </script>
 
+
+
+
+<!-- Handle Record button and Broadcast button -->
+<script>
+
+    var slug = {{ slug_json }};
+
+    {% if local %}
+    console.log('ws://' + window.location.host + '/ws/buttons/' + slug)
+    var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/buttons/' + slug);
+    {% else %}
+    var chatSocket = new WebSocket('wss://' + window.location.host + '/ws/buttons/' + slug);
+    {% endif %}
+
+    chatSocket.onmessage = function (e) {
+        var data = JSON.parse(e.data);
+        console.log(data);
+        var record_button = data['record_button'];
+        var broadcast_button = data['broadcast_button'];
+
+        record_element = document.getElementById("record_button");
+
+        if (record_button) {
+            
+            if (record_element.classList.contains('bg--green-button')) {
+                document.getElementById("recording_text").innerHTML = "Recording"
+                document.getElementById("recording_icon").classList.add('blinking');
+                record_element.classList.add('bg--dark-red');
+                record_element.classList.remove('bg--green-button');
+            }
+        }
+
+        else {
+
+            if (record_element.classList.contains('bg--dark-red')) {
+                document.getElementById("recording_icon").classList.remove('blinking');
+                record_element.classList.remove('bg--dark-red');
+                document.getElementById("recording_text").innerHTML = "Record"
+                record_element.classList.add('bg--green-button');
+            }
+
+        }
+
+        broadcast_element = document.getElementById("broadcast_button");
+        if (broadcast_button) {
+
+            if (broadcast_element.classList.contains('bg--blue-button')) {
+                document.getElementById("broadcast_text").innerHTML = "Broadcasting"
+                document.getElementById("broadcast_icon").classList.add('blinking');
+                broadcast_element.classList.add('bg--dark-red');
+                broadcast_element.classList.remove('bg--blue-button');
+            }
+        }
+
+        else {
+
+            if (broadcast_element.classList.contains('bg--dark-red')) {
+                document.getElementById("broadcast_icon").classList.remove('blinking');
+                broadcast_element.classList.remove('bg--dark-red');
+                document.getElementById("broadcast_text").innerHTML = "Broadcast"
+                broadcast_element.classList.add('bg--blue-button');
+            }
+
+        }
+
+
+    };
+
+    chatSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    function changeButtonStates () {
+
+        var record_button = false;
+        var broadcast_button = false;
+
+        record_element = document.getElementById("record_button");
+        if (record_element.classList.contains('bg--green-button')) {
+            record_button = false;
+        }
+        else {
+            record_button = true;
+        }
+
+        {% if event_live_broadcasts %}
+        broadcast_element = document.getElementById("broadcast_button");
+        if (broadcast_element.classList.contains('bg--blue-button')) {
+            broadcast_button = false;
+        }
+        else {
+            broadcast_button = true;
+        }
+        {% else %}
+        broadcast_button = false;
+        {% endif %}
+
+        chatSocket.send(JSON.stringify({
+            'record_button': record_button,
+            'broadcast_button': broadcast_button,
+        }));
+
+    };
+
+
+    function setButttonOnLoad () {
+
+        {% if event_live.recording %}
+        record_element = document.getElementById("record_button");
+        document.getElementById("recording_text").innerHTML = "Recording"
+        document.getElementById("recording_icon").classList.add('blinking');
+        record_element.classList.add('bg--dark-red');
+        record_element.classList.remove('bg--green-button');
+        {% endif %}
+
+        {% if event_live.broadcasting %}
+        broadcast_element = document.getElementById("broadcast_button");
+        document.getElementById("broadcast_text").innerHTML = "Broadcasting"
+        document.getElementById("broadcast_icon").classList.add('blinking');
+        broadcast_element.classList.add('bg--dark-red');
+        broadcast_element.classList.remove('bg--blue-button');
+        {% endif %}
+    }
+
+    window.onload = setButttonOnLoad();
+
+
+</script>
+
 {% endblock scripts %}
 
 {% block content %}
 <section style="padding-top: 3em;padding-bottom:0px;">
     <div class="container">
+
+        <div class="row text-center">
+            <div class="col-lg-2 col-md-4 col-4 responsive_navigation_col">
+                <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 40px;padding: 20px;border-radius: 15px;margin-bottom: 20px;">
+                    <a href="{{ event.get_live_options_view }}">
+                        <i class="far fa-stop-circle option_icon" style="color: #e24a66;"></i>
+                        <p style="margin-bottom: 0px;color: #e24a66;" class="option_text">Leave</p>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-4 responsive_navigation_col">
+                <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 40px;padding: 20px;border-radius: 15px;margin-bottom: 20px;">
+                    <a href="javascript:;" id="record_button" class="bg--green-button" onclick="toggleRecord(this);">
+                        <i class="fas fa-video option_icon" id="recording_icon"></i>
+                        <p style="margin-top: 0px;margin-bottom: 0px;" id="recording_text" class="option_text">Record</p>
+                    </a>
+                </div>
+            </div>
+            {% if event_live_broadcasts %}
+            <div class="col-lg-2 col-md-4 col-4 responsive_navigation_col">
+                <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 40px;padding: 20px;border-radius: 15px;margin-bottom: 20px;">
+                    <a href="javascript:;" id="broadcast_button" class="bg--blue-button" onclick="toggleBroadcast(this);">
+                        <i class="fas fa-broadcast-tower option_icon" id="broadcast_icon"></i>
+                        <p style="margin-top: 0px;margin-bottom: 0px;" id="broadcast_text" class="option_text">Broadcast</p>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            <div class="col-lg-2 col-md-4 col-4 responsive_navigation_col">
+                <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 40px;padding: 20px;border-radius: 15px;margin-bottom: 20px;">
+                    <a href="{{ event.get_resources_view }}" target="_blank">
+                        <i class="far fa-file-alt option_icon" style="color: #4a90e2;"></i>
+                        <p style="margin-top: 0px;margin-bottom: 0px;" class="option_text">Resources</p>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-4 responsive_navigation_col">
+                <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 40px;padding: 20px;border-radius: 15px;margin-bottom: 20px;">
+                    <a href="{{ event.get_archives_view }}" target="_blank">
+                        <i class="fas fa-archive option_icon" style="color: #4a90e2;"></i>
+                        <p style="margin-top: 0px;margin-bottom: 0px;" class="option_text">Recordings</p>
+                    </a>
+                </div>
+            </div>
+            {% if event.house.allow_donations %}
+            <div class="col-lg-2 col-md-4 col-4 responsive_navigation_col">
+                <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 40px;padding: 20px;border-radius: 15px;margin-bottom: 20px;">
+                    <a href="{{ event.house.get_public_donations_url }}" target="_blank">
+                        <i class="far fa-heart option_icon" style="color: #4a90e2;"></i>
+                        <p style="margin-top: 0px;margin-bottom: 0px;" class="option_text">Donate</p>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="row text-center d-none d-md-block" style="padding-bottom: 20px;">
+            <div class="col-12">
+                <progress value="0" max="5400" id="progressBar" style="width: 100%;"></progress>
+            </div>
+        </div>
 
         <div class="row" style="padding-bottom: 20px;">
             
@@ -965,34 +1191,9 @@ function eventLiveFeeCalculations() {
                 
                 </div>
 
-                <div class="row justify-content-center" style="padding-bottom: 10px;">
-                    <div class="col-lg-12 col-sm-12 col-10" {% if event_live_broadcasts %}style="padding-bottom: 0px;"
-                        {% else %}style="padding-bottom: 10px;" {% endif %}>
-                        <button class="btn bg--green-button btn-block" style="color: white;" id="record_button"
-                            onclick="toggleRecord(this);">Start Recording</button>
-                        <progress value="0" max="5400" id="progressBar" style="width: 100%;" class="d-none d-md-block"></progress>
-                    </div>
-                </div>
-                
-                {% if event_live_broadcasts %}
-                <div class="row justify-content-center" style="padding-bottom: 10px;">
-                    <div class="col-lg-12 col-sm-12 col-10" style="padding-bottom: 10px;">
-                        <button class="btn bg--blue-button btn-block" style="color: white;" id="broadcast_button"
-                            onclick="toggleBroadcast(this);">Broadcast</button>
-                    </div>
-                </div>
-                {% endif %}
-
-                <div class="row justify-content-center" style="padding-bottom: 20px;">
-                    <div class="col-lg-12 col-sm-12 col-10">
-                        <a href="{{ event.get_live_options_view }}" class="btn bg--googleplus btn-block" style="color: white;">Stop
-                            Live</a>
-                    </div>
-                </div>
-
                 <div class="row justify-content-center text-center" style="padding-bottom: 10px;">
                     <div class="col-sm-12 col-10" style="padding: 0px;">
-                        <p class="lead" style="color: #4a90e2;">Participants: <span id="viewers" style="font-weight:800;"></span></p>
+                        <p class="lead" style="color: #4a90e2;">Viewers: <span id="viewers" style="font-weight:800;"></span></p>
                     </div>
                 </div>
 
@@ -1012,7 +1213,7 @@ function eventLiveFeeCalculations() {
                         
                         <div class="row justify-content-center" style="padding-bottom: 20px;">
                             <div class="col-md-12 col-10">
-                                <div id="chat-area" class="overflow-auto" style="max-height: 400px;">
+                                <div id="chat-area" class="overflow-auto" style="max-height: 300px;">
                                     {% for comment in event_live_comments %}
                                     <div class="alert {% if comment.private %}bg--private{% else %}{% if profile.email == comment.profile.email %}bg--primary{% else %}alert bg--success{% endif %}{% endif %}" style="padding: 5px;margin-bottom: 10px;">
                                         <div class="alert__body">
@@ -1038,30 +1239,6 @@ function eventLiveFeeCalculations() {
                                         class="btn__text">Send</span></button>
                             </div>
                         </div>
-
-                        <div class="row justify-content-center" style="padding-bottom: 10px;">
-                            <div class="col-md-12 col-10">
-                                <a id="chat-message-submit" href="{{ event.get_resources_view }}" target="_blank"
-                                    class="btn btn--primary-1 btn-block"><span class="btn__text">Event Resources</span></a>
-                            </div>
-                        </div>
-
-                        <div class="row justify-content-center" style="padding-bottom: 10px;">
-                            <div class="col-md-12 col-10">
-                                <a id="chat-message-submit" href="{{ event.get_archives_view }}" target="_blank"
-                                    class="btn btn--primary-1 btn-block"><span class="btn__text">Archives</span></a>
-                            </div>
-                        </div>
-
-                        {% if event.house.allow_donations %}
-                        <div class="row justify-content-center" style="padding-bottom: 10px;">
-                            <div class="col-md-12 col-10">
-                                <a id="chat-message-submit" href="{{ event.house.get_public_donations_url }}"
-                                    style="background: #319c9c;border-color: #319c9c;" target="_blank"
-                                    class="btn btn--primary-1 btn-block"><span class="btn__text">Donate</span></a>
-                            </div>
-                        </div>
-                        {% endif %}
                     </div>
 
                 </div>

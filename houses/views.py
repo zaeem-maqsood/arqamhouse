@@ -39,16 +39,67 @@ from .mixins import HouseAccountMixin, HouseLandingMixin
 
 from core.mixins import LoginRequiredMixin
 
+from itertools import chain
+from operator import attrgetter
+
 from django.contrib.auth.models import User
 from profiles.models import Profile
 from .models import House, HouseUser, HouseDirector
 from .forms import (AddUserToHouse, HouseSupportInfoForm, HouseChangeForm, HouseForm, HouseVerificationForm, 
                     HouseDirectorForm, HouseUserOptionsForm, HouseLogoForm, HouseContactForm)
 
-from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee
+from events.models import Event, Ticket, EventCart, EventCartItem, EventOrder, Attendee, EventLiveArchive
 from profiles.models import Profile
 from payments.models import HouseBalance, HouseBalanceLog, Transaction, PayoutSetting
 from subscribers.models import Subscriber
+from donations.models import Donation, DonationType
+
+
+
+class HouseEventsListView(View):
+    template_name = "houses/events.html"
+
+    def get_house(self, slug):
+        try:
+            house = House.objects.get(slug=slug)
+            return house
+        except:
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        house = self.get_house(kwargs["slug"])
+        active_events = Event.objects.filter(house=house, deleted=False, active=True).order_by("-updated_at")
+        past_events = Event.objects.filter(house=house, deleted=False, active=False).order_by("-updated_at")
+
+        total_events = active_events.count() + past_events.count()
+        tickets_sold = Ticket.objects.filter(event__house=house).aggregate(Sum('amount_sold'))["amount_sold__sum"]
+
+        context["total_events"] = total_events
+        context["tickets_sold"] = tickets_sold
+        context["active_events"] = active_events
+        context["past_events"] = past_events
+        context["house"] = house
+        return render(request, self.template_name, context)
+
+
+class AllArchivedListView(View):
+    template_name = "houses/archives.html"
+
+    def get_house(self, slug):
+        try:
+            house = House.objects.get(slug=slug)
+            return house
+        except:
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        house = self.get_house(kwargs["slug"])
+        event_live_archives = EventLiveArchive.objects.filter(event_live__event__house=house).order_by("created_at")
+        context["event_live_archives"] = event_live_archives
+        context["house"] = house
+        return render(request, self.template_name, context)
 
 
 
@@ -95,26 +146,28 @@ class HouseHomePageView(DetailView):
         events = Event.objects.filter(house=house, deleted=False, active=True)
         return events
 
-    def get_past_events(self, house):
-        events = Event.objects.filter(house=house, deleted=False, active=False)
-        return events
-
 
     def get(self, request, *args, **kwargs):
 
         context = {}
         house = self.get_house(kwargs["slug"])
         active_events = self.get_active_events(house)
-        past_events = self.get_past_events(house)
+        donation_types = DonationType.objects.filter(house=house, deleted=False)[:2]
+        recordings = EventLiveArchive.objects.filter(event_live__event__house=house, event_live__event__allow_non_ticket_archive_viewers=True)[:2]
+
+        result_list = sorted(chain(active_events, donation_types, recordings), key=attrgetter('updated_at'))
+        result_list.reverse()
+        print(result_list)
+
         owner = self.check_if_user_is_owner(house)
         subscribed = self.check_if_user_is_subscribed(house)
-        print(subscribed)
 
+        context["recordings"] = recordings.exists()
         context["subscribed"] = subscribed
         context["owner"] = owner
         context["house"] = house
-        context["active_events"] = active_events
-        context["past_events"] = past_events
+        context["active_events"] = active_events.exists()
+        context["result_list"] = result_list
 
         return render(request, self.template_name, context)
 

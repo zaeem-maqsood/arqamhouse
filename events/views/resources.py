@@ -23,7 +23,7 @@ class EventResourceUpdateView(HouseAccountMixin, UpdateView):
             form = ResourceImageForm(instance=self.object)
             resource_type = 'image'
         elif self.object.text:
-            form = ResourceTextForm(instance=self.object)
+            form = ResourceTextForm(instance=self.object, house=house)
             resource_type = 'text'
         else:
             form = ResourceLinkForm(instance=self.object)
@@ -68,9 +68,9 @@ class EventResourceUpdateView(HouseAccountMixin, UpdateView):
         elif self.object.image:
             form = ResourceImageForm(data, request.FILES, instance=self.object)
         elif self.object.text:
-            form = ResourceTextForm(data, request.FILES, instance=self.object)
+            form = ResourceTextForm(data=data, instance=self.object, house=house)
         else:
-            form = ResourceLinkForm(data, request.FILES, instance=self.object)
+            form = ResourceLinkForm(data, instance=self.object)
 
 
         event = self.get_event()
@@ -118,7 +118,7 @@ class EventResourceCreateView(HouseAccountMixin, CreateView):
         elif resource_type == 'image':
             form = ResourceImageForm()
         elif resource_type == 'text':
-            form = ResourceTextForm()
+            form = ResourceTextForm(house=house)
         else:
             form = ResourceLinkForm()
         
@@ -153,7 +153,7 @@ class EventResourceCreateView(HouseAccountMixin, CreateView):
         elif resource_type == 'image':
             form = ResourceImageForm(data, request.FILES)
         elif resource_type == 'text':
-            form = ResourceTextForm(data, request.FILES)
+            form = ResourceTextForm(data=data, house=house)
         else:
             form = ResourceLinkForm(data, request.FILES)
 

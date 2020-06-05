@@ -26,20 +26,6 @@ Virtual Event
 {% block scripts %}
 <script>
 
-    function copyToClipboard() {
-        /* Get the text field */
-        var copyText = document.getElementById("id_presenter_link");
-        console.log(copyText)
-
-        /* Select the text field */
-        copyText.select();
-        copyText.setSelectionRange(0, 99999); /*For mobile devices*/
-
-        /* Copy the text inside the text field */
-        document.execCommand("copy");
-    } 
-
-
     function copyToClipboardViewer() {
         /* Get the text field */
         var copyText = document.getElementById("id_viewer_link");
@@ -214,23 +200,6 @@ Virtual Event
                     </div>
                 </div>
 
-                <div class="row justify-content-center">
-                    <div class="col-md-12">
-                        <h4>Presenter Link</h4>
-                        <p>The URL event speakers/presenters will use.</p>
-                    </div>
-                </div>
-
-                <div class="row justify-content-center" style="padding-bottom: 30px;">
-                    <div class="col-md-9 col-12" style="padding-bottom: 10px;">
-                        <input type="text" class="form-control m-input message" value="www.arqamhouse.com{{ event.get_live_event_presenter_view }}" required=""
-                            maxlength="180" id="id_presenter_link" readonly>
-                    </div>
-                    <div class="col-md-3 col-12">
-                        <button class="btn btn-primary btn-block" onclick="copyToClipboard();">
-                            Copy</button>
-                    </div>
-                </div>
 
                 <div class="row justify-content-center">
                     <div class="col-md-12">
@@ -276,51 +245,6 @@ Virtual Event
                         <h4>Virtual Event Comments</h4>
                         <p>Manage your virtual event comments.</p>
                         <a class="btn btn-info btn-block" href="{{ event.get_live_comments_view }}">Virtual Event Comments</a>
-                    </div>
-                </div>
-
-                <div class="row justify-content-center" style="padding-bottom: 50px;">
-                    <div class="col-md-12">
-                        <h4>Go To Archived Videos</h4>
-                        <p>Click the button to go to archives.</p>
-                        <a class="btn btn-warning btn-block" href="{{ event.get_archives_view }}">Go to archives</a>
-                    </div>
-                </div>
-
-                <div class="row justify-content-center" style="padding-bottom: 30px;">
-                    <div class="col-md-12">
-                        <h4>Archive access</h4>
-                        <p>Turn off to prevent access to archives.</p>
-                        <span class="kt-switch">
-                            <label>
-                                <input type="checkbox" {% if event.allow_non_ticket_archive_viewers %}checked{% else %}{% endif %} name=""
-                                    style="user-select: auto;" id="id_age" onchange="ajaxUpdateArchiveOption(this);">
-                                <span></span>
-                            </label>
-                        </span>
-                    </div>
-                </div>
-
-
-                <div class="row justify-content-center" style="padding-bottom: 10px;">
-                    <div class="col-md-12">
-                        <h4>Secret Archive Link</h4>
-                        <p>We've generated a secret link you can give whomever you choose. This link will grant anyone access to your
-                            archived event so please keep it safe.</p>
-                        <p>If you feel your link is compromised you can always refresh it below.</p>
-                        <button class="btn btn-danger" onclick="ajaxRefreshArchiveSecret();">Refresh</button>
-                    </div>
-                </div>
-                
-                <div class="row justify-content-center" style="padding-bottom: 50px;">
-                    <div class="col-md-9 col-12" style="padding-bottom: 10px;">
-                        <input type="text" class="form-control m-input message"
-                            value="www.arqamhouse.com{{ event.get_archives_view }}?secret={{ event.secret_archive_id }}" required=""
-                            maxlength="180" id="id_secret_archive_link" readonly>
-                    </div>
-                    <div class="col-md-3 col-12">
-                        <button class="btn btn-primary btn-block" onclick="copyToClipboardSecretArchive();">
-                            Copy</button>
                     </div>
                 </div>
 

@@ -136,6 +136,14 @@ class House(TimestampedModel):
         view_name = "house_contact"
         return reverse(view_name, kwargs={"slug": self.slug})
 
+    def get_recordings_url(self):
+        view_name = "house_recordings"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+    def get_events_url(self):
+        view_name = "house_events"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
 
 
 def house_pre_save_reciever(sender, instance, *args, **kwargs):

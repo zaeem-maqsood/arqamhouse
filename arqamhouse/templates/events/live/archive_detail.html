@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-Recordings | {{ event.title|safe }}
+{{ event_live_archive.name }} | Recording
 {% endblock title %}
 
 {% block page_description %}
@@ -20,6 +20,51 @@ Recordings | {{ event.title|safe }}
 
 {% block styles %}
 
+<style>
+.navigation_text {
+    font-size: 10px;
+}
+
+.navigation_icon {
+    font-size: 1.5em;
+}
+
+@media only screen and (min-width: 576px) {
+
+
+}
+
+
+@media (min-width: 768px) {
+
+    .navigation_text {
+        font-size: 1em;
+    }
+
+    .navigation_icon {
+        font-size: 2em;
+    }
+
+    .logo_responsive {
+        max-height: 150px;
+    }
+
+}
+
+
+@media (min-width: 992px) {
+
+
+}
+
+
+@media (min-width: 1200px) {
+
+
+}
+
+</style>
+
 {% endblock styles %}
 
 {% block top_page_scripts %}
@@ -27,18 +72,42 @@ Recordings | {{ event.title|safe }}
 
 {% block scripts %}
 <script>
-    function copyToClipboardSecretArchive() {
-        /* Get the text field */
-        var copyText = document.getElementById("id_secret_archive_link");
-        console.log(copyText)
 
-        /* Select the text field */
-        copyText.select();
-        copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+function copyToClipboardSecretArchive() {
+    /* Get the text field */
+    var copyText = document.getElementById("id_secret_archive_link");
+    console.log(copyText)
 
-        /* Copy the text inside the text field */
-        document.execCommand("copy");
-    } 
+    /* Select the text field */
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+    /* Copy the text inside the text field */
+    document.execCommand("copy");
+}
+
+
+function editTitleAndDescription() {
+    document.getElementById("archive_title_text").style.display = 'none';
+    document.getElementById("archive_title_description").style.display = 'none';
+    document.getElementById("archive_title").style.display = 'block';
+    document.getElementById("archive_description").style.display = 'block';
+    document.getElementById("save_changes").style.display = 'flex';
+    document.getElementById("edit_anchor").style.display = 'none';
+    document.getElementById("cancel_anchor").style.display = 'block';
+}
+
+function cancelEdit() {
+    document.getElementById("archive_title_text").style.display = 'block';
+    document.getElementById("archive_title_description").style.display = 'block';
+    document.getElementById("archive_title").style.display = 'none';
+    document.getElementById("archive_description").style.display = 'none';
+    document.getElementById("save_changes").style.display = 'none';
+    document.getElementById("edit_anchor").style.display = 'block';
+    document.getElementById("cancel_anchor").style.display = 'none';
+}
+
+
 </script>
 {% endblock scripts %}
 
@@ -46,18 +115,14 @@ Recordings | {{ event.title|safe }}
 <section style="padding-top: 3em;padding-bottom:0px;">
     <div class="container">
 
-
-        
-        <div class="row justify-content-center" style="padding-bottom: 30px;">
-            <div class="col-lg-10 col-sm-12 col-12">
-                <a href="{{ event.get_archives_view }}" class="btn btn--primary-1 btn-block" style="color: white;">Archives</a>
-            </div>
-        </div>
-
-
-        <div class="row justify-content-center" style="padding-bottom: 30px;">
-            <div class="col-lg-10 col-sm-12 col-12" >
+        <div class="row justify-content-center" style="padding-bottom: 10px;">
+            <div class="col-lg-8 col-sm-12 col-12" >
                 <div class="video-cover border--round">
+                    {% if house.logo %}
+                    <div class="background-image-holder">
+                        <img alt="image" src="{{ house.logo.url }}" />
+                    </div>
+                    {% endif %}
                     <div class="video-play-icon video-play-icon--sm"></div>
                     <video controls>
                         <source src="{{ event_live_archive_url }}" type="video/mp4">
@@ -67,37 +132,82 @@ Recordings | {{ event.title|safe }}
             </div>
         </div>
 
-        {% if is_owner %}
-        {% if not event.allow_non_ticket_archive_viewers %}
-        <div class="row justify-content-center" style="padding-top:10px;">
-            <div class="col-lg-10 col-sm-12 col-12">
-                <h4>Secret Video Link</h4>
-            </div>
-        </div>
-        <div class="row justify-content-center" style="padding-bottom: 30px;">
-            <div class="col-xl-7 col-lg-7 col-md-8 col-sm-8 col-12" style="padding-bottom: 10px;">
-                <input type="text" class="form-control m-input message"
-                    value="www.arqamhouse.com{{ event_live_archive.get_absolute_url }}?secret={{ event.secret_archive_id }}" required=""
-                    maxlength="180" id="id_secret_archive_link" readonly>
-            </div>
-            <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4 col-12">
-                <button class="btn btn--primary-1 btn-block" style="color: white;margin-top: 0px;" onclick="copyToClipboardSecretArchive();">
-                    Copy</button>
-            </div>
-        </div>
-        {% endif %}
-        {% endif %}
+        
+        <form method="POST">{% csrf_token %}
 
         {% if is_owner %}
-        <form method="POST">{% csrf_token %}
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-sm-12 col-12">
+                <a href="javascript:;" onclick="editTitleAndDescription();" style="color: orangered;text-decoration: none;" id="edit_anchor">Edit</a>
+                <a href="javascript:;" onclick="cancelEdit();" style="color: orangered;text-decoration: none;display: none;" id="cancel_anchor">Cancel</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row justify-content-center" style="padding-bottom: 10px;">
+            <div class="col-lg-8 col-sm-12 col-12">
+                <p id="archive_title_text" class="lead" style="color: #4a90e2;margin-bottom: 0px;">{{ event_live_archive.name }}</p>
+                <input type="text" id="archive_title" name="archive_title" value="{{ event_live_archive.name }}" maxlength="100" style="display: none;">
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-lg-8 col-sm-12 col-12">
+                <p style="color: #4a90e2;" id="archive_title_description">{{ event_live_archive.description }}</p>
+                <textarea id="archive_description" name="archive_description" rows="4" cols="10" style="display: none;">{{ event_live_archive.description }}</textarea>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 40px;display: none;" id="save_changes">
+            <div class="col-lg-8 col-sm-12 col-12">
+                <button class="btn btn--primary" style="color: white;margin-top: 0px;" value="update" name="update"
+                    type="submit">
+                    Save</button>
+            </div>
+        </div>
+        
+
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8 col-sm-12 col-12">
+                <div class="row">
+                    <div class="col-4">
+                        <div style="box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 30px;padding: 20px;border-radius: 15px;margin-bottom: 20px;">
+                            <a href="{{ event.get_archives_view }}">
+                                <i class="fas fa-video navigation_icon" style="color: #4a90e2;"></i>
+                                <p style="margin-top: 5px;" class="navigation_text">Recordings</p>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div style="box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 30px;padding: 20px;border-radius: 15px;margin-bottom: 20px;">
+                            <a href="{{ event.get_resources_view }}">
+                                <i class="far fa-file-alt navigation_icon" style="color: #4a90e2;"></i>
+                                <p style="margin-top: 5px;" class="navigation_text">Resources</p>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div style="box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 30px;padding: 20px;border-radius: 15px;margin-bottom: 20px;">
+                            <a href="{{ event.get_landing_view }}">
+                                <i class="far fa-calendar-alt navigation_icon" style="color: #4a90e2;"></i>
+                                <p style="margin-top: 5px;" class="navigation_text">Event</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {% if is_owner %}
         <div class="row justify-content-center" style="padding-bottom: 30px;padding-top: 60px;">
-            <div class="col-lg-10 col-sm-12 col-12">
+            <div class="col-lg-8 col-sm-12 col-12">
                 <button class="btn btn--icon bg--googleplus" style="color: white;margin-top: 0px;" value="delete" name="delete" type="submit">
                     Delete Archive</button>
             </div>
         </div>
-        </form>
         {% endif %}
+        </form>
 
 
 

@@ -217,30 +217,13 @@ class ArchivedDetailView(View):
         event = get_event(self.kwargs['slug'])
         house = event.house
 
-        if not event.allow_non_ticket_archive_viewers:
-            allow_entry = self.allow_entry(event)
-        else:
-            allow_entry = True
-
-        data = request.GET
-        if 'secret' in data:
-            if data['secret'] == event.secret_archive_id:
-                allow_entry = True
-            else: 
-                allow_entry = False
-
-        if not allow_entry:
-            context["allow_entry"] = False
-
-        else:
-            context["allow_entry"] = True
-
-
         is_owner = self.check_if_user_is_owner(event)
 
-        
         from urllib.parse import unquote
         event_live_archive = self.get_archive()
+        event_live_archive.views += 1
+        event_live_archive.save()
+
         s3_client = boto3.client('s3', 'ca-central-1', config=Config(signature_version='s3v4'),
                                  aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
         response = s3_client.generate_presigned_url('get_object', Params={
@@ -260,11 +243,13 @@ class ArchivedDetailView(View):
         data = request.POST
         print(data)
 
-        if 'delete' in data:
+        event = get_event(self.kwargs['slug'])
+        event_live = EventLive.objects.get(event=event)
+        event_live_archive = self.get_archive()
 
-            event = get_event(self.kwargs['slug'])
-            event_live = EventLive.objects.get(event=event)
-            event_live_archive = self.get_archive()
+       
+
+        if 'delete' in data:
 
             s3_client = boto3.client('s3', 'ca-central-1', config=Config(signature_version='s3v4'),
                                      aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
@@ -274,6 +259,19 @@ class ArchivedDetailView(View):
             )
             print(response)
             event_live_archive.delete()
+
+        if 'update' in data:
+
+            try:
+                archive_title = data["archive_title"]
+                archive_description = data["archive_description"]
+                event_live_archive.name = archive_title
+                event_live_archive.description = archive_description
+                event_live_archive.save()
+                view_name = "events:achrive_detail"
+                return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug, "pk": event_live_archive.id}))
+            except Exception as e:
+                print(e)
         
         view_name = "events:archives"
         return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
@@ -323,24 +321,6 @@ class ArchivedListView(View):
         context = {}
         event = get_event(self.kwargs['slug'])
         house = event.house
-
-        if not event.allow_non_ticket_archive_viewers:
-            allow_entry = self.allow_entry(event)
-        else:
-            allow_entry = True
-
-        data = request.GET
-        if 'secret' in data:
-            if data['secret'] == event.secret_archive_id:
-                allow_entry = True
-            else: 
-                allow_entry = False
-
-        if not allow_entry:
-            view_name = "events:landing"
-            return HttpResponseRedirect(reverse(view_name, kwargs={"slug": event.slug}))
-        else:
-            pass
 
         event_live = EventLive.objects.get(event=event)
         event_live_archives = EventLiveArchive.objects.filter(event_live=event_live).order_by("created_at")
@@ -549,7 +529,9 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         api_secret = settings.OPEN_TOK_SECRECT_KEY
         opentok = OpenTok(api_key, api_secret)
 
-        last_archive = EventLiveArchive.objects.filter(event_live=event_live).order_by("-created_at").first()
+        all_archives =  EventLiveArchive.objects.filter(event_live=event_live).order_by("-created_at")
+        total_archives = all_archives.count()
+        last_archive = total_archives.first()
         
         if json_data:
 
@@ -565,7 +547,7 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
                     print(archive)
                     print("the archive is")
                     archive_location = f"{api_key}/{archive.id}/archive.mp4"
-                    event_live_archive = EventLiveArchive.objects.create(event_live=event_live, archive_id=archive.id, archive_location=archive_location)
+                    event_live_archive = EventLiveArchive.objects.create(name=f"{event.title} - {total_archives}", description=f"Virtual Event recording #{total_archives} for {event.title}", event_live=event_live, archive_id=archive.id, archive_location=archive_location)
                 else:
                     print("No value")
                     opentok.stop_archive(last_archive.archive_id)

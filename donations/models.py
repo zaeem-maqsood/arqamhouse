@@ -49,7 +49,7 @@ class GiftDonationItem(TimestampedModel):
 
 
 
-class DonationType(models.Model):
+class DonationType(TimestampedModel):
 
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
     name = models.CharField(max_length=150, null=True, blank=True)

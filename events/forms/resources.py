@@ -2,7 +2,7 @@ from .base import *
 from events.models import EventResource
 from froala_editor.widgets import FroalaEditor
 
-
+from core.widgets import ArqamFroalaEditor
 
 class ResourceFileForm(forms.ModelForm):
 
@@ -27,6 +27,7 @@ class ResourceFileForm(forms.ModelForm):
                         attrs={
                             "required": True,
                             "class": "",
+                            "style": "border: 0px;background: #fff;"
                         }
                     ),
 
@@ -58,6 +59,7 @@ class ResourceImageForm(forms.ModelForm):
                         attrs={
                             "onchange": "document.getElementById('image-placeholder').src = window.URL.createObjectURL(this.files[0])",
                             "class": "validate-required",
+                            "style": "border: 0px;background: #fff;"
                         }
                     ),
 
@@ -96,8 +98,12 @@ class ResourceLinkForm(forms.ModelForm):
 
 class ResourceTextForm(forms.ModelForm):
 
-    text = forms.CharField(required=False, widget=FroalaEditor(options={
-                                  'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True}))
+    def __init__(self, house, *args, **kwargs):
+        super(ResourceTextForm, self).__init__(*args, **kwargs)
+
+        self.fields["text"] = forms.CharField(required=True, widget=ArqamFroalaEditor(options={
+            'toolbarInline': False, 'attribution': False, 'tableStyles': 'table', 'pastePlain': True, 'useClasses': False}, house=house))
+
 
     class Meta:
         model = EventResource

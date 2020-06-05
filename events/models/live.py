@@ -21,6 +21,8 @@ class EventLive(models.Model):
     broadcast_id = models.CharField(max_length=400, blank=True, null=True)
     facing_mode = models.CharField(max_length=150, choices=roles, blank=True, null=True)
     live_audience = models.ManyToManyField(Profile, related_name="live_audience", blank=True)
+    recording = models.BooleanField(default=False)
+    broadcasting = models.BooleanField(default=False)
 
     def __str__(self):
         return self.event.title
@@ -65,9 +67,12 @@ class EventLiveBroadcast(TimestampedModel):
 
 
 class EventLiveArchive(TimestampedModel):
+    name = models.CharField(max_length=120, null=True, blank=True)
     event_live = models.ForeignKey(EventLive, on_delete=models.CASCADE, blank=False, null=False)
     archive_id = models.CharField(max_length=400, blank=True, null=True)
     archive_location = models.CharField(max_length=500, blank=True, null=True)
+    views = models.PositiveIntegerField(blank=True, null=True, default=0)
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.event_live.event.title
@@ -109,6 +114,9 @@ class EventLiveFee(TimestampedModel):
     def save(self, *args, **kwargs):
         if self.presenters == 0:
             self.processed = True
+            self.event_live.recording = False
+            self.event_live.broadcasting = False
+            self.event_live.save()
             subscribed_mins_fee = 0.007 * self.subscribed_mins
             archived_mins_fee = 0.10 * self.archived_mins
             broadcasted_mins = 0.10 * self.broadcasted_mins

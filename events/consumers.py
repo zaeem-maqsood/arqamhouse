@@ -3,10 +3,79 @@ from channels.generic.websocket import WebsocketConsumer
 import json
 import decimal
 from django.utils import timezone
+from django.conf import settings
 
 from profiles.models import Profile
-from events.models import EventLiveComment, EventLive, Event, EventLiveFee
+from events.models import EventLiveComment, EventLive, Event, EventLiveFee, EventLiveArchive
 from payments.models import ArqamHouseServiceFee
+
+from opentok import OpenTok
+
+
+
+
+
+class LiveButtonCheckerConsumer(WebsocketConsumer):
+
+    def connect(self):
+        print("ZAEEM ZAEEM ZAEEM")
+        print(self.scope['url_route']['kwargs']['slug'])
+        self.slug = self.scope['url_route']['kwargs']['slug']
+        self.room_group_name = 'button_%s' % self.slug
+
+        # Join room group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        self.accept()
+
+    def disconnect(self, close_code):
+
+        # Leave room group
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    # Receive message from WebSocket
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        record_button = text_data_json['record_button']
+        broadcast_button = text_data_json['broadcast_button']
+
+        event_slug = self.scope['url_route']['kwargs']['slug']
+        event = Event.objects.get(slug=event_slug)
+        event_live = EventLive.objects.get(event=event)
+
+        event_live.recording = record_button
+        event_live.broadcasting = broadcast_button
+        event_live.save()
+
+        # Send message to room group
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'buttons_check',
+                'record_button': record_button,
+                'broadcast_button': broadcast_button,
+            }
+        )
+
+    # Receive message from room group
+    def buttons_check(self, event):
+        record_button = event['record_button']
+        broadcast_button = event['broadcast_button']
+
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({
+            'record_button': record_button,
+            'broadcast_button': broadcast_button
+        }))
+
+
+
 
 
 
@@ -143,13 +212,29 @@ class LiveEventFeeConsumer(WebsocketConsumer):
         event = Event.objects.get(slug=event_slug)
         event_live = EventLive.objects.get(event=event)
 
+        api_key = settings.OPEN_TOK_API_KEY
+        api_secret = settings.OPEN_TOK_SECRECT_KEY
+        opentok = OpenTok(api_key, api_secret)
+
+        
         try:
             event_live_fee = EventLiveFee.objects.get(event_live=event_live, processed=False)
             event_live_fee.presenters = event_live_fee.presenters - 1
             event_live_fee.save()
+
+            if event_live_fee.presenters == 0:
+
+                # Stop recording
+                last_archive = EventLiveArchive.objects.filter(event_live=event_live).order_by("-created_at").first()
+                opentok.stop_archive(last_archive.archive_id)
+
+                # Stop the broadcast
+                opentok.stop_broadcast(event_live.broadcast_id)
+
         except Exception as e:
             print(e)
 
+        
 
         # Leave room group
         async_to_sync(self.channel_layer.group_discard)(
