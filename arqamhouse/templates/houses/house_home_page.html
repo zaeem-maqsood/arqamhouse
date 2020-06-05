@@ -283,7 +283,7 @@ function Subscribe(boolean) {
                                 </div>
                             {% endif %}
 
-                            {% if active_events %}
+                            {% if show_events %}
                             <div class="col-lg-12 col-md-4 col-sm-4 col-4 responsive_navigation_col">
                                 <div style="box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 30px;border-radius: 15px;margin-bottom: 20px;" class="responsive_navigation">
                                     <a href="{{ house.get_events_url }}">
@@ -383,15 +383,19 @@ function Subscribe(boolean) {
                                                 <hr style="margin: 10px 0px;">
                                             </div>
                                         </div>
-                                        <div class="row justify-content-center" style="padding-bottom: 30px;">
+                                        <div class="row justify-content-center" style="padding-bottom: 10px;">
                                             <div class="col-lg-10 col-sm-12 col-12">
-                                                <div class="video-cover border--round">
+                                                <div class="video-cover border--round" style="background: #fff;">
                                                     <div class="video-play-icon video-play-icon--sm"></div>
                                                     <video controls>
                                                         <source src="{% get_archive_url item %}" type="video/mp4">
                                                     </video>
                                                 </div>
-                                                <!--end video cover-->
+                                            </div>
+                                        </div>
+                                        <div class="row text-center" style="padding-bottom: 20px;">
+                                            <div class="col-md-12">
+                                                <p style="margin-bottom: 0px;line-height: 1.8;" class="responsive_description">{{ item.description|truncatechars:150 }}</p>
                                             </div>
                                         </div>
                                         

@@ -142,8 +142,8 @@ class HouseHomePageView(DetailView):
             return False
 
 
-    def get_active_events(self, house):
-        events = Event.objects.filter(house=house, deleted=False, active=True)
+    def get_all_events(self, house):
+        events = Event.objects.filter(house=house, deleted=False)
         return events
 
 
@@ -151,9 +151,10 @@ class HouseHomePageView(DetailView):
 
         context = {}
         house = self.get_house(kwargs["slug"])
-        active_events = self.get_active_events(house)
+        all_events = self.get_all_events(house)
+        active_events = all_events.filter(active=True)
         donation_types = DonationType.objects.filter(house=house, deleted=False).order_by("-updated_at")[:2]
-        recordings = EventLiveArchive.objects.filter(event_live__event__house=house, event_live__event__allow_non_ticket_archive_viewers=True).order_by("-created_at")[:2]
+        recordings = EventLiveArchive.objects.filter(event_live__event__house=house, event_live__event__allow_non_ticket_archive_viewers=True).order_by("created_at")[:2]
  
         result_list = sorted(chain(active_events, donation_types, recordings), key=attrgetter('updated_at'))
         result_list.reverse()
@@ -162,6 +163,7 @@ class HouseHomePageView(DetailView):
         owner = self.check_if_user_is_owner(house)
         subscribed = self.check_if_user_is_subscribed(house)
 
+        context["show_events"] = all_events.exists()
         context["recordings"] = recordings.exists()
         context["subscribed"] = subscribed
         context["owner"] = owner
