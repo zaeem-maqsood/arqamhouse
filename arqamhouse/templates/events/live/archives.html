@@ -84,7 +84,7 @@ Recordings | {{ event.title|safe }}
         <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
             <div class="col-sm-12 col-10" style="padding: 0px;">
                 <p class="lead" id="title_responsive" style="margin-bottom: 0px;">Recordings for <a href="{{ event.get_landing_view }}">{{ event.title }}</a></p>
-                <p>Click <a href="#">here</a> for all recordings by {{ house.name }}</p>
+                <p>Click <a href="{{ house.get_recordings_url }}">here</a> for all recordings by {{ house.name }}</p>
             </div>
         </div>
 
@@ -96,24 +96,13 @@ Recordings | {{ event.title|safe }}
                     <div class="row text-center" style="padding-bottom: 10px;">
                         <div class="col-md-12">
                             <a href="{{ archive.get_absolute_url }}" style="text-decoration: none;color: #4a90e2;margin-bottom: 5px;"
-                                class="lead">{{ archive.name }}</a>
+                                class="lead"><i class="fas fa-video"></i> {{ archive.name }}</a>
                             <hr style="margin: 10px 0px;">
                         </div>
                     </div>
-                    <div class="row justify-content-center" style="padding-bottom: 30px;">
+                    <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
                         <div class="col-lg-10 col-sm-12 col-12">
-                            <div class="video-cover border--round">
-                                {% if house.logo %}
-                                <div class="background-image-holder">
-                                    <img alt="image" src="{{ house.logo.url }}" />
-                                </div>
-                                {% endif %}
-                                <div class="video-play-icon video-play-icon--sm"></div>
-                                <video controls>
-                                    <source src="{% get_archive_url archive %}" type="video/mp4">
-                                </video>
-                            </div>
-                            <!--end video cover-->
+                            <p>{{ archive.description }}</p>
                         </div>
                     </div>
                 </div>

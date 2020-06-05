@@ -29,6 +29,10 @@
     font-size: 1.5em;
 }
 
+.background-image-holder {
+    background: none;
+}
+
 @media only screen and (min-width: 576px) {
 
 
@@ -117,12 +121,7 @@ function cancelEdit() {
 
         <div class="row justify-content-center" style="padding-bottom: 10px;">
             <div class="col-lg-8 col-sm-12 col-12" >
-                <div class="video-cover border--round">
-                    {% if house.logo %}
-                    <div class="background-image-holder">
-                        <img alt="image" src="{{ house.logo.url }}" />
-                    </div>
-                    {% endif %}
+                <div class="video-cover border--round" style="background: #fff;">
                     <div class="video-play-icon video-play-icon--sm"></div>
                     <video controls>
                         <source src="{{ event_live_archive_url }}" type="video/mp4">
