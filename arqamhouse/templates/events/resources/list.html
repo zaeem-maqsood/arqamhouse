@@ -90,8 +90,9 @@ lottie.loadAnimation({
                     <img class="logo_responsive" src="{{ house.logo.url }}">
                 </a>
                 {% endif %}
-                <p class="lear" style="margin-bottom: 0px;">{{ house.name }}</p>
-                <a href="{{ event.get_landing_view }}" style="font-size: 1.5em;display: block;">Resources for {{ event.title }}</a>
+                <p style="margin-bottom: 0px;"><a href="{{ house.get_home_page_url }}"
+                        style="text-decoration: none;">{{ house.name }}</a></p>
+                <a href="{{ event.get_landing_view }}" style="display: block;">Resources for {{ event.title }}</a>
             </div>
         </div>
 

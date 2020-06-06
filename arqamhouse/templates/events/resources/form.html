@@ -71,8 +71,9 @@ Create Resource | {{ event.title|safe }}
                     <img class="logo_responsive" src="{{ house.logo.url }}">
                 </a>
                 {% endif %}
-                <p class="lear" style="margin-bottom: 0px;">{{ house.name }}</p>
-                <a href="{{ event.get_resources_view }}" style="font-size: 1.3em;">Back To Resources</a>
+                <p style="margin-bottom: 0px;"><a href="{{ house.get_home_page_url }}"
+                        style="text-decoration: none;">{{ house.name }}</a></p>
+                <a href="{{ event.get_resources_view }}">Back To Resources</a>
             </div>
         </div>
 

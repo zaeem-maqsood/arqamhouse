@@ -530,7 +530,7 @@ class LiveEventHouseView(HouseAccountMixin, EventSecurityMixin, UserPassesTestMi
         opentok = OpenTok(api_key, api_secret)
 
         all_archives =  EventLiveArchive.objects.filter(event_live=event_live).order_by("-created_at")
-        total_archives = all_archives.count()
+        total_archives = all_archives.count() + 1
         last_archive = all_archives.first()
         
         if json_data:

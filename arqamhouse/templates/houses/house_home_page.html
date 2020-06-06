@@ -348,8 +348,8 @@ function Subscribe(boolean) {
                                         {% if item.title %}
                                         <div class="row text-center">
                                             <div class="col-12">
-                                                <a href="{{ item.get_landing_view }}" style="text-decoration: none;color: #4a90e2;margin-bottom: 5px;"
-                                                    class="lead responsive_title">{{ item.title }}</a>
+                                                <p style="margin-bottom: 0px;color: #4a90e2;"><i class="far fa-calendar-alt"></i></p>
+                                                <p style="margin-bottom: 0px;color: #4a90e2;" class="lead responsive_title"><a href="{{ item.get_landing_view }}" style="text-decoration: none;color: #4a90e2;margin-bottom: 5px;">{{ item.title }}</a></p>
                                                 <hr style="margin: 10px 0px;">
                                             </div>
                                         </div>
@@ -378,14 +378,14 @@ function Subscribe(boolean) {
                                         {% elif item.event_live %}
                                         <div class="row text-center" style="padding-bottom: 10px;">
                                             <div class="col-md-12">
-                                                <a href="{{ item.get_absolute_url }}" style="text-decoration: none;color: #4a90e2;margin-bottom: 5px;"
-                                                    class="lead responsive_title">{{ item.name }}</a>
+                                                <p style="margin-bottom: 0px;color: #4a90e2;"><i class="fas fa-video"></i></p>
+                                                <p style="margin-bottom: 0px;color: #4a90e2;" class="lead responsive_title"><a href="{{ item.get_absolute_url }}" style="text-decoration: none;color: #4a90e2;margin-bottom: 5px;">{{ item.name }}</a></p>
                                                 <hr style="margin: 10px 0px;">
                                             </div>
                                         </div>
                                         <div class="row justify-content-center" style="padding-bottom: 10px;">
                                             <div class="col-lg-10 col-sm-12 col-12">
-                                                <div class="video-cover border--round" style="background: #fff;">
+                                                <div class="video-cover border--round">
                                                     <div class="video-play-icon video-play-icon--sm"></div>
                                                     <video controls>
                                                         <source src="{% get_archive_url item %}" type="video/mp4">
@@ -405,6 +405,7 @@ function Subscribe(boolean) {
                                         {% else %}
                                         <div class="row text-center" style="padding-bottom: 20px;">
                                             <div class="col-md-12">
+                                                <p style="margin-bottom: 0px;color: #4a90e2;"><i class="far fa-heart"></i></p>
                                                 <p style="margin-bottom: 0px;" class="lead responsive_title"> Donate to <span style="color:#4a90e2">{{ item.name }}</span></p>
                                                 <p style="margin-bottom: 0px;" class="responsive_description">Amount raised so far <span style="color:#4a90e2">${% get_total_donation_amount item %}</span></p>
                                                 <p style="margin-bottom: 0px;line-height: 1.8;" class="responsive_description"><i class="fas fa-heart" style="color: #e24a82;"></i> <span style="color:#4a90e2">{% get_last_donor item %}</span>, thank you for your donation!</p>

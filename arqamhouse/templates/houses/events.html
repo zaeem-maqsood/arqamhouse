@@ -99,21 +99,18 @@ Events | {{ house.name }}
 <section style="padding-top: 3em;padding-bottom:0px;">
     <div class="container" >
 
-        {% if house.logo %}
+        
         <div class="row text-center">
             <div class="col-lg-12 col-md-12 col-12">
+                {% if house.logo %}
                 <a href="{{ house.get_home_page_url }}">
-                    <img style="margin-bottom: 10px;" class="logo_responsive" src="{{ house.logo.url }}">
+                    <img class="logo_responsive" src="{{ house.logo.url }}">
                 </a>
+                {% endif %}
+                <p style="margin-bottom: 0px;"><a href="{{ house.get_home_page_url }}" style="text-decoration: none;">{{ house.name }}</a></p>
             </div>
         </div>
-        {% else %}
-        <div class="row text-center">
-            <div class="col-lg-12 col-md-12 col-12">
-                <h2><a href="{{ house.get_home_page_url }}">{{ house.name }}</a></h2>
-            </div>
-        </div>
-        {% endif %}
+        
 
 
         {% if active_events or past_events %}
