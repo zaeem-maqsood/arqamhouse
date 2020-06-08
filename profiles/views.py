@@ -22,14 +22,16 @@ from .token_generator import account_activation_token
 from django.utils.html import strip_tags
 from django.core import mail
 
+from itertools import chain
+from operator import attrgetter
 
 from subscribers.models import Subscriber
 from .models import Profile
 from .forms import ProfileForm, LoginForm, ProfileUpdateForm, ProfileChangePasswordForm, ProfileAlreadyExistsForm, ProfileVerifcationForm, ProfileChangePhoneForm
 from .mixins import ProfileMixin
 from cities_light.models import City, Region, Country
-from events.models import Event, EventOrder
-from donations.models import Donation
+from events.models import Event, EventOrder, EventLiveArchive
+from donations.models import Donation, DonationType
 
 
 class PasswordChangeView(ProfileMixin, FormView):
@@ -210,8 +212,16 @@ class UserDashboardView(ProfileMixin, View):
         houses = []
         for subscription in subscriptions:
             houses.append(subscription.house)
+
         events = Event.objects.filter(house__in=houses, deleted=False, active=True)
-        return events
+        donation_types = DonationType.objects.filter(house__in=houses, deleted=False).order_by("-updated_at")[:4]
+        recordings = EventLiveArchive.objects.filter(event_live__event__house__in=houses).order_by("-created_at")[:2]
+ 
+        result_list = sorted(chain(events, donation_types, recordings), key=attrgetter('updated_at'))
+        result_list.reverse()
+        print(result_list)
+
+        return result_list
 
     def get(self, request, *args, **kwargs):
         context = {}
@@ -219,8 +229,9 @@ class UserDashboardView(ProfileMixin, View):
         if not profile.verified:
             return redirect('profiles:verification')
         house = self.check_for_house(profile)
+        context["house"] = house
         context["profile"] = profile
-        context["events"] = self.get_updates(profile)
+        context["result_list"] = self.get_updates(profile)
         return render(request, self.template_name, context)
 
 

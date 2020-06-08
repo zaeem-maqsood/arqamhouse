@@ -13,7 +13,18 @@ Donation Types | {{ house.name }}
 
 
 {% block scripts %}
+<script>
+    function maxLength(el) {
+        if (!('maxLength' in el)) {
+            var max = el.attributes.maxLength.value;
+            el.onkeypress = function () {
+                if (this.value.length >= max) return false;
+            };
+        }
+    }
 
+    maxLength(document.getElementById("id_description"));
+</script>
 {% endblock scripts %}
 
 
@@ -37,6 +48,13 @@ Donation Types | {{ house.name }}
                         <div class="col-md-12">
                             <p style="margin-bottom: 5px;">Name</p>
                             {{ form.name }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 30px;">
+                        <div class="col-md-12">
+                            <p style="margin-bottom: 5px;">Description</p>
+                            {{ form.description }}
                         </div>
                     </div>
 

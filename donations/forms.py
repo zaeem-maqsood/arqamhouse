@@ -10,7 +10,7 @@ class DonationTypeForm(forms.ModelForm):
     class Meta:
         model = DonationType
         fields = [
-            "name", "pass_fee", "issue_receipts", "collect_address"
+            "name", "pass_fee", "issue_receipts", "collect_address", "description"
         ]
 
         widgets = {
@@ -23,6 +23,16 @@ class DonationTypeForm(forms.ModelForm):
                             "maxlength": '100',
                         }
                     ),
+
+                "description": forms.Textarea(
+                    attrs={
+                        "class": "form-control m-input",
+                        "placeholder": "What will these donations be used for?",
+                        "required": True,
+                        "maxlength": '150',
+                        "rows": "3"
+                    }
+                ),
 
                 "pass_fee": forms.CheckboxInput(),
                 "issue_receipts": forms.CheckboxInput(),

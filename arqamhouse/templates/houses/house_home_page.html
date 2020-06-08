@@ -240,16 +240,16 @@ function Subscribe(boolean) {
 
 
 
-                        <div class="row text-center" style="padding-bottom:30px;padding: 10px;">
+                        <div class="row text-center" style="padding-bottom:10px;padding: 10px;">
                             {% if owner %}
-                                <div class="col-12" style="padding-bottom: 20px;">
+                                <div class="col-12">
                                     <a id="homepage_links_a" class="btn btn--sm btn--primary-2 btn-block" href="{% url 'houses:dashboard' %}"
                                         style="margin-top: 10px;">
                                         <span class="btn__text">Dashboard</span>
                                     </a>
                                 </div>
                             {% else %}
-                                <div class="col-12" id="subscriber_switch" style="padding-bottom: 20px;">
+                                <div class="col-12" id="subscriber_switch">
                                     {% if not request.user.is_authenticated %}
                                         <a id="homepage_links_a" class="btn btn--sm btn-block" style="margin-top: 10px;"
                                             href="{% url 'profiles:login' %}?next=/{{ house.slug }}">
@@ -271,6 +271,16 @@ function Subscribe(boolean) {
                                     {% endif %}
                                 </div>
                             {% endif %}
+
+                            {% if request.user.is_authenticated %}
+                            <div class="col-12" style="padding-bottom: 20px;">
+                                <a id="homepage_links_a" class="btn btn--sm btn--primary-1 btn-block" href="{% url 'profiles:dashboard' %}"
+                                    style="margin-top: 10px;">
+                                    <span class="btn__text">Profile</span>
+                                </a>
+                            </div>
+                            {% endif %}
+                            
 
                             {% if house.allow_donations %}
                                 <div class="col-lg-12 col-md-4 col-sm-4 col-4 responsive_navigation_col">
@@ -406,8 +416,8 @@ function Subscribe(boolean) {
                                         <div class="row text-center" style="padding-bottom: 20px;">
                                             <div class="col-md-12">
                                                 <p style="margin-bottom: 0px;color: #4a90e2;"><i class="far fa-heart"></i></p>
-                                                <p style="margin-bottom: 0px;" class="lead responsive_title"> Donate to <span style="color:#4a90e2">{{ item.name }}</span></p>
-                                                <p style="margin-bottom: 0px;" class="responsive_description">Amount raised so far <span style="color:#4a90e2">${% get_total_donation_amount item %}</span></p>
+                                                <p style="margin-bottom: 0px;" class="lead responsive_title"> Donate to <a style="text-decoration: none;" href="{{ item.house.get_public_donations_url }}">{{ item.name }}</a></p>
+                                                <p style="margin-bottom: 0px;" class="responsive_description">Amount raised so far <a style="text-decoration: none;" href="{{ item.house.get_public_donations_url }}">${% get_total_donation_amount item %}</a></p>
                                                 <p style="margin-bottom: 0px;line-height: 1.8;" class="responsive_description"><i class="fas fa-heart" style="color: #e24a82;"></i> <span style="color:#4a90e2">{% get_last_donor item %}</span>, thank you for your donation!</p>
                                             </div>
                                         </div>

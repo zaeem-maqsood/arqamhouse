@@ -13,6 +13,38 @@ iframe {
     min-height: 0px;
     border: none;
 }
+
+
+#donation_type_reason {
+    font-size: 12px;
+}
+
+
+/* Media Queries */
+@media (min-width: 576px) {
+
+
+}
+    
+    
+@media (min-width: 768px) {
+
+    #donation_type_reason {
+        font-size: 1em;
+    }
+
+}
+    
+    
+@media (min-width: 992px) {
+    
+
+}
+
+@media (min-width: 1200px) {
+    
+}
+
 </style>
 
 
@@ -193,6 +225,12 @@ function showAddressAndFee(object) {
     console.log(donation_type_id);
 
     {% for donation_type in donation_types %}
+
+        
+        if (donation_type_id == '{{ donation_type.id }}') {
+            document.getElementById("donation_type_reason").innerHTML = '{{ donation_type.description }}';
+        }
+
         {% if donation_type.collect_address %}
 
             if (donation_type_id == '{{ donation_type.id }}') {
@@ -297,21 +335,23 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
 
         <form id="donationForm" method="POST" >{% csrf_token %}
 
-            {% if house.logo %}
-            <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+            <div class="row justify-content-center text-center" style="padding-bottom: 10px;">
                 <div class="col-lg-8 col-md-10 col-sm-12 col-10">
             
+                    {% if house.logo %}
                     <a href="{{ house.get_home_page_url }}">
                         <img src="{{ house.logo.url }}" style="max-height: 4em;">
                     </a>
+                    {% endif %}
+                    <p style="margin-bottom: 0px;"><a href="{{ house.get_home_page_url }}"
+                            style="text-decoration: none;">{{ house.name }}</a></p>
             
                 </div>
             </div>
-            {% endif %}
             
-            <div class="row justify-content-center text-center" style="padding-bottom: 10px;">
+            <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
                 <div class="col-lg-8 col-md-10 col-sm-12 col-10">
-                    <h4 style="color: grey;">Make a donation to {{ house.name }}</h4>
+                    <p id="donation_type_reason"></p>
                 </div>
             </div>
 

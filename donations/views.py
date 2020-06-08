@@ -603,11 +603,30 @@ class DonationView(FormView):
     def get(self, request, *args, **kwargs):
         house = self.get_house()
 
+        data = request.GET
+        initial_data = {}
+
+        # See if there is a donation type in the get parameter
+        # If there is make sure its valid
+        if 'type' in data:
+            try:
+                donation_type = DonationType.objects.get(id=data["type"], deleted=False)
+                initial_data["donation_type"] = donation_type
+            except Exception as e:
+                print(e)
+
+            
+        if 'amount' in data:
+            try:
+                initial_data["amount"] = decimal.Decimal(data["amount"])
+            except Exception as e:
+                print(e)
+
         if not house.allow_donations:
             view_name = "home_page"
             return HttpResponseRedirect(reverse(view_name, kwargs={"slug": house.slug}))
 
-        form = DonationForm(house=house)
+        form = DonationForm(house=house, initial=initial_data)
         return render(request, self.template_name, self.get_context_data(form=form))
 
     def get_success_url(self):

@@ -53,6 +53,7 @@ class DonationType(TimestampedModel):
 
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=False, null=False)
     name = models.CharField(max_length=150, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     pass_fee = models.BooleanField(default=False)
     issue_receipts = models.BooleanField(default=False)
     general_donation = models.BooleanField(default=False)
