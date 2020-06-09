@@ -132,7 +132,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         data = request.POST
-
+        house = self.get_house()
         self.object = self.get_campaign()
         form = GenericCampaignForm(data=data, house=house)
 
