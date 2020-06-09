@@ -350,11 +350,11 @@ function initMap() {
                             {% endif %}
                             <div class="row">
                                 <div class="col-md-6 col-lg-6" style="padding-top:20px;">
-                                    <p style="margin-bottom: 0;"><i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i> Full Name</p>
+                                    <p style="margin-bottom: 0;"><i style="color:#fc7847;" class="fas fa-asterisk"></i> Full Name</p>
                                     <input pattern="[a-zA-Z ]*" title="No numbers please" maxlength="100" class="validate-required" type="text" name="name" id="name" size="30" required placeholder="Full Name" {% if not cart.house_created and request.user.is_authenticated %}value="{{ request.user.name }}" readonly else %}value="{{ data.name }}"{% endif %}>
                                 </div>
                                 <div class="col-md-6 col-lg-6" style="padding-top:20px;">
-                                    <p style="margin-bottom: 0;"><i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i> Email</p>
+                                    <p style="margin-bottom: 0;"><i style="color:#fc7847;" class="fas fa-asterisk"></i> Email</p>
                                     <input class="validate-required" maxlength="150" type="email" name="email" id="email" size="30" required placeholder="email@address.com" {% if not cart.house_created and request.user.is_authenticated %}value="{{ request.user.email }}" readonly {%else %}value="{{ data.email }}"{% endif %}>
                                     {% if not cart.house_created and request.user.is_authenticated %}
                                     <p style="font-size: 12px;margin-left: 10px;">Not {{ request.user.name }}? <a href="{% url 'profiles:logout' %}">Log Out</a></p>
@@ -371,7 +371,7 @@ function initMap() {
 
                             <div class="row" style="padding-top: 20px;">
                                 <div class="col-md-12 col-lg-12">
-                                    <p style="margin-bottom: 0;">{% if order_question.question.required %}<i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i>{% endif %} {{ order_question.question.title }}</p>
+                                    <p style="margin-bottom: 0;">{% if order_question.question.required %}<i style="color:#fc7847;" class="fas fa-asterisk"></i>{% endif %} {{ order_question.question.title }}</p>
                                     {% if order_question.question.question_type == "Long" %}
                                     <textarea maxlength="300" name="{{ order_question.question.id }}_order_question" id="{{ order_question.question.id }}_order_question" placeholder="{% if order_question.question.help_text %}{{ order_question.question.help_text }}{% endif %}" class="validate-required" rows="3" style="user-select: auto;" {% if order_question.question.required %}required{% endif %}>{% get_order_question_initial_value data order_question.question.id %}</textarea>
                                     {% elif order_question.question.question_type == "Multiple Choice" %}
@@ -416,7 +416,7 @@ function initMap() {
 
                                     <div class="row" style="padding-bottom: 20px;">
                                         <div class="col-md-6 col-lg-6">
-                                            <p style="margin-bottom: 0;"><i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i> Full Name</p>
+                                            <p style="margin-bottom: 0;"><i style="color:#fc7847;" class="fas fa-asterisk"></i> Full Name</p>
                                             <input pattern="[a-zA-Z ]*" title="No numbers please" class="validate-required" type="text" name="{{ quantity }}_{{ cart_item.ticket.id }}_name" {% if not cart.house_created and request.user.is_authenticated %}value="{{ request.user.name }}"{% else %}value="{% get_attendee_name_initial_value data quantity cart_item.ticket.id %}"{% endif %} id="{{ quantity }}_{{ cart_item.ticket.id }}_name" size="30" required placeholder="Full Name">
                                         </div>
                                         {% if attendee_common_questions.email %}
@@ -439,13 +439,13 @@ function initMap() {
                                     <div class="row">
                                         {% if attendee_common_questions.age %}
                                         <div class="col-md-6 col-lg-6" style="padding-bottom: 20px;">
-                                            <p style="margin-bottom: 0;">{% if attendee_common_questions.age_required %}<i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i>{% endif %} Age</p>
+                                            <p style="margin-bottom: 0;">{% if attendee_common_questions.age_required %}<i style="color:#fc7847;" class="fas fa-asterisk"></i>{% endif %} Age</p>
                                             <input class="validate-required" name="{{ quantity }}_{{ cart_item.ticket.id }}_age" value="{% get_attendee_age_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_age" type="number" min="0" max="100" {% if attendee_common_questions.age_required %}required{% endif %}>
                                         </div>
                                         {% endif %}
                                         {% if attendee_common_questions.gender %}
                                         <div class="col-md-6 col-lg-6" style="padding-bottom: 20px;">
-                                            <p style="margin-bottom: 0;">{% if attendee_common_questions.gender_required %}<i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i>{% endif %} Gender</p>
+                                            <p style="margin-bottom: 0;">{% if attendee_common_questions.gender_required %}<i style="color:#fc7847;" class="fas fa-asterisk"></i>{% endif %} Gender</p>
                                             <select id="{{ quantity }}_{{ cart_item.ticket.id }}_gender" name="{{ quantity }}_{{ cart_item.ticket.id }}_gender" class="validate-required">
                                                 {% if not attendee_common_questions.gender_required %}
                                                 <option value="None">------</option>
@@ -467,7 +467,7 @@ function initMap() {
                                     {% if attendee_common_questions.address %}
                                     <div class="row" style="padding-bottom: 20px;">
                                         <div class="col-md-12 col-lg-12">
-                                            <p style="margin-bottom: 0;">{% if attendee_common_questions.address_required %}<i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i>{% endif %} Address</p>
+                                            <p style="margin-bottom: 0;">{% if attendee_common_questions.address_required %}<i style="color:#fc7847;" class="fas fa-asterisk"></i>{% endif %} Address</p>
                                             <input class="form-control m-input" name="{{ quantity }}_{{ cart_item.ticket.id }}_address" value="{% get_attendee_address_initial_value data quantity cart_item.ticket.id %}" id="{{ quantity }}_{{ cart_item.ticket.id }}_address" placeholder="123 Main Street" autocomplete="off" {% if attendee_common_questions.address_required %}required{% endif %}>
                                         </div>
                                     </div>
@@ -484,7 +484,7 @@ function initMap() {
 
                                         <div class="row" style="padding-bottom: 20px;">
                                             <div class="col-md-12 col-lg-12">
-                                                <p style="margin-bottom: 0;">{% if event_question.question.required %}<i style="color:#fc7847;font-weight:100;" class="fa fa-asterisk"></i>{% endif %}  {{ event_question.question.title }}</p>
+                                                <p style="margin-bottom: 0;">{% if event_question.question.required %}<i style="color:#fc7847;" class="fas fa-asterisk"></i>{% endif %}  {{ event_question.question.title }}</p>
                                                 {% if event_question.question.question_type == "Long" %}
                                                 <textarea maxlength="300" name="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" value="{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}" id="{{ quantity }}_{{ event_question.question.id }}_{{ cart_item.ticket.id }}" placeholder="{% if event_question.question.help_text %}{{ event_question.question.help_text }}{% endif %}" class="validate-required" rows="3" style="user-select: auto;" {% if event_question.question.required %}required{% endif %}>{% get_attendee_question_initial_value data quantity event_question.question.id cart_item.ticket.id %}</textarea>
                                                 {% elif event_question.question.question_type == "Multiple Choice" %}

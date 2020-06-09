@@ -249,7 +249,7 @@ function Subscribe(boolean) {
                                     </a>
                                 </div>
                             {% else %}
-                                <div class="col-12" id="subscriber_switch">
+                                <div class="col-12" id="subscriber_switch" style="padding-bottom: 20px;">
                                     {% if not request.user.is_authenticated %}
                                         <a id="homepage_links_a" class="btn btn--sm btn-block" style="margin-top: 10px;"
                                             href="{% url 'profiles:login' %}?next=/{{ house.slug }}">

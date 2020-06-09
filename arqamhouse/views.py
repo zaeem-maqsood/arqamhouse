@@ -101,8 +101,8 @@ class HomePageView(View):
         context = {}
         try:
             house = self.get_house()
-            response = redirect('profile/login')
-            return response
+            context["house"] = house
+            return render(request, self.template_name, context)
         except:
             return render(request, self.template_name, context)
 

@@ -70,6 +70,13 @@ lottie.loadAnimation({
 		</div>
 
 		<div class="row justify-content-center">
+			{% if house %}
+			<div class="col-lg-3" style="padding-bottom: 10px;">
+				<a class="btn btn--primary btn-block" href="{% url 'houses:dashboard' %}">
+					<span class="btn__text">House</span>
+				</a>
+			</div>
+			{% else %}
 			<div class="col-lg-3" style="padding-bottom: 10px;">
 				<a class="btn btn--primary btn-block" href="{% url 'profiles:login' %}">
 					<span class="btn__text">Sign In</span>
@@ -80,6 +87,7 @@ lottie.loadAnimation({
 					<span class="btn__text">Sign Up</span>
 				</a>
 			</div>
+			{% endif %}
 			<div class="col-lg-3" style="padding-bottom: 10px;">
 				<a class="btn btn--primary-1 btn-block" href="{% url 'find_house' %}">
 					<span class="btn__text">Find A House</span>
