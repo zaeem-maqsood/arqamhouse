@@ -134,7 +134,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         data = request.POST
         house = self.get_house()
         self.object = self.get_campaign()
-        form = GenericCampaignForm(data=data, house=house)
+        form = GenericCampaignForm(data=data, house=house, instance=self.object)
 
         if form.is_valid():
             return self.form_valid(form, request)
