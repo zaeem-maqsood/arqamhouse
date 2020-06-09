@@ -5,9 +5,60 @@ Dashboard | {{ house.name }}
 {% endblock title %}
 
 
-{% block css_vendors %}
+{% block styles %}
+<style>
 
-{% endblock css_vendors %}
+.greeting_message {
+	text-align: center;
+}
+
+
+.greeting_subscribers {
+	text-align: center;
+}
+
+/* iPhone SE */
+@media only screen and (min-width: 460px) {
+
+
+}
+
+
+@media only screen and (min-width: 576px) {
+
+
+}
+
+
+
+@media (min-width: 768px) {
+
+	.greeting_message {
+		text-align: left;
+	}
+
+
+	.greeting_subscribers {
+		text-align: right;
+	}
+
+}
+
+
+@media (min-width: 992px) {
+
+
+}
+
+
+@media (min-width: 1200px) {
+
+
+}
+
+</style>
+
+{% endblock styles %}
 
 {% block vendors %}
 
@@ -129,8 +180,26 @@ Dashboard | {{ house.name }}
 	color: #7396b0;
 }
 </style>
-<div class="row justify-content-center h-100" style="padding: 3rem 0px 3rem 0px;">
+<div class="row justify-content-center h-100" style="padding: 1rem 0px 3rem 0px;">
 	<div class="col-lg-10 col-md-12 col-12">
+
+		<div class="kt-portlet kt-portlet--mobile" style="padding:10px;margin-bottom: 20px;">
+			<div class="kt-portlet__body">
+		
+				<!-- Hide this on Mobile -->
+				<div class="row">
+					<div class="col-md-9" style="padding-bottom: 20px;">
+						<p style="margin-bottom: 0px;" class="greeting_message">Hello {{ request.user.name }}, you're in house:</p>
+						<h3 class="greeting_message"><a class="dashboard-links">{{ house.name }}</a></h3>
+					</div>
+					<div class="col-md-3" style="text-align: right;">
+						<h2 class="greeting_subscribers" style="color: #4692b8;">{{ subscribers }}</h2>
+						<p class="greeting_subscribers" style="margin-bottom: 0px;">Subscribers</p>
+					</div>
+				</div>
+				<!-- End here -->
+			</div>
+		</div>
 
 		<div class="kt-portlet kt-portlet--mobile" style="padding:10px;">
 			<div class="kt-portlet__body">
@@ -138,8 +207,7 @@ Dashboard | {{ house.name }}
 				<!-- Display this only on mobile devices -->
 				<div class="row text-center d-block d-md-none" style="padding-bottom:30px;">
 					<div class="col-12">
-						<p style="margin-bottom: 0px;;">Hello {{ request.user.name }}, you're in house:</p>
-						<h3><a class="dashboard-links" href="{{ event.get_update_view }}">{{ house.name }}</a></h3>
+						<h3><a class="dashboard-links" href="{% url 'payments:list' %}">Sales</a></h3>
 					</div>
 				</div>
 				<!-- End here -->
@@ -147,8 +215,7 @@ Dashboard | {{ house.name }}
 				<!-- Hide this on Mobile -->
 				<div class="row d-none d-sm-none d-md-flex" style="padding-bottom:30px;">
 					<div class="col-md-9">
-						<p style="margin-bottom: 0px;;">Hello {{ request.user.name }}, you're in house:</p>
-						<h3><a class="dashboard-links">{{ house.name }}</a></h3>
+						<h3><a class="dashboard-links">Sales</a></h3>
 					</div>
 					<div class="col-md-3">
 						<h3 class="pull-right" style="color: #91baa2;">${{ house_balance.balance }}</h3>

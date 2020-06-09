@@ -16,6 +16,7 @@ Arqam House
 
 {% block top_page_scripts %}
 <script src="https://kit.fontawesome.com/71fc1e3551.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.8/lottie.min.js"></script>
 {% endblock top_page_scripts %}
 
 {% block scripts %}
@@ -70,6 +71,18 @@ window.onload = function () {
 };
 </script>
 
+<script>
+
+    lottie.loadAnimation({
+        container: document.getElementById("find-house"), // the dom element that will contain the animation
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: "https://assets6.lottiefiles.com/datafiles/D7hmWWCXGWSQUPi/data.json" // the path to the animation json
+    });
+
+</script>
+
 {% endblock scripts %}
 
 {% block content %}
@@ -90,12 +103,18 @@ window.onload = function () {
 		</div>
         </form>
 
+
 		<div id="dynamic" style="padding-bottom: 300px;">
             <div class="row justify-content-center" style="padding: 10px;">
                 <div class="col-lg-8 col-md-10 boxed boxed--border bg--secondary boxed--lg box-shadow" 
                     style="box-shadow: 0px 10px 15px 10px rgba(0, 0, 0, 0.05);border-radius: 10px;margin-bottom: 20px;padding: 20px;">
                     
-                        <div class="row" style="padding-bottom: 5px;padding-left: 10px;padding-right: 10px;">
+                        <div class="row justify-content-center" style="padding-bottom: 5px;padding-left: 10px;padding-right: 10px;">
+
+
+                            <div class="col-lg-3 col-5" style="text-align: center;padding: 20px 0px;">
+                                <div id="find-house"></div>
+                            </div>
                             
                             <div class="col-12" style="text-align: center;">
                                 <p class="lead" style="margin-bottom: 0px;">Find a house by typing in the search bar.</p>

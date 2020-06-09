@@ -111,19 +111,9 @@ class HomePageView(View):
 class AboutUsView(View):
     template_name = "frontend/about.html"
 
-    def get_house(self):
-        profile = self.request.user
-        house = profile.house
-        return house
-
     def get(self, request, *args, **kwargs):
         context = {}
-        try:
-            house = self.get_house()
-            response = redirect('profile/login')
-            return response
-        except:
-            return render(request, self.template_name, context)
+        return render(request, self.template_name, context)
 
 
 

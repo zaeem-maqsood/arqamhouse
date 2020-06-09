@@ -519,7 +519,9 @@ class DashboardView(HouseAccountMixin, DetailView):
         profile = self.get_profile()
 
         graph_data = self.graph_data(house)
+        subscribers = Subscriber.objects.filter(house=house, unsubscribed=False).count()
 
+        context["subscribers"] = subscribers
         context["payout_set"] = PayoutSetting.objects.filter(house=house).exists()
         context["house_balance"] = house_balance
         context["graph_data"] = graph_data
