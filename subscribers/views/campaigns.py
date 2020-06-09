@@ -99,12 +99,11 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         campaign = Campaign.objects.get(slug=slug)
         return campaign
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, form, *args, **kwargs):
         context = {}
         house = self.get_house()
 
         subscribers = Subscriber.objects.filter(house=house, unsubscribed=False)
-        form = GenericCampaignForm(house=house)
 
         if self.object.audience:
             audience = self.object.audience
@@ -121,6 +120,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_campaign()
+        form = GenericCampaignForm(house=house, instance=self.object)
 
         if not self.object.draft:
             return redirect('subscribers:campaign_list')
@@ -128,7 +128,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
         if self.object.deleted:
             return redirect('subscribers:campaign_list')
 
-        return render(request, self.template_name, self.get_context_data())
+        return render(request, self.template_name, self.get_context_data(form=form))
 
     def post(self, request, *args, **kwargs):
         data = request.POST
