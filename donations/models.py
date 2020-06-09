@@ -95,6 +95,7 @@ class Donation(TimestampedModel):
     recipient_address = models.CharField(max_length=200, null=True, blank=True)
     recipient_postal_code = models.CharField(max_length=10, null=True, blank=True)
     send_e_card = models.BooleanField(default=False)
+    sent_to_recipient = models.BooleanField(default=False)
 
 
     def __str__(self):

@@ -13,6 +13,11 @@ iframe {
     min-height: 0px;
     border: none;
 }
+
+
+.slider[data-paging="true"]:not(section) .flickity-page-dots {
+    bottom: -30px;
+}
 </style>
 
 
@@ -377,7 +382,7 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
                     {% endif %}
 
 
-                    <div class="row justify-content-around" style="padding-bottom: 10px;">
+                    <div class="row justify-content-around" style="padding-bottom: 30px;">
                         <div class="col-sm-12 col-md-12 col-lg-12">
                             <h5 style="text-align: center;">{{ gift_donation_item.name }}</h5>
                             <div class="slider border--round boxed--border" data-paging="true" data-arrows="false" style="margin-bottom: 10px;">
@@ -420,7 +425,7 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
                             </p>
                             <h3>${{ gift_donation_item.amount }}</h3>
                             <h5 style="margin-bottom:0px;">Dimensions</h5>
-                            <p>3.5”W X 3.0”H X 3.0”D</p>
+                            <p>7”W X 5”L Premium Card Stock Paper</p>
                         </div>
                     </div>
                     <!--end of row-->

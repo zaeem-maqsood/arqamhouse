@@ -23,6 +23,7 @@ from houses.views import DashboardView, HouseHomePageView
 from .views import (HomePageView, ReportErrorView, ApplePayVerificationView, AboutUsView, PricingView, CustomScriptView,
                     EventInfoView, DonationInfoView, SubscriberInfoView, CampaignInfoView, FindHouseView)
 from events.views import OrderPublicDetailView
+from donations.views import DonationGiftsSentView
 
 urlpatterns = [
 
@@ -36,6 +37,7 @@ urlpatterns = [
     path('about', AboutUsView.as_view(), name='about'),
     path('pricing', PricingView.as_view(), name='pricing'),
     path('report', ReportErrorView.as_view(), name='report'),
+    path('donation-gifts', DonationGiftsSentView.as_view(), name='donation_gifts_sent'),
     path('zaeem-custom-script', CustomScriptView.as_view(), name='custom_script'),
     path('froala_editor/', include('core.urls')),
     path('house/', include('houses.urls')),

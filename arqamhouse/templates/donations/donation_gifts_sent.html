@@ -1,0 +1,96 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+
+{% block title %}
+Confirmed Sent Gift
+{% endblock title %}
+
+{% block styles %}
+<style>
+iframe {
+    width: 100%;
+    min-height: 0px;
+    border: none;
+}
+</style>
+
+
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+
+{% block scripts %}
+{% endblock scripts %}
+
+
+
+{% block content %}
+<section style="padding-top: 60px;">
+    <div class="container">
+
+
+        <div class="row" style="padding-bottom: 20px;">
+            <div class="col-md-12">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+            </div>
+        </div>
+        
+        {% if donation_gifts_not_sent %}
+        <div class="row text-left" style="padding-bottom: 20px;">
+            <div class="col-md-12">
+        
+                <table class="border--round table--alternate-row text-center">
+                    <thead>
+                        <tr>
+                            <th>House</th>
+                            <th>Donation Type</th>
+                            <th>Donation Type Description</th>
+                            <th>Donation Amount</th>
+                            <th>Donor Name</th>
+                            <th>Anonymous</th>
+                            <th>Donor Message to Recipient</th>
+                            <th>Recipient Name</th>
+                            <th>Recipient Postal Code</th>
+                            <th>Recipient Address</th>
+                            <th>Date</th>
+                            <th>Sent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for donation in donation_gifts_not_sent %}
+                        <tr>
+                            <td>{{ donation.donation_type.house.name }}</td>
+                            <td>{{ donation.donation_type.name }}</td>
+                            <td>{{ donation.donation_type.description }}</td>
+                            <td>${{ donation.amount }}</td>
+                            <td>{{ donation.name }}</td>
+                            <td>{{ donation.anonymous }}</td>
+                            <td>{{ donation.message_to_recipient }}</td>
+                            <td>{{ donation.recipient_name }}</td>
+                            <td>{{ donation.recipient_address }}</td>
+                            <td>{{ donation.recipient_postal_code }}</td>
+                            <td>{{ donation.created_at }}</td>
+                            <td><a href="#" class="btn btn--primary" style="color: white;">Sent</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        
+            </div>
+        </div>
+        
+        {% else %}
+        <div class="row" style="padding-bottom: 20px;">
+            <div class="col-md-12">
+                <h3>No gift donations yet!</h3>
+            </div>
+        </div>
+        {% endif %}
+
+        
+
+    </div>
+</section>
+{% endblock content %}

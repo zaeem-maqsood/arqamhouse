@@ -38,6 +38,22 @@ from profiles.models import Profile
 from donations.models import Donation, DonationType, GiftDonationItem
 from donations.forms import DonationTypeForm
 from payments.models import Transaction, Refund
+from core.mixins import SuperUserRequiredMixin
+
+
+# Create your views here.
+class DonationGiftsSentView(SuperUserRequiredMixin, View):
+    template_name = "donations/donation_gifts_sent.html"
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
+
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+        donation_gifts_not_sent = Donation.objects.filter(sent_to_recipient=False, gift_donation_item__isnull=False).order_by('-created_at')
+        context["donation_gifts_not_sent"] = donation_gifts_not_sent
+        return context
 
 
 
