@@ -271,6 +271,7 @@ class CampaignCreateView(HouseAccountMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         data = request.POST
+        house = self.get_house()
 
         form = GenericCampaignForm(data=data, house=house)
         if form.is_valid():
