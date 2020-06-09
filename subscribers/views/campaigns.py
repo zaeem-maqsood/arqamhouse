@@ -120,6 +120,7 @@ class CampaignUpdateView(HouseAccountMixin, UpdateView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_campaign()
+        house = self.get_house()
         form = GenericCampaignForm(house=house, instance=self.object)
 
         if not self.object.draft:
