@@ -337,7 +337,7 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
             </div>
 
             <div class="row justify-content-center" style="padding-bottom: 30px;">
-                <div class="col-lg-8 col-md-10 col-sm-12 col-10" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 40px;border-radius: 15px;">
+                <div class="col-lg-8 col-md-10 col-sm-12 col-12" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 40px;border-radius: 15px;">
 
                     {% if form.non_field_errors %}
                     <div class="row" style="padding-bottom: 20px;">
@@ -385,7 +385,7 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
                     <div class="row justify-content-around" style="padding-bottom: 30px;">
                         <div class="col-sm-12 col-md-12 col-lg-12">
                             <h5 style="text-align: center;">{{ gift_donation_item.name }}</h5>
-                            <div class="slider border--round boxed--border" data-paging="true" data-arrows="false" style="margin-bottom: 10px;">
+                            <div class="slider border--round boxed--border" data-paging="true" data-arrows="true" style="margin-bottom: 10px;">
                                 <ul class="slides">
                                     {% if gift_donation_item.image_1 %}
                                     <li>
@@ -425,7 +425,7 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
                             </p>
                             <h3>${{ gift_donation_item.amount }}</h3>
                             <h5 style="margin-bottom:0px;">Dimensions</h5>
-                            <p>7”W X 5”L Premium Card Stock Paper</p>
+                            <p>5” L X 7 ”W  Premium Card Stock</p>
                         </div>
                     </div>
                     <!--end of row-->

@@ -816,7 +816,7 @@ function toggleRecord(object) {
 
 function myTimer() {
     // 5400
-    document.getElementById("progressBar").value = 5400 - timeleft;
+    // document.getElementById("progressBar").value = 5400 - timeleft;
     timeleft = timeleft - 1;
 }
 
@@ -824,7 +824,7 @@ function resetTimer() {
     // 5400
     timeleft = 5400;
     clearInterval(timer);
-    document.getElementById("progressBar").value = 5400 - timeleft;
+    // document.getElementById("progressBar").value = 5400 - timeleft;
 }
 
 function stopRecordingTimeLimit() {
@@ -996,6 +996,7 @@ function eventLiveFeeCalculations() {
 
         }
 
+        {% if event_live_broadcasts %}
         broadcast_element = document.getElementById("broadcast_button");
         if (broadcast_button) {
 
@@ -1017,6 +1018,7 @@ function eventLiveFeeCalculations() {
             }
 
         }
+        {% endif %}
 
 
     };
@@ -1088,7 +1090,7 @@ function eventLiveFeeCalculations() {
 <section style="padding-top: 3em;padding-bottom:0px;">
     <div class="container">
 
-        <div class="row text-center" style="padding: 0 10px;">
+        <div class="row text-center" style="padding: 0 10px;padding-bottom: 20px;">
             <div class="col-lg-2 col-md-4 col-4 responsive_navigation_col">
                 <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 40px;padding: 20px;border-radius: 15px;margin-bottom: 20px;">
                     <a href="{{ event.get_live_options_view }}">
@@ -1143,11 +1145,11 @@ function eventLiveFeeCalculations() {
             {% endif %}
         </div>
 
-        <div class="row text-center d-none d-md-block" style="padding-bottom: 20px;">
+        <!-- <div class="row text-center d-none d-md-block" style="padding-bottom: 20px;">
             <div class="col-12">
                 <progress value="0" max="5400" id="progressBar" style="width: 100%;"></progress>
             </div>
-        </div>
+        </div> -->
 
         <div class="row" style="padding-bottom: 20px;">
             
