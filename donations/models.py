@@ -72,7 +72,7 @@ class DonationType(TimestampedModel):
 class Donation(TimestampedModel):
 
     donation_type = models.ForeignKey(DonationType, on_delete=models.CASCADE, blank=False, null=True)
-    name = models.CharField(max_length=150, null=True, blank=True)
+    name = models.CharField(max_length=30, null=True, blank=True)
     email = models.EmailField(max_length=300, blank=False, null=False)
     message = models.CharField(max_length=100, null=True, blank=True)
     message_to_recipient = models.CharField(max_length=150, null=True, blank=True)
@@ -90,7 +90,7 @@ class Donation(TimestampedModel):
     refund = models.ForeignKey(Refund, on_delete=models.CASCADE, blank=True, null=True)
     gift_donation_item = models.ForeignKey(GiftDonationItem, on_delete=models.CASCADE, blank=True, null=True)
     gift_donation_item_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
-    recipient_name = models.CharField(max_length=150, null=True, blank=True)
+    recipient_name = models.CharField(max_length=30, null=True, blank=True)
     recipient_email = models.EmailField(max_length=300, blank=True, null=True)
     recipient_address = models.CharField(max_length=200, null=True, blank=True)
     recipient_postal_code = models.CharField(max_length=10, null=True, blank=True)

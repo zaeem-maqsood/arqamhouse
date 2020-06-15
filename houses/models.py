@@ -55,7 +55,7 @@ def image_location(instance, filename):
 
 
 class House(TimestampedModel):
-    name = models.CharField(max_length=120, null=True, blank=False)
+    name = models.CharField(max_length=50, null=True, blank=False)
     email = models.EmailField(blank=True, null=True)
     phone = PhoneNumberField(blank=True, null=True)
     website = models.CharField(max_length=200, null=True, blank=True)

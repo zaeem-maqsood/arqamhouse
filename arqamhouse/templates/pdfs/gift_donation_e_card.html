@@ -1,0 +1,71 @@
+{% load tz %}
+{% load static %}
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Amatic+SC&family=Bebas+Neue&family=Bellota:wght@300&family=Handlee&family=Open+Sans:wght@300&family=Roboto:wght@100&display=swap"
+        rel="stylesheet">
+    <title>E-Card</title>
+    <meta name="description" content="E Card">
+    <meta name="author" content="Arqam House">
+</head>
+
+<body style="display:flex; flex-direction:column; justify-content:center;min-height:100vh;">
+
+    <div style="text-align: center;padding-bottom: 35px;">
+        <img src="{% static 'images/logo.png' %}" style="max-height: 70px;">
+    </div>
+
+    <div style="text-align: center;padding-bottom: 10px;">
+        <p>A donation has been made in honour of you</p>
+    </div>
+
+    <div style="text-align: center;padding-bottom: 15px;">
+        {% if short_name %}
+        <h1 style="font-size: 3.5em;">{{ donation.recipient_name }}</h1>
+        {% else %}
+        <h1 style="font-size: 2.5em;">{{ donation.recipient_name }}</h1>
+        {% endif %}
+    </div>
+
+    <div style="text-align: center;padding-bottom: 45px;">
+        <p style="margin-bottom: 5px;">for</p>
+        {% if short_house_name %}
+        <h2 style="font-size: 2em;">{{ donation.donation_type.house }}</h2>
+        {% else %}
+        <h2 style="font-size: 1.5em;">{{ donation.donation_type.house }}</h2>
+        {% endif %}
+    </div>
+
+    {% if donation.message_to_recipient %}
+    <div style="text-align: center;padding: 0px 50px;padding-bottom: 20px;">
+        <p style="margin-bottom: 5px;color: #4599d5;">Personal Message</p>
+        <p>{{ donation.message_to_recipient }}</p>
+    </div>
+    {% endif %}
+
+    <div style="text-align: center;padding-bottom: 30px;">
+        <hr style="background-color: rgb(172, 172, 172);height: 1px;border: none;margin: 20px 40px;">
+    </div>
+
+    <div style="text-align: center;padding-bottom: 20px;">
+        <p style="font-size: 0.8em;">A donation of ${{ donation.amount }} has been given on your behalf to</p>
+        <p style="color: #4599d5;font-size: 0.8em;">{{ donation.donation_type.house }}</p>
+        <p style="font-size: 0.8em;">by</p>
+        {% if donation.anonymous %}
+        <p style="color: #4599d5;font-size: 0.8em;">Anonymous</p>
+        {% else %}
+        <p style="color: #4599d5;font-size: 0.8em;">{{ donation.name }}</p>
+        {% endif %}
+    </div>
+
+    <div style="text-align: center;padding: 0px 50px;padding-bottom: 10px;">
+        <p style="font-size: 0.8em;">{{ donation.donation_type.description }}</p>
+    </div>
+
+</body>
+
+</html>

@@ -48,6 +48,16 @@ class DonationGiftsSentView(SuperUserRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, self.get_context_data())
 
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        print(data)
+        print("It came here")
+        donation = Donation.objects.get(id=data["sent"])
+        print(donation)
+        donation.sent_to_recipient = True
+        donation.save()
+        return render(request, self.template_name, self.get_context_data())
+
 
     def get_context_data(self, *args, **kwargs):
         context = {}
@@ -107,12 +117,27 @@ class DonationGiftView(FormView):
             view_name = "home_page"
             return HttpResponseRedirect(reverse(view_name, kwargs={"slug": house.slug}))
 
+        # return self.pdf_testing()
+
         form = GiftDonationForm(house=house)
         return render(request, self.template_name, self.get_context_data(form=form))
 
     def get_success_url(self):
         view_name = "public_donations_live"
         return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
+
+    def pdf_testing(self):
+        # PDF Attachment
+        pdf_context = {}
+        pdf_content = render_to_string('pdfs/gift_donation_e_card.html', pdf_context)
+        pdf_css = CSS(string=render_to_string('pdfs/gift_donation_e_card.css'))
+
+        # Creating http response
+        response = HttpResponse(content_type='application/pdf;')
+        response['Content-Disposition'] = 'inline; filename=e_card.pdf'
+
+        pdf_file = HTML(string=pdf_content).write_pdf(response, stylesheets=[pdf_css])
+        return response
 
     def get_context_data(self, form, *args, **kwargs):
         context = {}
@@ -187,6 +212,7 @@ class DonationGiftView(FormView):
         recipient_email = form.cleaned_data.get('recipient_email')
         recipient_address = form.cleaned_data.get('recipient_address')
         recipient_postal_code = form.cleaned_data.get('recipient_postal_code')
+        message_to_recipient = form.cleaned_data.get('message_to_recipient')
         send_e_card = form.cleaned_data.get('send_e_card')
 
 
@@ -379,7 +405,7 @@ class DonationGiftView(FormView):
         donation = Donation.objects.create(
             donation_type=donation_type, transaction=transaction, name=name, email=email, message=message, address=address, postal_code=charge.source['address_zip'], pass_fee=pass_fee,
             anonymous=anonymous, amount=donation_amount, recipient_name=recipient_name, recipient_email=recipient_email, recipient_address=recipient_address, recipient_postal_code=recipient_postal_code,
-            send_e_card=send_e_card, gift_donation_item=gift_donation_item, gift_donation_item_amount=gift_donation_item.amount)
+            message_to_recipient=message_to_recipient, send_e_card=send_e_card, gift_donation_item=gift_donation_item, gift_donation_item_amount=gift_donation_item.amount)
 
 
         subscriber_amount_donated = subscriber.amount_donated
@@ -395,10 +421,11 @@ class DonationGiftView(FormView):
         except Exception as e:
             print(e)
 
-        if donation_type.pass_fee:
-            self.send_confirmation_email(name=name, email=email, house=house, donation_amount=donation_amount, covered_fee=True, fee=total_fee)
-        else:
-            self.send_confirmation_email(name=name, email=email, house=house, donation_amount=donation_amount, covered_fee=False, fee=0.00)
+        self.send_confirmation_email(donation=donation, total_fee=total_fee)
+
+        if donation.send_e_card:
+            self.send_gift_email(donation=donation)
+
 
         valid_data = super(DonationGiftView, self).form_valid(form)
         return valid_data
@@ -408,24 +435,93 @@ class DonationGiftView(FormView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
+    def send_confirmation_email(self, donation, total_fee):
 
-    def send_confirmation_email(self, house, donation_amount, name, email, covered_fee, fee):
+        # PDF Attachment
+        pdf_context = {}
+        pdf_context["donation"] = donation
+        if len(donation.recipient_name) > 20:
+            short_name = False
+        else:
+            short_name = True
+
+        pdf_context["short_name"] = short_name
+
+        if len(donation.donation_type.house.name) > 20:
+            short_house_name = False
+        else:
+            short_house_name = True
+
+        pdf_context["short_house_name"] = short_house_name
+
+        pdf_content = render_to_string('pdfs/gift_donation_e_card.html', pdf_context)
+        pdf_css = CSS(string=render_to_string('pdfs/gift_donation_e_card.css'))
+        pdf_file = HTML(string=pdf_content).write_pdf(stylesheets=[pdf_css])
+
         # Compose Email
-        subject = f'{house.name}: Thank you for your donation, {name}.'
+        house = donation.donation_type.house
+        name = donation.name
+
+        subject = f'Thank you for your donation, {name}.'
         context = {}
         context["house"] = house
-        context["donation_amount"] = donation_amount
-        context["covered_fee"] = covered_fee
-        context["fee"] = fee
+        context["donation_amount"] = donation.amount
+        context["covered_fee"] = donation.pass_fee
+        context["fee"] = total_fee
         context["name"] = name
         
         html_content = render_to_string('emails/donation_confirmation.html', context)
         text_content = strip_tags(html_content)
         from_email = f'{house.name} <info@arqamhouse.com>'
-        to = [email]
+        to = [donation.email]
         email = EmailMultiAlternatives(subject=subject, body=text_content,
                                        from_email=from_email, to=to)
         email.attach_alternative(html_content, "text/html")
+        email.attach("ecard.pdf", pdf_file, 'application/pdf')
+        email.send()
+        return "Done"
+
+
+    def send_gift_email(self, donation):
+
+        # PDF Attachment
+        pdf_context = {}
+        pdf_context["donation"] = donation
+        if len(donation.recipient_name) > 20:
+            short_name = False
+        else:
+            short_name = True
+
+        pdf_context["short_name"] = short_name
+
+        if len(donation.donation_type.house.name) > 20:
+            short_house_name = False
+        else:
+            short_house_name = True
+
+        pdf_context["short_house_name"] = short_house_name
+
+        pdf_content = render_to_string('pdfs/gift_donation_e_card.html', pdf_context)
+        pdf_css = CSS(string=render_to_string('pdfs/gift_donation_e_card.css'))
+        pdf_file = HTML(string=pdf_content).write_pdf(stylesheets=[pdf_css])
+
+        # Compose Email
+        house = donation.donation_type.house
+        name = donation.name
+        recipient_name = donation.recipient_name
+
+        subject = f'A donation has been made in your honour.'
+        context = {}
+        context["donation"] = donation
+
+        html_content = render_to_string('emails/e_gift_donation.html', context)
+        text_content = strip_tags(html_content)
+        from_email = f'{house.name} <info@arqamhouse.com>'
+        to = [donation.recipient_email]
+        email = EmailMultiAlternatives(subject=subject, body=text_content,
+                                       from_email=from_email, to=to)
+        email.attach_alternative(html_content, "text/html")
+        email.attach("ecard.pdf", pdf_file, 'application/pdf')
         email.send()
         return "Done"
 

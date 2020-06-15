@@ -198,6 +198,12 @@ function showAddressAndFee(object) {
     console.log(donation_type_id);
 
     {% for donation_type in donation_types %}
+
+
+        if (donation_type_id == '{{ donation_type.id }}') {
+            document.getElementById("donation_type_reason").innerHTML = '{{ donation_type.description }}';
+        }
+
         {% if donation_type.collect_address %}
 
             if (donation_type_id == '{{ donation_type.id }}') {
@@ -312,19 +318,19 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
 
         <form id="donationForm" method="POST" >{% csrf_token %}
 
-            {% if house.logo %}
-            <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+            <div class="row justify-content-center text-center" style="padding-bottom: 10px;">
                 <div class="col-lg-8 col-md-10 col-sm-12 col-10">
-            
+                    
+                    {% if house.logo %}
                     <a href="{{ house.get_home_page_url }}">
                         <img src="{{ house.logo.url }}" style="max-height: 4em;">
                     </a>
+                    {% endif %}
                     <p style="margin-bottom: 0px;"><a href="{{ house.get_home_page_url }}"
                             style="text-decoration: none;">{{ house.name }}</a></p>
             
                 </div>
             </div>
-            {% endif %}
             
             <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
                 <div class="col-lg-8 col-md-10 col-sm-12 col-10">
@@ -430,6 +436,7 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
                     </div>
                     <!--end of row-->
 
+
                     <div class="row" style="padding-bottom: 30px;">
                         <div class="col-xl-9 col-lg-9 col-md-9 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Donation Type</p>
@@ -438,6 +445,12 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
                         <div class="col-xl-3 col-lg-3 col-md-3 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Amount</p>
                             {{ form.amount }}
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
+                        <div class="col-12">
+                            <p id="donation_type_reason"></p>
                         </div>
                     </div>
 
