@@ -14,7 +14,10 @@ register = template.Library()
 def get_total_donation_amount(donation_type):
     total_donations = Donation.objects.filter(donation_type=donation_type).aggregate(Sum('amount'))["amount__sum"]
     print(total_donations)
-    return total_donations
+    if total_donations:
+        return total_donations
+    else:
+        return 0
 
 
 
@@ -22,7 +25,10 @@ def get_total_donation_amount(donation_type):
 def get_last_donor(donation_type):
     last_donor = Donation.objects.filter(donation_type=donation_type).order_by("-created_at").first()
     print(last_donor)
-    return last_donor
+    if last_donor:
+        return f"{last_donor.name}, thank you for your donation!"
+    else:
+        return "Be the first to donate!"
 
 
 

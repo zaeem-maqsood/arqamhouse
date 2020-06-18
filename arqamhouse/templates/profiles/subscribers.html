@@ -13,23 +13,67 @@ Profile Dashboard
 
 {% block styles %}
 <style>
+
+#button-font-size {
+    font-size: 10px;
+}
+
+.circular--portrait img {
+    object-fit: cover;
+    width:100px;
+    height:100px;
+    border-radius: 50%;
+}
+
+
+.responsive_button {
+    padding: 5px;
+    font-size: 10px;
+}
+
+.responsive_navigation_col {
+    padding-right: 5px;
+    padding-left: 5px;
+
+}
+
+
+@media only screen and (min-width: 576px) {
+
+
+}
+
+
+
+@media (min-width: 768px) {
+
     #button-font-size {
-        font-size: 10px;
+        font-size: 12px;
     }
 
-    @media (min-width: 768px) {
-
-        #button-font-size {
-            font-size: 12px;
-        }
+  .responsive_button {
+        padding: 10;
+        font-size: inherit;
     }
 
-    .circular--portrait img {
-        object-fit: cover;
-        width:100px;
-        height:100px;
-        border-radius: 50%;
+    .responsive_navigation_col {
+            padding-right: 15px;
+            padding-left: 15px;
     }
+
+}
+
+
+@media (min-width: 992px) {
+
+
+}
+
+
+@media (min-width: 1200px) {
+
+
+}
 </style>
 {% endblock styles %}
 
@@ -49,13 +93,32 @@ Profile Dashboard
                 <div class="row" style="padding-top: 10px;">
                     <div class="col-md-12">
                         <h2 style="margin-bottom: 5px;color: #4990e2;font-weight: 600;">Subscriptions</h2>
+                        <p>You're subscribed to {{ subscribers.count }} house{% if subscribers.count > 1 %}s{% endif %}!</p>
                     </div>
                 </div>
                 
-                <div class="row justify-content-center" style="padding-top: 20px;padding-bottom: 20px;">
-                    <div class="col-md-4" style="padding-bottom: 20px;">
-                        <a class="btn btn--primary btn-block" href="{% url 'profiles:menu' %}">
+                <div class="row justify-content-center" style="padding: 20px 10px;">
+                    <div class="col-md-4 col-4 responsive_navigation_col" style="padding-bottom: 20px;">
+                        <a class="btn btn--primary btn-block responsive_button" href="{% url 'profiles:menu' %}">
                             <span class="btn__text" id="button-font-size"> Menu </span>
+                        </a>
+                    </div>
+                    {% if house %}
+                    <div class="col-md-4 col-4 responsive_navigation_col" style="padding-bottom: 20px;">
+                        <a class="btn btn--primary-2 btn-block responsive_button" href="{% url 'houses:dashboard' %}">
+                            <span class="btn__text" id="button-font-size"> House </span>
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="col-md-4 col-4 responsive_navigation_col" style="padding-bottom: 20px;">
+                        <a class="btn btn--primary-2 btn-block responsive_button" href="{% url 'profiles:dashboard' %}">
+                            <span class="btn__text" id="button-font-size"> Updates </span>
+                        </a>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-4 col-4 responsive_navigation_col" style="padding-bottom: 20px;">
+                        <a class="btn btn--primary-1 btn-block responsive_button" href="{% url 'find_house' %}">
+                            <span class="btn__text" id="button-font-size"> Subscribe To A House </span>
                         </a>
                     </div>
                 </div>
@@ -63,12 +126,6 @@ Profile Dashboard
 
 
                 {% if subscribers %}
-                <div class="row" style="padding-bottom: 20px;">
-                    <div class="col-md-12">
-                        <p>You're subscribed to {{ subscribers.count }} house{% if subscribers.count > 1 %}s{% endif %}!</p>
-                    </div>
-                </div>
-  
                 <div class="row" style="padding-bottom: 20px;">
                     {% for subscriber in subscribers %}
                     <div class="col-md-6">

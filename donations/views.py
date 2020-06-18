@@ -124,7 +124,7 @@ class DonationGiftView(FormView):
 
     def get_success_url(self):
         view_name = "public_donations_live"
-        return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
+        return reverse(view_name, kwargs={"slug": self.kwargs['slug']}) + "?success=true"
 
     def pdf_testing(self):
         # PDF Attachment
@@ -591,7 +591,6 @@ class DonationPublicListView(View):
         donations = Donation.objects.filter(donation_type__house=house).order_by('-created_at')[:50]
         graph_data = self.graph_data(house)
         context["graph_data"] = graph_data
-
         context["donations"] = donations
         context["house"] = house
         return context
@@ -672,7 +671,12 @@ class DonationPublicListLiveView(View):
 
         graph_data = self.graph_data(house)
         context["graph_data"] = graph_data
-
+        
+        get_data = self.request.GET
+        
+        if 'success' in get_data:
+            context["show_confetti"] = True
+            context["last_donor"] = donations.first()
         context["donations"] = donations
         context["house"] = house
         return context
@@ -743,7 +747,7 @@ class DonationView(FormView):
 
     def get_success_url(self):
         view_name = "public_donations_live"
-        return reverse(view_name, kwargs={"slug": self.kwargs['slug']})
+        return reverse(view_name, kwargs={"slug": self.kwargs['slug']}) + "?success=true"
 
     def get_context_data(self, form, *args, **kwargs):
         context = {}
@@ -1008,9 +1012,9 @@ class DonationView(FormView):
             print(e)
 
         if donation_type.pass_fee:
-            self.send_confirmation_email(name=name, email=email, house=house, donation_amount=donation_amount, covered_fee=True, fee=total_fee)
+            self.send_confirmation_email(name=name, email=email, house=house, donation_amount=donation_amount, covered_fee=True, fee=total_fee, donation=donation)
         else:
-            self.send_confirmation_email(name=name, email=email, house=house, donation_amount=donation_amount, covered_fee=False, fee=0.00)
+            self.send_confirmation_email(name=name, email=email, house=house, donation_amount=donation_amount, covered_fee=False, fee=0.00, donation=donation)
 
         valid_data = super(DonationView, self).form_valid(form)
         return valid_data
@@ -1021,12 +1025,13 @@ class DonationView(FormView):
 
 
 
-    def send_confirmation_email(self, house, donation_amount, name, email, covered_fee, fee):
+    def send_confirmation_email(self, house, donation_amount, name, email, covered_fee, fee, donation):
         # Compose Email
         subject = f'{house.name}: Thank you for your donation, {name}.'
         context = {}
         context["house"] = house
         context["donation_amount"] = donation_amount
+        context["donation"] = donation
         context["covered_fee"] = covered_fee
         context["fee"] = fee
         context["name"] = name
@@ -1173,7 +1178,7 @@ class DonationDashboardView(HouseAccountMixin, View):
                 house.allow_donations = True
                 general_donation_type = DonationType.objects.filter(house=house, general_donation=True)
                 if not general_donation_type:
-                    general_donation_type = DonationType.objects.create(house=house, general_donation=True, name="General Donation")
+                    general_donation_type = DonationType.objects.create(house=house, general_donation=True, name="General Donation", description=f"Your donations will be used where {house.name} most needs it at the moment.")
                 
                 messages.success(request, 'You are now accepting donations')
             house.save()

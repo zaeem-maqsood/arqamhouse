@@ -69,15 +69,57 @@ Donate | {{ house.name }}
     100%{   color: rgb(215, 56, 56);    }
 }
 
+
+.blinking_fast {
+    animation:blinkingText 1.0s infinite;
+}
+@keyframes blinkingText{
+    0%{     color: rgb(56, 167, 215);    }
+    49%{    color: rgb(56, 167, 215); }
+    60%{    color: transparent; }
+    99%{    color:transparent;  }
+    100%{   color: rgb(56, 167, 215);    }
+}
+
 </style>
 {% endblock styles %}
 
 {% block top_page_scripts %}
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.8/lottie.min.js"></script>
 {% endblock top_page_scripts %}
 
 
 {% block scripts %}
+
+{% if show_confetti %}
+<script>
+
+    lottie.loadAnimation({
+        container: document.getElementById("confetti"), // the dom element that will contain the animation
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: "https://assets3.lottiefiles.com/packages/lf20_QmWrkz.json" // the path to the animation json
+    });
+
+    lottie.loadAnimation({
+            container: document.getElementById("confetti-1"), // the dom element that will contain the animation
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: "https://assets3.lottiefiles.com/packages/lf20_WdkR06.json" // the path to the animation json
+        });
+
+    lottie.loadAnimation({
+            container: document.getElementById("confetti-2"), // the dom element that will contain the animation
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: "https://assets3.lottiefiles.com/packages/lf20_WdkR06.json" // the path to the animation json
+        });
+</script>
+{% endif %}
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
 <script type="text/javascript">
 
@@ -247,7 +289,7 @@ function updateGraph() {
     <div class="container">
 
             
-            <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+            <div class="row justify-content-center text-center">
                 <div class="col-lg-8 col-md-10 col-sm-12 col-10">
                     
                     {% if house.logo %}
@@ -260,9 +302,30 @@ function updateGraph() {
             
                 </div>
             </div>
+
+            {% if show_confetti %}
+            <div class="row justify-content-center text-center">
+                <div class="col-3 col-lg-2">
+                    <div id="confetti-1"></div>
+                </div>
+                <div class="col-6 col-md-6 col-lg-4">
+                    <div id="confetti"></div>
+                </div>
+                <div class="col-3 col-lg-2">
+                    <div id="confetti-2"></div>
+                </div>
+            </div>
+            <div class="row justify-content-center text-center">
+                
+                <div class="col-lg-8 col-md-8 col-sm-8 col-8">
+                    <p class="lead blinking_fast">Thank you, {{ last_donor }}!</p>
+                </div>
+            </div>
+            {% endif %}
+                
             
 
-            <div class="row justify-content-center" style="margin: 5px;">
+            <div class="row justify-content-center" style="margin: 5px;padding-top: 20px;">
                 <div class="col-lg-8 col-md-12 col-sm-12 col-12"
                     style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px; margin: 10px;border-radius: 15px;align-self: center;">
 
