@@ -6,6 +6,16 @@
 {{ postcard.name }}
 {% endblock title %}
 
+
+{% block page_description %}
+<meta name="description" content="{{ postcard.description|safe|striptags }}">
+<meta property="og:image" content="{{ postcard.image_1.url }}">
+
+<meta property="og:url" content="{{ request.path }}">
+<meta name="twitter:card" content="{{ postcard.slug }}">
+{% endblock page_description %}
+
+
 {% block styles %}
 <style>
 iframe {
