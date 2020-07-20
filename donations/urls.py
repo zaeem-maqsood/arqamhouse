@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.urls import path, include
 
 from donations.views import (DonationListView, DonationView, DonationTypeCreateView, DonationDashboardView, 
-                             DonationTypeListView, DonationTypeUpdateView, DonationDetailView)
+                             DonationTypeListView, DonationTypeUpdateView, DonationDetailView, update_payment_intent_amount)
 
 app_name = "donations"
 
@@ -30,6 +30,7 @@ urlpatterns = [
     path('types/create', DonationTypeCreateView.as_view(), name='create_type'),
     path('types/<int:pk>', DonationTypeUpdateView.as_view(), name='update_type'),
     path('detail/<public_id>', DonationDetailView.as_view(), name='detail'),
+    path('update_payment_intent_amount', update_payment_intent_amount, name='update_payment_intent_amount'),
 ]
 
 

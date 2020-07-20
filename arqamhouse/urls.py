@@ -21,7 +21,7 @@ from django.contrib.auth import views as auth_views
 
 from houses.views import DashboardView, HouseHomePageView
 from .views import (HomePageView, ReportErrorView, ApplePayVerificationView, AboutUsView, PricingView, CustomScriptView,
-                    EventInfoView, DonationInfoView, SubscriberInfoView, CampaignInfoView, FindHouseView)
+                    EventInfoView, DonationInfoView, SubscriberInfoView, CampaignInfoView, FindHouseView, StripeWebhook)
 from events.views import OrderPublicDetailView
 from donations.views import DonationGiftsSentView
 
@@ -39,6 +39,10 @@ urlpatterns = [
     path('report', ReportErrorView.as_view(), name='report'),
     path('donation-gifts', DonationGiftsSentView.as_view(), name='donation_gifts_sent'),
     path('zaeem-custom-script', CustomScriptView.as_view(), name='custom_script'),
+
+    path('stripe_webhook', StripeWebhook.as_view(), name='stripe_webhook'),
+
+    path('postcards/', include('postcards.urls')),
     path('froala_editor/', include('core.urls')),
     path('house/', include('houses.urls')),
     path('profile/', include('profiles.urls')),

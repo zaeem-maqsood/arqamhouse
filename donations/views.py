@@ -311,22 +311,22 @@ class DonationGiftView(FormView):
 
             # Charge the card
             charge = stripe.Charge.create(
-                        amount = int(round(charge_amount, 2) * 100),
-                        currency = 'cad',
-                        description = self.get_charge_descriptor(house),
-                        customer = customer.id,
-                        metadata = {
-                            'transaction_amount': round(charge_amount, 2),
-                            'transaction_arqam_amount': round(arqam_amount, 2),
-                            'transaction_stripe_amount': round(stripe_amount, 2),
-                            'transaction_house_amount': round(house_amount, 2),
-                            'buyer_email': email,
-                            'buyer_name': name,
-                            'house_name': house.name,
-                            'house_id': house.id
-                            },
-                        statement_descriptor = self.get_charge_descriptor(house),
-                    )
+                amount = int(round(charge_amount, 2) * 100),
+                currency = 'cad',
+                description = self.get_charge_descriptor(house),
+                customer = customer.id,
+                metadata = {
+                    'transaction_amount': round(charge_amount, 2),
+                    'transaction_arqam_amount': round(arqam_amount, 2),
+                    'transaction_stripe_amount': round(stripe_amount, 2),
+                    'transaction_house_amount': round(house_amount, 2),
+                    'buyer_email': email,
+                    'buyer_name': name,
+                    'house_name': house.name,
+                    'house_id': house.id
+                    },
+                statement_descriptor = self.get_charge_descriptor(house),
+            )
             
         except stripe.error.CardError as e:
             print(e)
@@ -599,8 +599,6 @@ class DonationPublicListView(View):
 
 
 
-
-
 class DonationPublicListLiveView(View):
     template_name = "donations/public-list-live.html"
 
@@ -706,10 +704,81 @@ class DonationPublicListLiveView(View):
             return JsonResponse(graph_data)
 
 
+def update_payment_intent_amount(request):
+    json_data = json.loads(request.body)
+    if json_data:
+        print(json_data)
+        amount = json_data['amount']
+        amount = decimal.Decimal(amount)
+        
+        intent_id = json_data['intent_id']
+        donation_type_id = json_data['donation_type_id']
+        print(donation_type_id)
+        donation_type = DonationType.objects.get(id=donation_type_id)
+        house = donation_type.house
+
+        platform_fee = decimal.Decimal(settings.PLATFORM_FEE/100)
+        stripe_fee = decimal.Decimal(settings.STRIPE_FEE/100)
+        stripe_base_fee = decimal.Decimal(settings.STRIPE_BASE_FEE)
+
+        total_fee = (amount * platform_fee) + stripe_base_fee
+        print(total_fee)
+
+        stripe_amount = ((amount + total_fee) * stripe_fee) + stripe_base_fee
+        print(stripe_amount)
+
+        arqam_amount = total_fee - stripe_amount
+        print(arqam_amount)
+
+        if donation_type.pass_fee:
+            house_amount = amount
+            charge_amount = amount + total_fee
+            print(house_amount)
+            print(charge_amount)
+            pass_fee = True
+            donation_amount = house_amount
+
+        else:
+            house_amount = amount - total_fee
+            charge_amount = amount
+            print(house_amount)
+            print(charge_amount)
+            pass_fee = False
+            donation_amount = charge_amount
 
 
+        print(f"The charge amount is {charge_amount}")
 
+        try:
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+            charge = stripe.PaymentIntent.modify(
+                intent_id,
+                amount=int(charge_amount * 100),
+                metadata= {
+                    "house": house,
+                    "donation_type_id": donation_type_id,
+                    "house_amount": house_amount,
+                    "charge_amount": charge_amount,
+                    "pass_fee": pass_fee,
+                    "donation_amount": donation_amount,
+                    "arqam_amount": arqam_amount,
+                    "stripe_amount": stripe_amount,
+                    "total_fee": total_fee,
+                    "platform_fee": platform_fee,
+                    "stripe_fee": stripe_fee,
+                    "stripe_base_fee": stripe_base_fee,
+                    'integration_check': 'accept_a_payment'
+                }
+            )
 
+            print("Is the problem here?")
+        except Exception as e:
+            print(e)
+            print("Exception was triggered")
+
+        
+        return JsonResponse({'html': True})
+        
 
 
 class DonationView(FormView):
@@ -755,6 +824,29 @@ class DonationView(FormView):
         slug = self.kwargs['slug']
         house = self.get_house()
         donation_types = DonationType.objects.filter(house=house, deleted=False)
+
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        intent_id = request.session.get('intent')
+        if intent_id:
+            intent = stripe.PaymentIntent.retrieve(intent_id)
+        else:
+
+            intent = stripe.PaymentIntent.create(
+                amount=2000,
+                currency='cad',
+                description = self.get_charge_descriptor(house),
+                metadata = {
+                    'house_name': house.name,
+                    'house_id': house.id
+                    },
+                statement_descriptor = self.get_charge_descriptor(house),
+            )
+            request.session['intent'] = str(intent.id)
+            request.session.modified = True
+
+
+        context["intent_id"] = intent.id
+        context["client_secret"] = intent.client_secret
         
         context['donation_types'] = donation_types
         context["form"] = form
@@ -797,7 +889,7 @@ class DonationView(FormView):
         data = request.POST
         house = self.get_house()
 
-        stripe_token = data["stripeToken"]
+        stripe_token = data["intent_id"]
         
         # Get buyer name and email address
         name = form.cleaned_data.get('name')
@@ -812,46 +904,16 @@ class DonationView(FormView):
         else:
             address = None
 
+        
+        # Calculate prices 
+
+
 
         stripe.api_key = settings.STRIPE_SECRET_KEY
 
         # ====================== Create Arqam House Profile and Subscribe them to the house ===========================
         # Check if user exists in the system 
         email = email.lower()
-
-
-
-        platform_fee = decimal.Decimal(settings.PLATFORM_FEE/100)
-
-        stripe_fee = decimal.Decimal(settings.STRIPE_FEE/100)
-        stripe_base_fee = decimal.Decimal(settings.STRIPE_BASE_FEE)
-
-        total_fee = (amount * platform_fee) + stripe_base_fee
-        print(total_fee)
-
-        stripe_amount = (amount * stripe_fee) + stripe_base_fee
-        print(stripe_amount)
-
-        arqam_amount = total_fee - stripe_amount
-        print(arqam_amount)
-
-        if donation_type.pass_fee:
-            house_amount = amount
-            charge_amount = amount + total_fee
-            print(house_amount)
-            print(charge_amount)
-            pass_fee = True
-            donation_amount = house_amount
-
-        else:
-            house_amount = amount - total_fee
-            charge_amount = amount
-            print(house_amount)
-            print(charge_amount)
-            pass_fee = False
-            donation_amount = charge_amount
-
-
 
         try:
             profile = Profile.objects.get(email=email)
@@ -881,120 +943,66 @@ class DonationView(FormView):
 
 
         try:
-            stripe_token = data["stripeToken"]
+            stripe_token = data["intent_id"]
         except Exception as e:
             print(e)
             form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
             return self.render_to_response(self.get_context_data(form=form))
 
-        
 
-        
 
         try:
             if profile.stripe_customer_id:
                 customer = stripe.Customer.retrieve(profile.stripe_customer_id)
             else:
-                customer = stripe.Customer.create(source=stripe_token, email=email, name=name)
+                customer = stripe.Customer.create(email=email, name=name)
                 print(customer)
                 profile.stripe_customer_id = customer.id
                 profile.save()
 
             # Charge the card
-            charge = stripe.Charge.create(
-                        amount = int(round(charge_amount, 2) * 100),
-                        currency = 'cad',
-                        description = self.get_charge_descriptor(house),
-                        customer = customer.id,
-                        metadata = {
-                            'transaction_amount': round(charge_amount, 2),
-                            'transaction_arqam_amount': round(arqam_amount, 2),
-                            'transaction_stripe_amount': round(stripe_amount, 2),
-                            'transaction_house_amount': round(house_amount, 2),
-                            'buyer_email': email,
-                            'buyer_name': name,
-                            'house_name': house.name,
-                            'house_id': house.id
-                            },
-                        statement_descriptor = self.get_charge_descriptor(house),
-                    )
-            
-        except stripe.error.CardError as e:
-            print(e)
-            print(e.error.code)
-            print(e.error.message)
-            print(e.error.type)
-            print(e.error.param)
-            error_message = e.error.message
-            if e.error.code == "incorrect_zip":
-                error_message = "The postal code your provided failed validation. Please make sure your postal code is correct and try again."
 
-            if e.error.code == "card_declined":
-                error_message = "The card you provided was declined. Please use another payment method."
-
-            form.add_error("amount", f"{error_message}")
-            return self.render_to_response(self.get_context_data(form=form))
-            
-        except stripe.error.RateLimitError as e:
-            # Too many requests made to the API too quickly
-            print(e)
-            form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
-            return self.render_to_response(self.get_context_data(form=form))
-
-        except stripe.error.InvalidRequestError as e:
-            # Invalid parameters were supplied to Stripe's API
-            print(e)
-            form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
-            return self.render_to_response(self.get_context_data(form=form))
-
-        except stripe.error.AuthenticationError as e:
-            # Authentication with Stripe's API failed
-            # (maybe you changed API keys recently)
-            print(e)
-            form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
-            return self.render_to_response(self.get_context_data(form=form))
-
-        except stripe.error.APIConnectionError as e:
-            # Network communication with Stripe failed
-            print(e)
-            form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
-            return self.render_to_response(self.get_context_data(form=form))
-
-        except stripe.error.StripeError as e:
-            # Display a very generic error to the user, and maybe send
-            # yourself an email
-            print(e)
-            form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
-            return self.render_to_response(self.get_context_data(form=form))
+            charge = stripe.PaymentIntent.retrieve(stripe_token)
+            print("The Charge is \n\n")
+            print(charge)
+            print("\n\nThe Charge is")
         
         except Exception as e:
             print(e)
             form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
+            del request.session['intent']
+            request.session.modified = True
             return self.render_to_response(self.get_context_data(form=form))
 
         
         transaction = Transaction.objects.create(house=house, name=name, email=email, donation_transaction=True)
+
+        charge_amount = decimal.Decimal(charge.metadata['charge_amount'])
+        arqam_amount = decimal.Decimal(charge.metadata['arqam_amount'])
+        stripe_amount = decimal.Decimal(charge.metadata['stripe_amount'])
+        house_amount = decimal.Decimal(charge.metadata['house_amount'])
+        donation_amount = decimal.Decimal(charge.metadata['donation_amount'])
+        total_fee = decimal.Decimal(charge.metadata['total_fee'])
+        pass_fee = charge.metadata['pass_fee']
 
         transaction.amount = charge_amount
         transaction.arqam_amount = arqam_amount
         transaction.stripe_amount = stripe_amount
         transaction.house_amount = house_amount
         transaction.payment_id = charge['id']
-        transaction.last_four = charge.source['last4']
-        transaction.brand = charge.source['brand']
-        transaction.network_status = charge.outcome['network_status']
-        transaction.risk_level = charge.outcome['risk_level']
-        transaction.seller_message = charge.outcome['seller_message']
-        transaction.outcome_type = charge.outcome['type']
-        transaction.address_line_1 = charge.source['address_line1']
-        transaction.address_state = charge.source['address_state']
-        transaction.address_postal_code = charge.source['address_zip']
-        transaction.address_city = charge.source['address_city']
-        transaction.address_country = charge.source['address_country']
+
+        payment_method = stripe.PaymentMethod.retrieve(charge.payment_method)
+        transaction.last_four = payment_method.card['last4']
+        transaction.brand = payment_method.card['brand']
+        transaction.address_line_1 = payment_method.billing_details.address['line1']
+        transaction.address_state = payment_method.billing_details.address['state']
+        transaction.address_postal_code = payment_method.billing_details.address['postal_code']
+        transaction.address_city = payment_method.billing_details.address['city']
+        transaction.address_country = payment_method.billing_details.address['country']
         transaction.save()
 
         donation = Donation.objects.create(
-            donation_type=donation_type, transaction=transaction, name=name, email=email, message=message, address=address, postal_code=charge.source['address_zip'], pass_fee=pass_fee,
+            donation_type=donation_type, transaction=transaction, name=name, email=email, message=message, address=address, postal_code=payment_method.billing_details.address['postal_code'], pass_fee=pass_fee,
             anonymous=anonymous, amount=donation_amount)
 
 
@@ -1016,11 +1024,16 @@ class DonationView(FormView):
         else:
             self.send_confirmation_email(name=name, email=email, house=house, donation_amount=donation_amount, covered_fee=False, fee=0.00, donation=donation)
 
+        # Delete the session intent variable 
+        del request.session['intent']
+        request.session.modified = True
         valid_data = super(DonationView, self).form_valid(form)
         return valid_data
 
     def form_invalid(self, form):
         print(form.errors)
+        del request.session['intent']
+        request.session.modified = True
         return self.render_to_response(self.get_context_data(form=form))
 
 

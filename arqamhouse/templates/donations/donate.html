@@ -57,6 +57,63 @@ iframe {
 
 
 {% block scripts %}
+
+<script>
+function updateAmount(donation_type_id) {
+
+    donation_type_id = donation_type_id.value
+
+    console.log("IS it coming here")
+    var amount = document.getElementById("id_amount").value;
+
+    console.log(amount);
+
+
+    var token = '{{ csrf_token }}';
+    const url = "{% url 'donations:update_payment_intent_amount' %}";
+
+    let data = {
+       "amount": amount,
+       "intent_id": '{{ intent_id }}',
+       "donation_type_id": donation_type_id,
+    }
+
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: { 
+            'X-CSRFToken': token,
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        
+    }
+
+
+    fetch(url, fetchData)
+        .then(
+            function (response) {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                        response.status);
+                    return;
+                }
+
+                // Examine the text in the response
+                response.json().then(function (data) {
+                    console.log(data)
+                });
+            }
+        )
+        .catch(function (err) {
+            console.log('Fetch Error :-S', err);
+        });
+
+}
+</script>
+
+
 <script>
 
 var stripe = Stripe('{{ public_key }}');
@@ -145,6 +202,7 @@ paymentRequest.on('token', function (ev) {
 
 
 <script>
+
 var stripe = Stripe('{{ public_key }}');
 var elements = stripe.elements();
 
@@ -182,31 +240,57 @@ card.addEventListener('change', function(event) {
   }
 });
 
+console.log(card);
 
 var form = document.getElementById('donationForm');
 form.addEventListener('submit', function(event) {
   event.preventDefault();
 
-  stripe.createToken(card).then(function(result) {
-    if (result.error) {
-      // Inform the customer that there was an error.
-      var errorElement = document.getElementById('card-errors');
-      errorElement.textContent = result.error.message;
-    } else {
-      // Send the token to your server.
-      stripeTokenHandler(result.token);
-    }
-  });
+  console.log("Itt came here");
+  clientSecret = '{{ client_secret }}';
+
+
+  stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+            card: card,
+            billing_details: {
+                name: document.getElementById("id_name").value,
+            }
+        }
+    }).then(function (result) {
+        if (result.error) {
+            // Show error to your customer (e.g., insufficient funds)
+            console.log(result)
+            console.log(result.error.message);
+            document.getElementById("stripe_error_row").style.display = 'block';
+            document.getElementById("stripe_error").innerHTML = result.error.message;
+            document.getElementById('customButton').disabled = false;
+
+        } else {
+            // The payment has been processed!
+            if (result.paymentIntent.status === 'succeeded') {
+
+                console.log("Succeed");
+                stripeClientSecretHandler('{{ intent_id }}');
+                // Show a success message to your customer
+                // There's a risk of the customer closing the window before callback
+                // execution. Set up a webhook or plugin to listen for the
+                // payment_intent.succeeded event that handles any business critical
+                // post-payment actions.
+            }
+        }
+    });
+
 });
 
 
-function stripeTokenHandler(token) {
+function stripeClientSecretHandler(intent_id) {
   // Insert the token ID into the form so it gets submitted to the server
   var form = document.getElementById('donationForm');
   var hiddenInput = document.createElement('input');
   hiddenInput.setAttribute('type', 'hidden');
-  hiddenInput.setAttribute('name', 'stripeToken');
-  hiddenInput.setAttribute('value', token.id);
+  hiddenInput.setAttribute('name', 'intent_id');
+  hiddenInput.setAttribute('value', intent_id);
   form.appendChild(hiddenInput);
 
   // Submit the form
@@ -221,8 +305,11 @@ function stripeTokenHandler(token) {
 
 function showAddressAndFee(object) {
 
+
     donation_type_id = object.value;
     console.log(donation_type_id);
+
+    // updateAmount(donation_type_id);
 
     {% for donation_type in donation_types %}
 
@@ -309,6 +396,7 @@ function showAddressAndFee(object) {
 
 
 window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
+window.onload = updateAmount(document.getElementById('id_donation_type'));
 </script>
 
 
@@ -333,7 +421,7 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
 <section style="padding-top: 60px;">
     <div class="container">
 
-        <form id="donationForm" method="POST" >{% csrf_token %}
+        <form id="donationForm" method="POST">{% csrf_token %}
 
             <div class="row justify-content-center text-center" style="padding-bottom: 10px;">
                 <div class="col-lg-8 col-md-10 col-sm-12 col-10">
@@ -357,6 +445,17 @@ window.onload = showAddressAndFee(document.getElementById('id_donation_type'));
 
             <div class="row justify-content-center" style="padding-bottom: 30px;">
                 <div class="col-lg-8 col-md-10 col-sm-12 col-10" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 30px;border-radius: 15px;">
+
+                    <!-- Stripe Errors -->
+                    <div class="row" style="padding-bottom: 20px;display: none;" id="stripe_error_row">
+                        <div class="col-md-12">
+                            <div class="alert bg--error">
+                                <div class="alert__body">
+                                    <span id="stripe_error"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     {% if form.non_field_errors %}
                     <div class="row" style="padding-bottom: 20px;">

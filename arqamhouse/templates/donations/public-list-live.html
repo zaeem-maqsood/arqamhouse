@@ -262,6 +262,8 @@ function updateGraph() {
 
                 // Examine the text in the response
                 response.json().then(function (data) {
+
+                    console.log(data)
                     myChart2.data.datasets[0].data = data["sales_label"];
                     myChart2.data.labels = data["minute_label"];
                     myChart2.update();
@@ -369,7 +371,7 @@ function updateGraph() {
 
                     
                     <div class="row justify-content-center">
-                        <div class="col-10" style="padding-bottom: 40px;">
+                        <div class="col-10" style="padding-bottom: 40px;" id="dynamic">
                             {% for donation in donations %}
                             <div class="row text-center"
                                 style="padding-top: 20px; padding-bottom: 20px;{% if donation.gift_donation_item %}background-color: #eafaff;{% endif %}">
