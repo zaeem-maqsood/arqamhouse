@@ -319,7 +319,8 @@ function stripeClientSecretHandler(intent_id) {
 
                     <div class="row justify-content-around" style="padding-bottom: 30px;">
                         <div class="col-sm-12 col-md-12 col-lg-12">
-                            <h3 style="text-align: center;">{{ postcard.name }}</h3>
+                            <h3 style="text-align: center;margin-bottom: 5px;">{{ postcard.name }}</h3>
+                            <p class="text-center">{{ postcard.amount_sold }} postcards sold</p>
                             <div class="slider border--round boxed--border" data-paging="true" data-arrows="true" style="margin-bottom: 10px;">
                                 <ul class="slides">
                                     {% if postcard.image_1 %}

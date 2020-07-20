@@ -208,6 +208,10 @@ class PostCardOrderView(FormView):
         except Exception as e:
             print(e)
 
+
+        postcard.amount_sold += 1
+        postcard.save()
+
         # Delete the session intent variable 
         del request.session['postcard_intent_id']
         request.session.modified = True
