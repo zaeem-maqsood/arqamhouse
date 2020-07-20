@@ -202,6 +202,12 @@ class PostCardOrderView(FormView):
         except Exception as e:
             print(e)
 
+
+        try: 
+            self.send_confirmation_email(postcard_order)
+        except Exception as e:
+            print(e)
+
         # Delete the session intent variable 
         del request.session['postcard_intent_id']
         request.session.modified = True
@@ -226,22 +232,16 @@ class PostCardOrderView(FormView):
                 )
 
 
-
-    def send_confirmation_email(self, house, donation_amount, name, email, covered_fee, fee, donation):
+    def send_confirmation_email(self, postcard_order):
         # Compose Email
-        subject = f'{house.name}: Thank you for your donation, {name}.'
+        subject = f'Thank you for your purchase, {postcard_order.name}.'
         context = {}
-        context["house"] = house
-        context["donation_amount"] = donation_amount
-        context["donation"] = donation
-        context["covered_fee"] = covered_fee
-        context["fee"] = fee
-        context["name"] = name
+        context["postcard_order"] = postcard_order
         
-        html_content = render_to_string('emails/donation_confirmation.html', context)
+        html_content = render_to_string('emails/postcard_confirmation.html', context)
         text_content = strip_tags(html_content)
-        from_email = f'{house.name} <info@arqamhouse.com>'
-        to = [email]
+        from_email = f'Arqam House <info@arqamhouse.com>'
+        to = [postcard_order.email]
         email = EmailMultiAlternatives(subject=subject, body=text_content,
                                        from_email=from_email, to=to)
         email.attach_alternative(html_content, "text/html")

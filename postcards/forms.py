@@ -25,7 +25,7 @@ class PostcardOrderForm(forms.ModelForm):
                 "name": forms.TextInput(
                         attrs={
                             "class": "validate-required",
-                            "placeholder":"Your loving sister, Maryam.",
+                            "placeholder":"Maryam Imran",
                             "required": True,
                             "maxlength": '100',
                         }
@@ -34,7 +34,7 @@ class PostcardOrderForm(forms.ModelForm):
                 "recipient_name": forms.TextInput(
                         attrs={
                             "class": "validate-required",
-                            "placeholder": "Maryam Imran",
+                            "placeholder": "Khadija Khuwaylid",
                             "required": True,
                             "maxlength": '100',
                         }
@@ -54,7 +54,7 @@ class PostcardOrderForm(forms.ModelForm):
                             
                             "placeholder":"Give a personalized message with your gift",
                             "required": False,
-                            "maxlength": '150',
+                            "maxlength": '280',
                             "rows": 2,
                         }
                     ),
