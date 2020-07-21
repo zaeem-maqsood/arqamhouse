@@ -49,7 +49,7 @@ var paymentRequest = stripe.paymentRequest({
     country: 'CA',
     currency: 'cad',
     total: {
-        label: 'Purchase for {{ postcard.name }}',
+        label: '{{ postcard.name }}',
         amount: 500,
     },
     requestPayerName: true,
