@@ -80,27 +80,21 @@ Choose A Postcard
                 </div>
             </div>
 
-            <div class="row" style="padding: 0 10px;">
-                <div class="col-lg-10 col-md-12">
-
-                    <div class="row text-center">
-                        {% for postcard in postcards %}
-                        {% if postcard.image_1 %}
-                        {% if postcard.amount %}
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-12"
-                            style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px; margin: 10px;padding:40px;border-radius: 15px;align-self: center;">
-                            <a href="{{ postcard.get_absolute_url }}" style="text-decoration: none;">
-                                <img src="{{ postcard.image_1.url }}" class="arrow">
-                                <p style="margin-bottom: 0px;font-size: 1.5em;">$ {{ postcard.amount }}</p>
-                                <p>{{ postcard.name }}</p>
-                            </a>
-                        </div>
-                        {% endif %}
-                        {% endif %}
-                        {% endfor %}
-                    </div>
-
+            <div class="row justify-content-center text-center" style="padding: 0 10px;">
+                {% for postcard in postcards %}
+                {% if postcard.image_1 %}
+                {% if postcard.amount %}
+                <div class="col-lg-3 col-md-4 col-sm-6 col-12"
+                    style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px; padding:40px;border-radius: 15px;align-self: center;">
+                    <a href="{{ postcard.get_absolute_url }}" style="text-decoration: none;">
+                        <img src="{{ postcard.image_1.url }}" class="arrow">
+                        <p style="margin-bottom: 0px;font-size: 1.5em;">$ {{ postcard.amount }}</p>
+                        <p>{{ postcard.name }}</p>
+                    </a>
                 </div>
+                {% endif %}
+                {% endif %}
+                {% endfor %}
             </div>
 
 
