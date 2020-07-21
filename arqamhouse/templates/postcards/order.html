@@ -357,7 +357,7 @@ function stripeClientSecretHandler(intent_id) {
                         <div class="col-sm-12 col-md-12 col-lg-12">
                             
                             <p style="font-size: small;">
-                                {{ postcard.description }}
+                                {{ postcard.description|safe }}
                             </p>
                             <h3>${{ postcard.amount }}</h3>
                             <h5 style="margin-bottom:0px;">Dimensions</h5>
