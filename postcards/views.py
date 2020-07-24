@@ -48,6 +48,13 @@ class PostCardListView(View):
     def get_context_data(self, *args, **kwargs):
         context = {}
         postcards = PostCard.objects.all()
+
+        get_data = self.request.GET
+        if 'success' in get_data:
+            context["show_confetti"] = True
+            context["postcard_order"] = PostCardOrder.objects.all().first()
+
+
         context["postcards"] = postcards
         return context
 
@@ -68,7 +75,7 @@ class PostCardOrderView(FormView):
 
     def get_success_url(self):
         view_name = "postcards:list"
-        return reverse(view_name)
+        return reverse(view_name) + "?success=true"
 
 
     def get_postcard(self):

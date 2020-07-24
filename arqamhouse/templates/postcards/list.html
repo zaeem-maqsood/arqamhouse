@@ -42,15 +42,59 @@ Choose A Postcard
     
 }
 
+
+
+.blinking_fast {
+    animation:blinkingText 1.0s infinite;
+}
+@keyframes blinkingText{
+    0%{     color: rgb(56, 167, 215);    }
+    49%{    color: rgb(56, 167, 215); }
+    60%{    color: transparent; }
+    99%{    color:transparent;  }
+    100%{   color: rgb(56, 167, 215);    }
+}
+
+
 </style>
 {% endblock styles %}
 
 {% block top_page_scripts %}
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.8/lottie.min.js"></script>
 {% endblock top_page_scripts %}
 
 
+
 {% block scripts %}
+
+{% if show_confetti %}
+<script>
+
+    lottie.loadAnimation({
+        container: document.getElementById("confetti"), // the dom element that will contain the animation
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: "https://assets3.lottiefiles.com/packages/lf20_QmWrkz.json" // the path to the animation json
+    });
+
+    lottie.loadAnimation({
+        container: document.getElementById("confetti-1"), // the dom element that will contain the animation
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: "https://assets3.lottiefiles.com/packages/lf20_WdkR06.json" // the path to the animation json
+    });
+
+    lottie.loadAnimation({
+        container: document.getElementById("confetti-2"), // the dom element that will contain the animation
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: "https://assets3.lottiefiles.com/packages/lf20_WdkR06.json" // the path to the animation json
+    });
+</script>
+{% endif %}
 
 {% endblock scripts %}
 
@@ -60,19 +104,43 @@ Choose A Postcard
 <section style="padding-top: 30px;">
     <div class="container">
 
+            {% if show_confetti %}
+            <div class="row justify-content-center text-center">
+                <div class="col-3 col-lg-2">
+                    <div id="confetti-1"></div>
+                </div>
+                <div class="col-6 col-md-6 col-lg-4">
+                    <div id="confetti"></div>
+                </div>
+                <div class="col-3 col-lg-2">
+                    <div id="confetti-2"></div>
+                </div>
+            </div>
+            <div class="row justify-content-center text-center">
+            
+                <div class="col-lg-8 col-md-8 col-sm-8 col-8">
+                    <p class="lead blinking_fast" style="margin-bottom: 0px;">Thank you, {{ postcard_order.name|title }}!
+                    <p>We've sent your order confirmation to your email, {{ postcard_order.email }}. {{ postcard_order.recipient_name|title }} is going to love their postcard!</p>
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+
             
             <div class="row justify-content-center text-center" style="padding-bottom: 40px;padding-top: 40px;">
                 <div class="col-lg-10 col-md-12">
             
                     <div class="row justify-content-center">
                         <div class="col-lg-3 col-md-3 col-sm-4 col-4">
-                            <img src="{% static 'images/logo.png' %}" style="max-height: 80px;">
+                            <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 80px;"></a>
                         </div>
                         <div class="col-lg-1 col-md-1 col-sm-1 col-1">
                             <h1 style="color: grey;font-weight: 900;margin-top: 10px;">X</h1>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-4 col-4">
+                            <a href="https://www.smilecan.org/">
                             <img src="https://static.wixstatic.com/media/e8cbaa_2e2e5338d0334fb4820e0ab060049eac.png" style="max-height: 80px;">
+                            </a>
                         </div>
                     </div>
             
@@ -85,7 +153,7 @@ Choose A Postcard
                     <h3 style="margin-bottom: 5px;color: grey;">Gift A Postcard</h3>
                     <p style="color: grey;margin-bottom: 0px;">We've partnered up with <a href="https://www.smilecan.org/" target="_blank" style="text-decoration: none;">Smile Canada</a> to raise funds to support children in youth with
                         dissabilities and their families.
-                        50% of the proceeds from Arqam House Eid cards will go to <a href="https://www.smilecan.org/" target="_blank" style="text-decoration: none;">Smile Canada</a>.
+                        50% of the proceeds ($2.50) from Arqam House Eid cards will go to <a href="https://www.smilecan.org/" target="_blank" style="text-decoration: none;">Smile Canada</a>.
                         Send handmade individualized postcards unique to friends and family. Add your own message and we'll ship it directly to
                         them, anywhere in Canada.
                     </p>
