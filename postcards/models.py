@@ -73,7 +73,7 @@ class PostCardOrder(models.Model):
     post_card = models.ForeignKey(PostCard, on_delete=models.CASCADE, blank=False, null=True)
     name = models.CharField(max_length=30, null=True, blank=True)
     email = models.EmailField(max_length=300, blank=False, null=False)
-    message_to_recipient = models.CharField(max_length=150, null=True, blank=True)
+    message_to_recipient = models.TextField(blank=True, null=True)
     address = models.CharField(max_length=200, null=True, blank=True)
     postal_code = models.CharField(max_length=10, null=True, blank=True)
     amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
