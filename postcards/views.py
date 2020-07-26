@@ -52,7 +52,7 @@ class PostCardListView(View):
         get_data = self.request.GET
         if 'success' in get_data:
             context["show_confetti"] = True
-            context["postcard_order"] = PostCardOrder.objects.all().first()
+            context["postcard_order"] = PostCardOrder.objects.all().reverse().first()
 
 
         context["postcards"] = postcards
