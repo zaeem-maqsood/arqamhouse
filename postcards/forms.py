@@ -11,13 +11,13 @@ class PostcardOrderForm(forms.ModelForm):
         super(PostcardOrderForm, self).__init__(*args, **kwargs)
         self.fields["address"] = forms.CharField(label="Address", widget=forms.TextInput(attrs={"class":"validate-required", "autocomplete": "off", "placeholder": "123 Main Street", "id": "autocomplete"}), required=False)
         self.fields["recipient_address"] = forms.CharField(label="Recipient Address", widget=forms.TextInput(
-            attrs={"class": "validate-required", "autocomplete": "off", "placeholder": "123 Main Street", "id": "autocomplete2"}), required=False)
+            attrs={"class": "validate-required", "autocomplete": "off", "placeholder": "123 Main Street", "id": "autocomplete2"}), required=True)
 
     class Meta:
         model = PostCardOrder
         fields = [
             "name", "email", "anonymous", "message_to_recipient", "recipient_name",
-            "recipient_postal_code"
+            "recipient_postal_code", "postal_code"
         ]
 
         widgets = {
@@ -49,10 +49,20 @@ class PostcardOrderForm(forms.ModelForm):
                         }
                     ),
 
+                
+                "postal_code": forms.TextInput(
+                    attrs={
+                        "class": "validate-required",
+                        "placeholder": "L1Z 5J5",
+                        "required": False,
+                        "maxlength": '7',
+                    }
+                ),
+
                 "message_to_recipient": forms.Textarea(
                         attrs={
                             
-                            "placeholder":"Give a personalized message with your gift",
+                            "placeholder":"Give a personalized message with your postcard",
                             "required": False,
                             "maxlength": '280',
                             "rows": 2,

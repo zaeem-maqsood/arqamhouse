@@ -246,10 +246,10 @@ function stripeClientSecretHandler(intent_id) {
     function initMap() {
 
         var input = document.getElementById('autocomplete');
-        var autocomplete = new google.maps.places.Autocomplete(input, { types: ['address'] });
+        var autocomplete = new google.maps.places.Autocomplete(input, { types: ['address'], componentRestrictions: { country: "ca" } });
 
         var input2 = document.getElementById('autocomplete2');
-        var autocomplete2 = new google.maps.places.Autocomplete(input2, { types: ['address'] });
+        var autocomplete2 = new google.maps.places.Autocomplete(input2, { types: ['address'], componentRestrictions: { country: "ca" } });
 
     }
 </script>
@@ -370,17 +370,21 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-12" style="padding-bottom: 10px;">
                             <h4 style="margin-bottom: 0px;">Your Information</h4>
+                            <p>We'll put the name your enter in the 'Name' 
+                                field on the back of your card under your personal message unless you choose to be anonymous.
+                                We ask you to enter your address so that we can add return address to the postcard, 
+                                if you choose anonymous we won't include a return address.</p>
                         </div>
                     </div>
 
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-5 col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Name <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
+                            <p style="margin-bottom: 0px;">Your Name <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="Who is the card from?"></i></p>
                             {{ form.name }}
                         </div>
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-7 col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Email <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
+                            <p style="margin-bottom: 0px;">Your Email <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="We'll send you a confirmation email of your purchase here."></i></p> 
                             {{ form.email }}
                         </div>
@@ -388,9 +392,16 @@ function stripeClientSecretHandler(intent_id) {
 
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-xl-9 col-lg-9 col-md-9 col-sm-8 col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Address</p>
+                            <p style="margin-bottom: 0px;">Your Address</p>
                             {{ form.address }}
+                            <span style="font-size: 0.8em;">Used as the return address on the postcard unless 'anonymous' is selected</span>
                         </div>
+                        <div class="col-md-3 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Your Postal Code</p>
+                            {{ form.postal_code }}
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom: 30px;">
                         <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Anonymous <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="Switch on and we won't tell your recipient you sent the card."></i></p>
@@ -405,6 +416,8 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-12" style="padding-bottom: 10px;">
                             <h4 style="margin-bottom: 0px;">Recipient Information</h4>
+                            <p>We'll use this information to personalize your card! 
+                                Please make sure the address and postal code is correct and tell us the message you'd like to write on the back of the card.</p>
                         </div>
                     </div>
                     
@@ -416,13 +429,13 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
 
-                    <div class="row" style="padding-bottom: 30px;">
-                        <div class="col-md-9 col-sm-12 col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Recipient Address <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-md-8 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Recipient's Address <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="Make sure you get this right :D"></i></p>
                             {{ form.recipient_address }}
                         </div>
-                        <div class="col-md-3 col-sm-12 col-12" style="padding-bottom: 10px;">
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Postal Code</p>
                             {{ form.recipient_postal_code }}
                         </div>
@@ -431,7 +444,7 @@ function stripeClientSecretHandler(intent_id) {
 
                     <div class="row" style="padding-bottom: 30px;">
                         <div class="col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Message to recipient <span style="font-size: 0.7em;">Optional</span> <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
+                            <p style="margin-bottom: 0px;">Personalized Message To Recipient <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="We'll write this on the back of the card for you."></i></p>
                             {{ form.message_to_recipient }}
                         </div>

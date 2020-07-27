@@ -143,6 +143,7 @@ class PostCardOrderView(FormView):
         anonymous = form.cleaned_data.get('anonymous')
         address = form.cleaned_data.get("address")
         message_to_recipient = form.cleaned_data.get('message_to_recipient')
+        postal_code = form.cleaned_data.get("postal_code")
 
         recipient_name = form.cleaned_data.get("recipient_name")
         recipient_email = form.cleaned_data.get("recipient_email")
@@ -198,16 +199,16 @@ class PostCardOrderView(FormView):
             return self.render_to_response(self.get_context_data(form=form))
 
         postcard_order = PostCardOrder.objects.create(post_card=postcard,
-            name=name, email=email, anonymous=anonymous, address=address, message_to_recipient=message_to_recipient, recipient_name=recipient_name, 
+                                                      name=name, email=email, anonymous=anonymous, postal_code=postal_code, address=address, message_to_recipient=message_to_recipient, recipient_name=recipient_name,
             recipient_address=recipient_address, recipient_postal_code=recipient_postal_code, payment_intent_id=charge['id'], 
             payment_method_id=charge['payment_method'], amount=postcard.amount)
 
 
-        # if settings.DEBUG == False:
-        try:
-            self.send_text_message(postcard_order)
-        except Exception as e:
-            print(e)
+        if settings.DEBUG == False:
+            try:
+                self.send_text_message(postcard_order)
+            except Exception as e:
+                print(e)
 
 
         try: 
