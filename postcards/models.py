@@ -82,8 +82,8 @@ class PostCardOrder(models.Model):
     recipient_address = models.CharField(max_length=200, null=True, blank=True)
     recipient_postal_code = models.CharField(max_length=10, null=True, blank=True)
     sent_to_recipient = models.BooleanField(default=False)
-    payment_intent_id = models.CharField(max_length=150, null=True, blank=True)
-    payment_method_id = models.CharField(max_length=150, null=True, blank=True)
+    payment_intent_id = models.CharField(max_length=300, null=True, blank=True)
+    payment_method_id = models.CharField(max_length=300, null=True, blank=True)
 
     def __str__(self):
         return (self.name)

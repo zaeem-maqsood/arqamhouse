@@ -65,7 +65,7 @@ class PostcardOrderForm(forms.ModelForm):
                             "placeholder":"Give a personalized message with your postcard",
                             "required": False,
                             "maxlength": '280',
-                            "rows": 2,
+                            "rows": 3,
                         }
                     ),
 
