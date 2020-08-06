@@ -50,7 +50,7 @@ var paymentRequest = stripe.paymentRequest({
     currency: 'cad',
     total: {
         label: '{{ postcard.name }}',
-        amount: 500,
+        amount: (500 * {{ quantity_str }}),
     },
     requestPayerName: true,
     requestPayerEmail: true,
@@ -86,21 +86,6 @@ paymentRequest.canMakePayment().then(function (result) {
         document.getElementById('payment-request-button').style.display = 'none';
     }
 });
-
-
-// // Check the availability of the Payment Request API first.
-// paymentRequest.canMakePayment().then(function (result) {
-//     if (result) {
-//         prButton.mount('#payment-request-button');
-//         // document.getElementById('card-element').style.display = 'none';
-//         // document.getElementById('checkout-button').style.display = 'none';
-
-//     } else {
-//         document.getElementById('payment-request-button').style.display = 'none';
-
-//     }
-// });
-
 
 
 paymentRequest.on('paymentmethod', function (ev) {
@@ -195,12 +180,15 @@ form.addEventListener('submit', function(event) {
             card: card,
             billing_details: {
                 name: document.getElementById("id_name").value,
+                email: document.getElementById("id_email").value,
+                address: {
+                    postal_code: document.getElementById("id_postal_code").value,
+                }
             }
         }
     }).then(function (result) {
         if (result.error) {
             // Show error to your customer (e.g., insufficient funds)
-            console.log("LETSSS GOOO")
             console.log(result)
             console.log(result.error.message);
             document.getElementById("stripe_error_row").style.display = 'block';
@@ -248,8 +236,52 @@ function stripeClientSecretHandler(intent_id) {
         var input = document.getElementById('autocomplete');
         var autocomplete = new google.maps.places.Autocomplete(input, { types: ['address'], componentRestrictions: { country: "ca" } });
 
-        var input2 = document.getElementById('autocomplete2');
-        var autocomplete2 = new google.maps.places.Autocomplete(input2, { types: ['address'], componentRestrictions: { country: "ca" } });
+        {% for quantity in quantity %}
+            var input2 = document.getElementById('autocomplete{{ forloop.counter0 }}');
+            var autocomplete2 = new google.maps.places.Autocomplete(input2, { types: ['address'], componentRestrictions: { country: "ca" } });
+        {% endfor %}
+
+    }
+
+
+    function copyAddress(increment) {
+
+        minus_one = increment - 1;
+        console.log(minus_one);
+
+        // get previous address 
+        prev_address = document.getElementById("autocomplete" + minus_one);
+        console.log(prev_address);
+
+        current_address = document.getElementById("autocomplete" + increment);
+        current_address.value = prev_address.value;
+
+    }
+
+    function copyPostalCode(increment) {
+
+        minus_one = increment - 1;
+        console.log(minus_one);
+
+        // get previous postal code 
+        prev_postal = document.getElementById("id_" + minus_one + "_recipient_postal_code");
+
+        current_postal = document.getElementById("id_" + increment + "_recipient_postal_code");
+        current_postal.value = prev_postal.value;
+
+    }
+
+
+    function copyMessage(increment) {
+
+        minus_one = increment - 1;
+        console.log(minus_one);
+
+        // get previous postal code 
+        prev_message = document.getElementById("id_" + minus_one + "_message_to_recipient");
+
+        current_message = document.getElementById("id_" + increment + "_message_to_recipient");
+        current_message.value = prev_message.value;
 
     }
 </script>
@@ -266,6 +298,8 @@ function stripeClientSecretHandler(intent_id) {
     <div class="container">
 
         <form id="donationForm" method="POST" >{% csrf_token %}
+
+            <input id="quantity" name="quantity" type="hidden" value="{{ quantity_str }}">
 
             <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
                 <div class="col-lg-8 col-md-10 col-sm-12 col-10">
@@ -360,9 +394,9 @@ function stripeClientSecretHandler(intent_id) {
                             <p style="font-size: small;">
                                 {{ postcard.description|safe }}
                             </p>
-                            <h3>${{ postcard.amount }}</h3>
+                            <h3>${{ postcard.amount }} <span style="font-size: small;">{% if one %}{% else %}each X {{ quantity_str }} = ${{ postcard_amount }}{% endif %}</span></h3>
                             <h5 style="margin-bottom:0px;">Dimensions</h5>
-                            <p>5” L X 7 ”W  Premium Card Stock</p>
+                            <p>7 ”Width X 5” Length</p>
                         </div>
                     </div>
                     <!--end of row-->
@@ -371,7 +405,7 @@ function stripeClientSecretHandler(intent_id) {
                         <div class="col-12" style="padding-bottom: 10px;">
                             <h4 style="margin-bottom: 0px;">Your Information</h4>
                             <p>We'll put the name your enter in the 'Name' 
-                                field on the back of your card under your personal message unless you choose to be anonymous.
+                                field on the back of your card under your personal message and on the envelope unless you choose to be anonymous.
                                 We ask you to enter your address so that we can add return address to the postcard, 
                                 if you choose anonymous we won't include a return address.</p>
                         </div>
@@ -412,8 +446,8 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
 
-
-                    <div class="row" style="padding-bottom: 10px;">
+                    
+                    <div class="row" style="padding-bottom: 20px;">
                         <div class="col-12" style="padding-bottom: 10px;">
                             <h4 style="margin-bottom: 0px;">Recipient Information</h4>
                             <p>We'll use this information to personalize your card! 
@@ -421,23 +455,43 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
                     
+
+                    {% for x in quantity %}
+
+                    <div class="row" style="padding-bottom: 5px;">
+                        <div class="col-12" style="padding-bottom: 10px;">
+                            <h5  style="margin-bottom: 0px;">
+                            {% if one %}
+                            {% else %}
+                            {{ forloop.counter }}{% if forloop.counter == 1 %}st{% elif forloop.counter == 2 %}nd{% elif forloop.counter == 3 %}rd{% else %}th{% endif %} 
+                            {% endif %}
+                            Recipient's Information</h5>
+                        </div>
+                    </div>
+
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-md-12 col-sm-12 col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Recipient's Name <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
-                                data-tooltip="This is the name we will place on the front of the card."></i></p>
-                            {{ form.recipient_name }}
+                            <p style="margin-bottom: 0px;">Recipient's Name</p>
+                            <input type="text" name="{{ forloop.counter0 }}_recipient_name" class="validate-required" placeholder="Recipient {{ forloop.counter }}" maxlength="100"
+                                required="" id="id_{{ forloop.counter0 }}_recipient_name">
+                            
                         </div>
                     </div>
 
                     <div class="row" style="padding-bottom: 20px;">
                         <div class="col-md-8 col-sm-12 col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Recipient's Address <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
-                                data-tooltip="Make sure you get this right :D"></i></p>
-                            {{ form.recipient_address }}
+                            <p style="margin-bottom: 0px;">Recipient's Address</p>
+                            <input type="text" name="{{ forloop.counter0 }}_recipient_address" class="validate-required" autocomplete="off" placeholder="123 Main Street"
+                                id="autocomplete{{ forloop.counter0 }}" required="">
+                            {% if forloop.counter != 1 %}<a href="javascript:;" onclick="copyAddress({{ forloop.counter0 }})"
+                                style="font-size: 0.8em;text-decoration: none;"> Copy from above</a>{% endif %}
                         </div>
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Postal Code</p>
-                            {{ form.recipient_postal_code }}
+                            <input type="text" name="{{ forloop.counter0 }}_recipient_postal_code" class="validate-required" placeholder="L1Z 5J5" maxlength="100"
+                                required="" id="id_{{ forloop.counter0 }}_recipient_postal_code">
+                            {% if forloop.counter != 1 %}<a href="javascript:;" onclick="copyPostalCode({{ forloop.counter0 }})"
+                                style="font-size: 0.8em;text-decoration: none;"> Copy from above</a>{% endif %}
                         </div>
                     </div>
 
@@ -446,18 +500,17 @@ function stripeClientSecretHandler(intent_id) {
                         <div class="col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Personalized Message To Recipient <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="We'll write this on the back of the card for you."></i></p>
-                            {{ form.message_to_recipient }}
+                            <textarea name="{{ forloop.counter0 }}_message_to_recipient" cols="40" rows="3" class="validate-required"
+                                placeholder="Write your personalized message for the recipient here" maxlength="280"
+                                id="id_{{ forloop.counter0 }}_message_to_recipient"></textarea>
+                            {% if forloop.counter != 1 %}<a href="javascript:;" onclick="copyMessage({{ forloop.counter0 }})"
+                                style="font-size: 0.8em;text-decoration: none;"> Copy from above</a>{% endif %}
                         </div>
                     </div>
+                    {% endfor %}
 
 
-                    <div class="row" style="padding-bottom: 30px;display: none;" id="fee_p">
-                        <div class="col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 5px;" class="lead">Fee | <span style="color: #4a90e2;" id="fee_amount"></span> </p>
-                            <p style="margin-bottom: 5px;font-size: 10px;line-height: 1.5;color: #4a90e2;">{{ house.name }} has requested
-                                it's donors pay the payment processing fees for '<span id="donation_type_name"></span>' donations.</p>
-                        </div>
-                    </div>
+
 
                     <div class="row justify-content-center" style="padding-bottom: 40px;">
                         <div class="col-md-12">
@@ -492,7 +545,7 @@ function stripeClientSecretHandler(intent_id) {
                             <div class="row justify-content-center" id="checkout-button" style="padding-bottom: 20px;">
                                 <div class="col-md-12">
                                     <button id="customButton" type="submit" class="btn btn--primary">Pay
-                                        ${{ postcard.amount }} with card</button>
+                                        ${{ postcard_amount }} with card</button>
                                 </div>
                             </div>
 
@@ -507,9 +560,6 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
 
-
-                    
-            
                 </div>
             </div>
             

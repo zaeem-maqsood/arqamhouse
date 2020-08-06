@@ -69,8 +69,17 @@ class PostCardOrderView(FormView):
     def get(self, request, *args, **kwargs):
 
         data = request.GET
+
+        if 'quantity' in data:
+            quantity = data["quantity"]
+
+        else:
+            quantity = 1
+        
+
+        print(quantity)
         initial_data = {}
-        form = PostcardOrderForm()
+        form = PostcardOrderForm(quantity)
         return render(request, self.template_name, self.get_context_data(form=form))
 
     def get_success_url(self):
@@ -91,6 +100,14 @@ class PostCardOrderView(FormView):
         context = {}
         request = self.request
 
+        data = request.GET
+        if 'quantity' in data:
+            quantity = int(data["quantity"])
+            one = False
+        else:
+            quantity = 1
+            one = True
+
         postcard = self.get_postcard()
 
         stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -99,7 +116,7 @@ class PostCardOrderView(FormView):
             postcard_intent = stripe.PaymentIntent.retrieve(postcard_intent_id)
         else:
             postcard_intent = stripe.PaymentIntent.create(
-                amount=500,
+                amount=(500 * quantity),
                 currency='cad',
                 description = "Postcard Arqam House",
                 metadata = {
@@ -111,18 +128,30 @@ class PostCardOrderView(FormView):
             request.session['postcard_intent_id'] = str(postcard_intent.id)
             request.session.modified = True
 
+
+        context["quantity_str"] = quantity
+        postcard_amount = (5*quantity)
+        quantity = range(quantity)
+        context["one"] = one
+        context["quantity"] = quantity
         context["intent_id"] = postcard_intent.id
         context["client_secret"] = postcard_intent.client_secret
         context["public_key"] = settings.STRIPE_PUBLIC_KEY
         context["form"] = form
         context["postcard"] = postcard
+        context["postcard_amount"] = postcard_amount
         return context
 
     def post(self, request, *args, **kwargs):
         data = request.POST
         print(data)
 
-        form = PostcardOrderForm(data=data)
+        if 'quantity' in data:
+            quantity = int(data["quantity"])
+        else:
+            quantity = 1
+
+        form = PostcardOrderForm(data=data, quantity=quantity)
 
         if form.is_valid():
             return self.form_valid(form, request)
@@ -133,6 +162,9 @@ class PostCardOrderView(FormView):
     def form_valid(self, form, request):
         data = request.POST
 
+        quantity = int(data["quantity"])
+        print(f" the quantity is {quantity}")
+
         postcard = self.get_postcard()
 
         stripe_token = data["intent_id"]
@@ -142,14 +174,9 @@ class PostCardOrderView(FormView):
         email = form.cleaned_data.get('email')
         anonymous = form.cleaned_data.get('anonymous')
         address = form.cleaned_data.get("address")
-        message_to_recipient = form.cleaned_data.get('message_to_recipient')
         postal_code = form.cleaned_data.get("postal_code")
 
-        recipient_name = form.cleaned_data.get("recipient_name")
-        recipient_email = form.cleaned_data.get("recipient_email")
-        recipient_address = form.cleaned_data.get("recipient_address")
-        recipient_postal_code = form.cleaned_data.get("recipient_postal_code")
-
+        
         stripe.api_key = settings.STRIPE_SECRET_KEY
 
         # ====================== Create Arqam House Profile ===========================
@@ -198,10 +225,18 @@ class PostCardOrderView(FormView):
             request.session.modified = True
             return self.render_to_response(self.get_context_data(form=form))
 
-        postcard_order = PostCardOrder.objects.create(post_card=postcard,
-                                                      name=name, email=email, anonymous=anonymous, postal_code=postal_code, address=address, message_to_recipient=message_to_recipient, recipient_name=recipient_name,
-            recipient_address=recipient_address, recipient_postal_code=recipient_postal_code, payment_intent_id=charge['id'], 
-            payment_method_id=charge['payment_method'], amount=postcard.amount)
+
+        for x in range(quantity):
+            recipient_name = form.cleaned_data.get(f"{x}_recipient_name")
+            recipient_email = form.cleaned_data.get(f"{x}_recipient_email")
+            recipient_address = form.cleaned_data.get(f"{x}_recipient_address")
+            recipient_postal_code = form.cleaned_data.get(f"{x}_recipient_postal_code")
+            message_to_recipient = form.cleaned_data.get(f"{x}_message_to_recipient")
+
+            postcard_order = PostCardOrder.objects.create(post_card=postcard,
+                                                      name=name, email=email, anonymous=anonymous, postal_code=postal_code, address=address, message_to_recipient=message_to_recipient, 
+                                                      recipient_name=recipient_name, recipient_address=recipient_address, recipient_postal_code=recipient_postal_code, 
+                                                      payment_intent_id=charge['id'], payment_method_id=charge['payment_method'], amount=postcard.amount)
 
 
         if settings.DEBUG == False:

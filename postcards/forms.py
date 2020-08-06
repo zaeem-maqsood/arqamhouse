@@ -6,18 +6,32 @@ from postcards.models import PostCardOrder
 
 class PostcardOrderForm(forms.ModelForm):
 
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, quantity, *args, **kwargs):
         super(PostcardOrderForm, self).__init__(*args, **kwargs)
+
+        print(f"The quantity is {quantity}")
+        
         self.fields["address"] = forms.CharField(label="Address", widget=forms.TextInput(attrs={"class":"validate-required", "autocomplete": "off", "placeholder": "123 Main Street", "id": "autocomplete"}), required=False)
-        self.fields["recipient_address"] = forms.CharField(label="Recipient Address", widget=forms.TextInput(
-            attrs={"class": "validate-required", "autocomplete": "off", "placeholder": "123 Main Street", "id": "autocomplete2"}), required=True)
+
+
+        for x in range(int(quantity)):
+            self.fields["%s_recipient_name" % (x)] = forms.CharField(widget=forms.TextInput(
+                attrs={"class": "validate-required", "placeholder": f"Recipient {x + 1}", "maxlength": '100', }), required=True)
+
+            self.fields["%s_recipient_address" % (x)] = forms.CharField(label="Recipient Address", widget=forms.TextInput(
+                attrs={"class": "validate-required", "autocomplete": "off", "placeholder": "123 Main Street", "id": f"autocomplete{x}"}), required=True)
+
+            self.fields["%s_recipient_postal_code" % (x)] = forms.CharField(widget=forms.TextInput(
+                attrs={"class": "validate-required", "placeholder": "L1Z 5J5", "maxlength": '100', }), required=True)
+
+            self.fields["%s_message_to_recipient" % (x)] = forms.CharField(widget=forms.Textarea(
+                attrs={"class": "validate-required", "placeholder": "Write your personalized message for the recipient here", "maxlength": '280', "rows": 3, }), required=False)
+
 
     class Meta:
         model = PostCardOrder
         fields = [
-            "name", "email", "anonymous", "message_to_recipient", "recipient_name",
-            "recipient_postal_code", "postal_code"
+            "name", "email", "anonymous", "postal_code"
         ]
 
         widgets = {
@@ -31,25 +45,7 @@ class PostcardOrderForm(forms.ModelForm):
                         }
                     ),
 
-                "recipient_name": forms.TextInput(
-                        attrs={
-                            "class": "validate-required",
-                            "placeholder": "Khadija Khuwaylid",
-                            "required": True,
-                            "maxlength": '100',
-                        }
-                    ),
 
-                "recipient_postal_code": forms.TextInput(
-                        attrs={
-                            "class": "validate-required",
-                            "placeholder":"L1Z 5J5",
-                            "required": True,
-                            "maxlength": '7',
-                        }
-                    ),
-
-                
                 "postal_code": forms.TextInput(
                     attrs={
                         "class": "validate-required",
@@ -58,16 +54,6 @@ class PostcardOrderForm(forms.ModelForm):
                         "maxlength": '7',
                     }
                 ),
-
-                "message_to_recipient": forms.Textarea(
-                        attrs={
-                            
-                            "placeholder":"Give a personalized message with your postcard",
-                            "required": False,
-                            "maxlength": '280',
-                            "rows": 3,
-                        }
-                    ),
 
                 "email": forms.EmailInput(
                         attrs={
