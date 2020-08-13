@@ -75,9 +75,7 @@ class PostCardOrderView(FormView):
 
         else:
             quantity = 1
-        
-
-        print(quantity)
+    
         initial_data = {}
         form = PostcardOrderForm(quantity)
         return render(request, self.template_name, self.get_context_data(form=form))
@@ -163,7 +161,6 @@ class PostCardOrderView(FormView):
         data = request.POST
 
         quantity = int(data["quantity"])
-        print(f" the quantity is {quantity}")
 
         postcard = self.get_postcard()
 
@@ -173,6 +170,10 @@ class PostCardOrderView(FormView):
         name = form.cleaned_data.get('name')
         email = form.cleaned_data.get('email')
         anonymous = form.cleaned_data.get('anonymous')
+        street_number = form.cleaned_data.get("street_number")
+        route = form.cleaned_data.get("route")
+        locality = form.cleaned_data.get("locality")
+        administrative_area_level_1 = form.cleaned_data.get("administrative_area_level_1")
         address = form.cleaned_data.get("address")
         postal_code = form.cleaned_data.get("postal_code")
 
@@ -228,15 +229,20 @@ class PostCardOrderView(FormView):
 
         for x in range(quantity):
             recipient_name = form.cleaned_data.get(f"{x}_recipient_name")
-            recipient_email = form.cleaned_data.get(f"{x}_recipient_email")
-            recipient_address = form.cleaned_data.get(f"{x}_recipient_address")
-            recipient_postal_code = form.cleaned_data.get(f"{x}_recipient_postal_code")
+            recipient_address = form.cleaned_data.get(f"autocomplete{x}")
+            recipient_street_number = form.cleaned_data.get(f"street_number_{x}")
+            recipient_route = form.cleaned_data.get(f"route_{x}")
+            recipient_locality = form.cleaned_data.get(f"locality_{x}")
+            recipient_administrative_area_level_1 = form.cleaned_data.get(f"administrative_area_level_1_{x}")
+            recipient_postal_code = form.cleaned_data.get(f"postal_code_{x}")
             message_to_recipient = form.cleaned_data.get(f"{x}_message_to_recipient")
 
-            postcard_order = PostCardOrder.objects.create(post_card=postcard,
-                                                      name=name, email=email, anonymous=anonymous, postal_code=postal_code, address=address, message_to_recipient=message_to_recipient, 
-                                                      recipient_name=recipient_name, recipient_address=recipient_address, recipient_postal_code=recipient_postal_code, 
-                                                      payment_intent_id=charge['id'], payment_method_id=charge['payment_method'], amount=postcard.amount)
+            postcard_order = PostCardOrder.objects.create(post_card=postcard, name=name, email=email, anonymous=anonymous, postal_code=postal_code, address=address, 
+                                                          street_number=street_number,  message_to_recipient=message_to_recipient, route=route, locality=locality, administrative_area_level_1=administrative_area_level_1,
+                                                          recipient_name=recipient_name, recipient_address=recipient_address, recipient_street_number=recipient_street_number,
+                                                          recipient_route=recipient_route, recipient_locality=recipient_locality, recipient_administrative_area_level_1=recipient_administrative_area_level_1,
+                                                          recipient_postal_code=recipient_postal_code,
+                                                          payment_intent_id=charge['id'], payment_method_id=charge['payment_method'], amount=postcard.amount)
 
 
         if settings.DEBUG == False:

@@ -182,7 +182,7 @@ form.addEventListener('submit', function(event) {
                 name: document.getElementById("id_name").value,
                 email: document.getElementById("id_email").value,
                 address: {
-                    postal_code: document.getElementById("id_postal_code").value,
+                    postal_code: document.getElementById("postal_code").value,
                 }
             }
         }
@@ -231,15 +231,130 @@ function stripeClientSecretHandler(intent_id) {
 
 <script type="text/javascript">
 
+
+
+    function hideMainAddressOnInput() {
+
+        main_address_row = document.getElementById("main_address_row");
+        main_address_row.style.display = 'none';
+
+    }
+
+    function  hideRecipientAddressOnInput(increment) {
+
+        address_row = document.getElementById("address_row_" + increment);
+        address_row.style.display = 'none';
+
+    }
+
+
+    var placeSearch, autocomplete;
+
+    {% for quantity in quantity %}
+        var placeSearch{{ forloop.counter0 }}, autocomplete{{ forloop.counter0 }}
+    {% endfor %}
+
+
     function initMap() {
 
-        var input = document.getElementById('autocomplete');
-        var autocomplete = new google.maps.places.Autocomplete(input, { types: ['address'], componentRestrictions: { country: "ca" } });
+        var input = document.getElementById('main_address');
+        autocomplete = new google.maps.places.Autocomplete(input, { types: ['address'], componentRestrictions: { country: "ca" } });
+        autocomplete.setFields(['address_component']);
+        autocomplete.addListener('place_changed', fillInAddress);
+
 
         {% for quantity in quantity %}
-            var input2 = document.getElementById('autocomplete{{ forloop.counter0 }}');
-            var autocomplete2 = new google.maps.places.Autocomplete(input2, { types: ['address'], componentRestrictions: { country: "ca" } });
+            var input{{ forloop.counter0 }} = document.getElementById('autocomplete{{ forloop.counter0 }}');
+            autocomplete{{ forloop.counter0 }} = new google.maps.places.Autocomplete(input{{ forloop.counter0 }}, { types: ['address'], componentRestrictions: { country: "ca" } });
+            autocomplete{{ forloop.counter0 }}.setFields(['address_component']);
+            autocomplete{{ forloop.counter0 }}.addListener('place_changed', fillInAddress{{ forloop.counter0 }});
         {% endfor %}
+
+    }
+
+
+    {% for quantity in quantity %}
+
+    function fillInAddress{{ forloop.counter0 }} () {
+
+        console.log("It came here");
+        // Get the place details from the autocomplete object.
+        var place{{ forloop.counter0 }} = autocomplete{{ forloop.counter0 }}.getPlace();
+
+        var componentForm{{ forloop.counter0 }} = 
+        {
+                street_number_{{ forloop.counter0 }}: 'short_name',
+                route_{{ forloop.counter0 }} : 'long_name',
+                locality_{{ forloop.counter0 }} : 'long_name',
+                administrative_area_level_1_{{ forloop.counter0 }} : 'short_name',
+                postal_code_{{ forloop.counter0 }}: 'short_name'
+        };
+
+        console.log("It came here2");
+
+        for (var component in componentForm{{ forloop.counter0 }}) {
+            document.getElementById(component).value = '';
+            document.getElementById(component).disabled = false;
+        }
+
+        console.log("It came here3");
+
+        // Get each component of the address from the place details,
+        // and then fill-in the corresponding field on the form.
+        for (var i = 0; i < place{{ forloop.counter0 }}.address_components.length; i++) {
+
+
+            var addressType{{ forloop.counter0 }} = place{{ forloop.counter0 }}.address_components[i].types[0];
+            console.log(addressType{{ forloop.counter0 }});
+
+            if (componentForm{{ forloop.counter0 }}[addressType{{ forloop.counter0 }} + "_{{ forloop.counter0 }}"]) {
+                var val{{ forloop.counter0 }} = place{{ forloop.counter0 }}.address_components[i][componentForm{{ forloop.counter0 }}[addressType{{ forloop.counter0 }} + "_{{ forloop.counter0 }}"]];
+
+                console.log(val{{ forloop.counter0 }});
+
+                document.getElementById(addressType{{ forloop.counter0 }} + "_{{ forloop.counter0 }}").value = val{{ forloop.counter0 }};
+            }
+        }
+
+        console.log("It came here4");
+        hideRecipientAddressOnInput({{ forloop.counter0 }});
+
+
+    }
+    {% endfor %}
+
+
+
+
+    function fillInAddress() {
+        // Get the place details from the autocomplete object.
+        var place = autocomplete.getPlace();
+
+        var componentForm = {
+            street_number: 'short_name',
+            route: 'long_name',
+            locality: 'long_name',
+            administrative_area_level_1: 'short_name',
+            postal_code: 'short_name'
+        };
+
+        for (var component in componentForm) {
+            document.getElementById(component).value = '';
+            document.getElementById(component).disabled = false;
+        }
+
+        // Get each component of the address from the place details,
+        // and then fill-in the corresponding field on the form.
+        for (var i = 0; i < place.address_components.length; i++) {
+            var addressType = place.address_components[i].types[0];
+            if (componentForm[addressType]) {
+                var val = place.address_components[i][componentForm[addressType]];
+                document.getElementById(addressType).value = val;
+            }
+        }
+
+
+        hideMainAddressOnInput();
 
     }
 
@@ -251,23 +366,33 @@ function stripeClientSecretHandler(intent_id) {
 
         // get previous address 
         prev_address = document.getElementById("autocomplete" + minus_one);
-        console.log(prev_address);
+        prev_street_number = document.getElementById("street_number_" + minus_one);
+        prev_route = document.getElementById("route_" + minus_one);
+        prev_locality = document.getElementById("locality_" + minus_one);
+        prev_province = document.getElementById("administrative_area_level_1_" + minus_one);
+        prev_postal_code = document.getElementById("postal_code_" + minus_one);
+
+
 
         current_address = document.getElementById("autocomplete" + increment);
         current_address.value = prev_address.value;
 
-    }
+        current_street_number = document.getElementById("street_number_" + increment);
+        current_street_number.value = prev_street_number.value;
 
-    function copyPostalCode(increment) {
+        current_route = document.getElementById("route_" + increment);
+        current_route.value = prev_route.value;
 
-        minus_one = increment - 1;
-        console.log(minus_one);
+        current_locality = document.getElementById("locality_" + increment);
+        current_locality.value = prev_locality.value;
 
-        // get previous postal code 
-        prev_postal = document.getElementById("id_" + minus_one + "_recipient_postal_code");
+        current_provice = document.getElementById("administrative_area_level_1_" + increment);
+        current_provice.value = prev_province.value;
 
-        current_postal = document.getElementById("id_" + increment + "_recipient_postal_code");
-        current_postal.value = prev_postal.value;
+        current_postal_code = document.getElementById("postal_code_" + increment);
+        current_postal_code.value = prev_postal_code.value;
+
+        hideRecipientAddressOnInput(increment);
 
     }
 
@@ -284,7 +409,10 @@ function stripeClientSecretHandler(intent_id) {
         current_message.value = prev_message.value;
 
     }
+
+
 </script>
+
 
 <script type="text/javascript"
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnTiJMXoPzVLoo-ztKaRyCrjAocA0K3pQ&libraries=places&callback=initMap"></script>
@@ -305,7 +433,7 @@ function stripeClientSecretHandler(intent_id) {
                 <div class="col-lg-8 col-md-10 col-sm-12 col-10">
             
                     <a href="{% url 'home' %}">
-                        <img src="{% static 'images/logo.png' %}" style="max-height: 5em;">
+                        <img src="{% static 'images/logo.png' %}" style="max-height: 4em;">
                     </a>
             
                 </div>
@@ -424,17 +552,41 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
 
-                    <div class="row" style="padding-bottom: 10px;">
-                        <div class="col-xl-9 col-lg-9 col-md-9 col-sm-8 col-12" style="padding-bottom: 10px;">
+                    <div class="row" style="padding-bottom: 10px;" id="main_address_row">
+                        <div class="col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Your Address</p>
                             {{ form.address }}
                             <span style="font-size: 0.8em;">Used as the return address on the postcard unless 'anonymous' is selected</span>
                         </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Street Number</p>
+                            {{ form.street_number }}
+                        </div>
+                        <div class="col-md-8 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Route</p>
+                            {{ form.route }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Locality</p>
+                            {{ form.locality }}
+                        </div>
                         <div class="col-md-3 col-sm-12 col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Your Postal Code</p>
+                            <p style="margin-bottom: 0px;">Province</p>
+                            {{ form.administrative_area_level_1 }}
+                        </div>
+                        <div class="col-md-5 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Postal Code</p>
                             {{ form.postal_code }}
                         </div>
                     </div>
+
+
                     <div class="row" style="padding-bottom: 30px;">
                         <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Anonymous <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
@@ -478,20 +630,43 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
 
-                    <div class="row" style="padding-bottom: 20px;">
+                    <div class="row" style="padding-bottom: 20px;" id="address_row_{{ forloop.counter0 }}">
                         <div class="col-md-8 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Recipient's Address</p>
-                            <input type="text" name="{{ forloop.counter0 }}_recipient_address" class="validate-required" autocomplete="off" placeholder="123 Main Street"
+                            <input type="text" name="autocomplete{{ forloop.counter0 }}" class="validate-required" autocomplete="off" placeholder="123 Main Street"
                                 id="autocomplete{{ forloop.counter0 }}" required="">
                             {% if forloop.counter != 1 %}<a href="javascript:;" onclick="copyAddress({{ forloop.counter0 }})"
                                 style="font-size: 0.8em;text-decoration: none;"> Copy from above</a>{% endif %}
                         </div>
+                    
+                    </div>
+
+
+
+                    <div class="row" style="padding-bottom: 10px;">
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Street Number</p>
+                            <input type="text" name="street_number_{{ forloop.counter0 }}" class="validate-required" placeholder="123" id="street_number_{{ forloop.counter0 }}">
+                        </div>
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Route</p>
+                            <input type="text" name="route_{{ forloop.counter0 }}" class="validate-required" placeholder="Main Street" id="route_{{ forloop.counter0 }}">
+                        </div>
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Locality</p>
+                            <input type="text" name="locality_{{ forloop.counter0 }}" class="validate-required" placeholder="Toronto" id="locality_{{ forloop.counter0 }}">
+                        </div>
+                    </div>
+                    
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-md-6 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Province</p>
+                            <input type="text" name="administrative_area_level_1_{{ forloop.counter0 }}" class="validate-required" placeholder="ON"
+                                id="administrative_area_level_1_{{ forloop.counter0 }}">
+                        </div>
+                        <div class="col-md-6 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Postal Code</p>
-                            <input type="text" name="{{ forloop.counter0 }}_recipient_postal_code" class="validate-required" placeholder="L1Z 5J5" maxlength="100"
-                                required="" id="id_{{ forloop.counter0 }}_recipient_postal_code">
-                            {% if forloop.counter != 1 %}<a href="javascript:;" onclick="copyPostalCode({{ forloop.counter0 }})"
-                                style="font-size: 0.8em;text-decoration: none;"> Copy from above</a>{% endif %}
+                            <input type="text" name="postal_code_{{ forloop.counter0 }}" class="validate-required" placeholder="L1Z 5G5" id="postal_code_{{ forloop.counter0 }}">
                         </div>
                     </div>
 
