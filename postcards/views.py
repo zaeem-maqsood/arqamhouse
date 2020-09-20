@@ -174,7 +174,17 @@ class PostCardOrderView(FormView):
         stripe.api_key = settings.STRIPE_SECRET_KEY
         postcard_intent_id = request.session.get('postcard_intent_id')
         if postcard_intent_id:
-            postcard_intent = stripe.PaymentIntent.retrieve(postcard_intent_id)
+            postcard_intent = stripe.PaymentIntent.modify(
+                postcard_intent_id,
+                amount=(500 * quantity),
+                description="Postcard Arqam House",
+                metadata={
+                    'postcard': postcard.name,
+                    'postcard_amount': postcard.amount,
+                },
+                statement_descriptor="Postcard Arqam House",
+            )
+
         else:
             postcard_intent = stripe.PaymentIntent.create(
                 amount=(500 * quantity),

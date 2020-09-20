@@ -37,7 +37,6 @@ def get_name_value(form, field, iteration):
         else:
             return ""
     except Exception as e:
-        print(e)
         return ""
 
 
@@ -53,7 +52,6 @@ def get_autocomplete_value(form, field, iteration):
         else:
             return ""
     except Exception as e:
-        print(e)
         return ""
 
 
@@ -87,5 +85,4 @@ def get_address_values(form, field, iteration):
         else:
             return ""
     except Exception as e:
-        print(e)
         return ""

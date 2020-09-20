@@ -39,11 +39,16 @@ iframe {
 {% endblock top_page_scripts %}
 
 
+
+
 {% block scripts %}
+
+
+
+<!-- Payment Request Button (ApplePay, GooglePay) -->
 <script>
 
 var clientSecret = '{{ client_secret }}';
-
 var stripe = Stripe('{{ public_key }}');
 var paymentRequest = stripe.paymentRequest({
     country: 'CA',
@@ -80,7 +85,6 @@ var prButton = elements.create('paymentRequestButton', {
 // Check the availability of the Payment Request API first.
 paymentRequest.canMakePayment().then(function (result) {
     if (result) {
-        console.log("Hellooo is the payment accepted");
         prButton.mount('#payment-request-button');
     } else {
         document.getElementById('payment-request-button').style.display = 'none';
@@ -126,6 +130,13 @@ paymentRequest.on('paymentmethod', function (ev) {
 </script>
 
 
+
+
+
+
+
+
+<!-- Regular credit card payment -->
 <script>
 
 var stripe = Stripe('{{ public_key }}');
@@ -170,9 +181,6 @@ console.log(card);
 var form = document.getElementById('donationForm');
 form.addEventListener('submit', function(event) {
   event.preventDefault();
-
-  console.log("Itt came here");
-
 
 
   stripe.confirmCardPayment(clientSecret, {
