@@ -257,24 +257,7 @@
                                                                             <div>
                                                                                 <div
                                                                                     style="font-family: Roboto, sans-serif; text-align: center">
-                                                                                    We are processing your customized
-                                                                                    postcard for {{ postcard_order.recipient_name|title }} and we will send you an email once it has shipped!</div>
-                                                                                <div
-                                                                                    style="font-family: Roboto, sans-serif; text-align: center">
-                                                                                    We'll be sending the postcard to {{ postcard_order.recipient_street_number }} {{ postcard_order.recipient_route }}
-                                                                                    {{ postcard_order.recipient_locality }}
-                                                                                    {{ postcard_order.recipient_administrative_area_level_1 }} {{ postcard_order.recipient_postal_code }}.&nbsp;
-                                                                                </div>
-                                                                                <div
-                                                                                    style="font-family: Roboto, sans-serif; text-align: center">
-                                                                                    This is the personalized message
-                                                                                    you requested to go on the back of the postcard:&nbsp;
-                                                                                </div>
-                                                                                <div style="font-family: Roboto, sans-serif; text-align: center">
-                                                                                    "{{ postcard_order.message_to_recipient }}"
-                                                                                </div>
-                                                                                <div style="font-family: Roboto, sans-serif; text-align: center">
-                                                                                    If there are any mistakes please email us at <a href="mailto:info@arqamhouse.com">info@arqamhouse.com</a>
+                                                                                    We are processing your {{ postcard_amounts }} customized postcards and we will send you an email once they have shipped!
                                                                                 </div>
                                                                                 <div></div>
                                                                             </div>
@@ -308,6 +291,57 @@
                                                                     <tr>
                                                                         <td style="padding:0px 0px 10px 0px;"
                                                                             role="module-content" bgcolor="">
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            
+                                                            {% for postcard_order in postcard_orders %}
+                                                            <table class="module" role="module" data-type="text" border="0" cellpadding="0" cellspacing="0" width="100%"
+                                                                style="table-layout: fixed;" data-muid="bc542827-d2e1-4493-acc8-1c5497755f58.1.2">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td style="padding:18px 0px 18px 0px; line-height:22px; text-align:inherit;" height="100%" valign="top"
+                                                                            bgcolor="" role="module-content">
+                                                                            <div>
+                                                                                <div style="font-family: Roboto, sans-serif; text-align: center">
+                                                                                    Postcard {{ forloop.counter }} will be sent to {{ postcard_order.recipient_name }}.
+                                                                                    The address you provided is {{ postcard_order.recipient_street_number }} {{ postcard_order.recipient_route }} {{ postcard_order.recipient_locality }} 
+                                                                                    {{ postcard_order.recipient_administrative_area_level_1 }} {{ postcard_order.recipient_postal_code }}.
+                                                                                    The personalized message you requested on the back of the card is: "{{ postcard_order.message_to_recipient }}"
+                                                                                    
+                                                                                </div>
+                                                                                <div></div>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            {% endfor %}
+
+                                                            <table class="module" role="module" data-type="text" border="0" cellpadding="0" cellspacing="0" width="100%"
+                                                                style="table-layout: fixed;" data-muid="bc542827-d2e1-4493-acc8-1c5497755f58.1.2">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td style="padding:18px 0px 18px 0px; line-height:22px; text-align:inherit;" height="100%" valign="top"
+                                                                            bgcolor="" role="module-content">
+                                                                            <div>
+                                                                                <div style="font-family: Roboto, sans-serif; text-align: center">
+                                                                                    If there are any mistakes please email us at <a
+                                                                                        href="mailto:info@arqamhouse.com">info@arqamhouse.com</a>
+                                                                                </div>
+                                                                                <div></div>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+
+                                                            <table class="module" role="module" data-type="spacer" border="0" cellpadding="0" cellspacing="0" width="100%"
+                                                                style="table-layout: fixed;" data-muid="900c43a7-71ca-4668-bbc4-18ebda654556.1.1">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td style="padding:0px 0px 10px 0px;" role="module-content" bgcolor="">
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>

@@ -27,6 +27,10 @@ from django.utils.crypto import get_random_string
 
 from twilio.rest import Client
 
+from urllib.parse import unquote
+import boto3
+from botocore.client import Config
+
 from itertools import chain
 from operator import attrgetter
 
@@ -37,8 +41,68 @@ from postcards.forms import PostcardOrderForm
 from postcards.models import PostCard, PostCardOrder
 from profiles.models import Profile
 
+from core.mixins import SuperUserRequiredMixin
 
 # Create your views here.
+
+
+class PostCardManageOrdersView(View, SuperUserRequiredMixin):
+
+    template_name = "postcards/manage.html"
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+        postcard_orders = PostCardOrder.objects.all().order_by("sent_to_recipient")
+        context["orders"] = postcard_orders
+        return context
+
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        print(data)
+
+        json_list = []
+        
+        for field in data:
+
+            json_data = {}
+
+            if not field == "csrfmiddlewaretoken":
+                print(field)
+                postcard_order = PostCardOrder.objects.get(id=field)
+                print(postcard_order)
+                json_data["sender_name"] = postcard_order.name
+                line_1 = f"{postcard_order.street_number} {postcard_order.route}"
+                json_data["sender_line_1"] = line_1
+                postal_code = postcard_order.postal_code.replace(" ", "")
+                cleaned_postal_code = postal_code[:3] + " " + postal_code[3:]
+                line_2 = f"{postcard_order.locality}, {postcard_order.administrative_area_level_1}  {cleaned_postal_code}"
+                json_data["sender_line_2"] = line_2
+
+                json_data["recipient_name"] = postcard_order.recipient_name
+                line_1 = f"{postcard_order.recipient_street_number} {postcard_order.recipient_route}"
+                json_data["recipient_line_1"] = line_1
+                postal_code = postcard_order.recipient_postal_code.replace(" ", "")
+                cleaned_postal_code = postal_code[:3] + " " + postal_code[3:]
+                line_2 = f"{postcard_order.recipient_locality}, {postcard_order.recipient_administrative_area_level_1}  {cleaned_postal_code}"
+                json_data["recipient_line_2"] = line_2
+
+                json_list.append(json_data)
+
+        
+        if json_data:
+            return JsonResponse(json_list, safe=False)
+                
+        
+        return render(request, self.template_name, self.get_context_data())
+        
+
+
+
+
 class PostCardListView(View):
     template_name = "postcards/list.html"
 
@@ -53,7 +117,6 @@ class PostCardListView(View):
         if 'success' in get_data:
             context["show_confetti"] = True
             context["postcard_order"] = PostCardOrder.objects.all().reverse().first()
-
 
         context["postcards"] = postcards
         return context
@@ -154,7 +217,7 @@ class PostCardOrderView(FormView):
         if form.is_valid():
             return self.form_valid(form, request)
         else:
-            return self.form_invalid(form)
+            return self.form_invalid(form, request)
 
         
     def form_valid(self, form, request):
@@ -227,6 +290,8 @@ class PostCardOrderView(FormView):
             return self.render_to_response(self.get_context_data(form=form))
 
 
+        postcard_orders = []
+
         for x in range(quantity):
             recipient_name = form.cleaned_data.get(f"{x}_recipient_name")
             recipient_address = form.cleaned_data.get(f"autocomplete{x}")
@@ -243,17 +308,19 @@ class PostCardOrderView(FormView):
                                                           recipient_route=recipient_route, recipient_locality=recipient_locality, recipient_administrative_area_level_1=recipient_administrative_area_level_1,
                                                           recipient_postal_code=recipient_postal_code,
                                                           payment_intent_id=charge['id'], payment_method_id=charge['payment_method'], amount=postcard.amount)
+            
+            postcard_orders.append(postcard_order)
 
 
         if settings.DEBUG == False:
             try:
-                self.send_text_message(postcard_order)
+                self.send_text_message(postcard_orders)
             except Exception as e:
                 print(e)
 
 
         try: 
-            self.send_confirmation_email(postcard_order)
+            self.send_confirmation_email(postcard_orders)
         except Exception as e:
             print(e)
 
@@ -267,36 +334,70 @@ class PostCardOrderView(FormView):
         valid_data = super(PostCardOrderView, self).form_valid(form)
         return valid_data
 
-    def form_invalid(self, form):
+
+    def form_invalid(self, form, request):
         print(form.errors)
-        # del request.session['postcard_intent_id']
-        # request.session.modified = True
+        del request.session['postcard_intent_id']
+        request.session.modified = True
         return self.render_to_response(self.get_context_data(form=form))
 
-    def send_text_message(self, postcard_order):
+
+    def send_text_message(self, postcard_orders):
         account_sid = settings.ACCOUNT_SID
         auth_token = settings.AUTH_TOKEN
         client = Client(account_sid, auth_token)
-        message = client.messages.create(
-            body="You have a new postcard order by %s, they want the %s postcard and they want to send it to %s." % (
-                postcard_order.name, postcard_order.post_card, postcard_order.recipient_name),
-                    from_='+16475571902',
-                    to='+12893887201'
-                )
+
+        postcard_amounts = len(postcard_orders)
+        sender_name = postcard_orders[0].name
+        postcard_type = postcard_orders[0].post_card.name
+
+        if postcard_amounts > 1:
+            message = client.messages.create(
+                body=f"You have {postcard_amounts} new postcard orders made by {sender_name}, they want the {postcard_type} postcard",
+                from_='+16475571902',
+                to='+12893887201'
+            )
+        else:
+            postcard_order = postcard_orders[0]
+            message = client.messages.create(
+                body="You have a new postcard order by %s, they want the %s postcard and they want to send it to %s." % (
+                    postcard_order.name, postcard_order.post_card, postcard_order.recipient_name),
+                        from_='+16475571902',
+                        to='+12893887201'
+                    )
 
 
-    def send_confirmation_email(self, postcard_order):
+    def send_confirmation_email(self, postcard_orders):
         # Compose Email
-        subject = f'Thank you for your purchase, {postcard_order.name}.'
-        context = {}
-        context["postcard_order"] = postcard_order
         
-        html_content = render_to_string('emails/postcard_confirmation.html', context)
+        context = {}
+
+        postcard_amounts = len(postcard_orders)
+        postcard_order = postcard_orders[0]
+        s3_client = boto3.client('s3', 'ca-central-1', config=Config(signature_version='s3v4'),
+                                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+        response = s3_client.generate_presigned_url('get_object', Params={
+            'Bucket': settings.AWS_STORAGE_BUCKET_NAME, 'Key': postcard_order.post_card.image_1_path}, ExpiresIn=360000)
+
+        subject = f'Thank you for your purchase, {postcard_order.name}.'
+        context["postcard_order"] = postcard_order
+        context["image_url"] = response
+
+        if postcard_amounts == 1:
+            html_content = render_to_string('emails/postcard_confirmation.html', context)
+
+        else:
+            context["postcard_amounts"] = postcard_amounts
+            context["postcard_orders"] = postcard_orders
+            html_content = render_to_string('emails/postcard_confirmation_multiple.html', context)
+
+
         text_content = strip_tags(html_content)
         from_email = f'Arqam House <info@arqamhouse.com>'
-        to = [postcard_order.email]
+        to = [postcard_orders[0].email]
         email = EmailMultiAlternatives(subject=subject, body=text_content,
                                        from_email=from_email, to=to)
         email.attach_alternative(html_content, "text/html")
         email.send()
+
         return "Done"

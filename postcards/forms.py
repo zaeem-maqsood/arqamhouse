@@ -16,19 +16,19 @@ class PostcardOrderForm(forms.ModelForm):
 
         # Fields
         self.fields["street_number"] = forms.CharField(label="Address", widget=forms.TextInput(
-            attrs={"class": "validate-required", "placeholder": "123", "id": "street_number"}), required=False)
+            attrs={"class": "validate-required", "placeholder": "123", "id": "street_number"}), required=True)
 
         self.fields["route"] = forms.CharField(label="Address", widget=forms.TextInput(
-            attrs={"class": "validate-required", "placeholder": "Main Street", "id": "route"}), required=False)
+            attrs={"class": "validate-required", "placeholder": "Main Street", "id": "route"}), required=True)
 
         self.fields["locality"] = forms.CharField(label="Address", widget=forms.TextInput(
-            attrs={"class": "validate-required", "placeholder": "Toronto", "id": "locality"}), required=False)
+            attrs={"class": "validate-required", "placeholder": "Toronto", "id": "locality"}), required=True)
 
         self.fields["administrative_area_level_1"] = forms.CharField(label="Address", widget=forms.TextInput(
-            attrs={"class": "validate-required", "placeholder": "ON", "id": "administrative_area_level_1"}), required=False)
+            attrs={"class": "validate-required", "placeholder": "ON", "id": "administrative_area_level_1"}), required=True)
 
         self.fields["postal_code"] = forms.CharField(label="Address", widget=forms.TextInput(
-            attrs={"class": "validate-required", "placeholder": "L1Z 5G5", "id": "postal_code"}), required=False)
+            attrs={"class": "validate-required", "placeholder": "L1Z 5G5", "id": "postal_code"}), required=True)
 
         
 
@@ -42,24 +42,24 @@ class PostcardOrderForm(forms.ModelForm):
                 attrs={"class": "validate-required", "autocomplete": "off", "placeholder": "123 Main Street", "id": f"autocomplete{x}"}), required=False)
 
             self.fields[f"street_number_{x}"] = forms.IntegerField(widget=forms.NumberInput(
-                attrs={"class": "validate-required", "placeholder": "123", "id": f"street_number_{x}"}), required=False)
+                attrs={"class": "validate-required", "placeholder": "123", "id": f"street_number_{x}", "max": 99999}), required=True)
 
             self.fields[f"route_{x}"] = forms.CharField(widget=forms.TextInput(
-                attrs={"class": "validate-required", "placeholder": "Main Street", "id": f"route_{x}", "maxlength": "100"}), required=False)
+                attrs={"class": "validate-required", "placeholder": "Main Street", "id": f"route_{x}", "maxlength": "40"}), required=True)
 
             self.fields[f"locality_{x}"] = forms.CharField(widget=forms.TextInput(
-                attrs={"class": "validate-required", "placeholder": "Toronto", "id": f"locality_{x}", "maxlength": "100"}), required=False)
+                attrs={"class": "validate-required", "placeholder": "Toronto", "id": f"locality_{x}", "maxlength": "40"}), required=True)
 
             self.fields[f"administrative_area_level_1_{x}"] = forms.CharField(widget=forms.TextInput(
-                attrs={"class": "validate-required", "placeholder": "ON", "id": f"administrative_area_level_1_{x}", "maxlength": "2"}), required=False)
+                attrs={"class": "validate-required", "placeholder": "ON", "id": f"administrative_area_level_1_{x}", "maxlength": "2"}), required=True)
 
             self.fields[f"postal_code_{x}"] = forms.CharField(widget=forms.TextInput(
-                attrs={"class": "validate-required", "placeholder": "L1Z 5G5", "id": f"postal_code_{x}", "maxlength": "10"}), required=False)
+                attrs={"class": "validate-required", "placeholder": "L1Z 5G5", "id": f"postal_code_{x}", "maxlength": "10"}), required=True)
 
 
 
             self.fields["%s_message_to_recipient" % (x)] = forms.CharField(widget=forms.Textarea(
-                attrs={"class": "validate-required", "placeholder": "Write your personalized message for the recipient here", "maxlength": '280', "rows": 3, }), required=False)
+                attrs={"class": "validate-required", "placeholder": "Write your personalized message for the recipient here", "maxlength": '280', "rows": 3, }), required=True)
 
 
     class Meta:

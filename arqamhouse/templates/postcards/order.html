@@ -1,6 +1,6 @@
 {% extends "frontend/base.html" %}
 {% load static %}
-{% load checkout_form_tags %}
+{% load postcard_checkout_tags %}
 
 {% block title %}
 {{ postcard.name }}
@@ -621,11 +621,18 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
 
+
+                    {% if form.errors %}
+                    {% autoescape off %}
+                    {% get_name_error_message form 'recipient_name' forloop.counter0  %}
+                    {% endautoescape %}
+                    {% endif %}
+
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-md-12 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Recipient's Name</p>
-                            <input type="text" name="{{ forloop.counter0 }}_recipient_name" class="validate-required" placeholder="Recipient {{ forloop.counter }}" maxlength="100"
-                                required="" id="id_{{ forloop.counter0 }}_recipient_name">
+                            <input required type="text" value="{% get_name_value form 'recipient_name' forloop.counter0 %}" name="{{ forloop.counter0 }}_recipient_name" class="validate-required" placeholder="Recipient {{ forloop.counter }}" maxlength="100"
+                                 id="id_{{ forloop.counter0 }}_recipient_name">
                             
                         </div>
                     </div>
@@ -633,40 +640,65 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 20px;" id="address_row_{{ forloop.counter0 }}">
                         <div class="col-md-8 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Recipient's Address</p>
-                            <input type="text" name="autocomplete{{ forloop.counter0 }}" class="validate-required" autocomplete="off" placeholder="123 Main Street"
-                                id="autocomplete{{ forloop.counter0 }}" required="">
+                            <input type="text" value="{% get_autocomplete_value form 'autocomplete' forloop.counter0 %}" name="autocomplete{{ forloop.counter0 }}" class="validate-required" autocomplete="off" placeholder="123 Main Street"
+                                id="autocomplete{{ forloop.counter0 }}">
                             {% if forloop.counter != 1 %}<a href="javascript:;" onclick="copyAddress({{ forloop.counter0 }})"
                                 style="font-size: 0.8em;text-decoration: none;"> Copy from above</a>{% endif %}
                         </div>
                     
                     </div>
 
-
-
+                
+                    
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Street Number</p>
-                            <input type="text" name="street_number_{{ forloop.counter0 }}" class="validate-required" placeholder="123" id="street_number_{{ forloop.counter0 }}">
+                            <input required type="text" value="{% get_address_values form 'street_number' forloop.counter0 %}" name="street_number_{{ forloop.counter0 }}" class="validate-required" placeholder="123" id="street_number_{{ forloop.counter0 }}">
+                            {% if form.errors %}
+                            {% autoescape off %}
+                            {% get_address_error_message form 'street_number' forloop.counter0  %}
+                            {% endautoescape %}
+                            {% endif %}
                         </div>
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Route</p>
-                            <input type="text" name="route_{{ forloop.counter0 }}" class="validate-required" placeholder="Main Street" id="route_{{ forloop.counter0 }}">
+                            <input required type="text" value="{% get_address_values form 'route' forloop.counter0 %}" name="route_{{ forloop.counter0 }}" class="validate-required" placeholder="Main Street" id="route_{{ forloop.counter0 }}">
+                            {% if form.errors %}
+                            {% autoescape off %}
+                            {% get_address_error_message form 'route' forloop.counter0  %}
+                            {% endautoescape %}
+                            {% endif %}
                         </div>
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Locality</p>
-                            <input type="text" name="locality_{{ forloop.counter0 }}" class="validate-required" placeholder="Toronto" id="locality_{{ forloop.counter0 }}">
+                            <input required type="text" value="{% get_address_values form 'locality' forloop.counter0 %}" name="locality_{{ forloop.counter0 }}" class="validate-required" placeholder="Toronto" id="locality_{{ forloop.counter0 }}">
+                            {% if form.errors %}
+                            {% autoescape off %}
+                            {% get_address_error_message form 'locality' forloop.counter0  %}
+                            {% endautoescape %}
+                            {% endif %}
                         </div>
                     </div>
                     
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-md-6 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Province</p>
-                            <input type="text" name="administrative_area_level_1_{{ forloop.counter0 }}" class="validate-required" placeholder="ON"
+                            <input type="text" minlength="2" maxlength="2" required value="{% get_address_values form 'administrative_area_level_1' forloop.counter0 %}" name="administrative_area_level_1_{{ forloop.counter0 }}" class="validate-required" placeholder="ON"
                                 id="administrative_area_level_1_{{ forloop.counter0 }}">
+                            {% if form.errors %}
+                            {% autoescape off %}
+                            {% get_address_error_message form 'administrative_area_level_1' forloop.counter0  %}
+                            {% endautoescape %}
+                            {% endif %}
                         </div>
                         <div class="col-md-6 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Postal Code</p>
-                            <input type="text" name="postal_code_{{ forloop.counter0 }}" class="validate-required" placeholder="L1Z 5G5" id="postal_code_{{ forloop.counter0 }}">
+                            <input type="text" minlength="6" maxlength="7" required value="{% get_address_values form 'postal_code' forloop.counter0 %}" name="postal_code_{{ forloop.counter0 }}" class="validate-required" placeholder="L1Z 5G5" id="postal_code_{{ forloop.counter0 }}">
+                            {% if form.errors %}
+                            {% autoescape off %}
+                            {% get_address_error_message form 'postal_code' forloop.counter0  %}
+                            {% endautoescape %}
+                            {% endif %}
                         </div>
                     </div>
 
@@ -675,11 +707,17 @@ function stripeClientSecretHandler(intent_id) {
                         <div class="col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Personalized Message To Recipient <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="We'll write this on the back of the card for you."></i></p>
-                            <textarea name="{{ forloop.counter0 }}_message_to_recipient" cols="40" rows="3" class="validate-required"
+                            <textarea required name="{{ forloop.counter0 }}_message_to_recipient" cols="40" rows="3" class="validate-required"
                                 placeholder="Write your personalized message for the recipient here" maxlength="280"
-                                id="id_{{ forloop.counter0 }}_message_to_recipient"></textarea>
+                                id="id_{{ forloop.counter0 }}_message_to_recipient">{% get_name_value form 'message_to_recipient' forloop.counter0 %}</textarea>
                             {% if forloop.counter != 1 %}<a href="javascript:;" onclick="copyMessage({{ forloop.counter0 }})"
                                 style="font-size: 0.8em;text-decoration: none;"> Copy from above</a>{% endif %}
+
+                            {% if form.errors %}
+                            {% autoescape off %}
+                            {% get_name_error_message form 'message_to_recipient' forloop.counter0  %}
+                            {% endautoescape %}
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}

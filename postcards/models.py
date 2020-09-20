@@ -1,3 +1,4 @@
+import os
 from django.db import models
 
 from django.utils.text import slugify
@@ -10,6 +11,7 @@ from django.db.models.signals import pre_save, post_save
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
 
 # Create your models here.
 
@@ -52,6 +54,11 @@ class PostCard(models.Model):
 
         self.slug = slug_candidate
 
+    @property
+    def image_1_path(self):
+        filename = os.path.basename(self.image_1.name)
+        return f"media/arqam_house_postcards/{self.pk}/{filename}"
+
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -70,6 +77,7 @@ class PostCard(models.Model):
 
 class PostCardOrder(models.Model):
 
+    created_at = models.DateTimeField(default=timezone.now)
     post_card = models.ForeignKey(PostCard, on_delete=models.CASCADE, blank=False, null=True)
     name = models.CharField(max_length=30, null=True, blank=True)
     email = models.EmailField(max_length=300, blank=False, null=False)
@@ -92,6 +100,9 @@ class PostCardOrder(models.Model):
     sent_to_recipient = models.BooleanField(default=False)
     payment_intent_id = models.CharField(max_length=300, null=True, blank=True)
     payment_method_id = models.CharField(max_length=300, null=True, blank=True)
+    envelope_printed = models.BooleanField(default=False)
+    name_printed = models.BooleanField(default=False)
+    message_printed = models.BooleanField(default=False)
 
     def __str__(self):
         return (self.name)

@@ -18,11 +18,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 
-from postcards.views import (PostCardListView, PostCardOrderView)
+from postcards.views import (
+    PostCardListView, PostCardOrderView, PostCardManageOrdersView)
 
 app_name = "postcards"
 
 urlpatterns = [
     path('', PostCardListView.as_view(), name='list'),
+    path('manage', PostCardManageOrdersView.as_view(), name='manage'),
     path('<slug:slug>', PostCardOrderView.as_view(), name='detail'),
 ]
