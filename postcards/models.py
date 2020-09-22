@@ -38,6 +38,7 @@ class PostCard(models.Model):
     image_5 = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
     amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     amount_sold = models.PositiveIntegerField(null=True, blank=True, default=0)
+    hidden = models.BooleanField(default=False)
 
     def __str__(self):
         return (self.name)

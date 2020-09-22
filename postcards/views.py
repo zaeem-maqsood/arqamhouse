@@ -111,7 +111,7 @@ class PostCardListView(View):
 
     def get_context_data(self, *args, **kwargs):
         context = {}
-        postcards = PostCard.objects.all()
+        postcards = PostCard.objects.filter(hidden=False)
 
         get_data = self.request.GET
         if 'success' in get_data:
