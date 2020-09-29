@@ -36,7 +36,7 @@ class PostcardOrderForm(forms.ModelForm):
 
         for x in range(int(quantity)):
             self.fields["%s_recipient_name" % (x)] = forms.CharField(widget=forms.TextInput(
-                attrs={"class": "validate-required", "placeholder": f"Recipient {x + 1}", "maxlength": '100', }), required=True)
+                attrs={"class": "validate-required", "placeholder": f"Recipient {x + 1}", "maxlength": '20', }), required=True)
 
             self.fields[f"autocomplete{x}"] = forms.CharField(label="Address", widget=forms.TextInput(
                 attrs={"class": "validate-required", "autocomplete": "off", "placeholder": "123 Main Street", "id": f"autocomplete{x}"}), required=False)
