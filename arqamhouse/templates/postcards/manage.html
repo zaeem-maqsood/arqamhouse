@@ -66,15 +66,19 @@ Orders
                         <button class="btn btn-info btn-block" id="envelope" name="envelope" value="envelope">Envelope</button>
                     </div>
 
+                    <div class="col-md-2">
+                        <button class="btn btn-warning btn-block" id="front" name="front" value="front">Front</button>
+                    </div>
+
                     <div class="col-md-3">
                         <button class="btn btn-warning btn-block" id="message" name="message" value="message">Message</button>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <button class="btn btn-primary btn-block" id="name" name="name" value="name">Name</button>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <button class="btn btn-danger btn-block" id="sent" name="sent" value="sent">Sent</button>
                     </div>
                 </div>
@@ -83,17 +87,53 @@ Orders
                     <div class="col-md-3">
                         <button class="btn btn-info btn-block" id="no_envelope" name="no_envelope" value="no_envelope">Undo Envelope</button>
                     </div>
+
+                    <div class="col-md-2">
+                        <button class="btn btn-warning btn-block" id="no_front" name="no_front" value="no_front">Undo Front</button>
+                    </div>
                 
                     <div class="col-md-3">
                         <button class="btn btn-warning btn-block" id="no_message" name="no_message" value="no_message">Undo Message</button>
                     </div>
                 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <button class="btn btn-primary btn-block" id="no_name" name="no_name" value="no_name">Undo Name</button>
                     </div>
                 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <button class="btn btn-danger btn-block" id="no_sent" name="no_sent" value="no_sent">Undo Sent</button>
+                    </div>
+                </div>
+
+
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-md-3">
+                        <button class="btn btn-info btn-block" id="ap_envelope" name="ap_envelope" value="ap_envelope">AP
+                            Envelope</button>
+                    </div>
+                
+                    <div class="col-md-3">
+                        <button class="btn btn-warning btn-block" id="ap_front" name="ap_front" value="ap_front">AP Front</button>
+                    </div>
+                
+                    <div class="col-md-3">
+                        <button class="btn btn-warning btn-block" id="ap_message" name="ap_message" value="ap_message">AP
+                            Message</button>
+                    </div>
+                
+                    <div class="col-md-3">
+                        <button class="btn btn-primary btn-block" id="ap_name" name="ap_name" value="ap_name">AP Name</button>
+                    </div>
+                </div>
+
+
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-md-3">
+                        <a class="btn btn-primary btn-block" href="{% url 'postcards:manage' %}?show_all=True"> Show All PostCards</a>
+                    </div>
+                
+                    <div class="col-md-3">
+                        <a class="btn btn-danger btn-block" href="{% url 'postcards:manage' %}">Pending Postcards</a>
                     </div>
                 </div>
 
@@ -104,6 +144,10 @@ Orders
                                 <th>Select</th>
                                 <th>Buyer</th>
                                 <th>Postcard</th>
+                                <th>Envelope</th>
+                                <th>Front</th>
+                                <th>Message</th>
+                                <th>Name</th>
                                 <th>Sent</th>
                                 <th class="d-none d-sm-none d-md-table-cell">Time</th>
                             </tr>
@@ -114,7 +158,16 @@ Orders
                                 <td><input type="checkbox" id="{{ order.id }}" name="{{ order.id }}" value="{{ order.id }}"></td>
                                 <td><a href="{{ order.get_order_view }}">{{ order.name|title }}</a></td>
                                 <td>{{ order.post_card.name }}</td>
-                                <td>{% if order.sent_to_recipient %}Yes{% else %}No{% endif %}</td>
+                                <td>{% if order.envelope_printed %}<span style="color: green;">Yes</span>{% else %}<span style="color: red;">No</span>{% endif %}</td>
+                                <td>{% if order.front_printed %}<span style="color: green;">Yes</span>{% else %}<span
+                                        style="color: red;">No</span>{% endif %}</td>
+                                <td>{% if order.message_printed %}<span style="color: green;">Yes</span>{% else %}<span
+                                        style="color: red;">No</span>{% endif %}</td>
+                                <td>{% if order.name_printed %}<span style="color: green;">Yes</span>{% else %}<span
+                                        style="color: red;">No</span>{% endif %}</td>
+                                
+                                <td>{% if order.sent_to_recipient %}<span style="color: green;">Yes</span>{% else %}<span
+                                        style="color: red;">No</span>{% endif %}</td>
                                 <td class="d-none d-sm-none d-md-table-cell">{{ order.created_at|localtime }}</td>
                             </tr>
                             {% endfor %}

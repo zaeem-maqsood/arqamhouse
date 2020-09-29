@@ -102,6 +102,7 @@ class PostCardOrder(models.Model):
     payment_intent_id = models.CharField(max_length=300, null=True, blank=True)
     payment_method_id = models.CharField(max_length=300, null=True, blank=True)
     envelope_printed = models.BooleanField(default=False)
+    front_printed = models.BooleanField(default=False)
     name_printed = models.BooleanField(default=False)
     message_printed = models.BooleanField(default=False)
 

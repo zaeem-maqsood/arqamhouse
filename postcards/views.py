@@ -3,6 +3,7 @@ import json
 import stripe
 import decimal
 import sendgrid
+import textwrap
 from django.utils import timezone
 from django.utils.timezone import datetime, timedelta
 from django.conf import settings
@@ -53,46 +54,17 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
 
     def get(self, request, *args, **kwargs):
 
-        
-        data = {}
-        data["list_ids"] = ["df17f359-2dd8-45ed-b9e1-bcb63080cf96"]
-        contacts = []
-        postcard_orders = PostCardOrder.objects.all()
-
-        for postcard_order in postcard_orders:
-            data_dict = {}
-            data_dict["email"] = postcard_order.email
-            data_dict["first_name"] = postcard_order.name
-            if postcard_order.street_number and postcard_order.route:
-                data_dict["address_liine_1"] = f"{postcard_order.street_number} {postcard_order.route}"
-            if postcard_order.locality:
-                data_dict["city"] = postcard_order.locality
-            if postcard_order.administrative_area_level_1:
-                data_dict["state_province_region"] = postcard_order.administrative_area_level_1
-            data_dict["country"] = "Canada"
-            if postcard_order.postal_code:
-                data_dict["postal_code"] = postcard_order.postal_code
-            contacts.append(data_dict)
-
-        data["contacts"] = contacts
-
-
-        sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
-        print(sg)
-
-        # response = sg.client.marketing.lists.get()
-        response = sg.client.marketing.contacts.put(request_body=data)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
-
-
-
         return render(request, self.template_name, self.get_context_data())
 
     def get_context_data(self, *args, **kwargs):
         context = {}
-        postcard_orders = PostCardOrder.objects.filter(sent_to_recipient=False).order_by("sent_to_recipient")
+        get_data = self.request.GET
+
+        if 'show_all' in get_data:
+            postcard_orders = PostCardOrder.objects.all()
+        else:
+            postcard_orders = PostCardOrder.objects.filter(sent_to_recipient=False).order_by("created_at")
+
         context["orders"] = postcard_orders
         return context
 
@@ -102,7 +74,31 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
         print(data)
 
         json_list = []
-        
+
+        if 'sent' in data:
+
+            for field in data:
+                json_data = {}
+
+                if field != "csrfmiddlewaretoken" and field != "sent":
+                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order.sent_to_recipient = True
+                    postcard_order.envelope_printed = True
+                    postcard_order.front_printed = True
+                    postcard_order.message_printed = True
+                    postcard_order.name_printed = True
+                    postcard_order.save()
+
+        if 'no_sent' in data:
+
+            for field in data:
+                json_data = {}
+
+                if field != "csrfmiddlewaretoken" and field != "no_sent":
+                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order.sent_to_recipient = False
+                    postcard_order.save()
+
 
         if 'envelope' in data:
 
@@ -131,7 +127,74 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
 
                     json_list.append(json_data)
 
-        
+
+        if 'ap_envelope' in data:
+
+            for field in data:
+                json_data = {}
+
+                if field != "csrfmiddlewaretoken" and field != "ap_envelope":
+                    postcard_order = PostCardOrder.objects.get(id=field)
+                    json_data["sender_name"] = "Arqam House"
+                    json_data["sender_line_1"] = ""
+                    json_data["sender_line_2"] = ""
+                    json_data["recipient_name"] = postcard_order.name
+                    line_1 = f"{postcard_order.street_number} {postcard_order.route}"
+                    json_data["recipient_line_1"] = line_1
+                    postal_code = postcard_order.postal_code.replace(" ", "")
+                    cleaned_postal_code = postal_code[:3] + " " + postal_code[3:]
+                    line_2 = f"{postcard_order.locality}, {postcard_order.administrative_area_level_1}  {cleaned_postal_code}"
+                    json_data["recipient_line_2"] = line_2
+
+                    json_list.append(json_data)
+
+
+        if 'no_envelope' in data:
+
+            for field in data:
+                json_data = {}
+
+                if field != "csrfmiddlewaretoken" and field != "no_envelope":
+                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order.envelope_printed = False
+                    postcard_order.save()
+
+
+        if 'front' in data:
+
+            for field in data:
+                json_data = {}
+
+                if field != "csrfmiddlewaretoken" and field != "front":
+                    postcard_order = PostCardOrder.objects.get(id=field)
+                    json_data["id"] = postcard_order.post_card.id
+                    json_list.append(json_data)
+
+                    postcard_order.envelope_printed = True
+                    postcard_order.save()
+
+
+        if 'ap_front' in data:
+
+            for field in data:
+                json_data = {}
+
+                if field != "csrfmiddlewaretoken" and field != "ap_front":
+                    postcard_order = PostCardOrder.objects.get(id=field)
+                    json_data["id"] = 6
+                    json_list.append(json_data)
+
+
+        if 'no_front' in data:
+
+            for field in data:
+                json_data = {}
+
+                if field != "csrfmiddlewaretoken" and field != "no_front":
+                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order.front_printed = False
+                    postcard_order.save()
+
 
         if 'message' in data:
 
@@ -139,11 +202,76 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "message":
-                    print(field)
                     postcard_order = PostCardOrder.objects.get(id=field)
-                    print(postcard_order)
-                    json_data["message"] = postcard_order.message_to_recipient
+                    json_data["id"] = postcard_order.post_card.id
+                    json_data["message"] = '\n'.join(['\r'.join(textwrap.wrap(line, 60, break_long_words=False, replace_whitespace=False)) for line in postcard_order.message_to_recipient.splitlines() if line.strip() != ''])
                     json_list.append(json_data)
+
+                    postcard_order.envelope_printed = True
+                    postcard_order.front_printed = True
+                    postcard_order.save()
+
+
+        if 'ap_message' in data:
+
+            for field in data:
+                json_data = {}
+
+                if field != "csrfmiddlewaretoken" and field != "ap_message":
+                    postcard_order = PostCardOrder.objects.get(id=field)
+                    json_data["id"] = 6
+                    json_data["message"] = f"Hi {postcard_order.name}! We just wanted to say thank you.\rThank you for trying out our postcard service and making someone feel special.\rOpening physical mail just has that special something to it.\rDon't forget to check out our site for more postcards!\r\rHugs, Arqam House Team."
+                    json_list.append(json_data)
+
+        if 'no_message' in data:
+
+            for field in data:
+                json_data = {}
+
+                if field != "csrfmiddlewaretoken" and field != "no_message":
+                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order.message_printed = False
+                    postcard_order.save()
+
+
+        if 'name' in data:
+
+            for field in data:
+                json_data = {}
+
+                if field != "csrfmiddlewaretoken" and field != "name":
+                    postcard_order = PostCardOrder.objects.get(id=field)
+                    json_data["id"] = postcard_order.post_card.id
+                    json_data["name"] = postcard_order.recipient_name
+                    json_list.append(json_data)
+
+                    postcard_order.envelope_printed = True
+                    postcard_order.front_printed = True
+                    postcard_order.message_printed = True
+                    postcard_order.save()
+
+
+        if 'ap_name' in data:
+
+            for field in data:
+                json_data = {}
+
+                if field != "csrfmiddlewaretoken" and field != "ap_name":
+                    postcard_order = PostCardOrder.objects.get(id=field)
+                    json_data["id"] = 6
+                    json_data["name"] = postcard_order.name
+                    json_list.append(json_data)
+
+
+        if 'no_name' in data:
+
+            for field in data:
+                json_data = {}
+
+                if field != "csrfmiddlewaretoken" and field != "no_name":
+                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order.name_printed = False
+                    postcard_order.save()
 
 
         
@@ -305,6 +433,34 @@ class PostCardOrderView(FormView):
         administrative_area_level_1 = form.cleaned_data.get("administrative_area_level_1")
         address = form.cleaned_data.get("address")
         postal_code = form.cleaned_data.get("postal_code")
+
+        # Add sender to sendgrid 
+        # -------------------------
+
+        try:
+            data = {}
+            data["list_ids"] = ["df17f359-2dd8-45ed-b9e1-bcb63080cf96"]
+            contacts = []
+            data_dict = {}
+
+            data_dict["email"] = email
+            data_dict["first_name"] = name
+            data_dict["address_line_1"] = f"{postcard_order.street_number} {postcard_order.route}"
+            data_dict["city"] = postcard_order.locality
+            data_dict["state_province_region"] = postcard_order.administrative_area_level_1
+            data_dict["country"] = "Canada"
+            data_dict["postal_code"] = postcard_order.postal_code
+            contacts.append(data_dict)
+            data["contacts"] = contacts
+            sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
+            response = sg.client.marketing.contacts.put(request_body=data)
+
+        except Exception as e:
+            print(e)
+
+
+        # -------------------------
+
 
         
         stripe.api_key = settings.STRIPE_SECRET_KEY
