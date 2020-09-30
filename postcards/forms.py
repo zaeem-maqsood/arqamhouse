@@ -41,7 +41,7 @@ class PostcardOrderForm(forms.ModelForm):
             self.fields[f"autocomplete{x}"] = forms.CharField(label="Address", widget=forms.TextInput(
                 attrs={"class": "validate-required", "autocomplete": "off", "placeholder": "123 Main Street", "id": f"autocomplete{x}"}), required=False)
 
-            self.fields[f"street_number_{x}"] = forms.IntegerField(widget=forms.NumberInput(
+            self.fields[f"street_number_{x}"] = forms.CharField(widget=forms.NumberInput(
                 attrs={"class": "validate-required", "placeholder": "123", "id": f"street_number_{x}", "max": 99999}), required=True)
 
             self.fields[f"route_{x}"] = forms.CharField(widget=forms.TextInput(

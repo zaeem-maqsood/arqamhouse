@@ -356,32 +356,35 @@ class PostCardOrderView(FormView):
         postcard = self.get_postcard()
 
         stripe.api_key = settings.STRIPE_SECRET_KEY
-        postcard_intent_id = request.session.get('postcard_intent_id')
-        if postcard_intent_id:
-            postcard_intent = stripe.PaymentIntent.modify(
-                postcard_intent_id,
-                amount=(500 * quantity),
-                description="Postcard Arqam House",
-                metadata={
-                    'postcard': postcard.name,
-                    'postcard_amount': postcard.amount,
-                },
-                statement_descriptor="Postcard Arqam House",
-            )
+        # postcard_intent_id = request.session.get('postcard_intent_id')
+        # if postcard_intent_id:
+        #     postcard_intent = stripe.PaymentIntent.create(
+        #         postcard_intent_id,
+        #         amount=(500 * quantity),
+        #         description="Postcard Arqam House",
+        #         metadata={
+        #             'postcard': postcard.name,
+        #             'postcard_amount': postcard.amount,
+        #         },
+        #         statement_descriptor="Postcard Arqam House",
+        #     )
 
-        else:
-            postcard_intent = stripe.PaymentIntent.create(
-                amount=(500 * quantity),
-                currency='cad',
-                description = "Postcard Arqam House",
-                metadata = {
-                    'postcard': postcard.name,
-                    'postcard_amount': postcard.amount,
-                    },
-                statement_descriptor="Postcard Arqam House",
-            )
-            request.session['postcard_intent_id'] = str(postcard_intent.id)
-            request.session.modified = True
+        #     request.session['postcard_intent_id'] = str(postcard_intent.id)
+        #     request.session.modified = True
+
+        # else:
+        postcard_intent = stripe.PaymentIntent.create(
+            amount=(500 * quantity),
+            currency='cad',
+            description = "Postcard Arqam House",
+            metadata = {
+                'postcard': postcard.name,
+                'postcard_amount': postcard.amount,
+                },
+            statement_descriptor="Postcard Arqam House",
+        )
+            # request.session['postcard_intent_id'] = str(postcard_intent.id)
+            # request.session.modified = True
 
 
         context["quantity_str"] = quantity
@@ -438,22 +441,22 @@ class PostCardOrderView(FormView):
         # -------------------------
 
         try:
-            data = {}
-            data["list_ids"] = ["df17f359-2dd8-45ed-b9e1-bcb63080cf96"]
+            send_grid_data = {}
+            send_grid_data["list_ids"] = ["df17f359-2dd8-45ed-b9e1-bcb63080cf96"]
             contacts = []
             data_dict = {}
 
             data_dict["email"] = email
             data_dict["first_name"] = name
-            data_dict["address_line_1"] = f"{postcard_order.street_number} {postcard_order.route}"
-            data_dict["city"] = postcard_order.locality
-            data_dict["state_province_region"] = postcard_order.administrative_area_level_1
+            data_dict["address_line_1"] = f"{street_number} {route}"
+            data_dict["city"] = locality
+            data_dict["state_province_region"] = administrative_area_level_1
             data_dict["country"] = "Canada"
-            data_dict["postal_code"] = postcard_order.postal_code
+            data_dict["postal_code"] = postal_code
             contacts.append(data_dict)
-            data["contacts"] = contacts
+            send_grid_data["contacts"] = contacts
             sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
-            response = sg.client.marketing.contacts.put(request_body=data)
+            response = sg.client.marketing.contacts.put(request_body=send_grid_data)
 
         except Exception as e:
             print(e)
@@ -484,7 +487,7 @@ class PostCardOrderView(FormView):
             stripe_token = data["intent_id"]
         except Exception as e:
             print(e)
-            form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
+            form.add_error(None, "Your payment was not processed. A network error prevented payment processing, please try again later.")
             return self.render_to_response(self.get_context_data(form=form))
 
 
@@ -506,7 +509,7 @@ class PostCardOrderView(FormView):
         
         except Exception as e:
             print(e)
-            form.add_error("amount", "Your payment was not processed. A network error prevented payment processing, please try again later.")
+            form.add_error(None, "Your payment was not processed. A network error prevented payment processing, please try again later.")
             del request.session['intent']
             request.session.modified = True
             return self.render_to_response(self.get_context_data(form=form))
