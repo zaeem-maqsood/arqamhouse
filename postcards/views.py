@@ -220,7 +220,7 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 if field != "csrfmiddlewaretoken" and field != "ap_message":
                     postcard_order = PostCardOrder.objects.get(id=field)
                     json_data["id"] = 6
-                    json_data["message"] = f"Hi {postcard_order.name}! We wanted to give a big thank you\r.\rfor supporting us. We hope you enjoyed using our postcard service\rand we were able to help make your loved one feel special.\rThere is nothing like receiving personal messages\rthrough the mail! You can check our new collection\rof postcards for Fall 2020 on our site!.\r\rLove, Arqam house team"
+                    json_data["message"] = f"Hi {postcard_order.name}! We wanted to give a big thank you\rfor supporting us. We hope you enjoyed using our postcard service\rand we were able to help make your loved one feel special.\rThere is nothing like receiving personal messages\rthrough the mail! You can check our new collection\rof postcards for Fall 2020 on our site!.\r\rLove, Arqam house team"
                     json_list.append(json_data)
 
         if 'no_message' in data:
