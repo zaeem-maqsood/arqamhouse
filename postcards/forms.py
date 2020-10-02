@@ -59,7 +59,7 @@ class PostcardOrderForm(forms.ModelForm):
 
 
             self.fields["%s_message_to_recipient" % (x)] = forms.CharField(widget=forms.Textarea(
-                attrs={"class": "validate-required", "placeholder": "Write your personalized message for the recipient here", "maxlength": '280', "rows": 3, }), required=True)
+                attrs={"class": "validate-required", "placeholder": "Write your personalized message for the recipient here", "maxlength": '280', "rows": 3}), required=True)
 
 
     class Meta:
