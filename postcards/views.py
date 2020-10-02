@@ -554,16 +554,15 @@ class PostCardOrderView(FormView):
         postcard.save()
 
         # Delete the session intent variable 
-        del request.session['postcard_intent_id']
-        request.session.modified = True
+        
+        
         valid_data = super(PostCardOrderView, self).form_valid(form)
         return valid_data
 
 
     def form_invalid(self, form, request):
         print(form.errors)
-        del request.session['postcard_intent_id']
-        request.session.modified = True
+        
         return self.render_to_response(self.get_context_data(form=form))
 
 
