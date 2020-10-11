@@ -428,14 +428,46 @@ class PostCardOrderView(FormView):
     
         # Get buyer name and email address
         name = form.cleaned_data.get('name')
+        if len(name) > 30:
+            form.add_error(None, "Please keep your name under 30 characters long. Sorry :(")
+            return self.render_to_response(self.get_context_data(form=form))
+
         email = form.cleaned_data.get('email')
+        if len(email) > 300:
+            form.add_error(None, "Please keep your email under 300 characters long. Sorry :(")
+            return self.render_to_response(self.get_context_data(form=form))
+
         anonymous = form.cleaned_data.get('anonymous')
+
         street_number = form.cleaned_data.get("street_number")
+        if len(street_number) > 20:
+            form.add_error(None, "Please keep your street number under 20 characters long. Sorry :(")
+            return self.render_to_response(self.get_context_data(form=form))
+
         route = form.cleaned_data.get("route")
+        if len(route) > 100:
+            form.add_error(None, "Please keep your route under 100 characters long. Sorry :(")
+            return self.render_to_response(self.get_context_data(form=form))
+
         locality = form.cleaned_data.get("locality")
+        if len(locality) > 100:
+            form.add_error(None, "Please keep your locality under 100 characters long. Sorry :(")
+            return self.render_to_response(self.get_context_data(form=form))
+
         administrative_area_level_1 = form.cleaned_data.get("administrative_area_level_1")
+        if len(administrative_area_level_1) >= 4:
+            form.add_error(None, "Please use a 2 digit province code i.e. 'ON'.")
+            return self.render_to_response(self.get_context_data(form=form))
+
         address = form.cleaned_data.get("address")
+        if len(address) > 200:
+            form.add_error(None, "Please keep the address under 200 characters long.")
+            return self.render_to_response(self.get_context_data(form=form))
+
         postal_code = form.cleaned_data.get("postal_code")
+        if len(postal_code) > 10:
+            form.add_error(None, "Please keep the postal code under 10 characters long.")
+            return self.render_to_response(self.get_context_data(form=form))
 
         # Add sender to sendgrid 
         # -------------------------
@@ -518,13 +550,42 @@ class PostCardOrderView(FormView):
         postcard_orders = []
 
         for x in range(quantity):
+
             recipient_name = form.cleaned_data.get(f"{x}_recipient_name")
+            if len(recipient_name) > 30:
+                form.add_error(None, f"Please keep recipient {x}'s name under 30 characters long.")
+                return self.render_to_response(self.get_context_data(form=form))
+
             recipient_address = form.cleaned_data.get(f"autocomplete{x}")
+            if len(recipient_address) > 200:
+                form.add_error(None, f"Please keep recipient {x}'s address under 200 characters long.")
+                return self.render_to_response(self.get_context_data(form=form))
+
             recipient_street_number = form.cleaned_data.get(f"street_number_{x}")
+            if len(recipient_street_number) > 20:
+                form.add_error(None, f"Please keep recipient {x}'s street number under 20 characters long. Sorry :(")
+                return self.render_to_response(self.get_context_data(form=form))
+
             recipient_route = form.cleaned_data.get(f"route_{x}")
+            if len(recipient_route) > 100:
+                form.add_error(None, f"Please keep recipient {x}'s route under 100 characters long. Sorry :(")
+                return self.render_to_response(self.get_context_data(form=form))
+
             recipient_locality = form.cleaned_data.get(f"locality_{x}")
+            if len(recipient_locality) > 100:
+                form.add_error(None, f"Please keep recipient {x}'s locality under 100 characters long. Sorry :(")
+                return self.render_to_response(self.get_context_data(form=form))
+
             recipient_administrative_area_level_1 = form.cleaned_data.get(f"administrative_area_level_1_{x}")
+            if len(recipient_administrative_area_level_1) >= 4:
+                form.add_error(None, f"Please use a 2 digit province code i.e. 'ON' for recipient {x}.")
+                return self.render_to_response(self.get_context_data(form=form))
+
             recipient_postal_code = form.cleaned_data.get(f"postal_code_{x}")
+            if len(recipient_postal_code) > 10:
+                form.add_error(None, f"Please keep recipient {x}'s postal code under 10 characters long.")
+                return self.render_to_response(self.get_context_data(form=form))
+
             message_to_recipient = form.cleaned_data.get(f"{x}_message_to_recipient")
 
             postcard_order = PostCardOrder.objects.create(post_card=postcard, name=name, email=email, anonymous=anonymous, postal_code=postal_code, address=address, 

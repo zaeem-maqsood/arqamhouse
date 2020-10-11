@@ -641,7 +641,7 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 20px;" id="address_row_{{ forloop.counter0 }}">
                         <div class="col-md-8 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Recipient's Address</p>
-                            <input type="text" value="{% get_autocomplete_value form 'autocomplete' forloop.counter0 %}" name="autocomplete{{ forloop.counter0 }}" class="validate-required" autocomplete="off" placeholder="123 Main Street"
+                            <input autocomplete="off" type="text" value="{% get_autocomplete_value form 'autocomplete' forloop.counter0 %}" name="autocomplete{{ forloop.counter0 }}" class="validate-required" autocomplete="off" placeholder="123 Main Street"
                                 id="autocomplete{{ forloop.counter0 }}">
                             {% if forloop.counter != 1 %}<a href="javascript:;" onclick="copyAddress({{ forloop.counter0 }})"
                                 style="font-size: 0.8em;text-decoration: none;"> Copy from above</a>{% endif %}
@@ -654,7 +654,7 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Street Number</p>
-                            <input required type="text" value="{% get_address_values form 'street_number' forloop.counter0 %}" name="street_number_{{ forloop.counter0 }}" class="validate-required" placeholder="123" id="street_number_{{ forloop.counter0 }}">
+                            <input autocomplete="off" required type="text" value="{% get_address_values form 'street_number' forloop.counter0 %}" name="street_number_{{ forloop.counter0 }}" class="validate-required" placeholder="123" id="street_number_{{ forloop.counter0 }}">
                             {% if form.errors %}
                             {% autoescape off %}
                             {% get_address_error_message form 'street_number' forloop.counter0  %}
@@ -663,7 +663,7 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Route</p>
-                            <input required type="text" value="{% get_address_values form 'route' forloop.counter0 %}" name="route_{{ forloop.counter0 }}" class="validate-required" placeholder="Main Street" id="route_{{ forloop.counter0 }}">
+                            <input autocomplete="off" required type="text" value="{% get_address_values form 'route' forloop.counter0 %}" name="route_{{ forloop.counter0 }}" class="validate-required" placeholder="Main Street" id="route_{{ forloop.counter0 }}">
                             {% if form.errors %}
                             {% autoescape off %}
                             {% get_address_error_message form 'route' forloop.counter0  %}
@@ -672,7 +672,7 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Locality</p>
-                            <input required type="text" value="{% get_address_values form 'locality' forloop.counter0 %}" name="locality_{{ forloop.counter0 }}" class="validate-required" placeholder="Toronto" id="locality_{{ forloop.counter0 }}">
+                            <input autocomplete="off" required type="text" value="{% get_address_values form 'locality' forloop.counter0 %}" name="locality_{{ forloop.counter0 }}" class="validate-required" placeholder="Toronto" id="locality_{{ forloop.counter0 }}">
                             {% if form.errors %}
                             {% autoescape off %}
                             {% get_address_error_message form 'locality' forloop.counter0  %}
@@ -684,7 +684,7 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-md-6 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Province</p>
-                            <input type="text" minlength="2" maxlength="2" required value="{% get_address_values form 'administrative_area_level_1' forloop.counter0 %}" name="administrative_area_level_1_{{ forloop.counter0 }}" class="validate-required" placeholder="ON"
+                            <input autocomplete="off" type="text" minlength="2" maxlength="2" required value="{% get_address_values form 'administrative_area_level_1' forloop.counter0 %}" name="administrative_area_level_1_{{ forloop.counter0 }}" class="validate-required" placeholder="ON"
                                 id="administrative_area_level_1_{{ forloop.counter0 }}">
                             {% if form.errors %}
                             {% autoescape off %}
@@ -694,7 +694,7 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                         <div class="col-md-6 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Postal Code</p>
-                            <input type="text" minlength="6" maxlength="7" required value="{% get_address_values form 'postal_code' forloop.counter0 %}" name="postal_code_{{ forloop.counter0 }}" class="validate-required" placeholder="L1Z 5G5" id="postal_code_{{ forloop.counter0 }}">
+                            <input autocomplete="off" type="text" minlength="6" maxlength="7" required value="{% get_address_values form 'postal_code' forloop.counter0 %}" name="postal_code_{{ forloop.counter0 }}" class="validate-required" placeholder="L1Z 5G5" id="postal_code_{{ forloop.counter0 }}">
                             {% if form.errors %}
                             {% autoescape off %}
                             {% get_address_error_message form 'postal_code' forloop.counter0  %}
@@ -722,8 +722,6 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
                     {% endfor %}
-
-
 
 
                     <div class="row justify-content-center" style="padding-bottom: 40px;">

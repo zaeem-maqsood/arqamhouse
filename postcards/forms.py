@@ -25,7 +25,7 @@ class PostcardOrderForm(forms.ModelForm):
             attrs={"class": "validate-required", "placeholder": "Toronto", "id": "locality"}), required=True)
 
         self.fields["administrative_area_level_1"] = forms.CharField(label="Address", widget=forms.TextInput(
-            attrs={"class": "validate-required", "placeholder": "ON", "id": "administrative_area_level_1"}), required=True)
+            attrs={"class": "validate-required", "placeholder": "ON", "id": "administrative_area_level_1", "maxlength": "2"}), required=True)
 
         self.fields["postal_code"] = forms.CharField(label="Address", widget=forms.TextInput(
             attrs={"class": "validate-required", "placeholder": "L1Z 5G5", "id": "postal_code"}), required=True)
