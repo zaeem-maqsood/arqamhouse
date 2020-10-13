@@ -56,6 +56,7 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
 
         return render(request, self.template_name, self.get_context_data())
 
+
     def get_context_data(self, *args, **kwargs):
         context = {}
         get_data = self.request.GET
@@ -88,6 +89,7 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                     postcard_order.message_printed = True
                     postcard_order.name_printed = True
                     postcard_order.save()
+                    self.send_confirmation_email(postcard_order)
 
         if 'no_sent' in data:
 
@@ -282,6 +284,37 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 
         
         return render(request, self.template_name, self.get_context_data())
+
+
+
+    def send_confirmation_email(self, postcard_order):
+        # Compose Email
+        
+        context = {}
+
+        if postcard_order.finished_image:
+            s3_client = boto3.client('s3', 'ca-central-1', config=Config(signature_version='s3v4'),
+                                    aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+            response = s3_client.generate_presigned_url('get_object', Params={
+                'Bucket': settings.AWS_STORAGE_BUCKET_NAME, 'Key': postcard_order.finished_image_path}, ExpiresIn=360000)
+
+            context["image_url"] = response
+
+        subject = f"Your postcard is on it's way."
+        context["postcard_order"] = postcard_order
+        
+
+        html_content = render_to_string('emails/postcard_shipped_confirmation.html', context)
+
+        text_content = strip_tags(html_content)
+        from_email = f'Arqam House <info@arqamhouse.com>'
+        to = [postcard_order.email]
+        email = EmailMultiAlternatives(subject=subject, body=text_content,
+                                       from_email=from_email, to=to)
+        email.attach_alternative(html_content, "text/html")
+        email.send()
+
+        return "Done"
         
 
 
@@ -603,6 +636,8 @@ class PostCardOrderView(FormView):
                 self.send_text_message(postcard_orders)
             except Exception as e:
                 print(e)
+
+        self.send_text_message(postcard_orders)
 
 
         try: 

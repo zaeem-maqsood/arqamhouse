@@ -24,8 +24,12 @@ def validate_file_size(value):
     else:
         return value
 
+
+def order_image_location(instance, filename):
+    return "arqam_house_postcards/orders/%s/%s" % (instance.id, filename)
+
 def image_location(instance, filename):
-    return "arqam_house_postcards/%s/%s" % (instance.pk, filename)
+    return "arqam_house_postcards/%s/%s" % (instance.id, filename)
 
 class PostCard(models.Model):
     name = models.CharField(max_length=150, null=True, blank=True)
@@ -105,6 +109,13 @@ class PostCardOrder(models.Model):
     front_printed = models.BooleanField(default=False)
     name_printed = models.BooleanField(default=False)
     message_printed = models.BooleanField(default=False)
+    finished_image = models.ImageField(upload_to=order_image_location, validators=[validate_file_size], null=True, blank=True)
 
     def __str__(self):
         return (self.name)
+
+
+    @property
+    def finished_image_path(self):
+        filename = os.path.basename(self.finished_image.name)
+        return f"media/arqam_house_postcards/orders/{self.pk}/{filename}"
