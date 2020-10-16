@@ -1,0 +1,227 @@
+{% extends "frontend/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Arqam House
+{% endblock title %}
+
+{% block footer %}
+{% include "frontend/footer.html" %}
+{% endblock footer %}
+
+{% block styles %}
+<link
+    href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400&family=Roboto+Condensed:wght@300&display=swap"
+    rel="stylesheet">
+
+<style>
+.confirm_selection {
+    animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+    to {
+        text-shadow: 0px 0 5px #ff8000;
+    }
+}
+
+.confirm_selection {
+    font-family: sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+}
+</style>
+{% endblock styles %}
+
+{% block top_page_scripts %}
+<script src="https://kit.fontawesome.com/71fc1e3551.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.6.8/lottie.min.js"></script>
+
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script>
+
+lottie.loadAnimation({
+	container: document.getElementById("bm"), // the dom element that will contain the animation
+	renderer: 'svg',
+	loop: true,
+	autoplay: true,
+	path: "https://assets4.lottiefiles.com/packages/lf20_3TL2tK.json" // the path to the animation json
+});
+
+
+lottie.loadAnimation({
+	container: document.getElementById("bm-training"), // the dom element that will contain the animation
+	renderer: 'svg',
+	loop: true,
+	autoplay: true,
+	path: "https://res.cloudinary.com/arqamhouse/raw/upload/v1588457120/data_xoqmhq.json" // the path to the animation json
+});
+
+</script>
+
+<script>
+    function thanksABunchHover(state) {
+
+        if (state) {
+            document.getElementById("thanks_a_bunch_front").style.display = "none";
+            document.getElementById("thanks_a_bunch_back").style.display = "inline-block";
+        }
+
+        else {
+            document.getElementById("thanks_a_bunch_front").style.display = "inline-block";
+            document.getElementById("thanks_a_bunch_back").style.display = "none";
+        }
+
+
+    }
+
+
+    function paperHugHover(state) {
+
+            if (state) {
+                document.getElementById("paper_hug_front").style.display = "none";
+                document.getElementById("paper_hug_back").style.display = "inline-block";
+            }
+
+            else {
+                document.getElementById("paper_hug_front").style.display = "inline-block";
+                document.getElementById("paper_hug_back").style.display = "none";
+            }
+
+
+        }
+</script>
+
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center">
+	<div class="container">
+		
+		<div class="row" style="padding-bottom: 20px;">
+			<div class="col-lg-8">
+				<a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+			</div>
+		</div>
+
+		<div class="row justify-content-center" style="padding-bottom: 40px;">
+			<div class="col-lg-8 col-md-10 ">
+				<h2 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;">We Make Personalized Postcards</h3>
+                <p>Whether your sending our postcards to friends and family or to catch up with past clients, our postcards add a 
+                    personalized touch to make your recipient's experience amazing.
+                </p>
+			</div>
+		</div>
+
+
+		<div class="row justify-content-center">
+			<div class="col-lg-3 col-6" style="padding-bottom: 10px;">
+				<a class="btn btn-block btn--primary" href="{% url 'postcards:list' %}">
+					<span class="btn__text">Personal</span>
+				</a>
+			</div>
+			
+			<div class="col-lg-3 col-6" style="padding-bottom: 10px;">
+				<a class="btn btn--primary-1 btn-block" href="{% url 'postcards:list' %}">
+					<span class="btn__text">Business</span>
+				</a>
+			</div>
+		</div>
+
+			
+	</div>
+</section>
+
+
+<section class="text-center">
+    <div class="container">
+
+        <div class="row justify-content-center" style="padding-bottom: 40px;">
+            <div class="col-md-6 col-10" style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px;border-radius: 15px;align-self: center;padding-bottom: 70px;">
+                <div>
+                    <img src="{% static 'images/thanks_a_bunch_flower.png' %}" style="max-width: 200px;margin-bottom: 0px;">
+                    <p style="font-family: 'Roboto Condensed', sans-serif;font-weight: 500;letter-spacing: 2px;color: #d18664;margin-bottom: 0px;">THANKS A BUNCH</p>
+                    <span style="font-family: 'Roboto Condensed', sans-serif;font-weight: 500;letter-spacing: 10px;color: #d18664;" class="confirm_selection">
+                        MARYAM IMRAN
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 40px;">
+            <div class="col-lg-8 col-md-10 ">
+                <h3 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;"><span style="color: #d18664;">Metallic Gold</span> Foiled Names</h3>
+                <p>Each Arqam House postcard has the name of the recipient foiled in gold colour on the front of the card, and a
+                    personalized message on the back.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="text-center">
+    <div class="container">
+        <div class="row justify-content-center">
+
+            <div class="col-md-6 col-10">
+                <span id="thanks_a_bunch" onmouseover="thanksABunchHover(true)" onmouseleave="thanksABunchHover(false)">
+                    <img src="{% static 'images/i_sent_a_postcard_front.png' %}" style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px;border-radius: 15px;align-self: center;" id="thanks_a_bunch_front">
+                    <img src="{% static 'images/postcard_back.png' %}" style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px;border-radius: 15px;align-self: center;display: none;" id="thanks_a_bunch_back" style="display:none">
+                </span>
+            </div>
+            <div class="col-md-4" style="margin: 10px; padding:40px;">
+                <h3 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;">Postcards > Everything</h3>
+                <p>
+                    Email and Text campaigns don't even come close to the turnover postcards receive. Personalized postcards do an even
+                    better job!
+                </p>
+                <a href="{% url 'profiles:create' %}">Get Started &raquo;</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+
+<section class="text-center">
+    <div class="container">
+        <div class="row justify-content-center">
+
+            
+            <div class="col-md-4" style="margin: 10px; padding:40px;">
+                <h3 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;">All In One.</h3>
+                <p>
+                    Our amazing price of $5 for personal postcards and $3 for business postcards includes printing, foiling, enveloping, stamping, shipping and taxes!
+                </p>
+                <a href="{% url 'profiles:create' %}">Get Started &raquo;</a>
+
+            </div>
+
+            <div class="col-md-6 col-10">
+                <span id="thanks_a_bunch" onmouseover="paperHugHover(true)" onmouseleave="paperHugHover(false)">
+                    <img src="{% static 'images/paper_hug.png' %}"
+                        style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px;border-radius: 15px;align-self: center;"
+                        id="paper_hug_front">
+                    <img src="{% static 'images/postcard_back.png' %}"
+                        style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px;border-radius: 15px;align-self: center;display: none;"
+                        id="paper_hug_back" style="display:none">
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+{% endblock content %}

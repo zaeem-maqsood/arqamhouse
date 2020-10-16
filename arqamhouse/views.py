@@ -133,7 +133,7 @@ class CampaignInfoView(View):
 
 
 class HomePageView(View):
-    template_name = "frontend/home.html"
+    template_name = "frontend/postcard_home.html"
 
     def get_house(self):
         profile = self.request.user
