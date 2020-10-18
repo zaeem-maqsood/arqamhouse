@@ -443,10 +443,13 @@ class PostCardOrderView(FormView):
             statement_descriptor="Postcard Arqam House",
         )
             
-        last_postcard = PostCardOrder.objects.filter(post_card=postcard).order_by("-created_at").first()
-        days_since_sold = datetime.today().day - last_postcard.created_at.day
-        context["last_postcard"] = last_postcard
-        context["days_since_sold"] = days_since_sold
+        try:
+            last_postcard = PostCardOrder.objects.filter(post_card=postcard).order_by("-created_at").first()
+            days_since_sold = datetime.today().day - last_postcard.created_at.day
+            context["last_postcard"] = last_postcard
+            context["days_since_sold"] = days_since_sold
+        except:
+            pass
 
         context["quantity_str"] = quantity
         postcard_amount = (5*quantity)
