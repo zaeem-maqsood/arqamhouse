@@ -93,6 +93,22 @@ lottie.loadAnimation({
 
 
         }
+
+
+    function makingAMoveHover(state) {
+
+            if (state) {
+                document.getElementById("making_a_move_front").style.display = "none";
+                document.getElementById("making_a_move_back").style.display = "inline-block";
+            }
+
+            else {
+                document.getElementById("making_a_move_front").style.display = "inline-block";
+                document.getElementById("making_a_move_back").style.display = "none";
+            }
+
+
+        }
 </script>
 
 {% endblock scripts %}
@@ -109,7 +125,7 @@ lottie.loadAnimation({
 
 		<div class="row justify-content-center" style="padding-bottom: 40px;">
 			<div class="col-lg-8 col-md-10 ">
-				<h2 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;">We Make Personalized Postcards</h3>
+				<h2 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;">WE SELL PAPER HUGS</h3>
                 <p>Whether your sending our postcards to friends and family or to catch up with past clients, our postcards add a 
                     personalized touch to make your recipient's experience amazing.
                 </p>
@@ -136,6 +152,40 @@ lottie.loadAnimation({
 </section>
 
 
+
+<section class="text-center">
+    <div class="container">
+        <div class="row justify-content-center">
+
+            <div class="col-md-6 col-10">
+                <span id="thanks_a_bunch" onmouseover="thanksABunchHover(true)" onmouseleave="thanksABunchHover(false)">
+                    <img src="{% static 'images/i_sent_a_postcard_front.png' %}"
+                        style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px;border-radius: 15px;align-self: center;"
+                        id="thanks_a_bunch_front">
+                    <img src="{% static 'images/postcard_back.png' %}"
+                        style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px;border-radius: 15px;align-self: center;display: none;"
+                        id="thanks_a_bunch_back" style="display:none">
+                </span>
+            </div>
+            <div class="col-md-4" style="margin: 10px; padding:40px;">
+                <h3 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;">
+                    Postcards > Everything.</h3>
+                <p>
+                    Email and Text campaigns don't even come close to the turnover postcards receive. Personalized
+                    postcards do an even
+                    better job!
+                </p>
+                <a href="{% url 'profiles:create' %}">Get Started &raquo;</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
 <section class="text-center">
     <div class="container">
 
@@ -153,41 +203,13 @@ lottie.loadAnimation({
 
         <div class="row justify-content-center" style="padding-bottom: 40px;">
             <div class="col-lg-8 col-md-10 ">
-                <h3 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;"><span style="color: #d18664;">Metallic Gold</span> Foiled Names</h3>
-                <p>Each Arqam House postcard has the name of the recipient foiled in gold colour on the front of the card, and a
+                <h3 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;"><span style="color: #d18664;">Metallic</span> Foiled Names.</h3>
+                <p>Each Arqam House postcard has the name of the recipient foiled in a mettallic colour on the front of the card, and a
                     personalized message on the back.</p>
             </div>
         </div>
     </div>
 </section>
-
-
-<section class="text-center">
-    <div class="container">
-        <div class="row justify-content-center">
-
-            <div class="col-md-6 col-10">
-                <span id="thanks_a_bunch" onmouseover="thanksABunchHover(true)" onmouseleave="thanksABunchHover(false)">
-                    <img src="{% static 'images/i_sent_a_postcard_front.png' %}" style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px;border-radius: 15px;align-self: center;" id="thanks_a_bunch_front">
-                    <img src="{% static 'images/postcard_back.png' %}" style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px;border-radius: 15px;align-self: center;display: none;" id="thanks_a_bunch_back" style="display:none">
-                </span>
-            </div>
-            <div class="col-md-4" style="margin: 10px; padding:40px;">
-                <h3 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;">Postcards > Everything</h3>
-                <p>
-                    Email and Text campaigns don't even come close to the turnover postcards receive. Personalized postcards do an even
-                    better job!
-                </p>
-                <a href="{% url 'profiles:create' %}">Get Started &raquo;</a>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
 
 
 
@@ -214,6 +236,40 @@ lottie.loadAnimation({
                         style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px;border-radius: 15px;align-self: center;display: none;"
                         id="paper_hug_back" style="display:none">
                 </span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<section class="text-center">
+    <div class="container">
+        <div class="row justify-content-center">
+
+            <div class="col-md-6 col-10">
+                <span id="making_a_move" onmouseover="makingAMoveHover(true)" onmouseleave="makingAMoveHover(false)">
+                    <img src="{% static 'images/making_a_move.png' %}"
+                        style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px;border-radius: 15px;align-self: center;"
+                        id="making_a_move_front">
+                    <img src="{% static 'images/postcard_back.png' %}"
+                        style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px;border-radius: 15px;align-self: center;display: none;"
+                        id="making_a_move_back" style="display:none">
+                </span>
+            </div>
+            <div class="col-md-4" style="margin: 10px; padding:40px;">
+                <h3 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;">
+                    Leave a real impression.</h3>
+                <p>
+                    Whether you're a real estate agent, lawyer or business owner, sending out our postcards to your
+                    past, present or future clients will definitely
+                    leave them with a memorable impression. Our cards make it to the fridge!
+                </p>
+                <a href="{% url 'profiles:create' %}">Get Started &raquo;</a>
+
             </div>
 
         </div>

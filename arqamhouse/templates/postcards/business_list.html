@@ -7,6 +7,10 @@ Choose A Postcard
 
 {% block styles %}
 
+<link
+    href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400&family=Roboto+Condensed:wght@300&display=swap"
+    rel="stylesheet">
+
 <style>
 
 
@@ -97,32 +101,12 @@ Choose A Postcard
 {% endif %}
 
 
-<script>
-
-function bulkOrder(increment, url) {
-
-    document.getElementById(increment + "_anchor").style.display = "none";
-    post_card_quantity = document.getElementById(increment + "_quantity");
-    console.log(post_card_quantity.value);
-
-    post_card_quantity.style.display = "block";
-    post_card_button = document.getElementById(increment + "_button");
-
-    post_card_button.style.display = "block";
-    post_card_button.href = url + "?quantity=" + post_card_quantity.value;
-
-    post_card_button.innerHTML = 'Buy ' + post_card_quantity.value + ' Postcards';
-
-}
-
-</script>
-
 {% endblock scripts %}
 
 
 
 {% block content %}
-<section style="padding-top: 30px;">
+<section style="padding-top: 50px;">
     <div class="container">
 
             {% if show_confetti %}
@@ -150,14 +134,18 @@ function bulkOrder(increment, url) {
 
             <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
                 <div class="col-lg-8 col-md-12">
-                    <h3 style="margin-bottom: 5px;color: grey;">These Things Make It To The Fridge.</h3>
-                    <p style="color: grey;margin-bottom: 0px;">
-                        Send your recipient a postcard that'll truly be unique to them. Each Arqam House postcard has your recipient's name metallically foiled on the front
-                        and a personal message from you on the back.
+                    <h3 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;"">Postcards For Business</h3>
+                    <p style="color: grey;margin-bottom: 20px;">
+                    Personalized postcards are proven to be more effective then traditional print media and much more effective than email or text campaigns.
+                    We make it easy to order postcards for your clients, whether it's to show appreciation for their business or to get them to use your services again.
                     </p>
-                    
+                    <a class="btn btn--primary" href="{% url 'postcards:list' %}">
+                        <span class="btn__text">Send Personal Postcards Instead</span>
+                    </a>
                 </div>
             </div>
+
+
 
             <div class="row justify-content-center text-center" style="padding: 0 10px;">
                 {% for postcard in postcards %}
@@ -165,23 +153,10 @@ function bulkOrder(increment, url) {
                 {% if postcard.amount %}
                 <div class="col-lg-3 col-md-4 col-sm-6 col-12"
                     style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;margin: 10px; padding:40px;border-radius: 15px;align-self: center;">
-                    <a href="{{ postcard.get_absolute_url }}" style="text-decoration: none;">
+                    <a href="{{ postcard.get_business_url }}" style="text-decoration: none;">
                         <img style="border: 0.1px solid #f6f0f0;" src="{{ postcard.image_1.url }}" class="arrow">
-                        <p style="margin-bottom: 0px;font-size: 1.5em;">$ {{ postcard.amount }}</p>
+                        <p style="margin-bottom: 0px;font-size: 1.5em;">$ {{ postcard.business_amount }}</p>
                         <p style="margin-bottom: 5px;">{{ postcard.name }}</p>
-                        <a href="javascript:;" id="{{ forloop.counter }}_anchor" onclick="bulkOrder({{ forloop.counter }}, '{{ postcard.get_absolute_url }}');" style="text-decoration: none;font-size: small;font-weight: 400;">Need more than 1?</a>
-                        <select id="{{ forloop.counter }}_quantity" name="{{ forloop.counter }}_quantity" onchange="bulkOrder({{ forloop.counter }}, '{{ postcard.get_absolute_url }}');" style="display: none;margin-top: 10px;">
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                        </select>
-                        <a href="{{ postcard.get_absolute_url }}?quantity=2" class="btn btn-block btn--primary" style="display: none;margin-top: 10px;color: white;" id="{{ forloop.counter }}_button">Buy 2 Cards</a>
                     </a>
                 </div>
                 {% endif %}

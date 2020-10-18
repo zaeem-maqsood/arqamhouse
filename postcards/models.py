@@ -6,6 +6,8 @@ import itertools
 from core.utils import strip_non_ascii
 from django.core.exceptions import ValidationError
 
+from phonenumber_field.modelfields import PhoneNumberField
+
 import decimal
 from django.db.models.signals import pre_save, post_save
 from django.conf import settings
@@ -40,6 +42,7 @@ class PostCard(models.Model):
     image_3 = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
     image_4 = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
     image_5 = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
+    business_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     amount_sold = models.PositiveIntegerField(null=True, blank=True, default=0)
     hidden = models.BooleanField(default=False)
@@ -75,6 +78,37 @@ class PostCard(models.Model):
     def get_absolute_url(self):
         view_name = "postcards:detail"
         return reverse(view_name, kwargs={"slug": self.slug})
+
+    def get_business_url(self):
+        view_name = "postcards:business_step_1"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+
+
+
+class PostCardBusinessOrder(models.Model):
+
+    created_at = models.DateTimeField(default=timezone.now)
+    post_card = models.ForeignKey(PostCard, on_delete=models.CASCADE, blank=False, null=True)
+
+    name = models.CharField(max_length=30, null=True, blank=True)
+    company_name = models.CharField(max_length=40, null=True, blank=True)
+    email = models.EmailField(max_length=300, blank=False, null=False)
+
+    address = models.CharField(max_length=200, null=True, blank=True)
+    street_number = models.CharField(max_length=20, null=True, blank=True)
+    route = models.CharField(max_length=100, null=True, blank=True)
+    locality = models.CharField(max_length=100, null=True, blank=True)
+    administrative_area_level_1 = models.CharField(max_length=4, null=True, blank=True)
+    postal_code = models.CharField(max_length=10, null=True, blank=True)
+
+    website = models.CharField(max_length=200, null=True, blank=True)
+    phone = PhoneNumberField(blank=True, null=True)
+
+    def __str__(self):
+        return (self.name)
+
+
 
 
 

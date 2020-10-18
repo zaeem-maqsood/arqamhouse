@@ -39,7 +39,7 @@ from operator import attrgetter
 from houses.mixins import HouseAccountMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 
-from postcards.forms import PostcardOrderForm
+from postcards.forms import PostcardOrderForm, PostCardBusinessOrderFormStepOne
 from postcards.models import PostCard, PostCardOrder
 from profiles.models import Profile
 
@@ -315,7 +315,49 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
         email.send()
 
         return "Done"
-        
+
+
+
+
+class PostCardBusinessOrderViewStepOne(FormView):
+    model = PostCard
+    template_name = "postcards/business_order_step_one.html"
+
+    def get(self, request, *args, **kwargs):
+
+        data = request.GET
+        form = PostCardBusinessOrderFormStepOne()
+        return render(request, self.template_name, self.get_context_data(form=form))
+
+    def get_context_data(self, form, *args, **kwargs):
+        context = {}
+        get_data = self.request.GET
+
+        context["form"] = form
+        return context
+
+
+
+
+class PostCardBusinessListView(View):
+    template_name = "postcards/business_list.html"
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+        postcards = PostCard.objects.filter(hidden=False)
+
+        get_data = self.request.GET
+        if 'success' in get_data:
+            context["show_confetti"] = True
+            context["postcard_order"] = PostCardOrder.objects.all(
+            ).reverse().first()
+
+        context["postcards"] = postcards
+        return context
+
 
 
 
@@ -389,23 +431,7 @@ class PostCardOrderView(FormView):
         postcard = self.get_postcard()
 
         stripe.api_key = settings.STRIPE_SECRET_KEY
-        # postcard_intent_id = request.session.get('postcard_intent_id')
-        # if postcard_intent_id:
-        #     postcard_intent = stripe.PaymentIntent.create(
-        #         postcard_intent_id,
-        #         amount=(500 * quantity),
-        #         description="Postcard Arqam House",
-        #         metadata={
-        #             'postcard': postcard.name,
-        #             'postcard_amount': postcard.amount,
-        #         },
-        #         statement_descriptor="Postcard Arqam House",
-        #     )
-
-        #     request.session['postcard_intent_id'] = str(postcard_intent.id)
-        #     request.session.modified = True
-
-        # else:
+        
         postcard_intent = stripe.PaymentIntent.create(
             amount=(500 * quantity),
             currency='cad',
@@ -416,9 +442,11 @@ class PostCardOrderView(FormView):
                 },
             statement_descriptor="Postcard Arqam House",
         )
-            # request.session['postcard_intent_id'] = str(postcard_intent.id)
-            # request.session.modified = True
-
+            
+        last_postcard = PostCardOrder.objects.filter(post_card=postcard).order_by("-created_at").first()
+        days_since_sold = datetime.today().day - last_postcard.created_at.day
+        context["last_postcard"] = last_postcard
+        context["days_since_sold"] = days_since_sold
 
         context["quantity_str"] = quantity
         postcard_amount = (5*quantity)

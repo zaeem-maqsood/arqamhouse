@@ -19,12 +19,14 @@ from django.conf.urls.static import static
 from django.urls import path, include
 
 from postcards.views import (
-    PostCardListView, PostCardOrderView, PostCardManageOrdersView)
+    PostCardListView, PostCardOrderView, PostCardManageOrdersView, PostCardBusinessListView, PostCardBusinessOrderViewStepOne)
 
 app_name = "postcards"
 
 urlpatterns = [
     path('', PostCardListView.as_view(), name='list'),
+    path('business', PostCardBusinessListView.as_view(), name='business_list'),
     path('manage', PostCardManageOrdersView.as_view(), name='manage'),
     path('<slug:slug>', PostCardOrderView.as_view(), name='detail'),
+    path('business/<slug:slug>/step-1', PostCardBusinessOrderViewStepOne.as_view(), name='business_step_1'),
 ]

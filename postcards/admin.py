@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from postcards.models import PostCard, PostCardOrder
+from postcards.models import PostCard, PostCardOrder, PostCardBusinessOrder
 
 
 class PostcardOrderAdmin(admin.ModelAdmin):
@@ -13,3 +13,4 @@ class PostcardOrderAdmin(admin.ModelAdmin):
 # Register your models here.
 admin.site.register(PostCard)
 admin.site.register(PostCardOrder, PostcardOrderAdmin)
+admin.site.register(PostCardBusinessOrder)

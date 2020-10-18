@@ -1,6 +1,131 @@
 
 from django import forms
-from postcards.models import PostCardOrder
+from postcards.models import PostCardOrder, PostCardBusinessOrder
+from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget, PhoneNumberPrefixWidget
+
+
+
+class PostCardBusinessOrderFormStepOne(forms.ModelForm):
+
+    class Meta:
+        model = PostCardBusinessOrder
+        fields = [
+            "name", "company_name", "email", "address", "street_number", "route", "locality", "administrative_area_level_1", "postal_code", "website", "phone"
+        ]
+
+        widgets = {
+
+            "name": forms.TextInput(
+                attrs={
+                    "class": "validate-required",
+                    "placeholder": "Full Name",
+                    "required": True,
+                    "maxlength": '100',
+                }
+            ),
+
+            "company_name": forms.TextInput(
+                attrs={
+                    "class": "validate-required",
+                    "placeholder": "Postcard Estate",
+                    "required": True,
+                    "maxlength": '40',
+                }
+            ),
+
+            "email": forms.EmailInput(
+                attrs={
+                    "class": "validate-required",
+                    "placeholder": "someone@example.com",
+                    "required": True,
+                    "maxlength": '200',
+                }
+            ),
+
+            "address": forms.TextInput(
+                attrs={
+                    "class": "validate-required",
+                    "placeholder": "123 Main Street",
+                    "autocomplete": "off",
+                    "required": True,
+                    "id": "main_address"
+                }
+            ),
+
+            "street_number": forms.TextInput(
+                attrs={
+                    "class": "validate-required",
+                    "placeholder": "123",
+                    "autocomplete": "off",
+                    "required": True,
+                    "id": "street_number"
+                }
+            ),
+
+            "route": forms.TextInput(
+                attrs={
+                    "class": "validate-required",
+                    "placeholder": "Main Street",
+                    "autocomplete": "off",
+                    "required": True,
+                    "id": "route"
+                }
+            ),
+
+
+            "locality": forms.TextInput(
+                attrs={
+                    "class": "validate-required",
+                    "placeholder": "Toronto",
+                    "autocomplete": "off",
+                    "required": True,
+                    "id": "locality"
+                }
+            ),
+
+            "administrative_area_level_1": forms.TextInput(
+                attrs={
+                    "class": "validate-required",
+                    "placeholder": "ON",
+                    "autocomplete": "off",
+                    "required": True,
+                    "id": "administrative_area_level_1",
+                    "maxlength": '2',
+                }
+            ),
+
+
+            "postal_code": forms.TextInput(
+                attrs={
+                    "class": "validate-required",
+                    "placeholder": "L1Z 5J5",
+                    "required": False,
+                    "id": "postal_code",
+                    "maxlength": '7',
+                }
+            ),
+
+
+            "website": forms.TextInput(
+                attrs={
+                    "class": "validate-required",
+                    "placeholder": "https://arqamhouse.com",
+                    "required": False,
+                    "id": "website",
+                }
+            ),
+
+            "phone": PhoneNumberPrefixWidget(
+                attrs={
+                    "required": False,
+                    "class": "form-control m-input",
+                }
+            ),
+
+            
+
+        }
+
 
 
 
