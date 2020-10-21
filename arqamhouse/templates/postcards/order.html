@@ -246,12 +246,24 @@ function stripeClientSecretHandler(intent_id) {
         main_address_row = document.getElementById("main_address_row");
         main_address_row.style.display = 'none';
 
+        main_line_1_row = document.getElementById("main_line_1_row");
+        main_line_1_row.style.display = 'flex';
+
+        main_line_2_row = document.getElementById("main_line_2_row");
+        main_line_2_row.style.display = 'flex';
+
     }
 
     function  hideRecipientAddressOnInput(increment) {
 
         address_row = document.getElementById("address_row_" + increment);
         address_row.style.display = 'none';
+
+        line_1_row = document.getElementById("line_1_row_" + increment);
+        line_1_row.style.display = 'flex';
+
+        line_2_row = document.getElementById("line_2_row_" + increment);
+        line_2_row.style.display = 'flex';
 
     }
 
@@ -564,7 +576,7 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
 
-                    <div class="row" style="padding-bottom: 10px;">
+                    <div class="row" style="padding-bottom: 10px;display: none;" id="main_line_1_row">
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Street Number</p>
                             {{ form.street_number }}
@@ -575,7 +587,7 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
 
-                    <div class="row" style="padding-bottom: 10px;">
+                    <div class="row" style="padding-bottom: 10px;display: none;" id="main_line_2_row">
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Locality</p>
                             {{ form.locality }}
@@ -654,7 +666,7 @@ function stripeClientSecretHandler(intent_id) {
 
                 
                     
-                    <div class="row" style="padding-bottom: 10px;">
+                    <div class="row" style="padding-bottom: 10px;display: none;" id="line_1_row_{{ forloop.counter0 }}">
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Street Number</p>
                             <input autocomplete="off" required type="text" value="{% get_address_values form 'street_number' forloop.counter0 %}" name="street_number_{{ forloop.counter0 }}" class="validate-required" placeholder="123" id="street_number_{{ forloop.counter0 }}">
@@ -684,7 +696,7 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
                     
-                    <div class="row" style="padding-bottom: 10px;">
+                    <div class="row" style="padding-bottom: 10px;display: none;" id="line_2_row_{{ forloop.counter0 }}">
                         <div class="col-md-6 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Province</p>
                             <input autocomplete="off" type="text" minlength="2" maxlength="2" required value="{% get_address_values form 'administrative_area_level_1' forloop.counter0 %}" name="administrative_area_level_1_{{ forloop.counter0 }}" class="validate-required" placeholder="ON"
