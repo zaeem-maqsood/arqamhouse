@@ -484,7 +484,7 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row justify-content-around" style="padding-bottom: 30px;">
                         <div class="col-sm-12 col-md-12 col-lg-12">
                             <h3 style="text-align: center;margin-bottom: 5px;">{{ postcard.name }}</h3>
-                            <p class="text-center" style="margin-bottom: 0px;">{{ postcard.amount_sold }} postcards sold</p>
+                            <p class="text-center" style="margin-bottom: 5px;">{{ postcard.amount_sold }} postcards sold</p>
                             {% if last_postcard %}
                             <p class="text-center">The last postcard was sent to {{ last_postcard.recipient_locality }}, {{ days_since_sold }} days ago</p>
                             {% endif %}
