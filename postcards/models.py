@@ -5,7 +5,7 @@ from django.utils.text import slugify
 import itertools
 from core.utils import strip_non_ascii
 from django.core.exceptions import ValidationError
-
+from django.core.validators import RegexValidator
 from phonenumber_field.modelfields import PhoneNumberField
 
 import decimal
@@ -111,13 +111,24 @@ class PostCardBusinessOrder(models.Model):
 
 
 
+class PromoCode(models.Model):
+        created_at = models.DateTimeField(default=timezone.now)
+        alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
+        code = models.CharField(max_length=100, null=True, blank=True, validators=[alphanumeric])
+        fixed_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+        total_uses = models.PositiveIntegerField(blank=True, null=True, default=1000)
+        used = models.PositiveIntegerField(blank=True, null=True, default=0)
+        active = models.BooleanField(default=True)
 
+        def __str__(self):
+            return (self.code)
 
 
 class PostCardOrder(models.Model):
 
     created_at = models.DateTimeField(default=timezone.now)
     post_card = models.ForeignKey(PostCard, on_delete=models.CASCADE, blank=False, null=True)
+    promo_code = models.ForeignKey(PromoCode, on_delete=models.CASCADE, blank=False, null=True)
     name = models.CharField(max_length=30, null=True, blank=True)
     email = models.EmailField(max_length=300, blank=False, null=False)
     message_to_recipient = models.TextField(blank=True, null=True)
@@ -153,3 +164,8 @@ class PostCardOrder(models.Model):
     def finished_image_path(self):
         filename = os.path.basename(self.finished_image.name)
         return f"media/arqam_house_postcards/orders/{self.pk}/{filename}"
+
+
+
+    
+

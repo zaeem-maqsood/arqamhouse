@@ -44,182 +44,264 @@ iframe {
 {% block scripts %}
 
 
-
-<!-- Payment Request Button (ApplePay, GooglePay) -->
 <script>
 
-var clientSecret = '{{ client_secret }}';
-var stripe = Stripe('{{ public_key }}');
-var paymentRequest = stripe.paymentRequest({
-    country: 'CA',
-    currency: 'cad',
-    total: {
-        label: '{{ postcard.name }}',
-        amount: (500 * {{ quantity_str }}),
-    },
-    requestPayerName: true,
-    requestPayerEmail: true,
-});
+function StripePayment() {
 
+    document.getElementById("ready_to_pay").style.display = 'none';
+    var promo_code = document.getElementById("promo_code").value;
 
-var elements = stripe.elements();
-var prButton = elements.create('paymentRequestButton', {
-    paymentRequest: paymentRequest,
-    style: {
-        paymentRequestButton: {
-            type: 'default',
-            // One of 'default', 'book', 'buy', or 'donate'
-            // Defaults to 'default'
+    var postcard = "{{ postcard.id }}";
+    var quantity = "{{ quantity_str }}";
 
-            theme: 'light-outline',
-            // One of 'dark', 'light', or 'light-outline'
-            // Defaults to 'dark'
+    var token = '{{ csrf_token }}';
 
-            height: '40px'
-            // Defaults to '40px'. The width is always '100%'.
-        },
-    },
-});
+    const url = "{% url 'postcards:stripe_payment' %}";
 
-
-// Check the availability of the Payment Request API first.
-paymentRequest.canMakePayment().then(function (result) {
-    if (result) {
-        prButton.mount('#payment-request-button');
-    } else {
-        document.getElementById('payment-request-button').style.display = 'none';
+    let data = {
+        postcard: postcard,
+        quantity: quantity,
+        promo_code: promo_code
     }
-});
 
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: {
+            'X-CSRFToken': token,
+            'Content-Type': 'application/json; charset=utf-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
 
-paymentRequest.on('paymentmethod', function (ev) {
-    // Confirm the PaymentIntent without handling potential next actions (yet).
+    }
 
-   stripe.confirmCardPayment(
-        clientSecret,
-        { payment_method: ev.paymentMethod.id },
-        { handleActions: false }
-    ).then(function (confirmResult) {
-        if (confirmResult.error) {
-            // Report to the browser that the payment failed, prompting it to
-            // re-show the payment interface, or show an error message and close
-            // the payment interface.
-            console.log("Failed");
-            ev.complete('fail');
-        } else {
-            // Report to the browser that the confirmation was successful, prompting
-            // it to close the browser payment method collection interface.
-            console.log("success");
-            ev.complete('success');
-            // Let Stripe.js handle the rest of the payment flow.
-            stripe.confirmCardPayment(clientSecret).then(function (result) {
-                if (result.error) {
-                    // The payment failed -- ask your customer for a new payment method.
-                    console.log("Failllll");
-                } else {
-                    // The payment has succeeded.
-                    console.log("DID IT COMEEE HEEREEE")
-                    stripeClientSecretHandler('{{ intent_id }}');
+    fetch(url, fetchData)
+        .then(
+            function (response) {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                        response.status);
+                    return;
                 }
-            });
-        }
-    });
 
-});
+                // Examine the text in the response
+                response.json().then(function (data) {
+                    console.log(data)
+
+                    if (data['retry']) {
+                        document.getElementById("fail_promo_code").style.display = 'block';
+                        document.getElementById("ready_to_pay").style.display = 'block';
+                    }
+
+                    else {
+
+                        document.getElementById("fail_promo_code").style.display = 'none';
+
+                        if (data['no_payment']) {
+                            document.getElementById("no_payment_checkout").style.display = 'block';
+                        }
+
+                        else {
+
+                            document.getElementById("stripe_stuff").style.display = 'block';
+                            StripeLogic(data['total'], data['intent_id'], data['client_secret'], data['public_key'], data['postcard_name']);
+                            document.getElementById('amount_to_pay').innerHTML = data['total_decimal'];
+                            document.getElementById('new_total').innerHTML = data['total_decimal'];
+
+                            if (data['code_used']) {
+                                document.getElementById("success_promo_code").style.display = 'block';
+                            }
+
+                        }
+                    }
+                    
+                });
+            }
+        )
+        .catch(function (err) {
+            console.log('Fetch Error :-S', err);
+        });
+
+}
 
 </script>
 
 
 
+<!-- Payment Request Button (ApplePay, GooglePay) -->
+<script>
 
 
+function StripeLogic(total, intent_id, client_secret, public_key, postcard_name) {
+
+    var clientSecret = client_secret;
+    var stripe = Stripe(public_key);
+    var paymentRequest = stripe.paymentRequest({
+        country: 'CA',
+        currency: 'cad',
+        total: {
+            label: postcard_name,
+            amount: total,
+        },
+        requestPayerName: true,
+        requestPayerEmail: true,
+    });
+
+
+    var elements = stripe.elements();
+    var prButton = elements.create('paymentRequestButton', {
+        paymentRequest: paymentRequest,
+        style: {
+            paymentRequestButton: {
+                type: 'default',
+                // One of 'default', 'book', 'buy', or 'donate'
+                // Defaults to 'default'
+
+                theme: 'light-outline',
+                // One of 'dark', 'light', or 'light-outline'
+                // Defaults to 'dark'
+
+                height: '40px'
+                // Defaults to '40px'. The width is always '100%'.
+            },
+        },
+    });
+
+
+    // Check the availability of the Payment Request API first.
+    paymentRequest.canMakePayment().then(function (result) {
+        if (result) {
+            prButton.mount('#payment-request-button');
+        } else {
+            document.getElementById('payment-request-button').style.display = 'none';
+        }
+    });
+
+
+    paymentRequest.on('paymentmethod', function (ev) {
+        // Confirm the PaymentIntent without handling potential next actions (yet).
+
+    stripe.confirmCardPayment(
+            clientSecret,
+            { payment_method: ev.paymentMethod.id },
+            { handleActions: false }
+        ).then(function (confirmResult) {
+            if (confirmResult.error) {
+                // Report to the browser that the payment failed, prompting it to
+                // re-show the payment interface, or show an error message and close
+                // the payment interface.
+                console.log("Failed");
+                ev.complete('fail');
+            } else {
+                // Report to the browser that the confirmation was successful, prompting
+                // it to close the browser payment method collection interface.
+                console.log("success");
+                ev.complete('success');
+                // Let Stripe.js handle the rest of the payment flow.
+                stripe.confirmCardPayment(clientSecret).then(function (result) {
+                    if (result.error) {
+                        // The payment failed -- ask your customer for a new payment method.
+                        console.log("Failllll");
+                    } else {
+                        // The payment has succeeded.
+                        console.log("DID IT COMEEE HEEREEE")
+                        stripeClientSecretHandler(intent_id);
+                    }
+                });
+            }
+        });
+
+    });
+
+
+
+
+
+    var style = {
+        base: {
+            color: '#303238',
+            color: "#32325d",
+            fontSmoothing: 'antialiased',
+            '::placeholder': {
+                color: '#ccc',
+            },
+        },
+        invalid: {
+            color: '#e5424d',
+            ':focus': {
+                color: '#303238',
+            },
+        },
+    };
+
+    // Create an instance of the card Element.
+    var card = elements.create('card', { style: style });
+
+    // Add an instance of the card Element into the `card-element` <div>.
+    card.mount('#card-element');
+
+    card.addEventListener('change', function (event) {
+        var displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+            console.log(event.error.message)
+        } else {
+            displayError.textContent = '';
+        }
+    });
+
+    console.log(card);
+
+    var form = document.getElementById('donationForm');
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+
+        stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: card,
+                billing_details: {
+                    name: document.getElementById("id_name").value,
+                    email: document.getElementById("id_email").value,
+                    address: {
+                        postal_code: document.getElementById("postal_code").value,
+                    }
+                }
+            }
+        }).then(function (result) {
+            if (result.error) {
+                // Show error to your customer (e.g., insufficient funds)
+                console.log(result)
+                console.log(result.error.message);
+                document.getElementById("stripe_error_row").style.display = 'block';
+                document.getElementById("stripe_error").innerHTML = result.error.message;
+                document.getElementById('customButton').disabled = false;
+
+            } else {
+                // The payment has been processed!
+                if (result.paymentIntent.status === 'succeeded') {
+
+                    console.log("Succeed");
+                    stripeClientSecretHandler(intent_id);
+                    // Show a success message to your customer
+                    // There's a risk of the customer closing the window before callback
+                    // execution. Set up a webhook or plugin to listen for the
+                    // payment_intent.succeeded event that handles any business critical
+                    // post-payment actions.
+                }
+            }
+        });
+
+    });
+
+}
+</script>
 
 
 
 <!-- Regular credit card payment -->
 <script>
-
-var stripe = Stripe('{{ public_key }}');
-var elements = stripe.elements();
-
-// Custom styling can be passed to options when creating an Element.
-var style = {
-  base: {
-    color: '#303238',
-    color: "#32325d",
-    fontSmoothing: 'antialiased',
-    '::placeholder': {
-      color: '#ccc',
-    },
-  },
-  invalid: {
-    color: '#e5424d',
-    ':focus': {
-      color: '#303238',
-    },
-  },
-};
-
-// Create an instance of the card Element.
-var card = elements.create('card',  {style: style});
-
-// Add an instance of the card Element into the `card-element` <div>.
-card.mount('#card-element');
-
-card.addEventListener('change', function(event) {
-  var displayError = document.getElementById('card-errors');
-  if (event.error) {
-    displayError.textContent = event.error.message;
-    console.log(event.error.message)
-  } else {
-    displayError.textContent = '';
-  }
-});
-
-console.log(card);
-
-var form = document.getElementById('donationForm');
-form.addEventListener('submit', function(event) {
-  event.preventDefault();
-
-
-  stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-            card: card,
-            billing_details: {
-                name: document.getElementById("id_name").value,
-                email: document.getElementById("id_email").value,
-                address: {
-                    postal_code: document.getElementById("postal_code").value,
-                }
-            }
-        }
-    }).then(function (result) {
-        if (result.error) {
-            // Show error to your customer (e.g., insufficient funds)
-            console.log(result)
-            console.log(result.error.message);
-            document.getElementById("stripe_error_row").style.display = 'block';
-            document.getElementById("stripe_error").innerHTML = result.error.message;
-            document.getElementById('customButton').disabled = false;
-
-        } else {
-            // The payment has been processed!
-            if (result.paymentIntent.status === 'succeeded') {
-
-                console.log("Succeed");
-                stripeClientSecretHandler('{{ intent_id }}');
-                // Show a success message to your customer
-                // There's a risk of the customer closing the window before callback
-                // execution. Set up a webhook or plugin to listen for the
-                // payment_intent.succeeded event that handles any business critical
-                // post-payment actions.
-            }
-        }
-    });
-
-});
-
 
 function stripeClientSecretHandler(intent_id) {
   // Insert the token ID into the form so it gets submitted to the server
@@ -498,7 +580,7 @@ function stripeClientSecretHandler(intent_id) {
                             <h3 style="text-align: center;margin-bottom: 5px;">{{ postcard.name }}</h3>
                             <p class="text-center" style="margin-bottom: 5px;">{{ postcard.amount_sold }} postcards sold</p>
                             {% if last_postcard %}
-                            <p class="text-center">The last postcard was sent to {{ last_postcard.recipient_locality }}, {{ days_since_sold }} days ago</p>
+                            <p class="text-center" style="font-size: 0.8em;">The last postcard was sent to {{ last_postcard.recipient_locality }}, {{ days_since_sold }} days ago</p>
                             {% endif %}
                             <div class="slider border--round boxed--border" data-paging="true" data-arrows="true" style="margin-bottom: 10px;">
                                 <ul class="slides">
@@ -739,7 +821,63 @@ function stripeClientSecretHandler(intent_id) {
                     {% endfor %}
 
 
-                    <div class="row justify-content-center" style="padding-bottom: 40px;">
+                    <div class="row justify-content-center" style="padding-bottom: 20px;display: none;" id="fail_promo_code">
+                        <div class="col-md-12">
+                    
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p style="margin-bottom: 0px;color: red;">Promo Code Didn't Work!</p>
+                                </div>
+                            </div>
+                    
+                        </div>
+                    </div>
+
+
+                    <div class="row justify-content-center" style="padding-bottom: 40px;" id="ready_to_pay">
+                        <div class="col-md-12">
+
+                            <div class="row" style="padding-bottom: 20px;">
+                                <div class="col-md-12">
+                                    {{ form.promo_code }}
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-bottom: 20px;">
+                                <div class="col-md-12">
+                                    <button type="button" class="btn btn--primary btn-block" onclick="StripePayment();">Ready To Pay</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="row justify-content-center" style="padding-bottom: 20px;display: none;" id="success_promo_code">
+                        <div class="col-md-12">
+                    
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p style="margin-bottom: 0px;color: green;">Promo Code Added Successfully!</p>
+                                    <p>Your new total is $<span id="new_total" style="color: green;"></span></p>
+                                </div>
+                            </div>
+                    
+                        </div>
+                    </div>
+
+
+                    <div class="row justify-content-center" style="display: none;" id="no_payment_checkout">
+                        <div class="col-md-12">
+                            <div class="row justify-content-center" id="checkout-button" style="padding-bottom: 20px;">
+                                <div class="col-md-12">
+                                    <button type="submit" class="btn btn--primary">It's Free!</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center" style="padding-bottom: 40px;display: none;" id="stripe_stuff">
                         <div class="col-md-12">
 
                             <!-- Stripe Errors -->
@@ -772,7 +910,7 @@ function stripeClientSecretHandler(intent_id) {
                             <div class="row justify-content-center" id="checkout-button" style="padding-bottom: 20px;">
                                 <div class="col-md-12">
                                     <button id="customButton" type="submit" class="btn btn--primary">Pay
-                                        ${{ postcard_amount }} with card</button>
+                                        $<span id="amount_to_pay"></span> with card</button>
                                 </div>
                             </div>
 

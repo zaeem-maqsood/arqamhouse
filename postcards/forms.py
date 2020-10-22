@@ -155,6 +155,9 @@ class PostcardOrderForm(forms.ModelForm):
         self.fields["postal_code"] = forms.CharField(label="Address", widget=forms.TextInput(
             attrs={"class": "validate-required", "placeholder": "L1Z 5G5", "id": "postal_code"}), required=True)
 
+        self.fields["promo_code"] = forms.CharField(label="Promo Code", widget=forms.TextInput(
+            attrs={"class": "validate-required", "id": "promo_code"}), required=False)
+
         
 
 

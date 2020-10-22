@@ -40,7 +40,7 @@ from houses.mixins import HouseAccountMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 
 from postcards.forms import PostcardOrderForm, PostCardBusinessOrderFormStepOne
-from postcards.models import PostCard, PostCardOrder
+from postcards.models import PostCard, PostCardOrder, PromoCode
 from profiles.models import Profile
 
 from core.mixins import SuperUserRequiredMixin
@@ -384,6 +384,66 @@ class PostCardListView(View):
 
 
 
+def stripePayment(request):
+    json_data = json.loads(request.body)
+    if json_data:
+        print(json_data)
+        postcard_id = json_data['postcard']
+        quantity = int(json_data['quantity'])
+        code = json_data['promo_code']
+
+        postcard = PostCard.objects.get(id=postcard_id)
+        print(postcard)
+
+        reduction = 0
+        code_used = False
+        if code:
+            try:
+                promo_code = PromoCode.objects.get(code=code)
+                reduction = promo_code.fixed_amount
+                code_used = True
+            except Exception as e:
+                print(e)
+                reduction = 0
+                return JsonResponse({'retry': True})
+
+        if reduction != 0:
+            total = int(((postcard.amount - reduction) * quantity) * 100)
+            total_decimal = (postcard.amount - reduction) * quantity
+        else:
+            total = int((postcard.amount * quantity) * 100)
+            total_decimal= postcard.amount * quantity
+        print(total)
+
+        if total <= 0:
+            no_payment = True
+
+            return JsonResponse({'retry': False, 'total': total, 'postcard_name': postcard.name,
+                                 'total_decimal': total_decimal, 'code_used': code_used, 'no_payment': no_payment})
+
+        else:
+            no_payment = False
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+            
+            postcard_intent = stripe.PaymentIntent.create(
+                amount=total,
+                currency='cad',
+                description = "Postcard Arqam House",
+                metadata = {
+                    'postcard': postcard.name,
+                    'postcard_amount': postcard.amount,
+                    },
+                statement_descriptor="Postcard Arqam House",
+            )
+
+            intent_id = postcard_intent.id
+            client_secret = postcard_intent.client_secret
+            public_key = settings.STRIPE_PUBLIC_KEY
+
+        return JsonResponse({'retry': False, 'total': total, 'intent_id': intent_id, 'client_secret': client_secret, 'public_key': public_key, 'postcard_name': postcard.name,
+                             'total_decimal': total_decimal, 'code_used': code_used, 'no_payment': no_payment})
+
+
 class PostCardOrderView(FormView):
     model = PostCard
     template_name = "postcards/order.html"
@@ -429,19 +489,6 @@ class PostCardOrderView(FormView):
             one = True
 
         postcard = self.get_postcard()
-
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        
-        postcard_intent = stripe.PaymentIntent.create(
-            amount=(500 * quantity),
-            currency='cad',
-            description = "Postcard Arqam House",
-            metadata = {
-                'postcard': postcard.name,
-                'postcard_amount': postcard.amount,
-                },
-            statement_descriptor="Postcard Arqam House",
-        )
             
         try:
             last_postcard = PostCardOrder.objects.filter(post_card=postcard).order_by("-created_at").first()
@@ -456,9 +503,6 @@ class PostCardOrderView(FormView):
         quantity = range(quantity)
         context["one"] = one
         context["quantity"] = quantity
-        context["intent_id"] = postcard_intent.id
-        context["client_secret"] = postcard_intent.client_secret
-        context["public_key"] = settings.STRIPE_PUBLIC_KEY
         context["form"] = form
         context["postcard"] = postcard
         context["postcard_amount"] = postcard_amount
@@ -487,8 +531,6 @@ class PostCardOrderView(FormView):
         quantity = int(data["quantity"])
 
         postcard = self.get_postcard()
-
-        stripe_token = data["intent_id"]
     
         # Get buyer name and email address
         name = form.cleaned_data.get('name')
@@ -532,6 +574,14 @@ class PostCardOrderView(FormView):
         if len(postal_code) > 10:
             form.add_error(None, "Please keep the postal code under 10 characters long.")
             return self.render_to_response(self.get_context_data(form=form))
+
+        code = form.cleaned_data.get("promo_code")
+        try:
+            promo_code = PromoCode.objects.get(code=code)
+            amount = postcard.amount - promo_code.fixed_amount
+        except Exception as e:
+            promo_code = None
+            amount = postcard.amount * quantity
 
         # Add sender to sendgrid 
         # -------------------------
@@ -578,13 +628,15 @@ class PostCardOrderView(FormView):
             profile = Profile.objects.create_user(name=name, email=email, password=profile_temp_password, temp_password=profile_temp_password)
             account_created = True
 
-
-        try:
-            stripe_token = data["intent_id"]
-        except Exception as e:
-            print(e)
-            form.add_error(None, "Your payment was not processed. A network error prevented payment processing, please try again later.")
-            return self.render_to_response(self.get_context_data(form=form))
+        if amount <= 0:
+            pass
+        else:
+            try:
+                stripe_token = data["intent_id"]
+            except Exception as e:
+                print(e)
+                form.add_error(None, "Your payment was not processed. A network error prevented payment processing, please try again later.")
+                return self.render_to_response(self.get_context_data(form=form))
 
 
         try:
@@ -595,19 +647,10 @@ class PostCardOrderView(FormView):
                 print(customer)
                 profile.stripe_customer_id = customer.id
                 profile.save()
-
-            # Charge the card
-
-            charge = stripe.PaymentIntent.retrieve(stripe_token)
-            print("The Charge is \n\n")
-            print(charge)
-            print("\n\nThe Charge is")
         
         except Exception as e:
             print(e)
             form.add_error(None, "Your payment was not processed. A network error prevented payment processing, please try again later.")
-            del request.session['intent']
-            request.session.modified = True
             return self.render_to_response(self.get_context_data(form=form))
 
 
@@ -656,10 +699,22 @@ class PostCardOrderView(FormView):
                                                           street_number=street_number,  message_to_recipient=message_to_recipient, route=route, locality=locality, administrative_area_level_1=administrative_area_level_1,
                                                           recipient_name=recipient_name, recipient_address=recipient_address, recipient_street_number=recipient_street_number,
                                                           recipient_route=recipient_route, recipient_locality=recipient_locality, recipient_administrative_area_level_1=recipient_administrative_area_level_1,
-                                                          recipient_postal_code=recipient_postal_code,
-                                                          payment_intent_id=charge['id'], payment_method_id=charge['payment_method'], amount=postcard.amount)
+                                                          recipient_postal_code=recipient_postal_code,amount=amount,
+                                                          promo_code=promo_code)
+
+            if amount <= 0:
+                pass
+            else:
+                charge = stripe.PaymentIntent.retrieve(stripe_token)
+                postcard_order.payment_intent_id = charge['id']
+                postcard_order.payment_method_id = charge['payment_method']
+                postcard_order.save()
             
             postcard_orders.append(postcard_order)
+        
+        if promo_code != None:
+            promo_code.used += quantity
+            promo_code.save()
 
 
         if settings.DEBUG == False:
@@ -668,8 +723,6 @@ class PostCardOrderView(FormView):
             except Exception as e:
                 print(e)
 
-        self.send_text_message(postcard_orders)
-
 
         try: 
             self.send_confirmation_email(postcard_orders)
@@ -677,6 +730,7 @@ class PostCardOrderView(FormView):
             print(e)
 
 
+        
         postcard.amount_sold += 1
         postcard.save()
 
