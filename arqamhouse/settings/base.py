@@ -110,7 +110,7 @@ ASGI_APPLICATION = "arqamhouse.routing.application"
 
 
 
-ADMINS = [('Zaeem Maqsood', 'errors@arqamhouse.com')]
+ADMINS = [('Zaeem Maqsood', 'info@arqamhouse.com')]
 
 
 # Django cities settings
@@ -140,7 +140,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 # Sendgrid Email Backend
 
 # SENDGRID_API_KEY = os.environ["SENDGRID_API_KEY"]
-SENDGRID_API_KEY = "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"
+SENDGRID_API_KEY = "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"
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = 'apikey'
