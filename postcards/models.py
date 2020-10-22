@@ -128,7 +128,7 @@ class PostCardOrder(models.Model):
 
     created_at = models.DateTimeField(default=timezone.now)
     post_card = models.ForeignKey(PostCard, on_delete=models.CASCADE, blank=False, null=True)
-    promo_code = models.ForeignKey(PromoCode, on_delete=models.CASCADE, blank=False, null=True)
+    promo_code = models.ForeignKey(PromoCode, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(max_length=30, null=True, blank=True)
     email = models.EmailField(max_length=300, blank=False, null=False)
     message_to_recipient = models.TextField(blank=True, null=True)
