@@ -580,6 +580,7 @@ class PostCardOrderView(FormView):
             promo_code = PromoCode.objects.get(code=code)
             amount = postcard.amount - promo_code.fixed_amount
         except Exception as e:
+            print("Exception 0")
             promo_code = None
             amount = postcard.amount * quantity
 
@@ -606,6 +607,7 @@ class PostCardOrderView(FormView):
 
         except Exception as e:
             print(e)
+            print("Exception 1")
 
 
         # -------------------------
@@ -635,6 +637,7 @@ class PostCardOrderView(FormView):
                 stripe_token = data["intent_id"]
             except Exception as e:
                 print(e)
+                print("Exception 2")
                 form.add_error(None, "Your payment was not processed. A network error prevented payment processing, please try again later.")
                 return self.render_to_response(self.get_context_data(form=form))
 
@@ -650,6 +653,7 @@ class PostCardOrderView(FormView):
         
         except Exception as e:
             print(e)
+            print("Exception 3")
             form.add_error(None, "Your payment was not processed. A network error prevented payment processing, please try again later.")
             return self.render_to_response(self.get_context_data(form=form))
 
@@ -722,12 +726,14 @@ class PostCardOrderView(FormView):
                 self.send_text_message(postcard_orders)
             except Exception as e:
                 print(e)
+                print("Exception 4")
 
 
         try: 
             self.send_confirmation_email(postcard_orders)
         except Exception as e:
             print(e)
+            print("Exception 5")
 
 
         
