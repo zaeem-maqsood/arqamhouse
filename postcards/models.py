@@ -31,9 +31,24 @@ def order_image_location(instance, filename):
     return "arqam_house_postcards/orders/%s/%s" % (instance.id, filename)
 
 def image_location(instance, filename):
-    return "arqam_house_postcards/%s/%s" % (instance.id, filename)
+    return "arqam_house_postcards/%s" % (filename)
+
+
+
+
+# Non-Profit Organization
+class NonProfit(models.Model):
+    name = models.CharField(max_length=150, null=True, blank=True)
+    slug = models.SlugField(unique=False, blank=True)
+    description = models.TextField(blank=True, null=True)
+
+
+    def __str__(self):
+        return (self.name)
+
 
 class PostCard(models.Model):
+    non_profit = models.ForeignKey(NonProfit, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(max_length=150, null=True, blank=True)
     slug = models.SlugField(unique=False, blank=True)
     description = models.TextField(blank=True, null=True)
@@ -122,6 +137,7 @@ class PromoCode(models.Model):
 
         def __str__(self):
             return (self.code)
+
 
 
 class PostCardOrder(models.Model):
