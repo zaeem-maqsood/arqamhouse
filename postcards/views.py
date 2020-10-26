@@ -629,7 +629,7 @@ class PostCardOrderView(FormView):
             account_created = True
 
         if amount <= 0:
-            pass
+            print(f"For some reason the amount is {amount}")
         else:
             try:
                 stripe_token = data["intent_id"]
