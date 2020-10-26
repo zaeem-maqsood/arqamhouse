@@ -636,6 +636,7 @@ class PostCardOrderView(FormView):
             try:
                 stripe_token = data["intent_id"]
             except Exception as e:
+                print(f"For some reason the amount is {amount}")
                 print(e)
                 print("Exception 2")
                 form.add_error(None, "Your payment was not processed. A network error prevented payment processing, please try again later.")
