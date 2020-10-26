@@ -80,7 +80,7 @@ class PostCard(models.Model):
     @property
     def image_1_path(self):
         filename = os.path.basename(self.image_1.name)
-        return f"media/arqam_house_postcards/{self.pk}/{filename}"
+        return f"media/arqam_house_postcards/{filename}"
 
 
     def save(self, *args, **kwargs):
