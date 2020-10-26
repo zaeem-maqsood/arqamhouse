@@ -576,8 +576,9 @@ class PostCardOrderView(FormView):
             return self.render_to_response(self.get_context_data(form=form))
 
         code = form.cleaned_data.get("promo_code")
+
         try:
-            promo_code = PromoCode.objects.get(code=code)
+            promo_code = PromoCode.objects.get(code=code.lower())
             amount = postcard.amount - promo_code.fixed_amount
         except Exception as e:
             print("Exception 0")
