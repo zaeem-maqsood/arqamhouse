@@ -40,7 +40,7 @@ from houses.mixins import HouseAccountMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 
 from postcards.forms import PostcardOrderForm, PostCardBusinessOrderFormStepOne
-from postcards.models import PostCard, PostCardOrder, PromoCode
+from postcards.models import PostCard, PostCardOrder, PromoCode, NonProfit
 from profiles.models import Profile
 
 from core.mixins import SuperUserRequiredMixin
@@ -361,6 +361,38 @@ class PostCardBusinessListView(View):
 
 
 
+class NonProfitPostCardListView(View):
+    template_name = "postcards/non_profit_list.html"
+
+    def get_non_profit(self):
+        slug = self.kwargs['slug']
+        try:
+            non_profit = NonProfit.objects.get(slug=slug)
+            return non_profit
+        except Exception as e:
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+
+        non_profit = self.get_non_profit()
+        postcards = PostCard.objects.filter(hidden=False, non_profit=non_profit)
+
+        get_data = self.request.GET
+        if 'success' in get_data:
+            context["show_confetti"] = True
+            context["postcard_order"] = PostCardOrder.objects.all().reverse().first()
+
+        context["postcards"] = postcards
+        context["non_profit"] = non_profit
+        return context
+
+
+
+
 
 class PostCardListView(View):
     template_name = "postcards/list.html"
@@ -370,7 +402,10 @@ class PostCardListView(View):
 
     def get_context_data(self, *args, **kwargs):
         context = {}
-        postcards = PostCard.objects.filter(hidden=False)
+        postcards = PostCard.objects.filter(hidden=False, non_profit__isnull=True)
+
+        non_profit = NonProfit.objects.filter(featured=True).first()
+        non_profit_postcards = PostCard.objects.filter(non_profit=non_profit)[:4]
 
         get_data = self.request.GET
         if 'success' in get_data:
@@ -378,6 +413,8 @@ class PostCardListView(View):
             context["postcard_order"] = PostCardOrder.objects.all().reverse().first()
 
         context["postcards"] = postcards
+        context["non_profit"] = non_profit
+        context["non_profit_postcards"] = non_profit_postcards
         return context
 
 
@@ -391,6 +428,7 @@ def stripePayment(request):
         postcard_id = json_data['postcard']
         quantity = int(json_data['quantity'])
         code = json_data['promo_code']
+        donation = decimal.Decimal(json_data['donation'])
 
         postcard = PostCard.objects.get(id=postcard_id)
         print(postcard)
@@ -413,6 +451,17 @@ def stripePayment(request):
         else:
             total = int((postcard.amount * quantity) * 100)
             total_decimal= postcard.amount * quantity
+
+        
+        # Handle Donations
+        if donation:
+            total = total + int(donation * 100)
+            total_decimal = total_decimal + donation
+            print(f" The donation is {donation}")
+        else:
+            print("no donation")
+
+        
         print(total)
 
         if total <= 0:
@@ -444,6 +493,9 @@ def stripePayment(request):
                              'total_decimal': total_decimal, 'code_used': code_used, 'no_payment': no_payment})
 
 
+
+
+
 class PostCardOrderView(FormView):
     model = PostCard
     template_name = "postcards/order.html"
@@ -459,7 +511,8 @@ class PostCardOrderView(FormView):
             quantity = 1
     
         initial_data = {}
-        form = PostcardOrderForm(quantity)
+        postcard = self.get_postcard()
+        form = PostcardOrderForm(quantity, postcard)
         return render(request, self.template_name, self.get_context_data(form=form))
 
     def get_success_url(self):
@@ -517,7 +570,8 @@ class PostCardOrderView(FormView):
         else:
             quantity = 1
 
-        form = PostcardOrderForm(data=data, quantity=quantity)
+        postcard = self.get_postcard()
+        form = PostcardOrderForm(data=data, quantity=quantity, postcard=postcard)
 
         if form.is_valid():
             return self.form_valid(form, request)
@@ -584,6 +638,18 @@ class PostCardOrderView(FormView):
             print("Exception 0")
             promo_code = None
             amount = postcard.amount * quantity
+
+        donation = 0
+        if postcard.non_profit:
+            donation = form.cleaned_data.get("donation")
+            donation = decimal.Decimal(donation)
+            print(f"The  donation is {donation}")
+
+            if donation > 0:
+                amount = amount + donation
+
+
+
 
         # Add sender to sendgrid 
         # -------------------------
@@ -705,7 +771,7 @@ class PostCardOrderView(FormView):
                                                           street_number=street_number,  message_to_recipient=message_to_recipient, route=route, locality=locality, administrative_area_level_1=administrative_area_level_1,
                                                           recipient_name=recipient_name, recipient_address=recipient_address, recipient_street_number=recipient_street_number,
                                                           recipient_route=recipient_route, recipient_locality=recipient_locality, recipient_administrative_area_level_1=recipient_administrative_area_level_1,
-                                                          recipient_postal_code=recipient_postal_code,amount=amount,
+                                                          recipient_postal_code=recipient_postal_code, amount=amount, donation_amount=donation,
                                                           promo_code=promo_code)
 
             if amount <= 0:
@@ -795,6 +861,11 @@ class PostCardOrderView(FormView):
         subject = f'Thank you for your purchase, {postcard_order.name}.'
         context["postcard_order"] = postcard_order
         context["image_url"] = response
+
+        if postcard_order.donation_amount > 0:
+            context["donated"] = True
+        else:
+            context["donated"] = False
 
         if postcard_amounts == 1:
             html_content = render_to_string('emails/postcard_confirmation.html', context)

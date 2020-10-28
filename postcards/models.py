@@ -34,6 +34,9 @@ def image_location(instance, filename):
     return "arqam_house_postcards/%s" % (filename)
 
 
+def non_profit_logo_location(instance, filename):
+    return "non_profit_logos/%s/%s" % (instance.name, filename)
+
 
 
 # Non-Profit Organization
@@ -41,10 +44,37 @@ class NonProfit(models.Model):
     name = models.CharField(max_length=150, null=True, blank=True)
     slug = models.SlugField(unique=False, blank=True)
     description = models.TextField(blank=True, null=True)
-
+    amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+    website = models.URLField(max_length=300, blank=True, null=True)
+    featured = models.BooleanField(default=False)
+    logo = models.ImageField(upload_to=non_profit_logo_location, validators=[validate_file_size], null=True, blank=True)
 
     def __str__(self):
         return (self.name)
+
+
+    def _generate_slug(self):
+        max_length = self._meta.get_field('slug').max_length
+        value = strip_non_ascii(self.name)
+        slug_candidate = slug_original = slugify(value, allow_unicode=True)
+        for i in itertools.count(1):
+            if not NonProfit.objects.filter(slug=slug_candidate).exists():
+                break
+            slug_candidate = '{}-{}'.format(slug_original, i)
+        self.slug = slug_candidate
+
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self._generate_slug()
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        view_name = "postcards:non_profit_list"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+
+
 
 
 class PostCard(models.Model):
@@ -60,7 +90,9 @@ class PostCard(models.Model):
     business_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     amount_sold = models.PositiveIntegerField(null=True, blank=True, default=0)
+    featured = models.BooleanField(default=False)
     hidden = models.BooleanField(default=False)
+    
 
     def __str__(self):
         return (self.name)
@@ -127,16 +159,16 @@ class PostCardBusinessOrder(models.Model):
 
 
 class PromoCode(models.Model):
-        created_at = models.DateTimeField(default=timezone.now)
-        alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
-        code = models.CharField(max_length=100, null=True, blank=True, validators=[alphanumeric])
-        fixed_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
-        total_uses = models.PositiveIntegerField(blank=True, null=True, default=1000)
-        used = models.PositiveIntegerField(blank=True, null=True, default=0)
-        active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
+    code = models.CharField(max_length=100, null=True, blank=True, validators=[alphanumeric])
+    fixed_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+    total_uses = models.PositiveIntegerField(blank=True, null=True, default=1000)
+    used = models.PositiveIntegerField(blank=True, null=True, default=0)
+    active = models.BooleanField(default=True)
 
-        def __str__(self):
-            return (self.code)
+    def __str__(self):
+        return (self.code)
 
 
 
@@ -155,6 +187,7 @@ class PostCardOrder(models.Model):
     administrative_area_level_1 = models.CharField(max_length=4, null=True, blank=True)
     postal_code = models.CharField(max_length=10, null=True, blank=True)
     amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
+    donation_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     anonymous = models.BooleanField(default=False)
     recipient_name = models.CharField(max_length=30, null=True, blank=True)
     recipient_address = models.CharField(max_length=200, null=True, blank=True)

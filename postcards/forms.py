@@ -131,7 +131,7 @@ class PostCardBusinessOrderFormStepOne(forms.ModelForm):
 
 class PostcardOrderForm(forms.ModelForm):
 
-    def __init__(self, quantity, *args, **kwargs):
+    def __init__(self, quantity, postcard, *args, **kwargs):
         super(PostcardOrderForm, self).__init__(*args, **kwargs)
 
         print(f"The quantity is {quantity}")
@@ -157,6 +157,13 @@ class PostcardOrderForm(forms.ModelForm):
 
         self.fields["promo_code"] = forms.CharField(label="Promo Code", widget=forms.TextInput(
             attrs={"class": "validate-required", "placeholder": "Promo Code", "id": "promo_code"}), required=False)
+
+
+        if postcard.non_profit:
+            self.fields["donation"] = forms.DecimalField(widget=forms.NumberInput(attrs={"class": "form-control m-input", "min": "0.00", "max": "100.00",
+                                                                        "step": "1.00", "value": "5.00", "required": False}))
+        else:
+            print("No non-profit")
 
         
 

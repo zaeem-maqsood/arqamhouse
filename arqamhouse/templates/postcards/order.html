@@ -49,7 +49,14 @@ iframe {
 function StripePayment() {
 
     document.getElementById("ready_to_pay").style.display = 'none';
+
+    {% if postcard.non_profit %}
+    var promo_code = "";
+    var donation = document.getElementById("id_donation").value;
+    {% else %}
     var promo_code = document.getElementById("promo_code").value;
+    var donation = 0;
+    {% endif %}
 
     var postcard = "{{ postcard.id }}";
     var quantity = "{{ quantity_str }}";
@@ -61,7 +68,8 @@ function StripePayment() {
     let data = {
         postcard: postcard,
         quantity: quantity,
-        promo_code: promo_code
+        promo_code: promo_code,
+        donation: donation
     }
 
     let fetchData = {
@@ -513,7 +521,7 @@ function stripeClientSecretHandler(intent_id) {
     }
 
     function cleanInput(object){
-        object.value = object.value.replace(/[^.!<>,a-zA-Z0-9 ]/gm, '');;
+        object.value = object.value.replace(/[^.!<>,a-zA-Z0-9 ]/gm, '');
     }
 
 </script>
@@ -577,8 +585,11 @@ function stripeClientSecretHandler(intent_id) {
 
                     <div class="row justify-content-around" style="padding-bottom: 30px;">
                         <div class="col-sm-12 col-md-12 col-lg-12">
-                            <h3 style="text-align: center;margin-bottom: 5px;">{{ postcard.name }}</h3>
-                            <p class="text-center" style="margin-bottom: 5px;">{{ postcard.amount_sold }} postcards sold</p>
+                            <h3 style="text-align: center;margin-bottom: 0px;">{{ postcard.name }} {% if postcard.non_profit %}<i class="fas fa-heart" style="color: #89d389;font-size: 1em;"></i>{% endif %}</h3>
+                            {% if postcard.non_profit %}
+                            <p class="text-center" style="margin-bottom: 0px;color: #57ae57;font-size: 0.8em;">${{ postcard.non_profit.amount }} from each postcard sold will go to <a href="{{ postcard.non_profit.website }}" target="_blank" style="text-decoration: none;">{{ postcard.non_profit.name }}</a></p>
+                            {% endif %}
+                            <p class="text-center" style="margin-bottom: 0px;">{{ postcard.amount_sold }} postcards sold</p>
                             {% if last_postcard %}
                             <p class="text-center" style="font-size: 0.8em;">The last postcard was sent to {{ last_postcard.recipient_locality }}, {% if days_since_sold != 0 %}{{ days_since_sold }} day{% if days_since_sold > 1 %}s{% endif %} ago{% else %}Today!{% endif %}</p>
                             {% endif %}
@@ -630,10 +641,6 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-12" style="padding-bottom: 10px;">
                             <h4 style="margin-bottom: 0px;">Your Information</h4>
-                            <p>We'll put the name you enter in the 'Name' 
-                                field on the back of your card under your personal message and on the envelope unless you choose to be anonymous.
-                                We ask you to enter your address so that we can add return address to the postcard, 
-                                if you choose anonymous we won't include a return address.</p>
                         </div>
                     </div>
 
@@ -834,14 +841,25 @@ function stripeClientSecretHandler(intent_id) {
                     </div>
 
 
-                    <div class="row justify-content-center" style="padding-bottom: 40px;" id="ready_to_pay">
+                    <div class="row justify-content-center" style="padding-bottom: 20px;" id="ready_to_pay">
                         <div class="col-md-12">
 
+
+                            {% if postcard.non_profit %}
+                            <div class="row" style="padding-bottom: 20px;">
+                                <div class="col-md-12 col-lg-12 col-12">
+                                    <h5 style="margin-bottom: 0px;">Make A Donation To {{ postcard.non_profit.name }}?</h5>
+                                    <p style="margin-bottom: 5px;">You can choose to donate an additional amount to {{ postcard.non_profit.name }} here.</p>
+                                    {{ form.donation }}
+                                </div>
+                            </div>
+                            {% else %}
                             <div class="row" style="padding-bottom: 20px;">
                                 <div class="col-md-12">
                                     {{ form.promo_code }}
                                 </div>
                             </div>
+                            {% endif %}
 
                             <div class="row" style="padding-bottom: 20px;">
                                 <div class="col-md-12">
@@ -877,7 +895,7 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
 
-                    <div class="row justify-content-center" style="padding-bottom: 40px;display: none;" id="stripe_stuff">
+                    <div class="row justify-content-center" style="padding-bottom: 20px;display: none;" id="stripe_stuff">
                         <div class="col-md-12">
 
                             <!-- Stripe Errors -->

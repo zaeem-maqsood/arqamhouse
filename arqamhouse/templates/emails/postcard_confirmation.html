@@ -215,8 +215,8 @@
                                                                                 <div
                                                                                     style="font-family: Roboto, sans-serif; text-align: center">
                                                                                     <span
-                                                                                        style="font-family: inherit; font-size: 20px">Jazakallahu
-                                                                                        Khair for your purchase</span>
+                                                                                        style="font-family: inherit; font-size: 20px">Thank
+                                                                                        you for your {% if donated %}donation{% else %}purchase{% endif %} </span>
                                                                                 </div>
                                                                                 <div></div>
                                                                             </div>
@@ -255,10 +255,21 @@
                                                                             height="100%" valign="top" bgcolor=""
                                                                             role="module-content">
                                                                             <div>
-                                                                                <div
-                                                                                    style="font-family: Roboto, sans-serif; text-align: center">
+                                                                                {% if donated %}
+                                                                                <div style="font-family: Roboto, sans-serif; text-align: center">
+                                                                                    Thank you for your donation of ${{ postcard_order.donation_amount }} to {{ postcard_order.post_card.non_profit.name }}!
+                                                                                </div>
+                                                                                {% endif %}
+                                                                                {% if postcard_order.post_card.non_profit %}
+                                                                                <div style="font-family: Roboto, sans-serif; text-align: center">
+                                                                                    A donation of ${{ postcard_order.post_card.non_profit.amount }} will be made to
+                                                                                    {{ postcard_order.post_card.non_profit.name }} for your purchase of this postcard{% if donated %} in addition to your donation{% else %}.{% endif %}
+                                                                                </div>
+                                                                                {% endif %}
+                                                                                <div style="font-family: Roboto, sans-serif; text-align: center">
                                                                                     We are processing your customized
-                                                                                    postcard for {{ postcard_order.recipient_name|title }} and we will send you an email once it has shipped!</div>
+                                                                                    postcard for {{ postcard_order.recipient_name|title }} and we will send you an email once it has shipped!
+                                                                                </div>
                                                                                 <div
                                                                                     style="font-family: Roboto, sans-serif; text-align: center">
                                                                                     We'll be sending the postcard to {{ postcard_order.recipient_street_number }} {{ postcard_order.recipient_route }}

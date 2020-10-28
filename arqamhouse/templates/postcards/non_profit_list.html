@@ -150,35 +150,20 @@ function bulkOrder(increment, url) {
                 </div>
             </div>
             {% endif %}
-
-
-            {% if non_profit %}
-            <div class="row justify-content-center text-center" style="padding-bottom: 50px;">
-                <div class="col-lg-8 col-md-12">
-                    <h4 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;">Featured
-                        Non-Profit: {{ non_profit.name }}</h4>
-                    <p style="color: grey;margin-bottom: 5px;">
-                        We've partnered with
-                        <span style="color:#4a90e2;">{{ non_profit.name }}</span> to help turn your postcard purchases into
-                        donations.
-                    </p>
-                    <a href="{{ non_profit.get_absolute_url }}" class="btn btn--primary">
-                        <span class="btn__text">View {{ non_profit.name }} postcards</span>
-                    </a>
-            
-                </div>
-            </div>
-            {% endif %}
             
 
             <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
                 <div class="col-lg-8 col-md-12">
-                    <h4 style="color:#4a90e2;margin-bottom: 5px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;">Send a paper hug.</h4>
-                    <p style="color: grey;margin-bottom: 0px;">
-                        Send your recipient a postcard that'll truly be unique to them. Each Arqam House postcard has your recipient's name metallically foiled on the front
-                        and a personal message from you on the back.
+                    {% if non_profit.logo %}
+                    <a href="{% url 'postcards:list' %}"><img style="max-width: 300px;max-height: 150px;" src="{{ non_profit.logo.url }}"></a>
+                    {% endif %}
+                    <h4 style="color:#4a90e2;margin-bottom: 5px;margin-top: 20px;font-family: 'Josefin Sans', sans-serif;font-weight: 1000;">{{ non_profit.name|upper }}</h4>
+                    <p style="color: grey;margin-bottom: 10px;">
+                        {{ non_profit.description }}
                     </p>
-                    
+                    <a style="margin-bottom: 10px;" href="{{ non_profit.website }}" target="_blank" class="btn btn--primary btn--sm">
+                        <span class="btn__text">{{ non_profit.name }} Website</span>
+                    </a>
                 </div>
             </div>
 
