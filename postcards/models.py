@@ -32,7 +32,7 @@ def order_image_location(instance, filename):
     return "arqam_house_postcards/orders/%s/%s" % (instance.id, filename)
 
 def image_location(instance, filename):
-    return "arqam_house_postcards/%s" % (filename)
+    return "arqam_house_postcards/%s/%s" % (instance.slug, filename)
 
 
 def non_profit_logo_location(instance, filename):
@@ -83,11 +83,11 @@ class PostCard(models.Model):
     name = models.CharField(max_length=150, null=True, blank=True)
     slug = models.SlugField(unique=False, blank=True)
     description = models.TextField(blank=True, null=True)
-    image_1 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 840, 'height': 600}}, null=True, blank=True)
-    image_2 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 840, 'height': 600}}, null=True, blank=True)
-    image_3 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 840, 'height': 600}}, null=True, blank=True)
-    image_4 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 840, 'height': 600}}, null=True, blank=True)
-    image_5 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 840, 'height': 600}}, null=True, blank=True)
+    image_1 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 1400, 'height': 1000}}, null=True, blank=True)
+    image_2 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 1400, 'height': 1000}}, null=True, blank=True)
+    image_3 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 1400, 'height': 1000}}, null=True, blank=True)
+    image_4 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 1400, 'height': 1000}}, null=True, blank=True)
+    image_5 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 1400, 'height': 1000}}, null=True, blank=True)
     business_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     amount_sold = models.PositiveIntegerField(null=True, blank=True, default=0)
@@ -113,7 +113,7 @@ class PostCard(models.Model):
     @property
     def image_1_path(self):
         filename = os.path.basename(self.image_1.name)
-        return f"media/arqam_house_postcards/{filename}"
+        return f"media/arqam_house_postcards/{self.slug}/{filename}"
 
 
     def save(self, *args, **kwargs):
