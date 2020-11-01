@@ -1,4 +1,4 @@
-{% extends "frontend/base.html" %}
+{% extends "postcards/base.html" %}
 {% load static %}
 {% load postcard_checkout_tags %}
 
@@ -524,6 +524,23 @@ function stripeClientSecretHandler(intent_id) {
         object.value = object.value.replace(/[^.!<>,a-zA-Z0-9 ]/gm, '');
     }
 
+
+
+    function turnOnHover(state) {
+
+        if (state) {
+            document.getElementById("front_cover").style.display = "none";
+            document.getElementById("back_cover").style.display = "inline-block";
+        }
+
+        else {
+            document.getElementById("front_cover").style.display = "inline-block";
+            document.getElementById("back_cover").style.display = "none";
+        }
+
+
+    }
+
 </script>
 
 
@@ -543,15 +560,61 @@ function stripeClientSecretHandler(intent_id) {
             <input id="quantity" name="quantity" type="hidden" value="{{ quantity_str }}">
             
             <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
-                <div class="col-lg-8 col-md-10 col-sm-12 col-10">
-                    <a class="btn btn--sm btn-block" href="{% url 'postcards:list' %}">
+                <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                    <a class="btn btn-primary btn-sm btn-block" href="{% url 'postcards:list' %}">
                         <span class="btn__text">All Postcards</span>
                     </a>
                 </div>
             </div>
 
+            <div class="row justify-content-around" style="padding-bottom: 30px;">
+                <div class="col-lg-6 col-10">
+                    <h3 style="text-align: center;margin-bottom: 0px;">{{ postcard.name }} {% if postcard.non_profit %}<i
+                            class="fas fa-heart" style="color: #89d389;font-size: 1em;"></i>{% endif %}</h3>
+                    {% if postcard.non_profit %}
+                    <p class="text-center" style="margin-bottom: 0px;color: #57ae57;font-size: 0.8em;">
+                        ${{ postcard.non_profit.amount }} from each postcard sold will go to <a
+                            href="{{ postcard.non_profit.website }}" target="_blank"
+                            style="text-decoration: none;">{{ postcard.non_profit.name }}</a></p>
+                    {% endif %}
+                    <p class="text-center" style="margin-bottom: 0px;">{{ postcard.amount_sold }} postcards sold</p>
+                    {% if last_postcard %}
+                    <p class="text-center" style="font-size: 0.8em;">The last postcard was sent to
+                        {{ last_postcard.recipient_locality }}, {% if days_since_sold != 0 %}{{ days_since_sold }}
+                        day{% if days_since_sold > 1 %}s{% endif %} ago{% else %}Today!{% endif %}</p>
+                    {% endif %}
+            
+                </div>
+            </div>
+
             <div class="row justify-content-center" style="padding-bottom: 30px;">
-                <div class="col-lg-8 col-md-10 col-sm-12 col-12" style="box-shadow: rgba(0, 0, 0, 0.2) -10px 5px 30px;padding: 40px;border-radius: 15px;">
+                <div class="col-lg-6 col-10">
+                    
+                    <span id="thanks_a_bunch" onmouseover="turnOnHover(true)" onmouseleave="turnOnHover(false)">
+                        <img src="{{ postcard.image_1.url }}"
+                            style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
+                            id="front_cover" class="img-fluid">
+                        <img src="{% static 'images/postcard_back.png' %}"
+                            style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;display: none;"
+                            id="back_cover" style="display:none" class="img-fluid">
+                    </span>
+                </div>
+            </div>
+
+            <div class="row justify-content-around" style="padding-bottom: 30px;">
+                <div class="col-10 col-md-10 col-lg-6">
+            
+                    <p style="font-size: small;">
+                        {{ postcard.description|safe }}
+                    </p>
+                    <h3>${{ postcard.amount }} <span style="font-size: small;">{% if one %}{% else %}each X {{ quantity_str }} =
+                            ${{ postcard_amount }}{% endif %}</span></h3>
+                </div>
+            </div>
+            <!--end of row-->
+
+            <div class="row justify-content-center" style="padding-bottom: 30px;">
+                <div class="col-lg-6 col-md-10 col-sm-12 col-10" style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;padding: 20px;">
 
                     {% if form.non_field_errors %}
                     <div class="row" style="padding-bottom: 20px;">
@@ -581,62 +644,6 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                     </div>
                     {% endif %}
-
-
-                    <div class="row justify-content-around" style="padding-bottom: 30px;">
-                        <div class="col-sm-12 col-md-12 col-lg-12">
-                            <h3 style="text-align: center;margin-bottom: 0px;">{{ postcard.name }} {% if postcard.non_profit %}<i class="fas fa-heart" style="color: #89d389;font-size: 1em;"></i>{% endif %}</h3>
-                            {% if postcard.non_profit %}
-                            <p class="text-center" style="margin-bottom: 0px;color: #57ae57;font-size: 0.8em;">${{ postcard.non_profit.amount }} from each postcard sold will go to <a href="{{ postcard.non_profit.website }}" target="_blank" style="text-decoration: none;">{{ postcard.non_profit.name }}</a></p>
-                            {% endif %}
-                            <p class="text-center" style="margin-bottom: 0px;">{{ postcard.amount_sold }} postcards sold</p>
-                            {% if last_postcard %}
-                            <p class="text-center" style="font-size: 0.8em;">The last postcard was sent to {{ last_postcard.recipient_locality }}, {% if days_since_sold != 0 %}{{ days_since_sold }} day{% if days_since_sold > 1 %}s{% endif %} ago{% else %}Today!{% endif %}</p>
-                            {% endif %}
-                            <div class="slider border--round boxed--border" data-paging="true" data-arrows="true" style="margin-bottom: 10px;">
-                                <ul class="slides">
-                                    {% if postcard.image_1 %}
-                                    <li>
-                                        <img alt="Image" src="{{ postcard.image_1.url }}" />
-                                    </li>
-                                    {% endif %}
-                                    {% if postcard.image_2 %}
-                                    <li>
-                                        <img alt="Image" src="{{ postcard.image_2.url }}" />
-                                    </li>
-                                    {% endif %}
-                                    {% if postcard.image_3 %}
-                                    <li>
-                                        <img alt="Image" src="{{ postcard.image_3.url }}" />
-                                    </li>
-                                    {% endif %}
-                                    {% if postcard.image_4 %}
-                                    <li>
-                                        <img alt="Image" src="{{ postcard.image_4.url }}" />
-                                    </li>
-                                    {% endif %}
-                                    {% if postcard.image_5 %}
-                                    <li>
-                                        <img alt="Image" src="{{ postcard.image_5.url }}" />
-                                    </li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-                            <!--end slider-->
-                        </div>
-                    </div>
-                    <div class="row justify-content-around" style="padding-bottom: 40px;">
-                        <div class="col-sm-12 col-md-12 col-lg-12">
-                            
-                            <p style="font-size: small;">
-                                {{ postcard.description|safe }}
-                            </p>
-                            <h3>${{ postcard.amount }} <span style="font-size: small;">{% if one %}{% else %}each X {{ quantity_str }} = ${{ postcard_amount }}{% endif %}</span></h3>
-                            <h5 style="margin-bottom:0px;">Dimensions</h5>
-                            <p>7 ”Width X 5” Length</p>
-                        </div>
-                    </div>
-                    <!--end of row-->
 
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-12" style="padding-bottom: 10px;">
@@ -736,7 +743,7 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-md-12 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Recipient's Name</p>
-                            <input required type="text" value="{% get_name_value form 'recipient_name' forloop.counter0 %}" name="{{ forloop.counter0 }}_recipient_name" class="validate-required" placeholder="Recipient {{ forloop.counter }}" maxlength="100"
+                            <input required type="text" value="{% get_name_value form 'recipient_name' forloop.counter0 %}" name="{{ forloop.counter0 }}_recipient_name" class="form-control" placeholder="Recipient {{ forloop.counter }}" maxlength="100"
                                  id="id_{{ forloop.counter0 }}_recipient_name">
                             
                         </div>
@@ -745,7 +752,7 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 20px;" id="address_row_{{ forloop.counter0 }}">
                         <div class="col-md-8 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Recipient's Address</p>
-                            <input autocomplete="off" type="text" value="{% get_autocomplete_value form 'autocomplete' forloop.counter0 %}" name="autocomplete{{ forloop.counter0 }}" class="validate-required" autocomplete="off" placeholder="123 Main Street"
+                            <input autocomplete="off" type="text" value="{% get_autocomplete_value form 'autocomplete' forloop.counter0 %}" name="autocomplete{{ forloop.counter0 }}" class="form-control" autocomplete="off" placeholder="123 Main Street"
                                 id="autocomplete{{ forloop.counter0 }}">
                             {% if forloop.counter != 1 %}<a href="javascript:;" onclick="copyAddress({{ forloop.counter0 }})"
                                 style="font-size: 0.8em;text-decoration: none;"> Copy from above</a>{% endif %}
@@ -758,7 +765,7 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 10px;display: none;" id="line_1_row_{{ forloop.counter0 }}">
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Street Number</p>
-                            <input autocomplete="off" required type="text" value="{% get_address_values form 'street_number' forloop.counter0 %}" name="street_number_{{ forloop.counter0 }}" class="validate-required" placeholder="123" id="street_number_{{ forloop.counter0 }}">
+                            <input autocomplete="off" required type="text" value="{% get_address_values form 'street_number' forloop.counter0 %}" name="street_number_{{ forloop.counter0 }}" class="form-control" placeholder="123" id="street_number_{{ forloop.counter0 }}">
                             {% if form.errors %}
                             {% autoescape off %}
                             {% get_address_error_message form 'street_number' forloop.counter0  %}
@@ -767,7 +774,7 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Route</p>
-                            <input autocomplete="off" required type="text" value="{% get_address_values form 'route' forloop.counter0 %}" name="route_{{ forloop.counter0 }}" class="validate-required" placeholder="Main Street" id="route_{{ forloop.counter0 }}">
+                            <input autocomplete="off" required type="text" value="{% get_address_values form 'route' forloop.counter0 %}" name="route_{{ forloop.counter0 }}" class="form-control" placeholder="Main Street" id="route_{{ forloop.counter0 }}">
                             {% if form.errors %}
                             {% autoescape off %}
                             {% get_address_error_message form 'route' forloop.counter0  %}
@@ -776,7 +783,7 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Locality</p>
-                            <input autocomplete="off" required type="text" value="{% get_address_values form 'locality' forloop.counter0 %}" name="locality_{{ forloop.counter0 }}" class="validate-required" placeholder="Toronto" id="locality_{{ forloop.counter0 }}">
+                            <input autocomplete="off" required type="text" value="{% get_address_values form 'locality' forloop.counter0 %}" name="locality_{{ forloop.counter0 }}" class="form-control" placeholder="Toronto" id="locality_{{ forloop.counter0 }}">
                             {% if form.errors %}
                             {% autoescape off %}
                             {% get_address_error_message form 'locality' forloop.counter0  %}
@@ -788,7 +795,7 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 10px;display: none;" id="line_2_row_{{ forloop.counter0 }}">
                         <div class="col-md-6 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Province</p>
-                            <input autocomplete="off" type="text" minlength="2" maxlength="2" required value="{% get_address_values form 'administrative_area_level_1' forloop.counter0 %}" name="administrative_area_level_1_{{ forloop.counter0 }}" class="validate-required" placeholder="ON"
+                            <input autocomplete="off" type="text" minlength="2" maxlength="2" required value="{% get_address_values form 'administrative_area_level_1' forloop.counter0 %}" name="administrative_area_level_1_{{ forloop.counter0 }}" class="form-control" placeholder="ON"
                                 id="administrative_area_level_1_{{ forloop.counter0 }}">
                             {% if form.errors %}
                             {% autoescape off %}
@@ -798,7 +805,7 @@ function stripeClientSecretHandler(intent_id) {
                         </div>
                         <div class="col-md-6 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Postal Code</p>
-                            <input autocomplete="off" type="text" minlength="6" maxlength="7" required value="{% get_address_values form 'postal_code' forloop.counter0 %}" name="postal_code_{{ forloop.counter0 }}" class="validate-required" placeholder="L1Z 5G5" id="postal_code_{{ forloop.counter0 }}">
+                            <input autocomplete="off" type="text" minlength="6" maxlength="7" required value="{% get_address_values form 'postal_code' forloop.counter0 %}" name="postal_code_{{ forloop.counter0 }}" class="form-control" placeholder="L1Z 5G5" id="postal_code_{{ forloop.counter0 }}">
                             {% if form.errors %}
                             {% autoescape off %}
                             {% get_address_error_message form 'postal_code' forloop.counter0  %}
@@ -812,7 +819,7 @@ function stripeClientSecretHandler(intent_id) {
                         <div class="col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Personalized Message To Recipient <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="We'll write this on the back of the card for you."></i></p>
-                            <textarea oninput="cleanInput(this);" required name="{{ forloop.counter0 }}_message_to_recipient" cols="40" rows="3" class="validate-required"
+                            <textarea oninput="cleanInput(this);" required name="{{ forloop.counter0 }}_message_to_recipient" cols="40" rows="3" class="form-control"
                                 placeholder="Write your personalized message for the recipient here" maxlength="280"
                                 id="id_{{ forloop.counter0 }}_message_to_recipient">{% get_name_value form 'message_to_recipient' forloop.counter0 %}</textarea>
                             {% if forloop.counter != 1 %}<a href="javascript:;" onclick="copyMessage({{ forloop.counter0 }})"
@@ -863,7 +870,7 @@ function stripeClientSecretHandler(intent_id) {
 
                             <div class="row" style="padding-bottom: 20px;">
                                 <div class="col-md-12">
-                                    <button type="button" class="btn btn--primary btn-block" onclick="StripePayment();">Ready To Pay</button>
+                                    <button type="button" class="btn btn-primary btn-block" onclick="StripePayment();">Ready To Pay</button>
                                 </div>
                             </div>
 
@@ -927,7 +934,7 @@ function stripeClientSecretHandler(intent_id) {
 
                             <div class="row justify-content-center" id="checkout-button" style="padding-bottom: 20px;">
                                 <div class="col-md-12">
-                                    <button id="customButton" type="submit" class="btn btn--primary">Pay
+                                    <button id="customButton" type="submit" class="btn btn-primary btn-block">Pay
                                         $<span id="amount_to_pay"></span> with card</button>
                                 </div>
                             </div>
@@ -947,7 +954,7 @@ function stripeClientSecretHandler(intent_id) {
             </div>
             
             <div class="row justify-content-center">
-                <div class="col-lg-8 col-md-10 col-sm-12 col-10">
+                <div class="col-lg-6 col-md-10 col-sm-12 col-10">
                     <p style="font-size: 12px;line-height: 1.5;"><span style="color: #4a90e2;font-weight: 800;">Refunds |</span>
                         Please note that due to the nature of these customized postcards we do not issue refunds. However if you have any concerns at all please contact us right away.</p>
                 </div>

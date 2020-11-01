@@ -1,4 +1,4 @@
-{% extends "frontend/base.html" %}
+{% extends "postcards/base.html" %}
 {% load static %}
 
 {% block title %}
@@ -162,7 +162,7 @@ function bulkOrder(increment, url) {
                         <span style="color:#4a90e2;">{{ non_profit.name }}</span> to help turn your postcard purchases into
                         donations.
                     </p>
-                    <a href="{{ non_profit.get_absolute_url }}" class="btn btn--primary">
+                    <a href="{{ non_profit.get_absolute_url }}" class="btn btn-primary">
                         <span class="btn__text">View {{ non_profit.name }} postcards</span>
                     </a>
             
@@ -191,7 +191,7 @@ function bulkOrder(increment, url) {
                 <div class="col-lg-3 col-md-4 col-sm-6 col-6" style="padding-bottom: 30px;"
                     style="border-radius: 15px;align-self: center;">
                     <a href="{{ postcard.get_absolute_url }}" style="text-decoration: none;">
-                        <img style="border: 0.1px solid #f6f0f0;" src="{{ postcard.image_1.url }}" class="arrow">
+                        <img style="border: 0.1px solid #f6f0f0;" src="{{ postcard.image_1.url }}" class="arrow img-fluid">
                         <p style="margin-bottom: 0px;">{{ postcard.name }}</p>
                         <a href="javascript:;" id="{{ forloop.counter }}_anchor" onclick="bulkOrder({{ forloop.counter }}, '{{ postcard.get_absolute_url }}');" style="text-decoration: none;font-size: small;font-weight: 400;">Need more than 1?</a>
                         <select id="{{ forloop.counter }}_quantity" name="{{ forloop.counter }}_quantity" onchange="bulkOrder({{ forloop.counter }}, '{{ postcard.get_absolute_url }}');" style="display: none;margin-top: 10px;">
@@ -205,7 +205,7 @@ function bulkOrder(increment, url) {
                             <option value="9">9</option>
                             <option value="10">10</option>
                         </select>
-                        <a href="{{ postcard.get_absolute_url }}?quantity=2" class="btn btn-block btn--primary" style="display: none;margin-top: 10px;color: white;" id="{{ forloop.counter }}_button">Buy 2 Cards</a>
+                        <a href="{{ postcard.get_absolute_url }}?quantity=2" class="btn btn-block btn-primary" style="display: none;margin-top: 10px;color: white;" id="{{ forloop.counter }}_button">Buy 2 Cards</a>
                     </a>
                 </div>
                 {% endif %}

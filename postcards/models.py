@@ -14,6 +14,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils import timezone
+from stdimage import StdImageField
 
 # Create your models here.
 
@@ -82,11 +83,11 @@ class PostCard(models.Model):
     name = models.CharField(max_length=150, null=True, blank=True)
     slug = models.SlugField(unique=False, blank=True)
     description = models.TextField(blank=True, null=True)
-    image_1 = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
-    image_2 = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
-    image_3 = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
-    image_4 = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
-    image_5 = models.ImageField(upload_to=image_location, validators=[validate_file_size], null=True, blank=True)
+    image_1 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 840, 'height': 600}}, null=True, blank=True)
+    image_2 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 840, 'height': 600}}, null=True, blank=True)
+    image_3 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 840, 'height': 600}}, null=True, blank=True)
+    image_4 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 840, 'height': 600}}, null=True, blank=True)
+    image_5 = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 672, 'height': 480}, 'main': {'width': 840, 'height': 600}}, null=True, blank=True)
     business_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     amount_sold = models.PositiveIntegerField(null=True, blank=True, default=0)

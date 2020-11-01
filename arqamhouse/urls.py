@@ -36,7 +36,7 @@ urlpatterns = [
     path('house', FindHouseView.as_view(), name='find_house'),
     path('about', AboutUsView.as_view(), name='about'),
     path('pricing', PricingView.as_view(), name='pricing'),
-    path('report', ReportErrorView.as_view(), name='report'),
+    path('contact', ReportErrorView.as_view(), name='report'),
     path('donation-gifts', DonationGiftsSentView.as_view(), name='donation_gifts_sent'),
     path('zaeem-custom-script', CustomScriptView.as_view(), name='custom_script'),
 

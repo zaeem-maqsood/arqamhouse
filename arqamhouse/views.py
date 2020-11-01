@@ -172,7 +172,7 @@ class PricingView(View):
 class ReportErrorView(FormView):
 
     template_name = "static/report_error.html"
-    success_url = "/report"
+    success_url = "/contact"
 
     def get(self, request, *args, **kwargs):
         context = {}
@@ -201,7 +201,8 @@ class ReportErrorView(FormView):
     def form_valid(self, form, request):
         name = form.cleaned_data["name"]
         message = form.cleaned_data["message"]
-        self.send_payout_email(name, message)
+        email = form.cleaned_data["email"]
+        self.send_payout_email(name, message, email)
         messages.success(request, 'Message Sent!')
         valid_data = super(ReportErrorView, self).form_valid(form)
         return valid_data
@@ -211,14 +212,15 @@ class ReportErrorView(FormView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-    def send_payout_email(self, name, message):
-        subject = 'New Error Report'
+    def send_payout_email(self, name, message, email):
+        subject = 'New Contact Inquiry'
         context = {}
         context["name"] = name
         context["message"] = message
+        context["email"] = email
         html_message = render_to_string('emails/error_report.html', context)
         plain_message = strip_tags(html_message)
-        from_email = 'Error Manager <admin@arqamhouse.com>'
-        to = ['errors@arqamhouse.com']
+        from_email = f'Contact Inquiry <{email}>'
+        to = ['info@arqamhouse.com']
         mail.send_mail(subject, plain_message, from_email, to, html_message=html_message)
         return "Done"
