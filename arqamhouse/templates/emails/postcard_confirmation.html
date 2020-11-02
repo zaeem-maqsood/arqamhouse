@@ -284,6 +284,11 @@
                                                                                 <div style="font-family: Roboto, sans-serif; text-align: center">
                                                                                     "{{ postcard_order.message_to_recipient }}"
                                                                                 </div>
+                                                                                {% if  postcard_order.add_gift_card %}
+                                                                                <div style="font-family: Roboto, sans-serif; text-align: center">
+                                                                                    We'll also be adding a{% if postcard_order.gift_card == "Apple" %}n{% elif postcard_order.gift_card == "Amazon" %}n{% elif postcard_order.gift_card == "Indigo" %}n{% else %}{% endif %} {{ postcard_order.gift_card }} gift card with an amount of ${{ postcard_order.gift_card_amount }} along side your postcard.
+                                                                                </div>
+                                                                                {% endif %}
                                                                                 <div style="font-family: Roboto, sans-serif; text-align: center">
                                                                                     If there are any mistakes please email us at <a href="mailto:info@arqamhouse.com">info@arqamhouse.com</a>
                                                                                 </div>

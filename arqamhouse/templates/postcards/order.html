@@ -46,9 +46,24 @@ iframe {
 
 <script>
 
+function checkGiftCard(object) {
+
+    console.log(object.checked);
+
+    if (object.checked) {
+        document.getElementById('gift_card_row').style.display = 'flex';
+    }
+
+    else {
+        document.getElementById('gift_card_row').style.display = 'none';
+    }
+
+}
+
 function StripePayment() {
 
     document.getElementById("ready_to_pay").style.display = 'none';
+    document.getElementById("id_gift_card_amount").readOnly = true;
 
     {% if postcard.non_profit %}
     var promo_code = "";
@@ -58,6 +73,21 @@ function StripePayment() {
     var donation = 0;
     {% endif %}
 
+    var name = document.getElementById("id_name").value;
+    var email = document.getElementById("id_email").value;
+
+
+    var add_gift_card = false;
+    var gift_card_amount = 0;
+    console.log("Checking");
+    console.log(document.getElementById("add_gift_card_row").style.display != 'none');
+    console.log("Checking");
+    if (document.getElementById("add_gift_card_row").style.display != 'none') {
+        add_gift_card = document.getElementById('gift_card_switch').checked;
+        gift_card_amount = document.getElementById('id_gift_card_amount').value;
+    }
+    
+
     var postcard = "{{ postcard.id }}";
     var quantity = "{{ quantity_str }}";
 
@@ -66,10 +96,14 @@ function StripePayment() {
     const url = "{% url 'postcards:stripe_payment' %}";
 
     let data = {
+        name: name,
+        email: email,
         postcard: postcard,
         quantity: quantity,
         promo_code: promo_code,
-        donation: donation
+        donation: donation,
+        add_gift_card: add_gift_card,
+        gift_card_amount: gift_card_amount
     }
 
     let fetchData = {
@@ -541,6 +575,8 @@ function stripeClientSecretHandler(intent_id) {
 
     }
 
+    
+
 </script>
 
 
@@ -555,7 +591,7 @@ function stripeClientSecretHandler(intent_id) {
 <section style="padding-top: 30px;">
     <div class="container">
 
-        <form id="donationForm" method="POST" >{% csrf_token %}
+        <form id="donationForm" method="POST" onSubmit="document.getElementById('customButton').disabled = true;">{% csrf_token %}
 
             <input id="quantity" name="quantity" type="hidden" value="{{ quantity_str }}">
             
@@ -567,7 +603,7 @@ function stripeClientSecretHandler(intent_id) {
                 </div>
             </div>
 
-            <div class="row justify-content-around" style="padding-bottom: 30px;">
+            <div class="row justify-content-around">
                 <div class="col-lg-6 col-10">
                     <h3 style="text-align: center;margin-bottom: 0px;">{{ postcard.name }} {% if postcard.non_profit %}<i
                             class="fas fa-heart" style="color: #89d389;font-size: 1em;"></i>{% endif %}</h3>
@@ -580,8 +616,7 @@ function stripeClientSecretHandler(intent_id) {
                     <p class="text-center" style="margin-bottom: 0px;">{{ postcard.amount_sold }} postcards sold</p>
                     {% if last_postcard %}
                     <p class="text-center" style="font-size: 0.8em;">The last postcard was sent to
-                        {{ last_postcard.recipient_locality }}, {% if days_since_sold != 0 %}{{ days_since_sold }}
-                        day{% if days_since_sold > 1 %}s{% endif %} ago{% else %}Today!{% endif %}</p>
+                        {{ last_postcard.recipient_locality }}</p>
                     {% endif %}
             
                 </div>
@@ -601,7 +636,7 @@ function stripeClientSecretHandler(intent_id) {
                 </div>
             </div>
 
-            <div class="row justify-content-around" style="padding-bottom: 30px;">
+            <div class="row justify-content-around" style="padding-bottom: 10px;">
                 <div class="col-10 col-md-10 col-lg-6">
             
                     <p style="font-size: small;">
@@ -612,6 +647,100 @@ function stripeClientSecretHandler(intent_id) {
                 </div>
             </div>
             <!--end of row-->
+
+            <div class="row justify-content-around" style="padding-bottom: 30px;" id="add_gift_card_row">
+                <div class="col-10 col-md-10 col-lg-6">
+                    <div class="custom-control custom-switch">
+                        {{ form.add_gift_card }}
+                        <label class="custom-control-label" for="gift_card_switch">Add A Gift Card For Free?</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-around" style="padding-bottom: 30px;display: none;" id="gift_card_row">
+                <div class="col-10 col-md-10 col-lg-6">
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-6 col-md-4 col-lg-4" style="padding-bottom: 20px;">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="Apple"
+                                    value="Apple">
+                                <label class="form-check-label" for="Apple">
+                                    <img src="{% static 'images/app-store-gift-card.png' %}"
+                                        style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
+                                        id="front_cover" class="img-fluid">
+                                    <p style="margin-bottom: 0px;margin-top:5px;" class="text-center">Apple Store</p>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-4" style="padding-bottom: 20px;">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="Google"
+                                    value="Google">
+                                <label class="form-check-label" for="Google">
+                                    <img src="{% static 'images/googleplaywhite.png' %}"
+                                        style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
+                                        id="front_cover" class="img-fluid">
+                                    <p style="margin-bottom: 0px;margin-top:5px;" class="text-center">Google Play</p>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-4" style="padding-bottom: 20px;">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="Amazon"
+                                    value="Amazon">
+                                <label class="form-check-label" for="Amazon">
+                                    <img src="{% static 'images/ca-generic-black.png' %}"
+                                        style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
+                                        id="front_cover" class="img-fluid">
+                                    <p style="margin-bottom: 0px;margin-top:5px;" class="text-center">Amazon</p>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-4" style="padding-bottom: 20px;">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="Indigo"
+                                    value="Indigo">
+                                <label class="form-check-label" for="Indigo">
+                                    <img src="{% static 'images/indigo.png' %}"
+                                        style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
+                                        id="front_cover" class="img-fluid">
+                                    <p style="margin-bottom: 0px;margin-top:5px;" class="text-center">Indigo</p>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-4" style="padding-bottom: 20px;">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="Shoppers"
+                                    value="Shoppers" checked>
+                                <label class="form-check-label" for="Shoppers">
+                                    <img src="{% static 'images/shoppers_drug_mart.png' %}"
+                                        style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
+                                        id="front_cover" class="img-fluid">
+                                    <p style="margin-bottom: 0px;margin-top:5px;" class="text-center">Shoppers</p>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-4" style="padding-bottom: 20px;">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="HomeSense"
+                                    value="HomeSense" checked>
+                                <label class="form-check-label" for="HomeSense">
+                                    <img src="{% static 'images/homesense_genericgiftcard-01.png' %}"
+                                        style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
+                                        id="front_cover" class="img-fluid">
+                                    <p style="margin-bottom: 0px;margin-top:5px;" class="text-center">Homesense</p>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12" style="padding-bottom: 20px;">
+                            <p style="margin-bottom: 5px;">Gift Card Amount</p>
+                            {{ form.gift_card_amount }}
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="row justify-content-center" style="padding-bottom: 30px;">
                 <div class="col-lg-6 col-md-10 col-sm-12 col-10" style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;padding: 20px;">

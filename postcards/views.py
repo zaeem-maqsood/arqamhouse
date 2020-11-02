@@ -429,6 +429,10 @@ def stripePayment(request):
         quantity = int(json_data['quantity'])
         code = json_data['promo_code']
         donation = decimal.Decimal(json_data['donation'])
+        name = json_data["name"]
+        email = json_data["email"]
+        add_gift_card = json_data["add_gift_card"]
+        gift_card_amount = decimal.Decimal(json_data["gift_card_amount"])
 
         postcard = PostCard.objects.get(id=postcard_id)
         print(postcard)
@@ -461,13 +465,20 @@ def stripePayment(request):
         else:
             print("no donation")
 
+        # Check for gift cards
+        if add_gift_card:
+            total = total + int((gift_card_amount * quantity) * 100)
+            total_decimal = total_decimal + (gift_card_amount * quantity)
+        else:
+            print("No Gift cards")
+
         
         print(total)
 
         if total <= 0:
             no_payment = True
 
-            return JsonResponse({'retry': False, 'total': total, 'postcard_name': postcard.name,
+            return JsonResponse({'retry': False, 'total': total, 'postcard_name': postcard.name, 
                                  'total_decimal': total_decimal, 'code_used': code_used, 'no_payment': no_payment})
 
         else:
@@ -481,6 +492,8 @@ def stripePayment(request):
                 metadata = {
                     'postcard': postcard.name,
                     'postcard_amount': postcard.amount,
+                    'name': name,
+                    'email': email
                     },
                 statement_descriptor="Postcard Arqam House",
             )
@@ -545,9 +558,7 @@ class PostCardOrderView(FormView):
             
         try:
             last_postcard = PostCardOrder.objects.filter(post_card=postcard).order_by("-created_at").first()
-            days_since_sold = datetime.today().day - last_postcard.created_at.day
             context["last_postcard"] = last_postcard
-            context["days_since_sold"] = days_since_sold
         except:
             pass
 
@@ -629,8 +640,9 @@ class PostCardOrderView(FormView):
             form.add_error(None, "Please keep the postal code under 10 characters long.")
             return self.render_to_response(self.get_context_data(form=form))
 
-        code = form.cleaned_data.get("promo_code")
 
+        # Handle Promo Codes
+        code = form.cleaned_data.get("promo_code")
         try:
             promo_code = PromoCode.objects.get(code=code.lower())
             amount = postcard.amount - promo_code.fixed_amount
@@ -639,6 +651,7 @@ class PostCardOrderView(FormView):
             promo_code = None
             amount = postcard.amount * quantity
 
+        # Handle donation
         donation = 0
         if postcard.non_profit:
             donation = form.cleaned_data.get("donation")
@@ -647,6 +660,19 @@ class PostCardOrderView(FormView):
 
             if donation > 0:
                 amount = amount + donation
+
+        # Handle Gift Cards
+        gift_card_amount = 0
+        gift_card =  None
+        add_gift_card = form.cleaned_data.get("add_gift_card")
+        if add_gift_card:
+            gift_card = data["giftCards"]
+            gift_card_amount = form.cleaned_data.get("gift_card_amount")
+            gift_card_amount = decimal.Decimal(gift_card_amount)
+            print(f"The  gift_card_amount is {gift_card_amount}")
+
+            if gift_card_amount > 0:
+                amount = amount + gift_card_amount
 
 
 
@@ -772,7 +798,7 @@ class PostCardOrderView(FormView):
                                                           recipient_name=recipient_name, recipient_address=recipient_address, recipient_street_number=recipient_street_number,
                                                           recipient_route=recipient_route, recipient_locality=recipient_locality, recipient_administrative_area_level_1=recipient_administrative_area_level_1,
                                                           recipient_postal_code=recipient_postal_code, amount=amount, donation_amount=donation,
-                                                          promo_code=promo_code)
+                                                          promo_code=promo_code, add_gift_card=add_gift_card, gift_card_amount=gift_card_amount, gift_card=gift_card)
 
             if amount <= 0:
                 pass

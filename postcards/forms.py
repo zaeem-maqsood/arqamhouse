@@ -158,6 +158,12 @@ class PostcardOrderForm(forms.ModelForm):
         self.fields["promo_code"] = forms.CharField(label="Promo Code", widget=forms.TextInput(
             attrs={"class": "form-control", "placeholder": "Promo Code", "id": "promo_code"}), required=False)
 
+        self.fields["add_gift_card"] = forms.BooleanField(label="Add Gift Card", widget=forms.CheckboxInput(
+            attrs={"class": "custom-control-input", "id": "gift_card_switch", "onchange": "checkGiftCard(this);"}), required=False)
+
+        self.fields["gift_card_amount"] = forms.DecimalField(widget=forms.NumberInput(attrs={"class": "form-control m-input", "min": "0.00", "max": "100.00",
+                                                                                             "step": "1.00", "value": "5.00", "id": "id_gift_card_amount"}), required=False)
+
 
         if postcard.non_profit:
             self.fields["donation"] = forms.DecimalField(widget=forms.NumberInput(attrs={"class": "form-control m-input", "min": "0.00", "max": "100.00",

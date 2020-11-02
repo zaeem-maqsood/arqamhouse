@@ -18,6 +18,16 @@ from stdimage import StdImageField
 
 # Create your models here.
 
+
+gift_cards = (
+    ('Apple', 'Apple'),
+    ('Google', 'Google'),
+    ('HomeSense', 'HomeSense'),
+    ('Amazon', 'Amazon'),
+    ('Indigo', 'Indigo'),
+    ('Shoppers', 'Shoppers'),
+)
+
 def validate_file_size(value):
     print("The file size is %s" % (value.size))
     filesize = value.size
@@ -190,6 +200,9 @@ class PostCardOrder(models.Model):
     amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     donation_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     anonymous = models.BooleanField(default=False)
+    add_gift_card = models.BooleanField(default=False)
+    gift_card = models.CharField(max_length=150, choices=gift_cards, blank=True, null=True)
+    gift_card_amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     recipient_name = models.CharField(max_length=30, null=True, blank=True)
     recipient_address = models.CharField(max_length=200, null=True, blank=True)
     recipient_street_number = models.CharField(max_length=20, null=True, blank=True)
