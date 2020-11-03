@@ -617,6 +617,9 @@ function stripeClientSecretHandler(intent_id) {
                     {% if last_postcard %}
                     <p class="text-center" style="font-size: 0.8em;">The last postcard was sent to
                         {{ last_postcard.recipient_locality }}</p>
+                    {% else %}
+                    <p class="text-center" style="font-size: 0.8em;">The last postcard was sent to
+                        Toronto</p>
                     {% endif %}
             
                 </div>
