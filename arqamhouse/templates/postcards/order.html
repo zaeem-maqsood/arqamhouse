@@ -830,7 +830,7 @@ function stripeClientSecretHandler(intent_id) {
                     </div>
 
 
-                    <div class="row" style="padding-bottom: 30px;">
+                    <div class="row" style="padding-bottom: 10px;">
                         <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Anonymous <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="Switch on and we won't tell your recipient you sent the card."></i></p>
@@ -842,17 +842,19 @@ function stripeClientSecretHandler(intent_id) {
                     </div>
 
                     
-                    <div class="row" style="padding-bottom: 20px;">
+                    <div class="row" style="padding-bottom: 0px;">
                         <div class="col-12" style="padding-bottom: 10px;">
                             <h4 style="margin-bottom: 0px;">Recipient Information</h4>
                             <p>We'll use this information to personalize your card! 
-                                Please make sure the address and postal code is correct and tell us the message you'd like to write on the back of the card.</p>
+                                Please make sure the address and postal code is correct.</p>
                         </div>
                     </div>
                     
 
                     {% for x in quantity %}
 
+                    {% if one %}
+                    {% else %}
                     <div class="row" style="padding-bottom: 5px;">
                         <div class="col-12" style="padding-bottom: 10px;">
                             <h5  style="margin-bottom: 0px;">
@@ -860,9 +862,11 @@ function stripeClientSecretHandler(intent_id) {
                             {% else %}
                             {{ forloop.counter }}{% if forloop.counter == 1 %}st{% elif forloop.counter == 2 %}nd{% elif forloop.counter == 3 %}rd{% else %}th{% endif %} 
                             {% endif %}
-                            Recipient's Information</h5>
+                            Recipient's Information
+                            </h5>
                         </div>
                     </div>
+                    {% endif %}
 
 
                     {% if form.errors %}
@@ -1027,7 +1031,7 @@ function stripeClientSecretHandler(intent_id) {
                         <div class="col-md-12">
                             <div class="row justify-content-center" id="checkout-button" style="padding-bottom: 20px;">
                                 <div class="col-md-12">
-                                    <button type="submit" class="btn btn--primary">It's Free!</button>
+                                    <button type="submit" class="btn btn-primary btn-block">Checkout For Free!</button>
                                 </div>
                             </div>
                         </div>
