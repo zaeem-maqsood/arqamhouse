@@ -904,7 +904,7 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 10px;display: none;" id="line_1_row_{{ forloop.counter0 }}">
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Apt/Suite <span style="font-size: 0.6em;">Optional</span></p>
-                            <input autocomplete="off" required type="text"
+                            <input autocomplete="off" type="text"
                                 value="{% get_address_values form 'apt_number' forloop.counter0 %}"
                                 name="apt_number_{{ forloop.counter0 }}" class="form-control" placeholder=""
                                 id="apt_number_{{ forloop.counter0 }}">
