@@ -610,6 +610,11 @@ class PostCardOrderView(FormView):
 
         anonymous = form.cleaned_data.get('anonymous')
 
+        apt_number = form.cleaned_data.get("apt_number")
+        if len(apt_number) > 20:
+            form.add_error(None, "Please keep your Apt/Suite number under 20 characters long. Sorry :(")
+            return self.render_to_response(self.get_context_data(form=form))
+
         street_number = form.cleaned_data.get("street_number")
         if len(street_number) > 20:
             form.add_error(None, "Please keep your street number under 20 characters long. Sorry :(")
@@ -766,6 +771,13 @@ class PostCardOrderView(FormView):
                 form.add_error(None, f"Please keep recipient {x}'s address under 200 characters long.")
                 return self.render_to_response(self.get_context_data(form=form))
 
+            recipient_apt_number = form.cleaned_data.get(f"apt_number_{x}")
+            if recipient_apt_number:
+                print("Did it come here")
+                if len(recipient_apt_number) > 20:
+                    form.add_error(None, f"Please keep recipient {x}'s Apt/Suite number under 20 characters long. Sorry :(")
+                    return self.render_to_response(self.get_context_data(form=form))
+
             recipient_street_number = form.cleaned_data.get(f"street_number_{x}")
             if len(recipient_street_number) > 20:
                 form.add_error(None, f"Please keep recipient {x}'s street number under 20 characters long. Sorry :(")
@@ -793,9 +805,9 @@ class PostCardOrderView(FormView):
 
             message_to_recipient = form.cleaned_data.get(f"{x}_message_to_recipient")
 
-            postcard_order = PostCardOrder.objects.create(post_card=postcard, name=name, email=email, anonymous=anonymous, postal_code=postal_code, address=address, 
+            postcard_order = PostCardOrder.objects.create(post_card=postcard, name=name, email=email, anonymous=anonymous, postal_code=postal_code, address=address, apt_number=apt_number,
                                                           street_number=street_number,  message_to_recipient=message_to_recipient, route=route, locality=locality, administrative_area_level_1=administrative_area_level_1,
-                                                          recipient_name=recipient_name, recipient_address=recipient_address, recipient_street_number=recipient_street_number,
+                                                          recipient_name=recipient_name, recipient_address=recipient_address, recipient_apt_number=recipient_apt_number, recipient_street_number=recipient_street_number,
                                                           recipient_route=recipient_route, recipient_locality=recipient_locality, recipient_administrative_area_level_1=recipient_administrative_area_level_1,
                                                           recipient_postal_code=recipient_postal_code, amount=amount, donation_amount=donation,
                                                           promo_code=promo_code, add_gift_card=add_gift_card, gift_card_amount=gift_card_amount, gift_card=gift_card)

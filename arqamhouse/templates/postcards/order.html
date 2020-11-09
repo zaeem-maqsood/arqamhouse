@@ -805,10 +805,14 @@ function stripeClientSecretHandler(intent_id) {
 
                     <div class="row" style="padding-bottom: 10px;display: none;" id="main_line_1_row">
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Apt/Suite <span style="font-size: 0.6em;">Optional</span></p>
+                            {{ form.apt_number }}
+                        </div>
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Street Number</p>
                             {{ form.street_number }}
                         </div>
-                        <div class="col-md-8 col-sm-12 col-12" style="padding-bottom: 10px;">
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Route</p>
                             {{ form.route }}
                         </div>
@@ -831,8 +835,8 @@ function stripeClientSecretHandler(intent_id) {
 
 
                     <div class="row" style="padding-bottom: 10px;">
-                        <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Anonymous <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
+                        <div class="col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Keep Me Anonymous <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="Switch on and we won't tell your recipient you sent the card."></i></p>
                             <div class="input-checkbox input-checkbox--switch">
                                 {{ form.anonymous }}
@@ -899,6 +903,18 @@ function stripeClientSecretHandler(intent_id) {
                     
                     <div class="row" style="padding-bottom: 10px;display: none;" id="line_1_row_{{ forloop.counter0 }}">
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Apt/Suite <span style="font-size: 0.6em;">Optional</span></p>
+                            <input autocomplete="off" required type="text"
+                                value="{% get_address_values form 'apt_number' forloop.counter0 %}"
+                                name="apt_number_{{ forloop.counter0 }}" class="form-control" placeholder=""
+                                id="apt_number_{{ forloop.counter0 }}">
+                            {% if form.errors %}
+                            {% autoescape off %}
+                            {% get_address_error_message form 'apt_number' forloop.counter0  %}
+                            {% endautoescape %}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Street Number</p>
                             <input autocomplete="off" required type="text" value="{% get_address_values form 'street_number' forloop.counter0 %}" name="street_number_{{ forloop.counter0 }}" class="form-control" placeholder="123" id="street_number_{{ forloop.counter0 }}">
                             {% if form.errors %}
@@ -907,7 +923,7 @@ function stripeClientSecretHandler(intent_id) {
                             {% endautoescape %}
                             {% endif %}
                         </div>
-                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
+                        <div class="col-md-5 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Route</p>
                             <input autocomplete="off" required type="text" value="{% get_address_values form 'route' forloop.counter0 %}" name="route_{{ forloop.counter0 }}" class="form-control" placeholder="Main Street" id="route_{{ forloop.counter0 }}">
                             {% if form.errors %}
@@ -916,19 +932,21 @@ function stripeClientSecretHandler(intent_id) {
                             {% endautoescape %}
                             {% endif %}
                         </div>
+                    </div>
+                    
+                    <div class="row" style="padding-bottom: 10px;display: none;" id="line_2_row_{{ forloop.counter0 }}">
                         <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Locality</p>
-                            <input autocomplete="off" required type="text" value="{% get_address_values form 'locality' forloop.counter0 %}" name="locality_{{ forloop.counter0 }}" class="form-control" placeholder="Toronto" id="locality_{{ forloop.counter0 }}">
+                            <input autocomplete="off" required type="text" value="{% get_address_values form 'locality' forloop.counter0 %}"
+                                name="locality_{{ forloop.counter0 }}" class="form-control" placeholder="Toronto"
+                                id="locality_{{ forloop.counter0 }}">
                             {% if form.errors %}
                             {% autoescape off %}
                             {% get_address_error_message form 'locality' forloop.counter0  %}
                             {% endautoescape %}
                             {% endif %}
                         </div>
-                    </div>
-                    
-                    <div class="row" style="padding-bottom: 10px;display: none;" id="line_2_row_{{ forloop.counter0 }}">
-                        <div class="col-md-6 col-sm-12 col-12" style="padding-bottom: 10px;">
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Province</p>
                             <input autocomplete="off" type="text" minlength="2" maxlength="2" required value="{% get_address_values form 'administrative_area_level_1' forloop.counter0 %}" name="administrative_area_level_1_{{ forloop.counter0 }}" class="form-control" placeholder="ON"
                                 id="administrative_area_level_1_{{ forloop.counter0 }}">
@@ -938,7 +956,7 @@ function stripeClientSecretHandler(intent_id) {
                             {% endautoescape %}
                             {% endif %}
                         </div>
-                        <div class="col-md-6 col-sm-12 col-12" style="padding-bottom: 10px;">
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
                             <p style="margin-bottom: 0px;">Postal Code</p>
                             <input autocomplete="off" type="text" minlength="6" maxlength="7" required value="{% get_address_values form 'postal_code' forloop.counter0 %}" name="postal_code_{{ forloop.counter0 }}" class="form-control" placeholder="L1Z 5G5" id="postal_code_{{ forloop.counter0 }}">
                             {% if form.errors %}

@@ -318,7 +318,7 @@
                                                                             <div>
                                                                                 <div style="font-family: Roboto, sans-serif; text-align: center">
                                                                                     Postcard {{ forloop.counter }} will be sent to {{ postcard_order.recipient_name }}.
-                                                                                    The address you provided is {{ postcard_order.recipient_street_number }} {{ postcard_order.recipient_route }} {{ postcard_order.recipient_locality }} 
+                                                                                    The address you provided is {% if postcard_order.recipient_apt_number %}{{ postcard_order.recipient_apt_number }}-{% else %}{% endif %} {{ postcard_order.recipient_street_number }} {{ postcard_order.recipient_route }} {{ postcard_order.recipient_locality }} 
                                                                                     {{ postcard_order.recipient_administrative_area_level_1 }} {{ postcard_order.recipient_postal_code }}.
                                                                                     The personalized message you requested on the back of the card is: "{{ postcard_order.message_to_recipient }}"
                                                                                     

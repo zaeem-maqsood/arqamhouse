@@ -140,6 +140,9 @@ class PostcardOrderForm(forms.ModelForm):
             attrs={"class": "form-control", "autocomplete": "off", "placeholder": "123 Main Street", "id": "main_address"}), required=False)
 
         # Fields
+        self.fields["apt_number"] = forms.CharField(label="Apt Number", widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "", "id": "apt_number"}), required=False)
+
         self.fields["street_number"] = forms.CharField(label="Address", widget=forms.TextInput(
             attrs={"class": "form-control", "placeholder": "123", "id": "street_number"}), required=True)
 
@@ -181,6 +184,9 @@ class PostcardOrderForm(forms.ModelForm):
 
             self.fields[f"autocomplete{x}"] = forms.CharField(label="Address", widget=forms.TextInput(
                 attrs={"class": "form-control", "autocomplete": "off", "placeholder": "123 Main Street", "id": f"autocomplete{x}"}), required=False)
+
+            self.fields[f"apt_number_{x}"] = forms.CharField(widget=forms.NumberInput(
+                attrs={"class": "form-control", "placeholder": "10", "id": f"recipient_apt_number_{x}", "max": 99999}), required=False)
 
             self.fields[f"street_number_{x}"] = forms.CharField(widget=forms.NumberInput(
                 attrs={"class": "form-control", "placeholder": "123", "id": f"street_number_{x}", "max": 99999}), required=True)

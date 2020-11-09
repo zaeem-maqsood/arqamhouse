@@ -272,7 +272,7 @@
                                                                                 </div>
                                                                                 <div
                                                                                     style="font-family: Roboto, sans-serif; text-align: center">
-                                                                                    We'll be sending the postcard to {{ postcard_order.recipient_street_number }} {{ postcard_order.recipient_route }}
+                                                                                    We'll be sending the postcard to {% if postcard_order.recipient_apt_number %}{{ postcard_order.recipient_apt_number }}-{% else %}{% endif %} {{ postcard_order.recipient_street_number }} {{ postcard_order.recipient_route }}
                                                                                     {{ postcard_order.recipient_locality }}
                                                                                     {{ postcard_order.recipient_administrative_area_level_1 }} {{ postcard_order.recipient_postal_code }}.&nbsp;
                                                                                 </div>
