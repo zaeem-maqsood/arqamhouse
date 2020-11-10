@@ -825,12 +825,11 @@ class PostCardOrderView(FormView):
             promo_code.used += quantity
             promo_code.save()
 
-        if settings.DEBUG == False or postcard_order.email == 'info@arqamhouse.com':
+        if settings.DEBUG == False or postcard_order.email != 'info@arqamhouse.com':
             try:
                 self.send_text_message(postcard_orders)
             except Exception as e:
                 print(e)
-
 
             try: 
                 self.send_confirmation_email(postcard_orders)
