@@ -773,7 +773,6 @@ class PostCardOrderView(FormView):
 
             recipient_apt_number = form.cleaned_data.get(f"apt_number_{x}")
             if recipient_apt_number:
-                print("Did it come here")
                 if len(recipient_apt_number) > 20:
                     form.add_error(None, f"Please keep recipient {x}'s Apt/Suite number under 20 characters long. Sorry :(")
                     return self.render_to_response(self.get_context_data(form=form))
@@ -826,20 +825,17 @@ class PostCardOrderView(FormView):
             promo_code.used += quantity
             promo_code.save()
 
-
-        if settings.DEBUG == False:
+        if settings.DEBUG == False or postcard_order.email == 'info@arqamhouse.com':
             try:
                 self.send_text_message(postcard_orders)
             except Exception as e:
                 print(e)
-                print("Exception 4")
 
 
-        try: 
-            self.send_confirmation_email(postcard_orders)
-        except Exception as e:
-            print(e)
-            print("Exception 5")
+            try: 
+                self.send_confirmation_email(postcard_orders)
+            except Exception as e:
+                print(e)
 
 
         
