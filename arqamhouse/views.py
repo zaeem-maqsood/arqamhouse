@@ -56,7 +56,7 @@ class CustomScriptView(View):
                 postcard_orders = PostCardOrder.objects.all()
                 for postcard_order in postcard_orders:
 
-                    profile = Profile.objects.get(email=postcard_order.email)
+                    profile = Profile.objects.get(email=postcard_order.email.lower())
 
                     recipient, created = Recipient.objects.get_or_create(profile=profile, created_at=postcard_order.created_at, name=postcard_order.recipient_name, email=None,
                                                         address=postcard_order.recipient_address, apt_number=postcard_order.recipient_apt_number, 
