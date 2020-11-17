@@ -64,6 +64,8 @@ INSTALLED_APPS = [
     'memberships',
     'posts',
     'postcards',
+    'recipients',
+    'orders'
 
 ]
 

@@ -1,14 +1,10 @@
-{% extends "frontend/base.html" %}
+{% extends "frontend/basic_base.html" %}
 
 {% load static %}
 
 {% block title %}
 Login | Arqam House 
 {% endblock title %}
-
-{# block footer #}
-	{# include "frontend/footer.html" #}
-{# endblock footer #}
 
 {% block styles %}
 {% endblock styles %}
@@ -20,103 +16,94 @@ Login | Arqam House
 {% endblock scripts %}
 
 {% block content %}
-<section class="text-center">
+<section class="text-center" style="padding-top:5rem;">
     <div class="container">
-        <div class="row">
-            <div class="col-md-9 col-lg-6">
 
-                <div class="row" style="padding-bottom: 20px;">
-                    <div class="col-md-12">
-                        <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+        <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 5em;"></a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom:15px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                {% for message in messages %}
+                <div class="alert bg--{{ message.tags }}">
+                    <div class="alert__body">
+                        <span>{{ message }}</span>
                     </div>
+                    <div class="alert__close"> × </div>
                 </div>
+                {% endfor %}
+            </div>
+        </div>
 
-                <div class="row" style="padding-bottom:15px;">
-                    <div class="col-md-12">
-                        {% for message in messages %}
-                        <div class="alert bg--{{ message.tags }}">
-                            <div class="alert__body">
-                                <span>{{ message }}</span>
-                            </div>
-                            <div class="alert__close"> × </div>
-                        </div>
+        {% if form.non_field_errors %}
+        <div class="row justify-content-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <div class="alert bg--error">
+                    <div class="alert__body">
+                        {% for error in form.non_field_errors %}
+                        <span>{{ error|escape }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="alert__close">×</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+
+        {% if form.email.errors %}
+        <div class="row justify-content-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <div class="alert bg--error">
+                    <div class="alert__body">
+                        {% for error in form.email.errors %}
+                        <span>{{ error|escape }}</span>
                         {% endfor %}
                     </div>
                 </div>
-
-                {% if form.non_field_errors %}
-                <div class="row" style="padding-bottom: 20px;">
-                    <div class="col-md-12">
-                        <div class="alert bg--error">
-                            <div class="alert__body">
-                                {% for error in form.non_field_errors %}
-                                <span>{{ error|escape }}</span>
-                                {% endfor %}
-                            </div>
-                            <div class="alert__close">×</div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-
-                {% if form.email.errors %}
-                <div class="row" style="padding-bottom: 20px;">
-                    <div class="col-md-12">
-                        <div class="alert bg--error">
-                            <div class="alert__body">
-                                {% for error in form.email.errors %}
-                                <span>{{ error|escape }}</span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                
-
-                <form class="boxed boxed--border" action="" method="POST">{% csrf_token %}
-                
-                    <div class="row" style="padding-bottom: 20px;">
-                        <div class="col-md-12">
-                            <div class="col-md-12">
-                                {{ form.email }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row" style="padding-bottom: 20px;">
-                        <div class="col-md-12">
-                            <div class="col-md-12">
-                                {{ form.password }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="col-md-12">
-                                <button class="btn btn--primary type--uppercase" type="submit">Sign in</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-
-                <div class="row" style="padding-bottom: 20px;">
-                    <div class="col-md-12">
-                        <span class="type--fine-print block">Dont have an account yet?
-                            <a href="{% url 'profiles:create' %}">Create account</a>
-                        </span>
-                        <span class="type--fine-print block">Forgot your username or password?
-                            <a href="{% url 'password_reset' %}">Recover account</a>
-                        </span>
-                    </div>
-                </div>
-
             </div>
         </div>
-        <!--end of row-->
+        {% endif %}
+        
+
+        <form action="" method="POST">{% csrf_token %}
+        
+            <div class="row justify-content-center" style="padding-bottom: 20px;">
+                <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                    
+                    {{ form.email }}
+                    
+                </div>
+            </div>
+
+            <div class="row justify-content-center" style="padding-bottom: 20px;">
+                <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                    
+                    {{ form.password }}
+                    
+                </div>
+            </div>
+
+            <div class="row justify-content-center" style="padding-bottom: 30px;">
+                <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                        <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="row justify-content-center" style="padding-bottom: 10px;">
+            <div class="col-lg-3 col-md-5 col-sm-12 col-10" style="padding-bottom: 10px;">
+                <a href="{% url 'profiles:create' %}" class="btn btn-info btn-block">Create account</a>
+            </div>
+            <div class="col-lg-3 col-md-5 col-sm-12 col-10">
+                <a href="{% url 'password_reset' %}" class="btn btn-warning btn-block">Recover account</a>
+            </div>
+        </div>
+
+        
     </div>
-    <!--end of container-->
 </section>
 {% endblock content %}

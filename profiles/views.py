@@ -270,6 +270,9 @@ class ProfileCreateView(FormView):
 
     def get(self, request, *args, **kwargs):
         self.object = None
+
+        # if request.user.is_authenticated:
+        #     return redirect(':verification')
         form = self.get_form()
         return self.render_to_response(self.get_context_data(form=form, request=request))
 
@@ -304,9 +307,13 @@ class ProfileCreateView(FormView):
         # Get email and password from the form
         email = form.cleaned_data.get("email")
         name = form.cleaned_data.get("name")
-        country = form.cleaned_data.get("country")
-        region = form.cleaned_data.get("region")
-        city = form.cleaned_data.get("city")
+        apt_number = form.cleaned_data.get("apt_number")
+        street_number = form.cleaned_data.get("street_number")
+        route = form.cleaned_data.get("route")
+        locality = form.cleaned_data.get("locality")
+        administrative_area_level_1 = form.cleaned_data.get("administrative_area_level_1")
+        address = form.cleaned_data.get("address")
+        postal_code = form.cleaned_data.get("postal_code")
 
         phone = form.cleaned_data.get("phone")
     
@@ -334,9 +341,13 @@ class ProfileCreateView(FormView):
             else:
                 profile.set_password(password1)
                 profile.temp_password = None
-                profile.phone = phone
-                profile.region = region
-                profile.city = city
+                profile.address = address
+                profile.apt_number = apt_number
+                profile.street_number = street_number
+                profile.route = route
+                profile.locality = locality
+                profile.administrative_area_level_1 = administrative_area_level_1
+                profile.postal_code = postal_code
                 profile.save()
 
             login(request, profile)

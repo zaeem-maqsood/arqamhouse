@@ -1,6 +1,7 @@
 
 from django import forms
 from postcards.models import PostCardOrder, PostCardBusinessOrder
+from orders.models import Order
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget, PhoneNumberPrefixWidget
 
 
@@ -129,7 +130,11 @@ class PostCardBusinessOrderFormStepOne(forms.ModelForm):
 
 
 
-class PostcardOrderForm(forms.ModelForm):
+class PostcardOrderForm(forms.Form):
+
+    name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Full Name"}), required=True, max_length=100)
+    email = forms.EmailField(widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "someone@example.com"}), required=True, max_length=200)
+    anonymous = forms.BooleanField(widget=forms.CheckboxInput(attrs={"checked": False}), required=False,)
 
     def __init__(self, quantity, postcard, *args, **kwargs):
         super(PostcardOrderForm, self).__init__(*args, **kwargs)
@@ -174,8 +179,6 @@ class PostcardOrderForm(forms.ModelForm):
         else:
             print("No non-profit")
 
-        
-
 
 
         for x in range(int(quantity)):
@@ -209,57 +212,64 @@ class PostcardOrderForm(forms.ModelForm):
                 attrs={"class": "form-control", "placeholder": "Write your personalized message for the recipient here", "maxlength": '280', "rows": 3}), required=True)
 
 
-    class Meta:
-        model = PostCardOrder
-        fields = [
-            "name", "email", "anonymous", "postal_code"
-        ]
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if len(name) > 30:
+            raise forms.ValidationError('Please keep your name under 30 characters long.')
+        return name
 
-        widgets = {
+    def clean(self, *args, **kwargs):
+        cleaned_data = super(PostcardOrderForm, self).clean(*args, **kwargs)
 
-                "name": forms.TextInput(
-                        attrs={
-                            "class": "form-control",
-                            "placeholder":"Maryam Imran",
-                            "required": True,
-                            "maxlength": '100',
-                        }
-                    ),
+        print("The args and kwargs are")
+        print(args)
+        print(kwargs)
+        print("The args and kwargs are")
+
+        # Email Validation
+        email = self.cleaned_data.get('email')
+        if len(email) > 300:
+            raise forms.ValidationError('Please keep your email under 200 characters long.')
+
+        # Apt number validation
+        apt_number = self.cleaned_data.get("apt_number")
+        if apt_number:
+            if len(apt_number) > 20:
+                raise forms.ValidationError("Please keep your apt/suite number under 20 characters long.")
+        
+        # Street Number Validation
+        street_number = self.cleaned_data.get("street_number")
+        if len(street_number) > 20:
+            raise forms.ValidationError("Please keep your street number under 20 characters long.")
+
+        # Route Validation
+        route = self.cleaned_data.get("route")
+        if len(route) > 100:
+            raise forms.ValidationError("Please keep your route under 100 characters long.")
+
+        # Locality Validation
+        locality = self.cleaned_data.get("locality")
+        if len(locality) > 100:
+            raise forms.ValidationError("Please keep your locality under 100 characters long.")
+
+        # admin area 1 validation
+        administrative_area_level_1 = self.cleaned_data.get("administrative_area_level_1")
+        if len(administrative_area_level_1) >= 4:
+            raise forms.ValidationError("Please use a 2 digit province code i.e. 'ON'.")
+
+        # Postal Code validation
+        postal_code = self.cleaned_data.get("postal_code")
+        if len(postal_code) > 10:
+            raise forms.ValidationError("Please keep the postal code under 10 characters long.")
 
 
-                "postal_code": forms.TextInput(
-                    attrs={
-                        "class": "form-control",
-                        "placeholder": "L1Z 5J5",
-                        "required": False,
-                        "maxlength": '7',
-                    }
-                ),
-
-                "email": forms.EmailInput(
-                        attrs={
-                            "class": "form-control",
-                            "placeholder": "someone@example.com",
-                            "required": True,
-                            "maxlength": '200',
-                        }
-                    ),
-
-                "anonymous": forms.CheckboxInput(
-                    attrs={
-                        "checked": False,
-                    }
-                ),
-        }
 
 
 
-    def clean_address(self):
-        address = self.cleaned_data.get('address')
 
-        if not address:
-            raise forms.ValidationError('Please enter an address')
-        else:
-            return address
+
+
+
+
 
 

@@ -40,8 +40,10 @@ from houses.mixins import HouseAccountMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 
 from postcards.forms import PostcardOrderForm, PostCardBusinessOrderFormStepOne
-from postcards.models import PostCard, PostCardOrder, PromoCode, NonProfit
+from postcards.models import PostCard, PostCardOrder, NonProfit
 from profiles.models import Profile
+from orders.models import Order, LineOrder, PromoCode
+from recipients.models import Recipient
 
 from core.mixins import SuperUserRequiredMixin
 
@@ -557,7 +559,7 @@ class PostCardOrderView(FormView):
         postcard = self.get_postcard()
             
         try:
-            last_postcard = PostCardOrder.objects.filter(post_card=postcard).order_by("-created_at").first()
+            last_postcard = Order.objects.filter(post_card=postcard).order_by("-created_at").first()
             context["last_postcard"] = last_postcard
         except:
             pass
@@ -599,72 +601,44 @@ class PostCardOrderView(FormView):
     
         # Get buyer name and email address
         name = form.cleaned_data.get('name')
-        if len(name) > 30:
-            form.add_error(None, "Please keep your name under 30 characters long. Sorry :(")
-            return self.render_to_response(self.get_context_data(form=form))
-
         email = form.cleaned_data.get('email')
-        if len(email) > 300:
-            form.add_error(None, "Please keep your email under 300 characters long. Sorry :(")
-            return self.render_to_response(self.get_context_data(form=form))
-
         anonymous = form.cleaned_data.get('anonymous')
-
         apt_number = form.cleaned_data.get("apt_number")
-        if len(apt_number) > 20:
-            form.add_error(None, "Please keep your Apt/Suite number under 20 characters long. Sorry :(")
-            return self.render_to_response(self.get_context_data(form=form))
-
         street_number = form.cleaned_data.get("street_number")
-        if len(street_number) > 20:
-            form.add_error(None, "Please keep your street number under 20 characters long. Sorry :(")
-            return self.render_to_response(self.get_context_data(form=form))
-
         route = form.cleaned_data.get("route")
-        if len(route) > 100:
-            form.add_error(None, "Please keep your route under 100 characters long. Sorry :(")
-            return self.render_to_response(self.get_context_data(form=form))
-
         locality = form.cleaned_data.get("locality")
-        if len(locality) > 100:
-            form.add_error(None, "Please keep your locality under 100 characters long. Sorry :(")
-            return self.render_to_response(self.get_context_data(form=form))
-
         administrative_area_level_1 = form.cleaned_data.get("administrative_area_level_1")
-        if len(administrative_area_level_1) >= 4:
-            form.add_error(None, "Please use a 2 digit province code i.e. 'ON'.")
-            return self.render_to_response(self.get_context_data(form=form))
-
         address = form.cleaned_data.get("address")
-        if len(address) > 200:
-            form.add_error(None, "Please keep the address under 200 characters long.")
-            return self.render_to_response(self.get_context_data(form=form))
-
         postal_code = form.cleaned_data.get("postal_code")
-        if len(postal_code) > 10:
-            form.add_error(None, "Please keep the postal code under 10 characters long.")
-            return self.render_to_response(self.get_context_data(form=form))
-
 
         # Handle Promo Codes
         code = form.cleaned_data.get("promo_code")
         try:
             promo_code = PromoCode.objects.get(code=code.lower())
-            amount = postcard.amount - promo_code.fixed_amount
+            line_amount = postcard.amount - promo_code.fixed_amount
+            amount = (postcard.amount - promo_code.fixed_amount) * quantity
         except Exception as e:
             print("Exception 0")
             promo_code = None
+            line_amount = postcard.amount
             amount = postcard.amount * quantity
 
         # Handle donation
         donation = 0
+        line_donation = 0
+        total_donation = 0
         if postcard.non_profit:
             donation = form.cleaned_data.get("donation")
             donation = decimal.Decimal(donation)
             print(f"The  donation is {donation}")
 
+            # line donation
+            line_donation = postcard.non_profit.amount
+
             if donation > 0:
                 amount = amount + donation
+                
+            total_donation = donation + line_donation
 
         # Handle Gift Cards
         gift_card_amount = 0
@@ -677,7 +651,9 @@ class PostCardOrderView(FormView):
             print(f"The  gift_card_amount is {gift_card_amount}")
 
             if gift_card_amount > 0:
-                amount = amount + gift_card_amount
+                gift_card_amount_total = gift_card_amount * quantity
+                line_amount = amount + gift_card_amount
+                amount = amount + gift_card_amount_total
 
 
 
@@ -759,6 +735,8 @@ class PostCardOrderView(FormView):
 
         postcard_orders = []
 
+        order = Order.objects.create(profile=profile, name=name, email=email, amount=amount,
+                                     donation_amount=donation, fulfilled=False, total_donation_amount=total_donation)
         for x in range(quantity):
 
             recipient_name = form.cleaned_data.get(f"{x}_recipient_name")
@@ -804,37 +782,42 @@ class PostCardOrderView(FormView):
 
             message_to_recipient = form.cleaned_data.get(f"{x}_message_to_recipient")
 
-            postcard_order = PostCardOrder.objects.create(post_card=postcard, name=name, email=email, anonymous=anonymous, postal_code=postal_code, address=address, apt_number=apt_number,
-                                                          street_number=street_number,  message_to_recipient=message_to_recipient, route=route, locality=locality, administrative_area_level_1=administrative_area_level_1,
-                                                          recipient_name=recipient_name, recipient_address=recipient_address, recipient_apt_number=recipient_apt_number, recipient_street_number=recipient_street_number,
-                                                          recipient_route=recipient_route, recipient_locality=recipient_locality, recipient_administrative_area_level_1=recipient_administrative_area_level_1,
-                                                          recipient_postal_code=recipient_postal_code, amount=amount, donation_amount=donation,
-                                                          promo_code=promo_code, add_gift_card=add_gift_card, gift_card_amount=gift_card_amount, gift_card=gift_card)
+            recipient = Recipient.objects.create(profile=profile, name=recipient_name, email=None,
+                                                 address=recipient_address, apt_number=recipient_apt_number,
+                                                 street_number=recipient_street_number, route=recipient_route, locality=recipient_locality,
+                                                 administrative_area_level_1=recipient_administrative_area_level_1, postal_code=recipient_postal_code)
+
+            line_order = LineOrder.objects.create(order=order, recipient=recipient, promo_code=promo_code, postcard=postcard,
+                                                  address=address, apt_number=apt_number, street_number=street_number,
+                                                  route=route, locality=locality, administrative_area_level_1=administrative_area_level_1,
+                                                  postal_code=postal_code, message_to_recipient=message_to_recipient, amount=line_amount,
+                                                  donation_amount=donation, anonymous=anonymous, add_gift_card=add_gift_card,
+                                                  gift_card=gift_card, gift_card_amount=gift_card_amount)
 
             if amount <= 0:
                 pass
             else:
                 charge = stripe.PaymentIntent.retrieve(stripe_token)
-                postcard_order.payment_intent_id = charge['id']
-                postcard_order.payment_method_id = charge['payment_method']
-                postcard_order.save()
+                order.payment_intent_id = charge['id']
+                order.payment_method_id = charge['payment_method']
+                order.save()
             
-            postcard_orders.append(postcard_order)
+            postcard_orders.append(line_order)
         
         if promo_code != None:
             promo_code.used += quantity
             promo_code.save()
 
-        if settings.DEBUG == False and postcard_order.email != 'info@arqamhouse.com':
-            try:
-                self.send_text_message(postcard_orders)
-            except Exception as e:
-                print(e)
+        # if settings.DEBUG == False and postcard_order.email != 'info@arqamhouse.com':
+        try:
+            self.send_text_message(order, postcard_orders, postcard)
+        except Exception as e:
+            print(e)
 
-            try: 
-                self.send_confirmation_email(postcard_orders)
-            except Exception as e:
-                print(e)
+        try: 
+            self.send_confirmation_email(order, postcard_orders, postcard)
+        except Exception as e:
+            print(e)
 
 
         
@@ -853,54 +836,54 @@ class PostCardOrderView(FormView):
         
         return self.render_to_response(self.get_context_data(form=form))
 
-
-    def send_text_message(self, postcard_orders):
+    def send_text_message(self, order, postcard_orders, postcard):
         account_sid = settings.ACCOUNT_SID
         auth_token = settings.AUTH_TOKEN
         client = Client(account_sid, auth_token)
 
         postcard_amounts = len(postcard_orders)
-        sender_name = postcard_orders[0].name
-        postcard_type = postcard_orders[0].post_card.name
+        sender_name = order.name
 
         if postcard_amounts > 1:
             message = client.messages.create(
-                body=f"You have {postcard_amounts} new postcard orders made by {sender_name}, they want the {postcard_type} postcard",
+                body=f"You have {postcard_amounts} new postcard orders made by {sender_name}",
                 from_='+16475571902',
-                to='+12893887201'
+                to='+16472985582'
             )
         else:
-            postcard_order = postcard_orders[0]
+            postcard_order = order
             message = client.messages.create(
-                body="You have a new postcard order by %s, they want the %s postcard and they want to send it to %s." % (
-                    postcard_order.name, postcard_order.post_card, postcard_order.recipient_name),
+                body="You have a new postcard order by %s, they want to send it to %s." % (
+                    postcard_order.name, postcard_orders[0].recipient.name),
                         from_='+16475571902',
-                        to='+12893887201'
+                        to='+16472985582'
                     )
 
-
-    def send_confirmation_email(self, postcard_orders):
+    def send_confirmation_email(self, order, postcard_orders, postcard):
         # Compose Email
         
         context = {}
 
         postcard_amounts = len(postcard_orders)
-        postcard_order = postcard_orders[0]
-        s3_client = boto3.client('s3', 'ca-central-1', config=Config(signature_version='s3v4'),
-                                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
-        response = s3_client.generate_presigned_url('get_object', Params={
-            'Bucket': settings.AWS_STORAGE_BUCKET_NAME, 'Key': postcard_order.post_card.image_1_path}, ExpiresIn=360000)
+        context["order"] = order
+        context["postcard"] = postcard
+        # s3_client = boto3.client('s3', 'ca-central-1', config=Config(signature_version='s3v4'),
+        #                          aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+        # response = s3_client.generate_presigned_url('get_object', Params={
+        #     'Bucket': settings.AWS_STORAGE_BUCKET_NAME, 'Key': postcard_order.post_card.image_1_path}, ExpiresIn=360000)
 
-        subject = f'Thank you for your purchase, {postcard_order.name}.'
-        context["postcard_order"] = postcard_order
-        context["image_url"] = response
+        subject = f'Thank you for your purchase, {order.name}.'
+        
+        # context["image_url"] = response
 
-        if postcard_order.donation_amount > 0:
+        if order.donation_amount > 0:
             context["donated"] = True
         else:
             context["donated"] = False
 
         if postcard_amounts == 1:
+            context["recipient"] = postcard_orders[0].recipient
+            context["line_order"] = postcard_orders[0]
             html_content = render_to_string('emails/postcard_confirmation.html', context)
 
         else:
@@ -911,7 +894,7 @@ class PostCardOrderView(FormView):
 
         text_content = strip_tags(html_content)
         from_email = f'Arqam House <info@arqamhouse.com>'
-        to = [postcard_orders[0].email]
+        to = [order.email]
         email = EmailMultiAlternatives(subject=subject, body=text_content,
                                        from_email=from_email, to=to)
         email.attach_alternative(html_content, "text/html")

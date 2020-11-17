@@ -25,32 +25,38 @@ from .views import (HomePageView, ReportErrorView, ApplePayVerificationView, Abo
 from events.views import OrderPublicDetailView
 from donations.views import DonationGiftsSentView
 
+from .views import Dashboard
+
 urlpatterns = [
 
     path('', HomePageView.as_view(), name='home'),
     path('zaeem/', admin.site.urls),
-    path('events', EventInfoView.as_view(), name='event_info'),
-    path('donations-info', DonationInfoView.as_view(), name='donation_info'),
-    path('subscribers-info', SubscriberInfoView.as_view(), name='subscriber_info'),
-    path('campaigns-info', CampaignInfoView.as_view(), name='campaign_info'),
-    path('house', FindHouseView.as_view(), name='find_house'),
+
+    path('dashboard', Dashboard.as_view(), name='dashboard'),
+
+
+    # path('events', EventInfoView.as_view(), name='event_info'),
+    # path('donations-info', DonationInfoView.as_view(), name='donation_info'),
+    # path('subscribers-info', SubscriberInfoView.as_view(), name='subscriber_info'),
+    # path('campaigns-info', CampaignInfoView.as_view(), name='campaign_info'),
+    # path('house', FindHouseView.as_view(), name='find_house'),
     path('about', AboutUsView.as_view(), name='about'),
-    path('pricing', PricingView.as_view(), name='pricing'),
+    # path('pricing', PricingView.as_view(), name='pricing'),
     path('contact', ReportErrorView.as_view(), name='report'),
-    path('donation-gifts', DonationGiftsSentView.as_view(), name='donation_gifts_sent'),
+    # path('donation-gifts', DonationGiftsSentView.as_view(), name='donation_gifts_sent'),
     path('zaeem-custom-script', CustomScriptView.as_view(), name='custom_script'),
 
     path('stripe_webhook', StripeWebhook.as_view(), name='stripe_webhook'),
 
     path('postcards/', include('postcards.urls')),
-    path('froala_editor/', include('core.urls')),
-    path('house/', include('houses.urls')),
+    # path('froala_editor/', include('core.urls')),
+    # path('house/', include('houses.urls')),
     path('profile/', include('profiles.urls')),
-    path('events/', include('events.urls')),
-    path('questions/', include('questions.urls')),
-    path('payments/', include('payments.urls')),
-    path('subscribers/', include('subscribers.urls')),
-    path('donations/', include('donations.urls')),
+    # path('events/', include('events.urls')),
+    # path('questions/', include('questions.urls')),
+    # path('payments/', include('payments.urls')),
+    # path('subscribers/', include('subscribers.urls')),
+    # path('donations/', include('donations.urls')),
 
     path('password_reset/', auth_views.PasswordResetView.as_view(html_email_template_name='registration/password_reset_email.html'), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),

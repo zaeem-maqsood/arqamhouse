@@ -182,6 +182,11 @@ class PromoCode(models.Model):
         return (self.code)
 
 
+    
+
+# Create an order model
+
+
 
 class PostCardOrder(models.Model):
 

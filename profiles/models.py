@@ -71,6 +71,15 @@ class Profile(AbstractUser):
     name = models.CharField(max_length=120, null=True, blank=False)
     picture = StdImageField(upload_to=image_location, validators=[validate_file_size], variations={'thumbnail': {'width': 350, 'height': 350}}, null=True, blank=True)
     slug = models.SlugField(unique = False, blank=True)
+    
+    address = models.CharField(max_length=200, null=True, blank=True)
+    apt_number = models.CharField(max_length=20, null=True, blank=True)
+    street_number = models.CharField(max_length=20, null=True, blank=True)
+    route = models.CharField(max_length=100, null=True, blank=True)
+    locality = models.CharField(max_length=100, null=True, blank=True)
+    administrative_area_level_1 = models.CharField(max_length=4, null=True, blank=True)
+    postal_code = models.CharField(max_length=10, null=True, blank=True)
+    
     country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=False, null=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=False, null=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=True)

@@ -216,7 +216,7 @@
                                                                                     style="font-family: Roboto, sans-serif; text-align: center">
                                                                                     <span
                                                                                         style="font-family: inherit; font-size: 20px">Thank
-                                                                                        you for your {% if donated %}donation{% else %}purchase{% endif %}</span>
+                                                                                        you for your {% if order.donation_amount > 0 %}donation{% else %}purchase{% endif %}</span>
                                                                                 </div>
                                                                                 <div></div>
                                                                             </div>
@@ -238,7 +238,7 @@
                                                                                 <div
                                                                                     style="font-family: Oswald, sans-serif; text-align: center; text-transform: uppercase; letter-spacing: 2px">
                                                                                     <span
-                                                                                        style="font-family: inherit; font-size: 48px; color: #4599d5">{{ postcard_order.name|title }}</span></div>
+                                                                                        style="font-family: inherit; font-size: 48px; color: #4599d5">{{ order.name|title }}</span></div>
                                                                                 <div></div>
                                                                             </div>
                                                                         </td>
@@ -255,16 +255,17 @@
                                                                             height="100%" valign="top" bgcolor=""
                                                                             role="module-content">
                                                                             <div>
-                                                                                {% if donated %}
+                                                                                {% if order.donation_amount > 0 %}
                                                                                 <div style="font-family: Roboto, sans-serif; text-align: center">
-                                                                                    Thank you for your donation of ${{ postcard_order.donation_amount }} to
-                                                                                    <a href="{{ postcard_order.post_card.non_profit.website }}">{{ postcard_order.post_card.non_profit.name }}</a>!
+                                                                                    Thank you for your donation of ${{ order.donation_amount }} to
+                                                                                    <a href="{{ postcard_order.post_card.non_profit.website }}">{{ postcard.non_profit.name }}</a>!
                                                                                 </div>
                                                                                 {% endif %}
-                                                                                {% if postcard_order.post_card.non_profit %}
+                                                                                {% if postcard.non_profit %}
                                                                                 <div style="font-family: Roboto, sans-serif; text-align: center">
-                                                                                    A donation of ${{ postcard_order.post_card.non_profit.amount }} will be made to
-                                                                                    {{ postcard_order.post_card.non_profit.name }} for each postcard you purchased{% if donated %} in addition to your donation.{% else %}.{% endif %}
+                                                                                    A donation of ${{ postcard.non_profit.amount }} will be made to
+                                                                                    {{ postcard.non_profit.name }} for your purchase of this postcard{% if order.donation_amount > 0 %}
+                                                                                    in addition to your donation of ${{ order.donation_amount }} (Total Donation: ${{ order.total_donation_amount }}){% else %}.{% endif %}
                                                                                 </div>
                                                                                 {% endif %}
                                                                                 <div
@@ -277,7 +278,7 @@
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
-                                                            <table class="wrapper" role="module" data-type="image"
+                                                            <!-- <table class="wrapper" role="module" data-type="image"
                                                                 border="0" cellpadding="0" cellspacing="0" width="100%"
                                                                 style="table-layout: fixed;"
                                                                 data-muid="bde5092a-abc0-4d89-b19b-9584676196da">
@@ -306,7 +307,7 @@
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
-                                                            </table>
+                                                            </table> -->
                                                             
                                                             {% for postcard_order in postcard_orders %}
                                                             <table class="module" role="module" data-type="text" border="0" cellpadding="0" cellspacing="0" width="100%"
@@ -317,9 +318,9 @@
                                                                             bgcolor="" role="module-content">
                                                                             <div>
                                                                                 <div style="font-family: Roboto, sans-serif; text-align: center">
-                                                                                    Postcard {{ forloop.counter }} will be sent to {{ postcard_order.recipient_name }}.
-                                                                                    The address you provided is {% if postcard_order.recipient_apt_number %}{{ postcard_order.recipient_apt_number }}-{% else %}{% endif %} {{ postcard_order.recipient_street_number }} {{ postcard_order.recipient_route }} {{ postcard_order.recipient_locality }} 
-                                                                                    {{ postcard_order.recipient_administrative_area_level_1 }} {{ postcard_order.recipient_postal_code }}.
+                                                                                    Postcard {{ forloop.counter }} will be sent to {{ postcard_order.recipient.name }}.
+                                                                                    The address you provided is {% if postcard_order.apt_number %}{{ postcard_order.recipient.apt_number }}-{% else %}{% endif %} {{ postcard_order.recipient.street_number }} {{ postcard_order.recipient.route }} {{ postcard_order.recipient.locality }} 
+                                                                                    {{ postcard_order.recipient.administrative_area_level_1 }} {{ postcard_order.recipient.postal_code }}.
                                                                                     The personalized message you requested on the back of the card is: "{{ postcard_order.message_to_recipient }}"
                                                                                     
                                                                                 </div>

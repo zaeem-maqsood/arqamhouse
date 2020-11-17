@@ -1,0 +1,57 @@
+{% extends "frontend/basic_base.html" %}
+
+{% load static %}
+
+{% block title %}
+Custom Scripts
+{% endblock title %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<section class="text-center" style="padding-top:5rem;">
+    <div class="container">
+
+        <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 4em;"></a>
+                <p style="margin-bottom: 0px;margin-top:5px;font-size: 0.6em;">Hey, {{ user.name }}</p>
+            </div>
+        </div>
+
+
+        <form id="donationForm" method="POST" onSubmit="document.getElementById('customButton').disabled = true;">{% csrf_token %}
+        
+        
+        <div class="row justify-content-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <button class="btn btn-primary btn-sm btn-block" id="action_1" name="action_1" value="true">Action 1</button>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <button class="btn btn-primary btn-sm btn-block" id="action_2" name="action_2" value="true">Action 2</button>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <button class="btn btn-primary btn-sm btn-block" id="action_3" name="action_3" value="true">Action 3</button>
+            </div>
+        </div>
+
+
+
+        </form>
+
+    </div>
+</section>
+{% endblock content %}
