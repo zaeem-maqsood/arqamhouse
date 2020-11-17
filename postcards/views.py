@@ -412,7 +412,7 @@ class PostCardListView(View):
         get_data = self.request.GET
         if 'success' in get_data:
             context["show_confetti"] = True
-            context["postcard_order"] = PostCardOrder.objects.all().reverse().first()
+            context["postcard_order"] = Order.objects.latest('id')
 
         context["postcards"] = postcards
         context["non_profit"] = non_profit
@@ -559,7 +559,7 @@ class PostCardOrderView(FormView):
         postcard = self.get_postcard()
             
         try:
-            last_postcard = Order.objects.filter(post_card=postcard).latest('id')
+            last_postcard = LineOrder.objects.filter(post_card=postcard).latest('id')
             context["last_postcard"] = last_postcard
         except:
             pass
