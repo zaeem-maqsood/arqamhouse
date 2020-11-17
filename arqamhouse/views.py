@@ -56,35 +56,39 @@ class CustomScriptView(View):
                 postcard_orders = PostCardOrder.objects.all()
                 for postcard_order in postcard_orders:
 
-                    profile = Profile.objects.get(email=postcard_order.email.lower())
+                    try:
+                        profile = Profile.objects.get(email=postcard_order.email.lower())
 
-                    recipient, created = Recipient.objects.get_or_create(profile=profile, created_at=postcard_order.created_at, name=postcard_order.recipient_name, email=None,
-                                                        address=postcard_order.recipient_address, apt_number=postcard_order.recipient_apt_number, 
-                                                        street_number=postcard_order.recipient_street_number, route=postcard_order.recipient_route, locality=postcard_order.recipient_locality,
-                                                        administrative_area_level_1=postcard_order.recipient_administrative_area_level_1, postal_code=postcard_order.recipient_postal_code)
+                        recipient, created = Recipient.objects.get_or_create(profile=profile, created_at=postcard_order.created_at, name=postcard_order.recipient_name, email=None,
+                                                            address=postcard_order.recipient_address, apt_number=postcard_order.recipient_apt_number, 
+                                                            street_number=postcard_order.recipient_street_number, route=postcard_order.recipient_route, locality=postcard_order.recipient_locality,
+                                                            administrative_area_level_1=postcard_order.recipient_administrative_area_level_1, postal_code=postcard_order.recipient_postal_code)
 
-                    # Create Order
-                    order = Order.objects.create(profile=profile, created_at=postcard_order.created_at, name=postcard_order.name, email=postcard_order.email, 
-                                                 amount=postcard_order.amount, donation_amount=postcard_order.donation_amount, fulfilled=True, 
-                                                 payment_intent_id=postcard_order.payment_intent_id, payment_method_id=postcard_order.payment_method_id)
+                        # Create Order
+                        order = Order.objects.create(profile=profile, created_at=postcard_order.created_at, name=postcard_order.name, email=postcard_order.email, 
+                                                    amount=postcard_order.amount, donation_amount=postcard_order.donation_amount, fulfilled=True, 
+                                                    payment_intent_id=postcard_order.payment_intent_id, payment_method_id=postcard_order.payment_method_id)
 
-                    if postcard_order.promo_code:
-                        promo_code, created = orderPromoCode.objects.get_or_create(created_at=postcard_order.promo_code.created_at,
-                                                            code=postcard_order.promo_code.code, fixed_amount=postcard_order.promo_code.fixed_amount,
-                                                            total_uses=postcard_order.promo_code.total_uses, used=postcard_order.promo_code.used, 
-                                                            active=postcard_order.promo_code.active)
-                    else:
-                        promo_code = None
+                        if postcard_order.promo_code:
+                            promo_code, created = orderPromoCode.objects.get_or_create(created_at=postcard_order.promo_code.created_at,
+                                                                code=postcard_order.promo_code.code, fixed_amount=postcard_order.promo_code.fixed_amount,
+                                                                total_uses=postcard_order.promo_code.total_uses, used=postcard_order.promo_code.used, 
+                                                                active=postcard_order.promo_code.active)
+                        else:
+                            promo_code = None
 
-                    line_order = LineOrder.objects.create(order=order, recipient=recipient, promo_code=promo_code, created_at=postcard_order.created_at, postcard=postcard_order.post_card,
-                                                        address=postcard_order.address, apt_number=postcard_order.apt_number, street_number=postcard_order.street_number,
-                                                      route=postcard_order.route, locality=postcard_order.locality, administrative_area_level_1=postcard_order.administrative_area_level_1,
-                                                      postal_code=postcard_order.postal_code, message_to_recipient=postcard_order.message_to_recipient, amount=postcard_order.amount, 
-                                                      donation_amount=postcard_order.donation_amount, anonymous=postcard_order.anonymous, add_gift_card=postcard_order.add_gift_card,
-                                                      gift_card=postcard_order.gift_card, gift_card_amount=postcard_order.gift_card_amount, sent_to_recipient=postcard_order.sent_to_recipient,
-                                                    envelope_printed=postcard_order.envelope_printed,
-                                                      front_printed=postcard_order.front_printed, name_printed=postcard_order.name_printed, message_printed=postcard_order.message_printed,
-                                                      finished_image=postcard_order.finished_image)
+                        line_order = LineOrder.objects.create(order=order, recipient=recipient, promo_code=promo_code, created_at=postcard_order.created_at, postcard=postcard_order.post_card,
+                                                            address=postcard_order.address, apt_number=postcard_order.apt_number, street_number=postcard_order.street_number,
+                                                        route=postcard_order.route, locality=postcard_order.locality, administrative_area_level_1=postcard_order.administrative_area_level_1,
+                                                        postal_code=postcard_order.postal_code, message_to_recipient=postcard_order.message_to_recipient, amount=postcard_order.amount, 
+                                                        donation_amount=postcard_order.donation_amount, anonymous=postcard_order.anonymous, add_gift_card=postcard_order.add_gift_card,
+                                                        gift_card=postcard_order.gift_card, gift_card_amount=postcard_order.gift_card_amount, sent_to_recipient=postcard_order.sent_to_recipient,
+                                                        envelope_printed=postcard_order.envelope_printed,
+                                                        front_printed=postcard_order.front_printed, name_printed=postcard_order.name_printed, message_printed=postcard_order.message_printed,
+                                                        finished_image=postcard_order.finished_image)
+
+                    except Exception as e:
+                        print(e)
 
 
         if 'action_2' in data:
