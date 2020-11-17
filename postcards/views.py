@@ -559,7 +559,7 @@ class PostCardOrderView(FormView):
         postcard = self.get_postcard()
             
         try:
-            last_postcard = Order.objects.filter(post_card=postcard).order_by("-created_at").first()
+            last_postcard = Order.objects.filter(post_card=postcard).latest('id')
             context["last_postcard"] = last_postcard
         except:
             pass
