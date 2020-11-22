@@ -134,7 +134,7 @@ class CustomScriptView(View):
                     profile = line_order.order.profile
                     address, created = Address.objects.get_or_create(profile=profile)
                     if created:
-                        address.name = line_order.name
+                        address.name = line_order.order.name
                         address.default = True
                         address.address = line_order.address
                         address.apt_number = line_order.apt_number
