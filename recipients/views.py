@@ -39,7 +39,7 @@ class RecipientList(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         context = {}
         profile = self.get_profile()
-        recipients = Recipient.objects.filter(profile=profile)
+        recipients = Recipient.objects.filter(profile=profile, deleted=False)
         context["recipients"] = recipients
         context["profile"] = profile
         print(profile.name)
@@ -132,6 +132,14 @@ class UpdateRecipient(LoginRequiredMixin, UpdateView):
         data = request.POST
         print(data)
 
+        if 'delete' in data:
+            print("Is it coming here")
+            recipient = self.get_recipient(profile)
+            recipient.deleted = True
+            recipient.save()
+            messages.warning(request, 'Recipient Deleted')
+            return HttpResponseRedirect(self.get_success_url())
+
         form = self.get_form()
         if form.is_valid():
             return self.form_valid(form, request)
@@ -149,13 +157,9 @@ class UpdateRecipient(LoginRequiredMixin, UpdateView):
     def form_valid(self, form, request):
         data = request.POST
         profile = self.get_profile()
+        messages.success(request, "Recipient Updated")
         self.object = form.save()
 
-        if 'delete' in data:
-            self.object.delete()
-            messages.warning(request, 'Recipient Deleted')
-        else:
-            messages.success(request, "Recipient Updated")
         valid_data = super(UpdateRecipient, self).form_valid(form)
         return valid_data
 

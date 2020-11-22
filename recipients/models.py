@@ -19,6 +19,7 @@ class Recipient(models.Model):
     administrative_area_level_1 = models.CharField(max_length=4, null=True, blank=True)
     postal_code = models.CharField(max_length=10, null=True, blank=True)
     counter = models.PositiveIntegerField(blank=True, null=True, default=0)
+    deleted = models.BooleanField(default=False)
 
     def __str__(self):
         return (self.name)

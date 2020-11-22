@@ -114,8 +114,8 @@ Orders
                         {% endif %}
                         <p style="margin-bottom: 0px;font-size: 0.8em;" class="p-align-middle">Postcard Price: ${{ line_order.postcard.amount }}</p>
                         {% if line_order.promo_code %}
-                        <p style="margin-bottom: 0px;font-size: 0.8em;" class="p-align-middle">Promo Code Used: ${{ line_order.promo_code.code }} for
-                            ${{ line_order.promo_code.fixed_amount }} off purchase.</p>
+                        <p style="margin-bottom: 0px;font-size: 0.8em;" class="p-align-middle">Promo Code Used: <span style="color: #007bff;">{{ line_order.promo_code.code }}</span> for
+                            <span style="color: green;">${{ line_order.promo_code.fixed_amount }}</span> off purchase.</p>
                         {% endif %}
                         <p style="margin-bottom: 0px;" class="p-align-middle">Sub Total: ${{ line_order.amount }}</p>
                     </div>
