@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+from django.urls import reverse
+
 from profiles.models import Profile
 
 # Create your models here.
@@ -16,6 +18,11 @@ class Recipient(models.Model):
     locality = models.CharField(max_length=100, null=True, blank=True)
     administrative_area_level_1 = models.CharField(max_length=4, null=True, blank=True)
     postal_code = models.CharField(max_length=10, null=True, blank=True)
+    counter = models.PositiveIntegerField(blank=True, null=True, default=0)
 
     def __str__(self):
         return (self.name)
+
+    def get_update_url(self):
+        view_name = "profiles:recipients:update_recipient"
+        return reverse(view_name, kwargs={"id": self.id})

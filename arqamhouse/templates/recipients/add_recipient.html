@@ -1,0 +1,159 @@
+{% extends "frontend/basic_base.html" %}
+
+{% block title %}
+Add Recipient
+{% endblock title %}
+
+{% load static %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+
+<script>
+
+    function hideMainAddressOnInput() {
+
+        main_address_row = document.getElementById("main_address_row");
+        main_address_row.style.display = 'none';
+
+        main_line_1_row = document.getElementById("main_line_1_row");
+        main_line_1_row.style.display = 'flex';
+
+        main_line_2_row = document.getElementById("main_line_2_row");
+        main_line_2_row.style.display = 'flex';
+
+    }
+
+    function initMap() {
+
+        var input = document.getElementById('main_address');
+        autocomplete = new google.maps.places.Autocomplete(input, { types: ['address'], componentRestrictions: { country: "ca" } });
+        autocomplete.setFields(['address_component']);
+        autocomplete.addListener('place_changed', fillInAddress);
+
+    }
+
+    function fillInAddress() {
+        // Get the place details from the autocomplete object.
+        var place = autocomplete.getPlace();
+
+        var componentForm = {
+            street_number: 'short_name',
+            route: 'long_name',
+            locality: 'long_name',
+            administrative_area_level_1: 'short_name',
+            postal_code: 'short_name'
+        };
+
+        for (var component in componentForm) {
+            document.getElementById(component).value = '';
+            document.getElementById(component).disabled = false;
+        }
+
+        // Get each component of the address from the place details,
+        // and then fill-in the corresponding field on the form.
+        for (var i = 0; i < place.address_components.length; i++) {
+            var addressType = place.address_components[i].types[0];
+            if (componentForm[addressType]) {
+                var val = place.address_components[i][componentForm[addressType]];
+                document.getElementById(addressType).value = val;
+            }
+        }
+
+
+        hideMainAddressOnInput();
+
+    }
+
+
+
+
+</script>
+
+<script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnTiJMXoPzVLoo-ztKaRyCrjAocA0K3pQ&libraries=places&callback=initMap"></script>
+{% endblock scripts %}
+
+{% block content %}
+<section style="padding-top:5rem;">
+    <div class="container" onload="enableVerifyPhoneButton();">
+
+        <form action="" method="POST" enctype="multipart/form-data" id="profileForm">
+            {% csrf_token %}
+
+            <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+                <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                    <a href="{% url 'home' %}"><img id="image-placeholder" src="{% static 'images/logo.png' %}"
+                            style="max-height: 5em;"></a>
+                </div>
+            </div>
+
+
+            <div class="row justify-content-center" style="padding-bottom: 30px;">
+                <div class="col-lg-6 col-md-10 col-sm-12 col-10"
+                    style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;padding: 20px;">
+
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-12" style="padding-bottom: 10px;">
+                            <p style="text-align: left;margin-bottom: 0px;">Name</p>
+                            {{ form.name }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 10px;" id="main_address_row">
+                        <div class="col-12" style="padding-bottom: 10px;">
+                            <p style="text-align: left;margin-bottom: 0px;">Address</p>
+                            {{ form.address }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 10px;display: none;" id="main_line_1_row">
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Apt/Suite <span style="font-size: 0.6em;">Optional</span></p>
+                            {{ form.apt_number }}
+                        </div>
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Street Number</p>
+                            {{ form.street_number }}
+                        </div>
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Route</p>
+                            {{ form.route }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 10px;display: none;" id="main_line_2_row">
+                        <div class="col-md-4 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Locality</p>
+                            {{ form.locality }}
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Province</p>
+                            {{ form.administrative_area_level_1 }}
+                        </div>
+                        <div class="col-md-5 col-sm-12 col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Postal Code</p>
+                            {{ form.postal_code }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-12">
+                            <button type="submit" id="create_account_button" class="btn btn-primary btn-block">Add
+                                Recipient</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>
+{% endblock content %}

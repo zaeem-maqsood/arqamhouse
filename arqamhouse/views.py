@@ -14,25 +14,55 @@ from django.http import Http404, HttpResponseRedirect, HttpResponse, JsonRespons
 from django.conf import settings
 from django.db import transaction
 
+
 from .forms import ReportErrorForm
 from houses.models import House
+
+from core.mixins import LoginRequiredMixin
 
 from postcards.models import PostCardOrder, PromoCode
 from orders.models import Order, LineOrder
 from orders.models import PromoCode as orderPromoCode
 from recipients.models import Recipient
-from profiles.models import Profile
+from profiles.models import Profile, Address
 
 from django.views.decorators.csrf import csrf_exempt
 
 
-class Dashboard(View):
+
+class Menu(LoginRequiredMixin,View):
+    template_name = "dashboard/menu.html"
+
+    def get_profile(self):
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except Exception as e:
+            print(e)
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        profile = self.get_profile()
+        context["profile"] = profile
+        return render(request, self.template_name, context)
+
+
+class Dashboard(LoginRequiredMixin,View):
     template_name = "dashboard/main.html"
+
+    def get_profile(self):
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except Exception as e:
+            print(e)
+            raise Http404
 
     def get(self, request, *args, **kwargs):
         context = {}
         user = request.user
-        postcard_orders = PostCardOrder.objects.filter(email=user.email).order_by("-created_at")[:3]
+        postcard_orders = LineOrder.objects.filter(order__email=user.email).order_by("-id")[:3]
         context["user"] = user
         context["postcard_orders"] = postcard_orders
         return render(request, self.template_name, context)
@@ -56,43 +86,64 @@ class CustomScriptView(View):
                 postcard_orders = PostCardOrder.objects.all()
                 for postcard_order in postcard_orders:
 
-                    try:
-                        profile = Profile.objects.get(email=postcard_order.email.lower())
+                    if postcard_order.name:
+                        try:
+                            profile = Profile.objects.get(email=postcard_order.email.lower())
 
-                        recipient, created = Recipient.objects.get_or_create(profile=profile, created_at=postcard_order.created_at, name=postcard_order.recipient_name, email=None,
-                                                            address=postcard_order.recipient_address, apt_number=postcard_order.recipient_apt_number, 
-                                                            street_number=postcard_order.recipient_street_number, route=postcard_order.recipient_route, locality=postcard_order.recipient_locality,
-                                                            administrative_area_level_1=postcard_order.recipient_administrative_area_level_1, postal_code=postcard_order.recipient_postal_code)
+                            recipient, created = Recipient.objects.get_or_create(profile=profile, created_at=postcard_order.created_at, name=postcard_order.recipient_name, email=None,
+                                                                                address=postcard_order.recipient_address, apt_number=postcard_order.recipient_apt_number,
+                                                                                street_number=postcard_order.recipient_street_number, route=postcard_order.recipient_route, locality=postcard_order.recipient_locality,
+                                                                                administrative_area_level_1=postcard_order.recipient_administrative_area_level_1, postal_code=postcard_order.recipient_postal_code)
 
-                        # Create Order
-                        order = Order.objects.create(profile=profile, created_at=postcard_order.created_at, name=postcard_order.name, email=postcard_order.email, 
-                                                    amount=postcard_order.amount, donation_amount=postcard_order.donation_amount, fulfilled=True, 
-                                                    payment_intent_id=postcard_order.payment_intent_id, payment_method_id=postcard_order.payment_method_id)
+                            # Create Order
+                            order = Order.objects.create(profile=profile, created_at=postcard_order.created_at, name=postcard_order.name, email=postcard_order.email,
+                                                        amount=postcard_order.amount, donation_amount=postcard_order.donation_amount, fulfilled=True,
+                                                        payment_intent_id=postcard_order.payment_intent_id, payment_method_id=postcard_order.payment_method_id)
 
-                        if postcard_order.promo_code:
-                            promo_code, created = orderPromoCode.objects.get_or_create(created_at=postcard_order.promo_code.created_at,
-                                                                code=postcard_order.promo_code.code, fixed_amount=postcard_order.promo_code.fixed_amount,
-                                                                total_uses=postcard_order.promo_code.total_uses, used=postcard_order.promo_code.used, 
-                                                                active=postcard_order.promo_code.active)
-                        else:
-                            promo_code = None
+                            if postcard_order.promo_code:
+                                promo_code, created = orderPromoCode.objects.get_or_create(created_at=postcard_order.promo_code.created_at,
+                                                                                        code=postcard_order.promo_code.code, fixed_amount=postcard_order.promo_code.fixed_amount,
+                                                                                        total_uses=postcard_order.promo_code.total_uses, used=postcard_order.promo_code.used,
+                                                                                        active=postcard_order.promo_code.active)
+                            else:
+                                promo_code = None
 
-                        line_order = LineOrder.objects.create(order=order, recipient=recipient, promo_code=promo_code, created_at=postcard_order.created_at, postcard=postcard_order.post_card,
-                                                            address=postcard_order.address, apt_number=postcard_order.apt_number, street_number=postcard_order.street_number,
-                                                        route=postcard_order.route, locality=postcard_order.locality, administrative_area_level_1=postcard_order.administrative_area_level_1,
-                                                        postal_code=postcard_order.postal_code, message_to_recipient=postcard_order.message_to_recipient, amount=postcard_order.amount, 
-                                                        donation_amount=postcard_order.donation_amount, anonymous=postcard_order.anonymous, add_gift_card=postcard_order.add_gift_card,
-                                                        gift_card=postcard_order.gift_card, gift_card_amount=postcard_order.gift_card_amount, sent_to_recipient=postcard_order.sent_to_recipient,
-                                                        envelope_printed=postcard_order.envelope_printed,
-                                                        front_printed=postcard_order.front_printed, name_printed=postcard_order.name_printed, message_printed=postcard_order.message_printed,
-                                                        finished_image=postcard_order.finished_image)
+                            sender_address, created = Address.objects.get_or_create(profile=profile, name=postcard_order.name, address=postcard_order.address, apt_number=postcard_order.apt_number, street_number=postcard_order.street_number,
+                                                                            route=postcard_order.street_number, locality=postcard_order.locality, 
+                                                                            administrative_area_level_1=postcard_order.administrative_area_level_1, postal_code=postcard_order.postal_code)
 
-                    except Exception as e:
-                        print(e)
+                        
+                            line_order = LineOrder.objects.create(order=order, recipient=recipient, promo_code=promo_code, created_at=postcard_order.created_at, postcard=postcard_order.post_card,
+                                                                sender_address=sender_address, message_to_recipient=postcard_order.message_to_recipient, amount=postcard_order.amount,
+                                                                donation_amount=postcard_order.donation_amount, anonymous=postcard_order.anonymous, add_gift_card=postcard_order.add_gift_card,
+                                                                gift_card=postcard_order.gift_card, gift_card_amount=postcard_order.gift_card_amount, sent_to_recipient=postcard_order.sent_to_recipient,
+                                                                envelope_printed=postcard_order.envelope_printed,
+                                                                front_printed=postcard_order.front_printed, name_printed=postcard_order.name_printed, message_printed=postcard_order.message_printed,
+                                                                finished_image=postcard_order.finished_image)
 
+                        except Exception as e:
+                            print(e)
 
         if 'action_2' in data:
-            pass
+
+            with transaction.atomic():
+                line_orders = LineOrder.objects.all()
+                for line_order in line_orders:
+                    
+                    print(line_order)
+                    profile = line_order.order.profile
+                    address, created = Address.objects.get_or_create(profile=profile)
+                    if created:
+                        address.name = line_order.name
+                        address.default = True
+                        address.address = line_order.address
+                        address.apt_number = line_order.apt_number
+                        address.street_number = line_order.street_number
+                        address.route = line_order.route
+                        address.locality = line_order.locality
+                        address.administrative_area_level_1 = line_order.administrative_area_level_1
+                        address.postal_code = line_order.postal_code
+                        address.save()
 
         if 'action_3' in data:
             pass

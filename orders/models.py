@@ -1,10 +1,11 @@
 from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator
+from django.urls import reverse
 
 from postcards.models import PostCard
 from recipients.models import Recipient
-from profiles.models import Profile
+from profiles.models import Profile, Address
 
 # Create your models here.
 
@@ -48,6 +49,11 @@ class Order(models.Model):
     def __str__(self):
         return (self.name)
 
+    def get_absolute_url(self):
+        view_name = "profiles:orders:detail"
+        return reverse(view_name, kwargs={"id": self.id})
+
+
 
 
 class PromoCode(models.Model):
@@ -73,6 +79,7 @@ class LineOrder(models.Model):
     recipient = models.ForeignKey(Recipient, on_delete=models.CASCADE, blank=True, null=True)
 
     # replace with address model --------
+    sender_address = models.ForeignKey(Address, on_delete=models.CASCADE, blank=True, null=True)
     address = models.CharField(max_length=200, null=True, blank=True)
     apt_number = models.CharField(max_length=20, null=True, blank=True)
     street_number = models.CharField(max_length=20, null=True, blank=True)
@@ -103,3 +110,8 @@ class LineOrder(models.Model):
 
     def __str__(self):
         return (self.order.name)
+
+
+    def get_order_url(self):
+        view_name = "profiles:orders:detail"
+        return reverse(view_name, kwargs={"id": self.order.id})

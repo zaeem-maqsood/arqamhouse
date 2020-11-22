@@ -2,6 +2,7 @@
 from django import forms
 from postcards.models import PostCardOrder, PostCardBusinessOrder
 from orders.models import Order
+from recipients.models import Recipient
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget, PhoneNumberPrefixWidget
 
 
@@ -132,37 +133,49 @@ class PostCardBusinessOrderFormStepOne(forms.ModelForm):
 
 class PostcardOrderForm(forms.Form):
 
-    name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Full Name"}), required=True, max_length=100)
-    email = forms.EmailField(widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "someone@example.com"}), required=True, max_length=200)
-    anonymous = forms.BooleanField(widget=forms.CheckboxInput(attrs={"checked": False}), required=False,)
-
-    def __init__(self, quantity, postcard, *args, **kwargs):
+    def __init__(self, quantity, postcard, profile, authenticated, *args, **kwargs):
         super(PostcardOrderForm, self).__init__(*args, **kwargs)
 
+        self.authenticated = authenticated
+        self.profile = profile
+
         print(f"The quantity is {quantity}")
+
+        if profile and authenticated:
+            pass
+        else:
+
+            self.fields["name"] = forms.CharField(widget=forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Full Name"}), required=True, max_length=30)
+
+            self.fields["email"] = forms.EmailField(widget=forms.EmailInput(
+                attrs={"class": "form-control", "placeholder": "someone@example.com"}), required=True, max_length=200)
         
-        self.fields["address"] = forms.CharField(label="Address", widget=forms.TextInput(
-            attrs={"class": "form-control", "autocomplete": "off", "placeholder": "123 Main Street", "id": "main_address"}), required=False)
+            self.fields["address"] = forms.CharField(label="Address", widget=forms.TextInput(
+                attrs={"class": "form-control", "autocomplete": "off", "placeholder": "123 Main Street", "id": "main_address"}), required=False)
 
-        # Fields
-        self.fields["apt_number"] = forms.CharField(label="Apt Number", widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "", "id": "apt_number"}), required=False)
+            # Fields
+            self.fields["apt_number"] = forms.CharField(label="Apt Number", widget=forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "", "id": "apt_number"}), required=False)
 
-        self.fields["street_number"] = forms.CharField(label="Address", widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "123", "id": "street_number"}), required=True)
+            self.fields["street_number"] = forms.CharField(label="Address", widget=forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "123", "id": "street_number"}), required=True)
 
-        self.fields["route"] = forms.CharField(label="Address", widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Main Street", "id": "route"}), required=True)
+            self.fields["route"] = forms.CharField(label="Address", widget=forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Main Street", "id": "route"}), required=True)
 
-        self.fields["locality"] = forms.CharField(label="Address", widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Toronto", "id": "locality"}), required=True)
+            self.fields["locality"] = forms.CharField(label="Address", widget=forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Toronto", "id": "locality"}), required=True)
 
-        self.fields["administrative_area_level_1"] = forms.CharField(label="Address", widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "ON", "id": "administrative_area_level_1", "maxlength": "2"}), required=True)
+            self.fields["administrative_area_level_1"] = forms.CharField(label="Address", widget=forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "ON", "id": "administrative_area_level_1", "maxlength": "2"}), required=True)
 
-        self.fields["postal_code"] = forms.CharField(label="Address", widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "L1Z 5G5", "id": "postal_code"}), required=True)
+            self.fields["postal_code"] = forms.CharField(label="Address", widget=forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "L1Z 5G5", "id": "postal_code"}), required=True)
 
+        self.fields["anonymous"] = forms.BooleanField(
+            widget=forms.CheckboxInput(attrs={"checked": False}), required=False,)
+            
         self.fields["promo_code"] = forms.CharField(label="Promo Code", widget=forms.TextInput(
             attrs={"class": "form-control", "placeholder": "Promo Code", "id": "promo_code"}), required=False)
 
@@ -182,31 +195,34 @@ class PostcardOrderForm(forms.Form):
 
 
         for x in range(int(quantity)):
-            self.fields["%s_recipient_name" % (x)] = forms.CharField(widget=forms.TextInput(
-                attrs={"class": "form-control", "placeholder": f"Recipient {x + 1}", "maxlength": '20', }), required=True)
 
-            self.fields[f"autocomplete{x}"] = forms.CharField(label="Address", widget=forms.TextInput(
-                attrs={"class": "form-control", "autocomplete": "off", "placeholder": "123 Main Street", "id": f"autocomplete{x}"}), required=False)
+            if authenticated:
+                self.fields[f"recipient_{x}"] = forms.ModelChoiceField(queryset=Recipient.objects.filter(profile=profile).order_by("-counter"), empty_label=None)
 
-            self.fields[f"apt_number_{x}"] = forms.CharField(widget=forms.NumberInput(
-                attrs={"class": "form-control", "placeholder": "10", "id": f"recipient_apt_number_{x}", "max": 99999}), required=False)
+            else:
+                self.fields["%s_recipient_name" % (x)] = forms.CharField(widget=forms.TextInput(
+                    attrs={"class": "form-control", "placeholder": f"Recipient {x + 1}", "maxlength": '20', }), required=True)
 
-            self.fields[f"street_number_{x}"] = forms.CharField(widget=forms.NumberInput(
-                attrs={"class": "form-control", "placeholder": "123", "id": f"street_number_{x}", "max": 99999}), required=True)
+                self.fields[f"autocomplete{x}"] = forms.CharField(label="Address", widget=forms.TextInput(
+                    attrs={"class": "form-control", "autocomplete": "off", "placeholder": "123 Main Street", "id": f"autocomplete{x}"}), required=False)
 
-            self.fields[f"route_{x}"] = forms.CharField(widget=forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Main Street", "id": f"route_{x}", "maxlength": "40"}), required=True)
+                self.fields[f"apt_number_{x}"] = forms.CharField(widget=forms.NumberInput(
+                    attrs={"class": "form-control", "placeholder": "10", "id": f"recipient_apt_number_{x}", "max": 99999}), required=False)
 
-            self.fields[f"locality_{x}"] = forms.CharField(widget=forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Toronto", "id": f"locality_{x}", "maxlength": "40"}), required=True)
+                self.fields[f"street_number_{x}"] = forms.CharField(widget=forms.NumberInput(
+                    attrs={"class": "form-control", "placeholder": "123", "id": f"street_number_{x}", "max": 99999}), required=True)
 
-            self.fields[f"administrative_area_level_1_{x}"] = forms.CharField(widget=forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "ON", "id": f"administrative_area_level_1_{x}", "maxlength": "2"}), required=True)
+                self.fields[f"route_{x}"] = forms.CharField(widget=forms.TextInput(
+                    attrs={"class": "form-control", "placeholder": "Main Street", "id": f"route_{x}", "maxlength": "40"}), required=True)
 
-            self.fields[f"postal_code_{x}"] = forms.CharField(widget=forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "L1Z 5G5", "id": f"postal_code_{x}", "maxlength": "10"}), required=True)
+                self.fields[f"locality_{x}"] = forms.CharField(widget=forms.TextInput(
+                    attrs={"class": "form-control", "placeholder": "Toronto", "id": f"locality_{x}", "maxlength": "40"}), required=True)
 
+                self.fields[f"administrative_area_level_1_{x}"] = forms.CharField(widget=forms.TextInput(
+                    attrs={"class": "form-control", "placeholder": "ON", "id": f"administrative_area_level_1_{x}", "maxlength": "2"}), required=True)
 
+                self.fields[f"postal_code_{x}"] = forms.CharField(widget=forms.TextInput(
+                    attrs={"class": "form-control", "placeholder": "L1Z 5G5", "id": f"postal_code_{x}", "maxlength": "10"}), required=True)
 
             self.fields["%s_message_to_recipient" % (x)] = forms.CharField(widget=forms.Textarea(
                 attrs={"class": "form-control", "placeholder": "Write your personalized message for the recipient here", "maxlength": '280', "rows": 3}), required=True)
@@ -221,46 +237,45 @@ class PostcardOrderForm(forms.Form):
     def clean(self, *args, **kwargs):
         cleaned_data = super(PostcardOrderForm, self).clean(*args, **kwargs)
 
-        print("The args and kwargs are")
-        print(args)
-        print(kwargs)
-        print("The args and kwargs are")
+        if self.profile and self.authenticated:
+            pass
 
-        # Email Validation
-        email = self.cleaned_data.get('email')
-        if len(email) > 300:
-            raise forms.ValidationError('Please keep your email under 200 characters long.')
+        else:
+            # Email Validation
+            email = self.cleaned_data.get('email')
+            if len(email) > 300:
+                raise forms.ValidationError('Please keep your email under 200 characters long.')
 
-        # Apt number validation
-        apt_number = self.cleaned_data.get("apt_number")
-        if apt_number:
-            if len(apt_number) > 20:
-                raise forms.ValidationError("Please keep your apt/suite number under 20 characters long.")
-        
-        # Street Number Validation
-        street_number = self.cleaned_data.get("street_number")
-        if len(street_number) > 20:
-            raise forms.ValidationError("Please keep your street number under 20 characters long.")
+            # Apt number validation
+            apt_number = self.cleaned_data.get("apt_number")
+            if apt_number:
+                if len(apt_number) > 20:
+                    raise forms.ValidationError("Please keep your apt/suite number under 20 characters long.")
+            
+            # Street Number Validation
+            street_number = self.cleaned_data.get("street_number")
+            if len(street_number) > 20:
+                raise forms.ValidationError("Please keep your street number under 20 characters long.")
 
-        # Route Validation
-        route = self.cleaned_data.get("route")
-        if len(route) > 100:
-            raise forms.ValidationError("Please keep your route under 100 characters long.")
+            # Route Validation
+            route = self.cleaned_data.get("route")
+            if len(route) > 100:
+                raise forms.ValidationError("Please keep your route under 100 characters long.")
 
-        # Locality Validation
-        locality = self.cleaned_data.get("locality")
-        if len(locality) > 100:
-            raise forms.ValidationError("Please keep your locality under 100 characters long.")
+            # Locality Validation
+            locality = self.cleaned_data.get("locality")
+            if len(locality) > 100:
+                raise forms.ValidationError("Please keep your locality under 100 characters long.")
 
-        # admin area 1 validation
-        administrative_area_level_1 = self.cleaned_data.get("administrative_area_level_1")
-        if len(administrative_area_level_1) >= 4:
-            raise forms.ValidationError("Please use a 2 digit province code i.e. 'ON'.")
+            # admin area 1 validation
+            administrative_area_level_1 = self.cleaned_data.get("administrative_area_level_1")
+            if len(administrative_area_level_1) >= 4:
+                raise forms.ValidationError("Please use a 2 digit province code i.e. 'ON'.")
 
-        # Postal Code validation
-        postal_code = self.cleaned_data.get("postal_code")
-        if len(postal_code) > 10:
-            raise forms.ValidationError("Please keep the postal code under 10 characters long.")
+            # Postal Code validation
+            postal_code = self.cleaned_data.get("postal_code")
+            if len(postal_code) > 10:
+                raise forms.ValidationError("Please keep the postal code under 10 characters long.")
 
 
 

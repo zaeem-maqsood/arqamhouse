@@ -26,8 +26,9 @@ from itertools import chain
 from operator import attrgetter
 
 from subscribers.models import Subscriber
-from .models import Profile
-from .forms import ProfileForm, LoginForm, ProfileUpdateForm, ProfileChangePasswordForm, ProfileAlreadyExistsForm, ProfileVerifcationForm, ProfileChangePhoneForm
+from .models import Profile, Address
+from .forms import (ProfileForm, LoginForm, ProfileUpdateForm, ProfileChangePasswordForm, ProfileAlreadyExistsForm, 
+                    ProfileVerifcationForm, ProfileChangePhoneForm, AddressForm)
 from .mixins import ProfileMixin
 from cities_light.models import City, Region, Country
 from events.models import Event, EventOrder, EventLiveArchive
@@ -253,13 +254,181 @@ def activate_account(request, uidb64, token):
 
 
 
+
+
+
+class AddAddress(CreateView):
+    model = Address
+    form_class = AddressForm
+    template_name = "profiles/address.html"
+
+    def get(self, request, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        view_name = "profiles:address_list"
+        return reverse(view_name)
+
+    def get_profile(self):
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except:
+            return None
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form, request)
+        else:
+            return self.form_invalid(form)
+
+    def get_context_data(self, form, *args, **kwargs):
+        context = {}
+        profile = self.get_profile()
+        context["form"] = form
+        context["profile"] = profile
+        return context
+
+    
+    def form_valid(self, form, request):
+        data = request.POST
+        default = form.cleaned_data.get("default")
+        profile = self.get_profile()
+        
+        if default:
+            addresses = Address.objects.filter(profile=profile)
+            for address in addresses:
+                address.default = False
+                address.save()
+
+        print(default)
+        form.instance.profile = profile
+        self.object = form.save()
+        messages.success(request, "Address Created")
+        valid_data = super(AddAddress, self).form_valid(form)
+        return valid_data
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+
+class UpdateAddress(UpdateView):
+    model = Address
+    form_class = AddressForm
+    template_name = "profiles/update_address.html"
+
+    def get_address(self, profile):
+        try:
+            address = Address.objects.get(profile=profile, id=self.kwargs["id"])
+            return address
+        except Exception as e:
+            print(e)
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        profile = self.get_profile()
+        self.object = self.get_address(profile)
+        form = self.get_form()
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+
+        if 'postcard' in self.request.GET:
+            view_name = "postcards:order_view_senders"
+
+            if 'recep' in self.request.GET:
+                return f"{reverse(view_name, kwargs={'slug': self.request.GET['postcard']})}?recep={self.request.GET['recep']}"
+            else:
+                return reverse(view_name, kwargs={"slug": self.request.GET["postcard"]})
+
+        view_name = "profiles:address_list"
+        return reverse(view_name)
+
+    def get_profile(self):
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except:
+            raise Http404
+
+    def post(self, request, *args, **kwargs):
+        profile = self.get_profile()
+        self.object = self.get_address(profile)
+        data = request.POST
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form, request)
+        else:
+            return self.form_invalid(form)
+
+    def get_context_data(self, form, *args, **kwargs):
+        context = {}
+        profile = self.get_profile()
+        context["form"] = form
+        context["profile"] = profile
+        return context
+
+    
+    def form_valid(self, form, request):
+        data = request.POST
+        default = form.cleaned_data.get("default")
+        profile = self.get_profile()
+        
+        if default:
+            addresses = Address.objects.filter(profile=profile)
+            for address in addresses:
+                address.default = False
+                address.save()
+
+        print(default)
+        self.object = form.save()
+        messages.success(request, "Address Updated")
+        valid_data = super(UpdateAddress, self).form_valid(form)
+        return valid_data
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+
+# Create your views here.
+class AddressList(View):
+
+    template_name = "profiles/address_list.html"
+
+    def get_profile(self):
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except:
+            return None
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        profile = self.get_profile()
+        addresses = Address.objects.filter(profile=profile).order_by("-default")
+        context["addresses"] = addresses
+        context["profile"] = profile
+        return render(request, self.template_name, context)
+
+
+
+
+
 class ProfileCreateView(FormView):
     model = Profile
     form_class = ProfileForm
     template_name = "profiles/profile_create.html"
 
     def get_success_url(self):
-        view_name = "profiles:verification"
+        view_name = "dashboard"
         return reverse(view_name)
 
     def get_context_data(self, form, request, *args, **kwargs):
@@ -307,6 +476,7 @@ class ProfileCreateView(FormView):
         # Get email and password from the form
         email = form.cleaned_data.get("email")
         name = form.cleaned_data.get("name")
+
         apt_number = form.cleaned_data.get("apt_number")
         street_number = form.cleaned_data.get("street_number")
         route = form.cleaned_data.get("route")
@@ -341,14 +511,17 @@ class ProfileCreateView(FormView):
             else:
                 profile.set_password(password1)
                 profile.temp_password = None
-                profile.address = address
-                profile.apt_number = apt_number
-                profile.street_number = street_number
-                profile.route = route
-                profile.locality = locality
-                profile.administrative_area_level_1 = administrative_area_level_1
-                profile.postal_code = postal_code
+
+                address_object = Address.objects.create(profile=profile)
+                address_object.address = address
+                address_object.apt_number = apt_number
+                address_object.street_number = street_number
+                address_object.route = route
+                address_object.locality = locality
+                address_object.administrative_area_level_1 = administrative_area_level_1
+                address_object.postal_code = postal_code
                 profile.save()
+                address_object.save()
 
             login(request, profile)
 
@@ -370,19 +543,25 @@ class ProfileCreateView(FormView):
             self.object.email = email.lower()
             self.object.is_active = True #Change this to false and when we want email authntication again.
             self.object.save()
+            address_object = Address.objects.create(profile=self.object)
+            address_object.address = form.cleaned_data.get("address")
+            address_object.apt_number = form.cleaned_data.get("apt_number")
+            address_object.street_number = form.cleaned_data.get("street_number")
+            address_object.route = form.cleaned_data.get("route")
+            address_object.locality = form.cleaned_data.get("locality")
+            address_object.administrative_area_level_1 = form.cleaned_data.get("administrative_area_level_1")
+            address_object.postal_code = form.cleaned_data.get("postal_code")
+            address_object.save()
 
             login(request, self.object)
-
-        messages.success(request, 'Account Created! Login to continue.')
-
         
-        account_sid = settings.ACCOUNT_SID
-        auth_token = settings.AUTH_TOKEN
-        client = Client(account_sid, auth_token)
-        service_id = "VAc350a17577cac4548f9dc591cbc1e950"
-        verification = client.verify.services(service_id).verifications.create(to=str(phone), channel='sms')
-        print(verification.status)
-        status = verification.status
+        # account_sid = settings.ACCOUNT_SID
+        # auth_token = settings.AUTH_TOKEN
+        # client = Client(account_sid, auth_token)
+        # service_id = "VAc350a17577cac4548f9dc591cbc1e950"
+        # verification = client.verify.services(service_id).verifications.create(to=str(phone), channel='sms')
+        # print(verification.status)
+        # status = verification.status
 
         valid_data = super(ProfileCreateView, self).form_valid(form)
         return valid_data
@@ -555,7 +734,7 @@ class LoginView(FormView):
         if 'next' in self.request.GET:
             return self.request.GET['next']
         else:
-            view_name = "profiles:dashboard"
+            view_name = "dashboard"
             return reverse(view_name)
 
     def get_context_data(self, form, *args, **kwargs):
@@ -570,10 +749,7 @@ class LoginView(FormView):
         if user.is_anonymous:
             form = self.get_form()
         else:
-            if user.house:
-                return redirect('houses:dashboard')
-            else:
-                return redirect('profiles:dashboard')
+            return redirect('dashboard')
 
         return self.render_to_response(self.get_context_data(form))
 
@@ -617,9 +793,8 @@ class LoginView(FormView):
                     next_page = request.GET['next']
                     self.success_url = next_page
                 except:
-                    if profile.house:
-                        print("It came here son")
-                        self.success_url = reverse('houses:dashboard')
+                    print("It came here son")
+                    self.success_url = reverse('dashboard')
 
         except Exception as e:
             print(e)

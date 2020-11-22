@@ -25,13 +25,14 @@ from .views import (HomePageView, ReportErrorView, ApplePayVerificationView, Abo
 from events.views import OrderPublicDetailView
 from donations.views import DonationGiftsSentView
 
-from .views import Dashboard
+from .views import Dashboard, Menu
 
 urlpatterns = [
 
     path('', HomePageView.as_view(), name='home'),
     path('zaeem/', admin.site.urls),
 
+    path('menu', Menu.as_view(), name='menu'),
     path('dashboard', Dashboard.as_view(), name='dashboard'),
 
 

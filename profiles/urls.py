@@ -6,7 +6,8 @@ from django.urls import path, include
 
 from .views import (ProfileUpdateView, ProfileCreateView, LoginView, LogoutView,
                     load_cities, load_regions, UserDashboardView, activate_account, UserOrdersView, PasswordChangeView,
-                    UserSubscribersView, VerificationView, ChangePhoneNumberView, UserMenuPage, UserDonationsView)
+                    UserSubscribersView, VerificationView, ChangePhoneNumberView, UserMenuPage, UserDonationsView, AddAddress,
+                    AddressList, UpdateAddress)
 
 
 app_name="profiles"
@@ -21,9 +22,16 @@ urlpatterns = [
 	path('logout', LogoutView.as_view(), name='logout'),
 	path('new', ProfileCreateView.as_view(), name='create'),
 
-	path('donations', UserDonationsView.as_view(), name='donations'),
-	path('tickets', UserOrdersView.as_view(), name='tickets'),
-	path('subscribers', UserSubscribersView.as_view(), name='subscribers'),
+	path('recipients/', include('recipients.urls')),
+	path('orders/', include('orders.urls')),
+
+	path('addresses', AddressList.as_view(), name='address_list'),
+	path('addresses/new', AddAddress.as_view(), name='add_address'),
+	path('addresses/<int:id>', UpdateAddress.as_view(), name='update_address'),
+
+	# path('donations', UserDonationsView.as_view(), name='donations'),
+	# path('tickets', UserOrdersView.as_view(), name='tickets'),
+	# path('subscribers', UserSubscribersView.as_view(), name='subscribers'),
 
 	path('change-password/', PasswordChangeView.as_view(), name='change_password'),
 	path('change-phone/', ChangePhoneNumberView.as_view(), name='change_phone'),

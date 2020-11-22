@@ -1,0 +1,101 @@
+{% extends "frontend/basic_base.html" %}
+
+{% block title %}
+Orders
+{% endblock title %}
+
+{% load static %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<section style="padding-top:1rem;">
+    <div class="container" onload="enableVerifyPhoneButton();">
+
+        {% if messages %}
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <div class="row">
+                    <div class="col-12" style="padding-right: 5px;padding-left: 5px;">
+                        <h4 style="margin-bottom: 0px;">Your Orders</h4>
+                        <p style="font-size: 0.8em;margin-bottom: 0px;">Total | {{ orders.count }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <div class="row">
+                    <div class="col-4" style="padding-right: 5px;padding-left: 5px;">
+                        <a class="btn btn-primary btn-sm btn-block" href="{% url 'dashboard' %}">Dashboard</a>
+
+                    </div>
+                    <div class="col-4" style="padding-right: 5px;padding-left: 5px;">
+                        <a href="{% url 'postcards:list' %}" class="btn btn-primary btn-sm btn-block">Send A
+                            Postcard</a>
+                    </div>
+                    <div class="col-4" style="padding-right: 5px;padding-left: 5px;">
+                        <a class="btn btn-primary btn-sm btn-block" href="{% url 'menu' %}">Menu</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10"
+                style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;padding: 20px;">
+
+                {% for order in orders %}
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-sm-8 col-12">
+                        <p style="margin-bottom: 0px;">{{ order.lineorder_set.all.count }} Postcard{% if order.lineorder_set.all.count > 1 %}s{% endif %} Orderd</p>
+                        <p style="margin-bottom: 5px;">on {{ order.created_at }}</p>
+                        {% for line_order in order.lineorder_set.all %}
+                        <p style="margin-bottom: 0px;"><a href="{{ order.get_absolute_url }}">{{ line_order.postcard.name }}</a> to <a href="{{ order.get_absolute_url }}">{{ line_order.recipient.name }}</a></p>
+                            {% if line_order.add_gift_card %}
+                            <p style="margin-bottom: 0px;">${{ line_order.gift_card_amount }} {{ line_order.gift_card }} gift card added.</p>
+                            {% endif %}
+                        {% endfor %}
+                        <p style="margin-top: 5px;">Status | {% if order.fulfilled %}<span style="color: green;">Fulfilled</span>{% else %}<span style="color: orange;">Processing</span>{% endif %} </p>
+                    </div>
+                    <div class="col-sm-4 col-12">
+                        <a class="btn btn-block btn-sm btn-primary" href="{{ order.get_absolute_url }}"> View Order </a>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+
+        <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 4em;"></a>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock content %}

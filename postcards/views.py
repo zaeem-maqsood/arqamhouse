@@ -39,9 +39,11 @@ from operator import attrgetter
 from houses.mixins import HouseAccountMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 
+from core.mixins import LoginRequiredMixin
+
 from postcards.forms import PostcardOrderForm, PostCardBusinessOrderFormStepOne
 from postcards.models import PostCard, PostCardOrder, NonProfit
-from profiles.models import Profile
+from profiles.models import Profile, Address
 from orders.models import Order, LineOrder, PromoCode
 from recipients.models import Recipient
 
@@ -511,6 +513,82 @@ def stripePayment(request):
 
 
 
+
+class PostCardViewAllRecipients(LoginRequiredMixin, View):
+
+    template_name = "postcards/order_view_all_recipients.html"
+
+    def get_profile(self):
+
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except:
+            return None
+
+    def get_postcard(self):
+        slug = self.kwargs['slug']
+        try:
+            postcard = PostCard.objects.get(slug=slug)
+            return postcard
+        except Exception as e:
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        data = request.GET
+        return render(request, self.template_name, self.get_context_data())
+
+    def get_context_data(self, *args, **kwargs):
+        context = {}
+        data = self.request.GET
+        postcard = self.get_postcard()
+        profile = self.get_profile()
+        recipients = Recipient.objects.filter(profile=profile)
+
+        context["recipients"] = recipients
+        context["postcard"] = postcard
+        return context
+
+
+
+class PostcardSenderAddressList(LoginRequiredMixin, View):
+
+    template_name = "postcards/sender_address_list.html"
+
+    def get_profile(self):
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except:
+            return None
+
+    def get_postcard(self):
+        slug = self.kwargs['slug']
+        try:
+            postcard = PostCard.objects.get(slug=slug)
+            return postcard
+        except Exception as e:
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        data = request.GET
+        profile = self.get_profile()
+
+        postcard = self.get_postcard()
+        context["postcard"] = postcard
+        addresses = Address.objects.filter(profile=profile).order_by("-default")
+
+        if 'recep' in data:
+            context["recep"] = data["recep"]
+        context["addresses"] = addresses
+
+        context["profile"] = profile
+        return render(request, self.template_name, context)
+
+
+
+
 class PostCardOrderView(FormView):
     model = PostCard
     template_name = "postcards/order.html"
@@ -527,7 +605,9 @@ class PostCardOrderView(FormView):
     
         initial_data = {}
         postcard = self.get_postcard()
-        form = PostcardOrderForm(quantity, postcard)
+        profile = self.get_profile()
+        authenticated = request.user.is_authenticated
+        form = PostcardOrderForm(quantity, postcard, profile, authenticated)
         return render(request, self.template_name, self.get_context_data(form=form))
 
     def get_success_url(self):
@@ -542,6 +622,14 @@ class PostCardOrderView(FormView):
             return postcard
         except Exception as e:
             raise Http404
+
+    def get_profile(self):
+
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except:
+            return None
 
 
     def get_context_data(self, form, *args, **kwargs):
@@ -561,9 +649,35 @@ class PostCardOrderView(FormView):
         try:
             last_postcard = LineOrder.objects.filter(postcard=postcard).latest('id')
             context["last_postcard"] = last_postcard
-        except:
-            pass
+        except Exception as e:
+            print(e)
+    
 
+        profile = self.get_profile()
+        if profile:
+            context["profile"] = profile
+
+            # default sender
+            try:
+                default_address = Address.objects.get(profile=profile, default=True)
+                context["default_address"] = default_address
+            except Exception as e:
+                print(e)
+                context["default_address"] = False
+
+            # If new sender
+            if 'sender' in data:
+                try:
+                    chosen_sender = Address.objects.get(profile=profile, id=data["sender"])
+                    context["chosen_sender"] = chosen_sender
+                except Exception as e:
+                    print(e)
+
+            # All recipients
+            recipients = Recipient.objects.filter(profile=profile)
+            context["recipients"] = recipients
+
+        
         context["quantity_str"] = quantity
         postcard_amount = (5*quantity)
         quantity = range(quantity)
@@ -583,8 +697,11 @@ class PostCardOrderView(FormView):
         else:
             quantity = 1
 
+        profile = self.get_profile()
         postcard = self.get_postcard()
-        form = PostcardOrderForm(data=data, quantity=quantity, postcard=postcard)
+        authenticated = request.user.is_authenticated
+        form = PostcardOrderForm(data=data, quantity=quantity,
+                                 postcard=postcard, profile=profile, authenticated=authenticated)
 
         if form.is_valid():
             return self.form_valid(form, request)
@@ -594,22 +711,12 @@ class PostCardOrderView(FormView):
         
     def form_valid(self, form, request):
         data = request.POST
-
+        get_data = request.GET
         quantity = int(data["quantity"])
 
         postcard = self.get_postcard()
     
-        # Get buyer name and email address
-        name = form.cleaned_data.get('name')
-        email = form.cleaned_data.get('email')
         anonymous = form.cleaned_data.get('anonymous')
-        apt_number = form.cleaned_data.get("apt_number")
-        street_number = form.cleaned_data.get("street_number")
-        route = form.cleaned_data.get("route")
-        locality = form.cleaned_data.get("locality")
-        administrative_area_level_1 = form.cleaned_data.get("administrative_area_level_1")
-        address = form.cleaned_data.get("address")
-        postal_code = form.cleaned_data.get("postal_code")
 
         # Handle Promo Codes
         code = form.cleaned_data.get("promo_code")
@@ -656,52 +763,57 @@ class PostCardOrderView(FormView):
                 amount = amount + gift_card_amount_total
 
 
-
-
-        # Add sender to sendgrid 
-        # -------------------------
-
-        try:
-            send_grid_data = {}
-            send_grid_data["list_ids"] = ["df17f359-2dd8-45ed-b9e1-bcb63080cf96"]
-            contacts = []
-            data_dict = {}
-
-            data_dict["email"] = email
-            data_dict["first_name"] = name
-            data_dict["address_line_1"] = f"{street_number} {route}"
-            data_dict["city"] = locality
-            data_dict["state_province_region"] = administrative_area_level_1
-            data_dict["country"] = "Canada"
-            data_dict["postal_code"] = postal_code
-            contacts.append(data_dict)
-            send_grid_data["contacts"] = contacts
-            sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
-            response = sg.client.marketing.contacts.put(request_body=send_grid_data)
-
-        except Exception as e:
-            print(e)
-            print("Exception 1")
-
-
-        # -------------------------
-
-
         
         stripe.api_key = settings.STRIPE_SECRET_KEY
 
         # ====================== Create Arqam House Profile ===========================
         # Check if user exists in the system 
-        email = email.lower()
+        if request.user.is_authenticated:
+            email = request.user.email
+        else:
+            email = email.lower()
 
         try:
             profile = Profile.objects.get(email=email)
             account_created = False
 
+            # If new sender
+            if 'sender' in get_data:
+                sender_address = Address.objects.get(profile=profile, id=get_data["sender"])
+                
+            else:
+                sender_address = Address.objects.get(profile=profile, default=True)
+
+            name = sender_address.name
+            email = profile.email
+            apt_number = sender_address.apt_number
+            street_number = sender_address.street_number
+            route = sender_address.route
+            locality = sender_address.locality
+            administrative_area_level_1 = sender_address.administrative_area_level_1
+            address = sender_address.address
+            postal_code = sender_address.postal_code
+
+
         # If the user doesn't exist at all then we need to create a customer
-        except:
+        except Exception as e:
+            print(e)
+
+            name = form.cleaned_data.get('name')
+            email = form.cleaned_data.get('email')
+            apt_number = form.cleaned_data.get("apt_number")
+            street_number = form.cleaned_data.get("street_number")
+            route = form.cleaned_data.get("route")
+            locality = form.cleaned_data.get("locality")
+            administrative_area_level_1 = form.cleaned_data.get("administrative_area_level_1")
+            address = form.cleaned_data.get("address")
+            postal_code = form.cleaned_data.get("postal_code")
+
+
             profile_temp_password = get_random_string(length=10)
             profile = Profile.objects.create_user(name=name, email=email, password=profile_temp_password, temp_password=profile_temp_password)
+            sender_address = Address.objects.create(profile=profile, name=name, address=address, default=True, apt_number=apt_number, street_number=street_number,
+                                             route=route, locality=locality, administrative_area_level_1=administrative_area_level_1, postal_code=postal_code)
             account_created = True
 
         if amount <= 0:
@@ -733,64 +845,107 @@ class PostCardOrderView(FormView):
             return self.render_to_response(self.get_context_data(form=form))
 
 
+
+
+        # Add sender to sendgrid
+        # -------------------------
+
+        try:
+            send_grid_data = {}
+            send_grid_data["list_ids"] = [
+                "df17f359-2dd8-45ed-b9e1-bcb63080cf96"]
+            contacts = []
+            data_dict = {}
+
+            data_dict["email"] = email
+            data_dict["first_name"] = name
+            data_dict["address_line_1"] = f"{street_number} {route}"
+            data_dict["city"] = locality
+            data_dict["state_province_region"] = administrative_area_level_1
+            data_dict["country"] = "Canada"
+            data_dict["postal_code"] = postal_code
+            contacts.append(data_dict)
+            send_grid_data["contacts"] = contacts
+            sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
+            response = sg.client.marketing.contacts.put(
+                request_body=send_grid_data)
+
+        except Exception as e:
+            print(e)
+            print("Exception 1")
+
+        # -------------------------
+
+
         postcard_orders = []
 
         order = Order.objects.create(profile=profile, name=name, email=email, amount=amount,
                                      donation_amount=donation, fulfilled=False, total_donation_amount=total_donation)
         for x in range(quantity):
 
-            recipient_name = form.cleaned_data.get(f"{x}_recipient_name")
-            if len(recipient_name) > 30:
-                form.add_error(None, f"Please keep recipient {x}'s name under 30 characters long.")
-                return self.render_to_response(self.get_context_data(form=form))
+            if request.user.is_authenticated:
 
-            recipient_address = form.cleaned_data.get(f"autocomplete{x}")
-            if len(recipient_address) > 200:
-                form.add_error(None, f"Please keep recipient {x}'s address under 200 characters long.")
-                return self.render_to_response(self.get_context_data(form=form))
+                recipient = form.cleaned_data.get(f"recipient_{x}")
+                recipient.counter += 1
+                recipient.save()
 
-            recipient_apt_number = form.cleaned_data.get(f"apt_number_{x}")
-            if recipient_apt_number:
-                if len(recipient_apt_number) > 20:
-                    form.add_error(None, f"Please keep recipient {x}'s Apt/Suite number under 20 characters long. Sorry :(")
+            else:
+
+                recipient_name = form.cleaned_data.get(f"{x}_recipient_name")
+                if len(recipient_name) > 30:
+                    form.add_error(None, f"Please keep recipient {x}'s name under 30 characters long.")
                     return self.render_to_response(self.get_context_data(form=form))
 
-            recipient_street_number = form.cleaned_data.get(f"street_number_{x}")
-            if len(recipient_street_number) > 20:
-                form.add_error(None, f"Please keep recipient {x}'s street number under 20 characters long. Sorry :(")
-                return self.render_to_response(self.get_context_data(form=form))
+                recipient_address = form.cleaned_data.get(f"autocomplete{x}")
+                if len(recipient_address) > 200:
+                    form.add_error(None, f"Please keep recipient {x}'s address under 200 characters long.")
+                    return self.render_to_response(self.get_context_data(form=form))
 
-            recipient_route = form.cleaned_data.get(f"route_{x}")
-            if len(recipient_route) > 100:
-                form.add_error(None, f"Please keep recipient {x}'s route under 100 characters long. Sorry :(")
-                return self.render_to_response(self.get_context_data(form=form))
+                recipient_apt_number = form.cleaned_data.get(f"apt_number_{x}")
+                if recipient_apt_number:
+                    if len(recipient_apt_number) > 20:
+                        form.add_error(None, f"Please keep recipient {x}'s Apt/Suite number under 20 characters long. Sorry :(")
+                        return self.render_to_response(self.get_context_data(form=form))
 
-            recipient_locality = form.cleaned_data.get(f"locality_{x}")
-            if len(recipient_locality) > 100:
-                form.add_error(None, f"Please keep recipient {x}'s locality under 100 characters long. Sorry :(")
-                return self.render_to_response(self.get_context_data(form=form))
+                recipient_street_number = form.cleaned_data.get(f"street_number_{x}")
+                if len(recipient_street_number) > 20:
+                    form.add_error(None, f"Please keep recipient {x}'s street number under 20 characters long. Sorry :(")
+                    return self.render_to_response(self.get_context_data(form=form))
 
-            recipient_administrative_area_level_1 = form.cleaned_data.get(f"administrative_area_level_1_{x}")
-            if len(recipient_administrative_area_level_1) >= 4:
-                form.add_error(None, f"Please use a 2 digit province code i.e. 'ON' for recipient {x}.")
-                return self.render_to_response(self.get_context_data(form=form))
+                recipient_route = form.cleaned_data.get(f"route_{x}")
+                if len(recipient_route) > 100:
+                    form.add_error(None, f"Please keep recipient {x}'s route under 100 characters long. Sorry :(")
+                    return self.render_to_response(self.get_context_data(form=form))
 
-            recipient_postal_code = form.cleaned_data.get(f"postal_code_{x}")
-            if len(recipient_postal_code) > 10:
-                form.add_error(None, f"Please keep recipient {x}'s postal code under 10 characters long.")
-                return self.render_to_response(self.get_context_data(form=form))
+                recipient_locality = form.cleaned_data.get(f"locality_{x}")
+                if len(recipient_locality) > 100:
+                    form.add_error(None, f"Please keep recipient {x}'s locality under 100 characters long. Sorry :(")
+                    return self.render_to_response(self.get_context_data(form=form))
+
+                recipient_administrative_area_level_1 = form.cleaned_data.get(f"administrative_area_level_1_{x}")
+                if len(recipient_administrative_area_level_1) >= 4:
+                    form.add_error(None, f"Please use a 2 digit province code i.e. 'ON' for recipient {x}.")
+                    return self.render_to_response(self.get_context_data(form=form))
+
+                recipient_postal_code = form.cleaned_data.get(f"postal_code_{x}")
+                if len(recipient_postal_code) > 10:
+                    form.add_error(None, f"Please keep recipient {x}'s postal code under 10 characters long.")
+                    return self.render_to_response(self.get_context_data(form=form))
+
+                recipient, created = Recipient.objects.get_or_create(profile=profile, name=recipient_name, email=None,
+                                                    address=recipient_address, apt_number=recipient_apt_number,
+                                                    street_number=recipient_street_number, route=recipient_route, locality=recipient_locality,
+                                                    administrative_area_level_1=recipient_administrative_area_level_1, postal_code=recipient_postal_code,
+                                                    counter=1)
+
+                if not created:
+                    recipient.counter += 1
+                    recipient.save()      
 
             message_to_recipient = form.cleaned_data.get(f"{x}_message_to_recipient")
 
-            recipient = Recipient.objects.create(profile=profile, name=recipient_name, email=None,
-                                                 address=recipient_address, apt_number=recipient_apt_number,
-                                                 street_number=recipient_street_number, route=recipient_route, locality=recipient_locality,
-                                                 administrative_area_level_1=recipient_administrative_area_level_1, postal_code=recipient_postal_code)
-
             line_order = LineOrder.objects.create(order=order, recipient=recipient, promo_code=promo_code, postcard=postcard,
-                                                  address=address, apt_number=apt_number, street_number=street_number,
-                                                  route=route, locality=locality, administrative_area_level_1=administrative_area_level_1,
-                                                  postal_code=postal_code, message_to_recipient=message_to_recipient, amount=line_amount,
+                                                  sender_address=sender_address, message_to_recipient=message_to_recipient, amount=line_amount,
                                                   donation_amount=donation, anonymous=anonymous, add_gift_card=add_gift_card,
                                                   gift_card=gift_card, gift_card_amount=gift_card_amount)
 
@@ -808,16 +963,16 @@ class PostCardOrderView(FormView):
             promo_code.used += quantity
             promo_code.save()
 
-        # if settings.DEBUG == False and postcard_order.email != 'info@arqamhouse.com':
-        try:
-            self.send_text_message(order, postcard_orders, postcard)
-        except Exception as e:
-            print(e)
+        if settings.DEBUG == False and postcard_order.email != 'info@arqamhouse.com':
+            try:
+                self.send_text_message(order, postcard_orders, postcard)
+            except Exception as e:
+                print(e)
 
-        try: 
-            self.send_confirmation_email(order, postcard_orders, postcard)
-        except Exception as e:
-            print(e)
+            try: 
+                self.send_confirmation_email(order, postcard_orders, postcard)
+            except Exception as e:
+                print(e)
 
 
         

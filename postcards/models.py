@@ -137,6 +137,14 @@ class PostCard(models.Model):
         view_name = "postcards:detail"
         return reverse(view_name, kwargs={"slug": self.slug})
 
+    def order_choose_senders(self):
+        view_name = "postcards:order_view_senders"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
+    def order_choose_recipients(self):
+        view_name = "postcards:order_view_recipients"
+        return reverse(view_name, kwargs={"slug": self.slug})
+
     def get_business_url(self):
         view_name = "postcards:business_step_1"
         return reverse(view_name, kwargs={"slug": self.slug})

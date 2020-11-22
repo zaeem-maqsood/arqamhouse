@@ -1,0 +1,158 @@
+{% extends "frontend/basic_base.html" %}
+
+{% block title %}
+Orders
+{% endblock title %}
+
+{% load static %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<section style="padding-top:1rem;">
+    <div class="container" onload="enableVerifyPhoneButton();">
+
+        {% if messages %}
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <div class="row">
+                    <div class="col-12" style="padding-right: 5px;padding-left: 5px;">
+                        <h4 style="margin-bottom: 0px;">Order Detail</h4>
+                        <p style="font-size: 0.8em;margin-bottom: 0px;">Status | {% if order.fulfilled %}<span style="color: green;">Fulfilled</span>{% else %}<span
+                            style="color: orange;">Processing</span>{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <div class="row">
+                    <div class="col-4" style="padding-right: 5px;padding-left: 5px;">
+                        <a class="btn btn-primary btn-sm btn-block" href="{% url 'profiles:orders:list' %}">Orders</a>
+
+                    </div>
+                    <div class="col-4" style="padding-right: 5px;padding-left: 5px;">
+                        <a href="{% url 'postcards:list' %}" class="btn btn-primary btn-sm btn-block">Send A
+                            Postcard</a>
+                    </div>
+                    <div class="col-4" style="padding-right: 5px;padding-left: 5px;">
+                        <a class="btn btn-primary btn-sm btn-block" href="{% url 'menu' %}">Menu</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10"
+                style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;padding: 20px;">
+
+                
+                <div class="row text-center" style="padding-bottom: 20px;">
+                    <div class="col-12">
+                        <p style="margin-bottom: 0px;">{{ order.lineorder_set.all.count }}
+                            Postcard{% if order.lineorder_set.all.count > 1 %}s{% endif %} Ordered</p>
+                        <p style="margin-bottom: 5px;">on {{ order.created_at }}</p>
+                        <hr>
+                    </div>
+                </div>
+
+                {% for line_order in order.lineorder_set.all %}
+                <div class="row justify-content-center img-center-phone">
+                    <div class="col-sm-6 col-8" style="padding-bottom: 10px;">
+                        <img style="border: 0.1px solid #f6f0f0;" src="{{ line_order.postcard.image_1.thumbnail.url }}"
+                            class="img-fluid">
+                    </div>
+                    <div class="col-sm-6 col-12">
+
+                        <p style="margin-bottom: 0px;" class="p-align-middle">
+                        <a href="{{ line_order.postcard.get_absolute_url }}">{{ line_order.postcard.name }}</a> to 
+                        <a href="{{ line_order.recipient.get_update_url }}">{{ line_order.recipient.name|title }}</a>
+                        </p>
+
+                        <p style="margin-bottom: 20px;font-size: 0.7em;" class="p-align-middle">Sent to {% if line_order.recipient.apt_number %}{{ line_order.recipient.apt_number }}-{% else %}{% endif %}
+                        {{ line_order.recipient.street_number }}
+                        {{ line_order.recipient.route }}
+                        {{ line_order.recipient.locality }}
+                        {{ line_order.recipient.administrative_area_level_1 }} {{ line_order.recipient.postal_code }}
+                        </p>
+
+                        {% if line_order.add_gift_card %}
+                        <img style="border: 0.1px solid #f6f0f0;max-width: 80px;" src="{% static 'images/homesense_genericgiftcard-01.png' %}"
+                            class="img-fluid">
+                        <p style="font-size: 0.8em;" class="p-align-middle"><span style="color: #007bff;">{{ line_order.gift_card }}</span> gift card added</p>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-sm-8 col-12" style="padding-bottom: 20px;">
+                        {% if line_order.add_gift_card %}
+                        <p style="margin-bottom: 0px;font-size: 0.8em;" class="p-align-middle">Gift Card Amount: ${{ line_order.gift_card_amount }}</p>
+                        {% endif %}
+                        <p style="margin-bottom: 0px;font-size: 0.8em;" class="p-align-middle">Postcard Price: ${{ line_order.postcard.amount }}</p>
+                        {% if line_order.promo_code %}
+                        <p style="margin-bottom: 0px;font-size: 0.8em;" class="p-align-middle">Promo Code Used: ${{ line_order.promo_code.code }} for
+                            ${{ line_order.promo_code.fixed_amount }} off purchase.</p>
+                        {% endif %}
+                        <p style="margin-bottom: 0px;" class="p-align-middle">Sub Total: ${{ line_order.amount }}</p>
+                    </div>
+                    <div class="col-sm-4 col-8">
+                        {% if order.fulfilled %}
+                        {% else %}
+                        <a href="#" class="btn btn-primary btn-sm float-sm-right btn-block">Edit</a>
+                        {% endif %}
+                        <a class="btn btn-primary btn-sm float-sm-right btn-block" href="{{ line_order.postcard.get_absolute_url }}?recep={{ line_order.recipient.id }}">Send Another</a>
+                    </div>
+                </div>
+                
+                <hr>
+                {% endfor %}
+
+                <div class="row justify-content-center">
+                    <div class="col-12" style="padding-bottom: 20px;">
+                        {% if order.donation_amount > 0 %}
+                        <p>Donated Amount: ${{ order.donation_amount }}</p>
+                        {% endif %}
+                        {% if order.total_donation_amount > 0 %}
+                        <p>Total donation: ${{ order.total_donation_amount }}</p>
+                        {% endif %}
+                        <h5>Total Charged: ${{ order.amount }}</h5>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 4em;"></a>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock content %}

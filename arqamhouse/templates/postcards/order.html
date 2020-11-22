@@ -73,8 +73,13 @@ function StripePayment() {
     var donation = 0;
     {% endif %}
 
+    {% if profile and default_address %}
+    var name = '{{ profile.name }}'
+    var email = '{{ profile.email }}'
+    {% else %}
     var name = document.getElementById("id_name").value;
     var email = document.getElementById("id_email").value;
+    {% endif %}
 
 
     var add_gift_card = false;
@@ -304,10 +309,10 @@ function StripeLogic(total, intent_id, client_secret, public_key, postcard_name)
             payment_method: {
                 card: card,
                 billing_details: {
-                    name: document.getElementById("id_name").value,
-                    email: document.getElementById("id_email").value,
+                    name: {% if profile and default_address %}'{{ profile.name }}'{% else %}document.getElementById("id_name").value{% endif %},
+                    email: {% if profile and default_address %} '{{ profile.email }}'{% else %}document.getElementById("id_email").value{% endif %},
                     address: {
-                        postal_code: document.getElementById("postal_code").value,
+                        postal_code: {% if profile and default_address %}'{{ default_address.postal_code }}'{% else %}document.getElementById("postal_code").value{% endif %},
                     }
                 }
             }
@@ -360,7 +365,16 @@ function stripeClientSecretHandler(intent_id) {
 }
 </script>
 
+{% if profile and default_address %}
 
+<script>
+    var recep_id = window.location.search.substr(1);
+    if (recep_id) {
+        document.getElementById('recipient_info').scrollIntoView();
+    }
+</script>
+
+{% else %}
 <script type="text/javascript">
 
 
@@ -540,6 +554,11 @@ function stripeClientSecretHandler(intent_id) {
 
     }
 
+</script>
+{% endif %}
+
+
+<script>
 
     function copyMessage(increment) {
 
@@ -554,11 +573,13 @@ function stripeClientSecretHandler(intent_id) {
 
     }
 
-    function cleanInput(object){
+    function cleanInput(object) {
         object.value = object.value.replace(/[^.!<>,a-zA-Z0-9 ]/gm, '');
     }
 
+</script>
 
+<script>
 
     function turnOnHover(state) {
 
@@ -579,9 +600,11 @@ function stripeClientSecretHandler(intent_id) {
 
 </script>
 
-
+{% if profile and default_address %}
+{% else %}
 <script type="text/javascript"
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnTiJMXoPzVLoo-ztKaRyCrjAocA0K3pQ&libraries=places&callback=initMap"></script>
+{% endif %}
 
 {% endblock scripts %}
 
@@ -777,19 +800,55 @@ function stripeClientSecretHandler(intent_id) {
                     {% endif %}
 
                     <div class="row" style="padding-bottom: 10px;">
-                        <div class="col-12" style="padding-bottom: 10px;">
-                            <h4 style="margin-bottom: 0px;">Your Information</h4>
+                        <div class="col-12">
+                            <h4 style="margin-bottom: 0px;">Sender Information</h4>
+                            {% if profile and default_address %}
+                            <p>Send this postcard using your default information:</p>
+                            {% endif %}
                         </div>
                     </div>
 
+                    {% if profile and default_address %}
+
+                    {% if chosen_sender %}
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-12">
+                            <p style="margin-bottom: 0px;font-weight: 700;color: #093f7d;">{{ chosen_sender.name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 500;color: #4a90e2;">
+                                {% if chosen_sender.apt_number %}{{ chosen_sender.apt_number }}-{% else %}{% endif %}
+                                {{ chosen_sender.street_number }}
+                                {{ chosen_sender.route }}
+                                {{ chosen_sender.locality }}
+                                {{ chosen_sender.administrative_area_level_1 }} {{ chosen_sender.postal_code }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-12">
+                            <p style="margin-bottom: 0px;font-weight: 700;color: #093f7d;">{{ default_address.name }}</p>
+                            <p style="margin-bottom: 0px;font-weight: 500;color: #4a90e2;">{% if default_address.apt_number %}{{ default_address.apt_number }}-{% else %}{% endif %} {{ default_address.street_number }}
+                            {{ default_address.route }}
+                            {{ default_address.locality }}
+                            {{ default_address.administrative_area_level_1 }} {{ default_address.postal_code }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-12">
+                            <a class="btn btn-primary btn-sm" href="{{ postcard.order_choose_senders }}{% if chosen_recipient %}?recep={{ chosen_recipient.id }}{% endif %}">Change Sender</a>
+                        </div>
+                    </div>
+
+                    {% else %}
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-5 col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Your Name <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
+                            <p style="margin-bottom: 0px;">Sender Name <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="Who is the card from?"></i></p>
                             {{ form.name }}
                         </div>
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-7 col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Your Email <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
+                            <p style="margin-bottom: 0px;">Email <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="We'll send you a confirmation email of your purchase here."></i></p> 
                             {{ form.email }}
                         </div>
@@ -797,7 +856,7 @@ function stripeClientSecretHandler(intent_id) {
 
                     <div class="row" style="padding-bottom: 10px;" id="main_address_row">
                         <div class="col-12" style="padding-bottom: 10px;">
-                            <p style="margin-bottom: 0px;">Your Address</p>
+                            <p style="margin-bottom: 0px;">Sender Address</p>
                             {{ form.address }}
                             <span style="font-size: 0.8em;">Used as the return address on the postcard unless 'anonymous' is selected</span>
                         </div>
@@ -832,6 +891,7 @@ function stripeClientSecretHandler(intent_id) {
                             {{ form.postal_code }}
                         </div>
                     </div>
+                    {% endif %}
 
 
                     <div class="row" style="padding-bottom: 10px;">
@@ -846,11 +906,10 @@ function stripeClientSecretHandler(intent_id) {
                     </div>
 
                     
-                    <div class="row" style="padding-bottom: 0px;">
-                        <div class="col-12" style="padding-bottom: 10px;">
+                    <div class="row" style="padding-bottom: 0px;" id="recipient_info">
+                        <div class="col-12">
                             <h4 style="margin-bottom: 0px;">Recipient Information</h4>
-                            <p>We'll use this information to personalize your card! 
-                                Please make sure the address and postal code is correct.</p>
+                            <p>Please make sure your recipient address and postal code is correct.</p>
                         </div>
                     </div>
                     
@@ -872,6 +931,35 @@ function stripeClientSecretHandler(intent_id) {
                     </div>
                     {% endif %}
 
+                    {% if profile and recipients %}
+
+                        <div class="row" style="padding-bottom: 10px;">
+                            <div class="col-md-12 col-sm-12 col-12">
+                                
+                                <select class="form-control" name="recipient_{{ forloop.counter0 }}" id="id_recipient_{{ forloop.counter0 }}">
+                                    {% for recipient in recipients %}
+                                    <option value="{{ recipient.id }}">
+                                        {{ recipient.name }} | {% if recipient.apt_number %}{{ recipient.apt_number }}-{% else %}{% endif %}
+                                        {{ recipient.street_number }}
+                                        {{ recipient.route }} |
+                                        {{ recipient.locality }}
+                                        {{ recipient.administrative_area_level_1 }} | {{ recipient.postal_code }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="row" style="padding-bottom: 30px;">
+                            
+                            <div class="col-6">
+                                <a class="btn btn-primary btn-sm btn-block" href="#">Add New Recipient</a>
+                            </div>
+                        </div>
+
+                    {% else %}
+                    
 
                     {% if form.errors %}
                     {% autoescape off %}
@@ -966,6 +1054,8 @@ function stripeClientSecretHandler(intent_id) {
                             {% endif %}
                         </div>
                     </div>
+
+                    {% endif %}
 
 
                     <div class="row" style="padding-bottom: 30px;">
