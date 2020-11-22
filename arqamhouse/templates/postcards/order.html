@@ -954,7 +954,7 @@ function stripeClientSecretHandler(intent_id) {
                         <div class="row" style="padding-bottom: 30px;">
                             
                             <div class="col-6">
-                                <a class="btn btn-primary btn-sm btn-block" href="#">Add New Recipient</a>
+                                <a class="btn btn-primary btn-sm btn-block" href="{% url 'profiles:recipients:new_recipient' %}?postcard_order={{ postcard.slug }}">Add New Recipient</a>
                             </div>
                         </div>
 

@@ -674,7 +674,7 @@ class PostCardOrderView(FormView):
                     print(e)
 
             # All recipients
-            recipients = Recipient.objects.filter(profile=profile)
+            recipients = Recipient.objects.filter(profile=profile).order_by("-created_at")
             context["recipients"] = recipients
 
         
@@ -963,7 +963,7 @@ class PostCardOrderView(FormView):
             promo_code.used += quantity
             promo_code.save()
 
-        if settings.DEBUG == False and postcard_order.email != 'info@arqamhouse.com':
+        if settings.DEBUG == False and order.email != 'info@arqamhouse.com':
             try:
                 self.send_text_message(order, postcard_orders, postcard)
             except Exception as e:

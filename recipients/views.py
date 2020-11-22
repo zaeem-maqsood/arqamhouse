@@ -57,7 +57,13 @@ class AddRecipient(LoginRequiredMixin, CreateView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
-        view_name = "profiles:recipients:list"
+
+        if 'postcard_order' in self.request.GET:
+            view_name = "postcards:detail"
+            return reverse(view_name, kwargs={"slug": self.request.GET['postcard_order']})
+
+        else:
+            view_name = "profiles:recipients:list"
         return reverse(view_name)
 
     def get_profile(self):
