@@ -86,8 +86,7 @@ class CustomScriptView(View):
                 line_orders = LineOrder.objects.all()
                 for line_order in line_orders:
                     try:
-                        sender_address = Address.objects.get(profile=line_order.order.profile, address=line_order.address, apt_number=line_order.apt_number,
-                                                         street_number=line_order.street_number, route=line_order.street_number)
+                        sender_address = Address.objects.filter(profile=line_order.order.profile).first()
                         line_order.sender_address = sender_address
                         line_order.save()
 
