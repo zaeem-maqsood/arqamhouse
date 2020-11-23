@@ -66,9 +66,9 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
         get_data = self.request.GET
 
         if 'show_all' in get_data:
-            postcard_orders = PostCardOrder.objects.all()
+            postcard_orders = LineOrder.objects.all()
         else:
-            postcard_orders = PostCardOrder.objects.filter(sent_to_recipient=False).order_by("created_at")
+            postcard_orders = LineOrder.objects.filter(sent_to_recipient=False).order_by("created_at")
 
         context["orders"] = postcard_orders
         return context
@@ -86,7 +86,7 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "sent":
-                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order = LineOrder.objects.get(id=field)
                     postcard_order.sent_to_recipient = True
                     postcard_order.envelope_printed = True
                     postcard_order.front_printed = True
@@ -101,7 +101,7 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "no_sent":
-                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order = LineOrder.objects.get(id=field)
                     postcard_order.sent_to_recipient = False
                     postcard_order.save()
 
@@ -113,22 +113,22 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
 
                 if field != "csrfmiddlewaretoken" and field != "envelope":
                     print(field)
-                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order = LineOrder.objects.get(id=field)
                     print(postcard_order)
-                    json_data["sender_name"] = postcard_order.name
-                    line_1 = f"{postcard_order.street_number} {postcard_order.route}"
+                    json_data["sender_name"] = postcard_order.order.name
+                    line_1 = f"{postcard_order.sender_address.street_number} {postcard_order.sender_address.route}"
                     json_data["sender_line_1"] = line_1
-                    postal_code = postcard_order.postal_code.replace(" ", "")
+                    postal_code = postcard_order.sender_address.postal_code.replace(" ", "")
                     cleaned_postal_code = postal_code[:3] + " " + postal_code[3:]
-                    line_2 = f"{postcard_order.locality}, {postcard_order.administrative_area_level_1}  {cleaned_postal_code}"
+                    line_2 = f"{postcard_order.sender_address.locality}, {postcard_order.sender_address.administrative_area_level_1}  {cleaned_postal_code}"
                     json_data["sender_line_2"] = line_2
 
-                    json_data["recipient_name"] = postcard_order.recipient_name
-                    line_1 = f"{postcard_order.recipient_street_number} {postcard_order.recipient_route}"
+                    json_data["recipient_name"] = postcard_order.recipient.name
+                    line_1 = f"{postcard_order.recipient.street_number} {postcard_order.recipient.route}"
                     json_data["recipient_line_1"] = line_1
-                    postal_code = postcard_order.recipient_postal_code.replace(" ", "")
+                    postal_code = postcard_order.recipient.postal_code.replace(" ", "")
                     cleaned_postal_code = postal_code[:3] + " " + postal_code[3:]
-                    line_2 = f"{postcard_order.recipient_locality}, {postcard_order.recipient_administrative_area_level_1}  {cleaned_postal_code}"
+                    line_2 = f"{postcard_order.recipient.locality}, {postcard_order.recipient.administrative_area_level_1}  {cleaned_postal_code}"
                     json_data["recipient_line_2"] = line_2
 
                     json_list.append(json_data)
@@ -140,16 +140,16 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "ap_envelope":
-                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order = LineOrder.objects.get(id=field)
                     json_data["sender_name"] = "Arqam House"
                     json_data["sender_line_1"] = ""
                     json_data["sender_line_2"] = ""
-                    json_data["recipient_name"] = postcard_order.name
-                    line_1 = f"{postcard_order.street_number} {postcard_order.route}"
+                    json_data["recipient_name"] = postcard_order.sender_address.name
+                    line_1 = f"{postcard_order.sender_address.street_number} {postcard_order.sender_address.route}"
                     json_data["recipient_line_1"] = line_1
-                    postal_code = postcard_order.postal_code.replace(" ", "")
+                    postal_code = postcard_order.sender_address.postal_code.replace(" ", "")
                     cleaned_postal_code = postal_code[:3] + " " + postal_code[3:]
-                    line_2 = f"{postcard_order.locality}, {postcard_order.administrative_area_level_1}  {cleaned_postal_code}"
+                    line_2 = f"{postcard_order.sender_address.locality}, {postcard_order.sender_address.administrative_area_level_1}  {cleaned_postal_code}"
                     json_data["recipient_line_2"] = line_2
 
                     json_list.append(json_data)
@@ -161,7 +161,7 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "no_envelope":
-                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order = LineOrder.objects.get(id=field)
                     postcard_order.envelope_printed = False
                     postcard_order.save()
 
@@ -172,8 +172,8 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "front":
-                    postcard_order = PostCardOrder.objects.get(id=field)
-                    json_data["id"] = postcard_order.post_card.id
+                    postcard_order = LineOrder.objects.get(id=field)
+                    json_data["id"] = postcard_order.postcard.id
                     json_list.append(json_data)
 
                     postcard_order.envelope_printed = True
@@ -186,7 +186,7 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "ap_front":
-                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order = LineOrder.objects.get(id=field)
                     json_data["id"] = 6
                     json_list.append(json_data)
 
@@ -197,7 +197,7 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "no_front":
-                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order = LineOrder.objects.get(id=field)
                     postcard_order.front_printed = False
                     postcard_order.save()
 
@@ -208,8 +208,8 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "message":
-                    postcard_order = PostCardOrder.objects.get(id=field)
-                    json_data["id"] = postcard_order.post_card.id
+                    postcard_order = LineOrder.objects.get(id=field)
+                    json_data["id"] = postcard_order.postcard.id
                     json_data["message"] = '\n'.join(['\r'.join(textwrap.wrap(line, 60, break_long_words=False, replace_whitespace=False)) for line in postcard_order.message_to_recipient.splitlines() if line.strip() != ''])
                     json_list.append(json_data)
 
@@ -224,9 +224,9 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "ap_message":
-                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order = LineOrder.objects.get(id=field)
                     json_data["id"] = 6
-                    json_data["message"] = f"Hi {postcard_order.name}! We wanted to give a big thank you\rfor supporting us. We hope you enjoyed using our postcard service\rand we were able to help make your loved one feel special.\rThere is nothing like receiving personal messages\rthrough the mail! You can check our new collection\rof postcards for Fall 2020 on our site!\r\rLove, Arqam house team"
+                    json_data["message"] = f"Hi {postcard_order.sender_address.name}! We wanted to give a big thank you\rfor supporting us. We hope you enjoyed using our postcard service\rand we were able to help make your loved one feel special.\rThere is nothing like receiving personal messages\rthrough the mail! You can check our new collection\rof postcards for Fall 2020 on our site!\r\rLove, Arqam house team"
                     json_list.append(json_data)
 
         if 'no_message' in data:
@@ -235,7 +235,7 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "no_message":
-                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order = LineOrder.objects.get(id=field)
                     postcard_order.message_printed = False
                     postcard_order.save()
 
@@ -246,9 +246,9 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "name":
-                    postcard_order = PostCardOrder.objects.get(id=field)
-                    json_data["id"] = postcard_order.post_card.id
-                    json_data["name"] = postcard_order.recipient_name
+                    postcard_order = LineOrder.objects.get(id=field)
+                    json_data["id"] = postcard_order.postcard.id
+                    json_data["name"] = postcard_order.recipient.name
                     json_list.append(json_data)
 
                     postcard_order.envelope_printed = True
@@ -263,9 +263,9 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "ap_name":
-                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order = LineOrder.objects.get(id=field)
                     json_data["id"] = 6
-                    json_data["name"] = postcard_order.name
+                    json_data["name"] = postcard_order.sender_address.name
                     json_list.append(json_data)
 
 
@@ -275,7 +275,7 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                 json_data = {}
 
                 if field != "csrfmiddlewaretoken" and field != "no_name":
-                    postcard_order = PostCardOrder.objects.get(id=field)
+                    postcard_order = LineOrder.objects.get(id=field)
                     postcard_order.name_printed = False
                     postcard_order.save()
 
@@ -312,7 +312,7 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
 
         text_content = strip_tags(html_content)
         from_email = f'Arqam House <info@arqamhouse.com>'
-        to = [postcard_order.email]
+        to = [postcard_order.order.email]
         email = EmailMultiAlternatives(subject=subject, body=text_content,
                                        from_email=from_email, to=to)
         email.attach_alternative(html_content, "text/html")
@@ -356,7 +356,7 @@ class PostCardBusinessListView(View):
         get_data = self.request.GET
         if 'success' in get_data:
             context["show_confetti"] = True
-            context["postcard_order"] = PostCardOrder.objects.all(
+            context["postcard_order"] = LineOrder.objects.all(
             ).reverse().first()
 
         context["postcards"] = postcards
@@ -388,7 +388,7 @@ class NonProfitPostCardListView(View):
         get_data = self.request.GET
         if 'success' in get_data:
             context["show_confetti"] = True
-            context["postcard_order"] = PostCardOrder.objects.all().reverse().first()
+            context["postcard_order"] = LineOrder.objects.all().reverse().first()
 
         context["postcards"] = postcards
         context["non_profit"] = non_profit

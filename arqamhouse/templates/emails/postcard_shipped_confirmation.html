@@ -236,7 +236,7 @@
                                                                                 <div
                                                                                     style="font-family: Oswald, sans-serif; text-align: center; text-transform: uppercase; letter-spacing: 2px">
                                                                                     <span
-                                                                                        style="font-family: inherit; font-size: 48px; color: #4599d5">{{ postcard_order.recipient_name|title }}</span></div>
+                                                                                        style="font-family: inherit; font-size: 48px; color: #4599d5">{{ postcard_order.recipient.name|title }}</span></div>
                                                                                 <div></div>
                                                                             </div>
                                                                         </td>
@@ -255,7 +255,7 @@
                                                                             <div>
                                                                                 <div
                                                                                     style="font-family: Roboto, sans-serif; text-align: center">
-                                                                                    We've finished creating your postcard for {{ postcard_order.recipient_name|title }} and it's on its way.
+                                                                                    We've finished creating your postcard for {{ postcard_order.recipient.name|title }} and it's on its way.
                                                                                     Please allow 2-5 business days for it to arrive.
                                                                                     </div>
                                                                                 

@@ -1,4 +1,4 @@
-{% extends "backend/base.html" %}
+{% extends "frontend/basic_base.html" %}
 {% load tz %}
 {% load static %}
 
@@ -10,12 +10,6 @@ Orders
 {% endblock page_title %}
 
 {% block styles %}
-<style type="text/css">
-    .row-padder {
-        padding-top: 15px;
-        padding-bottom: 15px;
-    }
-</style>
 {% endblock styles %}
 
 
@@ -23,7 +17,8 @@ Orders
 <script>
 
     function FocusOnInput() {
-        document.getElementById("product-search").focus();
+        
+        document.getElementById("order-search").focus();
 
     }
 </script>
@@ -32,15 +27,7 @@ Orders
 
 
 {% block content %}
-<style>
-    .dashboard-links {
-        color: #7396b0;
-    }
-</style>
-
-
-
-<div class="row justify-content-center h-100" style="padding: 3rem 0px 3rem 0px;">
+<div class="row justify-content-center" style="padding: 3rem 0px 3rem 0px;">
     <div class="col-lg-10 col-md-12 col-12">
         <div class="kt-portlet kt-portlet--mobile">
             <div class="kt-portlet__body">
@@ -156,8 +143,8 @@ Orders
                             {% for order in orders %}
                             <tr>
                                 <td><input type="checkbox" id="{{ order.id }}" name="{{ order.id }}" value="{{ order.id }}"></td>
-                                <td><a href="{{ order.get_order_view }}">{{ order.name|title }}</a></td>
-                                <td>{{ order.post_card.name }}</td>
+                                <td><a href="{{ order.get_order_view }}">{{ order.order.name|title }}</a></td>
+                                <td>{{ order.postcard.name }}</td>
                                 <td>{% if order.envelope_printed %}<span style="color: green;">Yes</span>{% else %}<span style="color: red;">No</span>{% endif %}</td>
                                 <td>{% if order.front_printed %}<span style="color: green;">Yes</span>{% else %}<span
                                         style="color: red;">No</span>{% endif %}</td>
@@ -193,9 +180,6 @@ Orders
                         </svg>
                         <br>
                         <h3 style="font-weight: 300;">No Orders Yet!</h3>
-                        <br>
-                        <a href="{{ event.get_landing_view }}" class="btn btn-primary">Create Order</a>
-                    </div>
                 </div>
                 {% endif %}
 
