@@ -83,16 +83,16 @@ class CustomScriptView(View):
         # Add logic for actiton 1
         if 'action_1' in data:
             with transaction.atomic():
-                addresses = Address.objects.all()
-                for address in addresses:
-                    address.default = False
-                    address.save()
+                line_orders = LineOrder.objects.all()
+                for line_order in line_orders:
+                    try:
+                        sender_address = Address.objects.get(profile=line_order.order.profile, address=line_order.address, apt_number=line_order.apt_number,
+                                                         street_number=line_order.street_number, route=line_order.street_number)
+                        line_order.sender_address = sender_address
+                        line_order.save()
 
-                addresses = Address.objects.all().distinct('profile')
-                print(addresses)
-                for address in addresses:
-                    address.default = True
-                    address.save()
+                    except Exception as e:
+                        print(e)
 
 
         if 'action_2' in data:
