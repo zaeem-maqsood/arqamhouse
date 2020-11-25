@@ -618,9 +618,15 @@ function stripeClientSecretHandler(intent_id) {
             
             <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
                 <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                    {% if postcard.non_profit %}
+                    <a class="btn btn-primary btn-sm btn-block" href="{{ postcard.non_profit.get_absolute_url }}">
+                        <span class="btn__text">All {{ postcard.non_profit.name }}'s Postcards</span>
+                    </a>
+                    {% else %}
                     <a class="btn btn-primary btn-sm btn-block" href="{% url 'postcards:list' %}">
                         <span class="btn__text">All Postcards</span>
                     </a>
+                    {% endif %}
                 </div>
             </div>
 
