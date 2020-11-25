@@ -406,7 +406,7 @@ class PostCardListView(View):
 
     def get_context_data(self, *args, **kwargs):
         context = {}
-        postcards = PostCard.objects.filter(hidden=False, non_profit__isnull=True)
+        postcards = PostCard.objects.filter(hidden=False)
 
         non_profit = NonProfit.objects.filter(featured=True).first()
         non_profit_postcards = PostCard.objects.filter(non_profit=non_profit)[:4]
