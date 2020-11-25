@@ -65,12 +65,17 @@ function StripePayment() {
     document.getElementById("ready_to_pay").style.display = 'none';
     document.getElementById("id_gift_card_amount").readOnly = true;
 
-    {% if postcard.non_profit %}
-    var promo_code = "";
-    var donation = document.getElementById("id_donation").value;
-    {% else %}
-    var promo_code = document.getElementById("promo_code").value;
     var donation = 0;
+    var promo_code = "";
+    {% if postcard.non_profit %}
+    donation = document.getElementById("id_donation").value;
+    console.log(donation);
+    if (donation == '') {
+        donation = 0;
+    }
+    {% else %}
+    promo_code = document.getElementById("promo_code").value;
+    donation = 0;
     {% endif %}
 
     {% if profile and default_address %}
@@ -366,13 +371,6 @@ function stripeClientSecretHandler(intent_id) {
 </script>
 
 {% if profile and default_address %}
-
-<script>
-    var recep_id = window.location.search.substr(1);
-    if (recep_id) {
-        document.getElementById('recipient_info').scrollIntoView();
-    }
-</script>
 
 {% else %}
 <script type="text/javascript">

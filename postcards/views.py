@@ -736,7 +736,10 @@ class PostCardOrderView(FormView):
         total_donation = 0
         if postcard.non_profit:
             donation = form.cleaned_data.get("donation")
-            donation = decimal.Decimal(donation)
+            if donation:
+                donation = decimal.Decimal(donation)
+            else:
+                donation = 0
             print(f"The  donation is {donation}")
 
             # line donation
@@ -745,7 +748,7 @@ class PostCardOrderView(FormView):
             if donation > 0:
                 amount = amount + donation
                 
-            total_donation = donation + line_donation
+            total_donation = donation + (line_donation * quantity)
 
         # Handle Gift Cards
         gift_card_amount = 0
@@ -771,6 +774,7 @@ class PostCardOrderView(FormView):
         if request.user.is_authenticated:
             email = request.user.email
         else:
+            email = form.cleaned_data.get('email')
             email = email.lower()
 
         try:
@@ -969,10 +973,10 @@ class PostCardOrderView(FormView):
             except Exception as e:
                 print(e)
 
-            try: 
-                self.send_confirmation_email(order, postcard_orders, postcard)
-            except Exception as e:
-                print(e)
+        try: 
+            self.send_confirmation_email(order, postcard_orders, postcard)
+        except Exception as e:
+            print(e)
 
 
         

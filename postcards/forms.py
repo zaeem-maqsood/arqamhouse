@@ -188,7 +188,7 @@ class PostcardOrderForm(forms.Form):
 
         if postcard.non_profit:
             self.fields["donation"] = forms.DecimalField(widget=forms.NumberInput(attrs={"class": "form-control m-input", "min": "0.00", "max": "100.00",
-                                                                        "step": "1.00", "value": "5.00", "required": False}))
+                                                                        "step": "1.00", "value": "5.00"}), required=False)
         else:
             print("No non-profit")
 

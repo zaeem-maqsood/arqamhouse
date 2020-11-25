@@ -263,7 +263,7 @@
                                                                                 {% if postcard.non_profit %}
                                                                                 <div style="font-family: Roboto, sans-serif; text-align: center">
                                                                                     A donation of ${{ postcard.non_profit.amount }} will be made to
-                                                                                    {{ postcard.non_profit.name }} for your purchase of this postcard{% if order.donation_amount > 0 %} in addition to your donation of ${{ order.donation_amount }} (Total Donation: ${{ order.total_donation }}){% else %}.{% endif %}
+                                                                                    {{ postcard.non_profit.name }} for your purchase of this postcard{% if order.donation_amount > 0 %} in addition to your donation of ${{ order.donation_amount }} (Total Donation: ${{ order.total_donation_amount }}){% else %}.{% endif %}
                                                                                 </div>
                                                                                 {% endif %}
                                                                                 <div style="font-family: Roboto, sans-serif; text-align: center">
