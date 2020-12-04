@@ -18,6 +18,7 @@ from django.views.generic.list import ListView
 from django.views import View
 from django.urls import reverse
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 
 from django.db.models import Sum
 
@@ -115,13 +116,20 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                     print(field)
                     postcard_order = LineOrder.objects.get(id=field)
                     print(postcard_order)
-                    json_data["sender_name"] = postcard_order.order.name
-                    line_1 = f"{postcard_order.sender_address.street_number} {postcard_order.sender_address.route}"
-                    json_data["sender_line_1"] = line_1
-                    postal_code = postcard_order.sender_address.postal_code.replace(" ", "")
-                    cleaned_postal_code = postal_code[:3] + " " + postal_code[3:]
-                    line_2 = f"{postcard_order.sender_address.locality}, {postcard_order.sender_address.administrative_area_level_1}  {cleaned_postal_code}"
-                    json_data["sender_line_2"] = line_2
+
+                    if postcard_order.anonymous:
+                        json_data["sender_name"] = ""
+                        json_data["sender_line_1"] = ""
+                        json_data["sender_line_2"] = ""
+
+                    else:
+                        json_data["sender_name"] = postcard_order.order.name
+                        line_1 = f"{postcard_order.sender_address.street_number} {postcard_order.sender_address.route}"
+                        json_data["sender_line_1"] = line_1
+                        postal_code = postcard_order.sender_address.postal_code.replace(" ", "")
+                        cleaned_postal_code = postal_code[:3] + " " + postal_code[3:]
+                        line_2 = f"{postcard_order.sender_address.locality}, {postcard_order.sender_address.administrative_area_level_1}  {cleaned_postal_code}"
+                        json_data["sender_line_2"] = line_2
 
                     json_data["recipient_name"] = postcard_order.recipient.name
                     line_1 = f"{postcard_order.recipient.street_number} {postcard_order.recipient.route}"
@@ -422,6 +430,21 @@ class PostCardListView(View):
         return context
 
 
+def profile_exists(request):
+    json_data = json.loads(request.body)
+    if json_data:
+        print(json_data)
+        email = json_data['email']
+        try:
+            profile = Profile.objects.get(email=email)
+            if profile.temp_password:
+                return JsonResponse({'exists': False})
+            else:
+                return JsonResponse({'exists': True})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'exists': False})
+
 
 
 
@@ -611,9 +634,17 @@ class PostCardOrderView(FormView):
         return render(request, self.template_name, self.get_context_data(form=form))
 
     def get_success_url(self):
-        view_name = "postcards:list"
-        return reverse(view_name) + "?success=true"
 
+        postcard = self.get_postcard()
+
+        try:
+            last_order = Order.objects.all().latest('id')
+            view_name = "profiles:orders:public_detail"
+            return reverse(view_name, kwargs={"public_id": last_order.public_id})
+        except Exception as e:
+            print(e)
+            view_name = "postcards:list"
+            return reverse(view_name) + "?success=true"
 
     def get_postcard(self):
         slug = self.kwargs['slug']
@@ -659,7 +690,7 @@ class PostCardOrderView(FormView):
 
             # default sender
             try:
-                default_address = Address.objects.get(profile=profile, default=True)
+                default_address = Address.objects.filter(profile=profile, default=True).first()
                 context["default_address"] = default_address
             except Exception as e:
                 print(e)
@@ -710,39 +741,60 @@ class PostCardOrderView(FormView):
 
         
     def form_valid(self, form, request):
-        data = request.POST
-        get_data = request.GET
-        quantity = int(data["quantity"])
 
-        postcard = self.get_postcard()
-    
+        # Post data
+        data = request.POST
+
+        # Get Data
+        get_data = request.GET
+
         anonymous = form.cleaned_data.get('anonymous')
 
-        # Handle Promo Codes
+        # Get the quantity 
+        # There will always be a quantity value coming from quantity_str 
+        quantity = int(data["quantity"])
+
+        # grab postcard object
+        postcard = self.get_postcard()
+
+        # Set line amount and order amounts
+        line_amount = postcard.amount
+        amount = postcard.amount * quantity
+
+        # --------------------------- Handle Promo Codes --------------------------
         code = form.cleaned_data.get("promo_code")
+
+        # Read the promo code if it exists
         try:
             promo_code = PromoCode.objects.get(code=code.lower())
+            # Set the line amount based off of the promo code reduction
             line_amount = postcard.amount - promo_code.fixed_amount
+            # set the amount based on the promo code reduction
             amount = (postcard.amount - promo_code.fixed_amount) * quantity
-        except Exception as e:
-            print("Exception 0")
-            promo_code = None
-            line_amount = postcard.amount
-            amount = postcard.amount * quantity
 
-        # Handle donation
+        # If code does not exist
+        except Exception as e:
+            promo_code = None
+
+        # --------------------------- Handle Promo Codes --------------------------
+            
+
+
+        # --------------------------- Handle donations --------------------------
         donation = 0
         line_donation = 0
         total_donation = 0
+
+        # Check if the postcard is even a non-profit card or not
         if postcard.non_profit:
+
             donation = form.cleaned_data.get("donation")
             if donation:
                 donation = decimal.Decimal(donation)
             else:
                 donation = 0
-            print(f"The  donation is {donation}")
 
-            # line donation
+            # set the line donation
             line_donation = postcard.non_profit.amount
 
             if donation > 0:
@@ -750,7 +802,11 @@ class PostCardOrderView(FormView):
                 
             total_donation = donation + (line_donation * quantity)
 
-        # Handle Gift Cards
+        # --------------------------- Handle donations --------------------------
+
+
+
+        # --------------------------- Handle Gift Cards --------------------------
         gift_card_amount = 0
         gift_card =  None
         add_gift_card = form.cleaned_data.get("add_gift_card")
@@ -758,53 +814,67 @@ class PostCardOrderView(FormView):
             gift_card = data["giftCards"]
             gift_card_amount = form.cleaned_data.get("gift_card_amount")
             gift_card_amount = decimal.Decimal(gift_card_amount)
-            print(f"The  gift_card_amount is {gift_card_amount}")
 
             if gift_card_amount > 0:
                 gift_card_amount_total = gift_card_amount * quantity
                 line_amount = amount + gift_card_amount
                 amount = amount + gift_card_amount_total
 
+        # --------------------------- Handle Gift Cards --------------------------
 
-        
         stripe.api_key = settings.STRIPE_SECRET_KEY
 
-        # ====================== Create Arqam House Profile ===========================
-        # Check if user exists in the system 
+        # 1. User logged in 
+        # 2. User logged in but uses different sender information
+        # 3. User not logged in but their profile exists
+        # 4. User not logged in, we need to create their profile
+
+
+
+        accept_form_data = True
+
+        # Determine if the user is logged in or not
         if request.user.is_authenticated:
+
             email = request.user.email
-        else:
-            email = form.cleaned_data.get('email')
-            email = email.lower()
-
-        try:
+            # Grab the users profile if logged in
             profile = Profile.objects.get(email=email)
-            account_created = False
-
-            # If new sender
+            
+            # Determine if user is using default information or ad
             if 'sender' in get_data:
                 sender_address = Address.objects.get(profile=profile, id=get_data["sender"])
-                
+                accept_form_data = False
+
             else:
-                sender_address = Address.objects.get(profile=profile, default=True)
 
-            name = sender_address.name
-            email = profile.email
-            apt_number = sender_address.apt_number
-            street_number = sender_address.street_number
-            route = sender_address.route
-            locality = sender_address.locality
-            administrative_area_level_1 = sender_address.administrative_area_level_1
-            address = sender_address.address
-            postal_code = sender_address.postal_code
+                # We have to add a try block here because some users might exist
+                # Without an address
+                try:
+                    sender_address = Address.objects.filter(profile=profile, default=True).first()
+                    accept_form_data = False
+
+                # If the sender address does not exist we are expecting data from the form
+                except Exception as e:
+                    print(e)
+                    accept_form_data = True
 
 
-        # If the user doesn't exist at all then we need to create a customer
-        except Exception as e:
-            print(e)
+            # Use sender address as variables if we don't need the form data
+            if not accept_form_data:
+                name = sender_address.name
+                apt_number = sender_address.apt_number
+                street_number = sender_address.street_number
+                route = sender_address.route
+                locality = sender_address.locality
+                administrative_area_level_1 = sender_address.administrative_area_level_1
+                address = sender_address.address
+                postal_code = sender_address.postal_code
 
+        
+        # If we need to accept the form data
+        if accept_form_data:  
             name = form.cleaned_data.get('name')
-            email = form.cleaned_data.get('email')
+            email = form.cleaned_data.get('email').lower()
             apt_number = form.cleaned_data.get("apt_number")
             street_number = form.cleaned_data.get("street_number")
             route = form.cleaned_data.get("route")
@@ -813,12 +883,56 @@ class PostCardOrderView(FormView):
             address = form.cleaned_data.get("address")
             postal_code = form.cleaned_data.get("postal_code")
 
+            password_entered = False
+            if form.cleaned_data.get('password') != '':
+                print("There is a password")
+                password = form.cleaned_data.get("password")
+                password_entered = True
 
-            profile_temp_password = get_random_string(length=10)
-            profile = Profile.objects.create_user(name=name, email=email, password=profile_temp_password, temp_password=profile_temp_password)
+
+        # If the user is not authenticatted
+        if not request.user.is_authenticated:
+
+            # We need to check if the user exists or not
+            try:
+                profile = Profile.objects.get(email=email)
+
+                # Check to see if an existing user entered a password to make an account
+                # If so update the password and log them in
+                if password_entered:
+                    profile.set_password(password)
+                    profile.save()
+
+                    # Login the user
+                    login(request, profile)
+
+
+            except Exception as e:
+                print(e)
+
+                # Check if there is a password set by the user
+                if password_entered:
+                    profile = Profile.objects.create_user(name=name, email=email, password=password)
+
+                    # Login the user
+                    login(request, profile)
+
+                else:
+                    profile_temp_password = get_random_string(length=10)
+                    profile = Profile.objects.create_user(name=name, email=email, password=profile_temp_password, temp_password=profile_temp_password)
+
+
+
+
+        # create the sender address if we need to collect data
+        # and once we have a profile object
+        if accept_form_data:
             sender_address = Address.objects.create(profile=profile, name=name, address=address, default=True, apt_number=apt_number, street_number=street_number,
-                                             route=route, locality=locality, administrative_area_level_1=administrative_area_level_1, postal_code=postal_code)
-            account_created = True
+                                                    route=route, locality=locality, administrative_area_level_1=administrative_area_level_1, postal_code=postal_code)
+
+
+
+
 
         if amount <= 0:
             print(f"For some reason the amount is {amount}")
@@ -856,8 +970,7 @@ class PostCardOrderView(FormView):
 
         try:
             send_grid_data = {}
-            send_grid_data["list_ids"] = [
-                "df17f359-2dd8-45ed-b9e1-bcb63080cf96"]
+            send_grid_data["list_ids"] = ["df17f359-2dd8-45ed-b9e1-bcb63080cf96"]
             contacts = []
             data_dict = {}
 
@@ -871,8 +984,7 @@ class PostCardOrderView(FormView):
             contacts.append(data_dict)
             send_grid_data["contacts"] = contacts
             sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
-            response = sg.client.marketing.contacts.put(
-                request_body=send_grid_data)
+            response = sg.client.marketing.contacts.put(request_body=send_grid_data)
 
         except Exception as e:
             print(e)
@@ -887,7 +999,7 @@ class PostCardOrderView(FormView):
                                      donation_amount=donation, fulfilled=False, total_donation_amount=total_donation)
         for x in range(quantity):
 
-            if request.user.is_authenticated:
+            if not accept_form_data:
 
                 recipient = form.cleaned_data.get(f"recipient_{x}")
                 recipient.counter += 1
@@ -896,46 +1008,14 @@ class PostCardOrderView(FormView):
             else:
 
                 recipient_name = form.cleaned_data.get(f"{x}_recipient_name")
-                if len(recipient_name) > 30:
-                    form.add_error(None, f"Please keep recipient {x}'s name under 30 characters long.")
-                    return self.render_to_response(self.get_context_data(form=form))
-
                 recipient_address = form.cleaned_data.get(f"autocomplete{x}")
-                if len(recipient_address) > 200:
-                    form.add_error(None, f"Please keep recipient {x}'s address under 200 characters long.")
-                    return self.render_to_response(self.get_context_data(form=form))
-
                 recipient_apt_number = form.cleaned_data.get(f"apt_number_{x}")
-                if recipient_apt_number:
-                    if len(recipient_apt_number) > 20:
-                        form.add_error(None, f"Please keep recipient {x}'s Apt/Suite number under 20 characters long. Sorry :(")
-                        return self.render_to_response(self.get_context_data(form=form))
-
                 recipient_street_number = form.cleaned_data.get(f"street_number_{x}")
-                if len(recipient_street_number) > 20:
-                    form.add_error(None, f"Please keep recipient {x}'s street number under 20 characters long. Sorry :(")
-                    return self.render_to_response(self.get_context_data(form=form))
-
                 recipient_route = form.cleaned_data.get(f"route_{x}")
-                if len(recipient_route) > 100:
-                    form.add_error(None, f"Please keep recipient {x}'s route under 100 characters long. Sorry :(")
-                    return self.render_to_response(self.get_context_data(form=form))
-
                 recipient_locality = form.cleaned_data.get(f"locality_{x}")
-                if len(recipient_locality) > 100:
-                    form.add_error(None, f"Please keep recipient {x}'s locality under 100 characters long. Sorry :(")
-                    return self.render_to_response(self.get_context_data(form=form))
-
                 recipient_administrative_area_level_1 = form.cleaned_data.get(f"administrative_area_level_1_{x}")
-                if len(recipient_administrative_area_level_1) >= 4:
-                    form.add_error(None, f"Please use a 2 digit province code i.e. 'ON' for recipient {x}.")
-                    return self.render_to_response(self.get_context_data(form=form))
-
                 recipient_postal_code = form.cleaned_data.get(f"postal_code_{x}")
-                if len(recipient_postal_code) > 10:
-                    form.add_error(None, f"Please keep recipient {x}'s postal code under 10 characters long.")
-                    return self.render_to_response(self.get_context_data(form=form))
-
+                
                 recipient, created = Recipient.objects.get_or_create(profile=profile, name=recipient_name, email=None,
                                                     address=recipient_address, apt_number=recipient_apt_number,
                                                     street_number=recipient_street_number, route=recipient_route, locality=recipient_locality,
@@ -973,19 +1053,16 @@ class PostCardOrderView(FormView):
             except Exception as e:
                 print(e)
 
-        try: 
-            self.send_confirmation_email(order, postcard_orders, postcard)
-        except Exception as e:
-            print(e)
+            try: 
+                self.send_confirmation_email(order, postcard_orders, postcard)
+            except Exception as e:
+                print(e)
 
 
-        
         postcard.amount_sold += 1
         postcard.save()
 
-        # Delete the session intent variable 
-        
-        
+        messages.success(request, 'Order Placed!')
         valid_data = super(PostCardOrderView, self).form_valid(form)
         return valid_data
 

@@ -38,8 +38,6 @@ class ProfileUpdateForm(forms.ModelForm):
         model = Profile
         fields = [
             "picture",
-            "region",
-            "city"
         ]
 
         widgets = {
@@ -51,36 +49,7 @@ class ProfileUpdateForm(forms.ModelForm):
                         "style": "background: #ffffff;border: 0px;"
                     }
                 ),
-                "region": forms.Select(
-                        attrs={
-                            "required" : True,
-                            "class":"form-control",
-                            "onchange": "cityChange(this);"
-                        },
-                ),
-                "city": forms.Select(
-                        attrs={
-                            "required" : True,
-                            "class":"form-control",
-                        }
-                ),
             }
-
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.fields['city'].empty_label = "City"
-        self.fields['region'].empty_label = "Region"
-
-        self.fields['city'].queryset = City.objects.all()
-        self.fields['region'].queryset = Region.objects.all()
-
-        self.fields['region'].initial = Region.objects.get(name="Ontario")
-        self.fields['city'].initial = City.objects.get(name="Toronto")
-
-        self.fields["region"].label_from_instance = lambda obj: "%s" % obj.name
-        self.fields["city"].label_from_instance = lambda obj: "%s" % obj.name
 
     def clean_picture(self):
         picture = self.cleaned_data.get('picture')

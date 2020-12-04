@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator
 from django.urls import reverse
+from django.utils.crypto import get_random_string
 
 from postcards.models import PostCard
 from recipients.models import Recipient
@@ -11,12 +12,9 @@ from profiles.models import Profile, Address
 
 
 gift_cards = (
-    ('Apple', 'Apple'),
-    ('Google', 'Google'),
-    ('HomeSense', 'HomeSense'),
+    ('Tim Hortons', 'Tim Hortons'),
+    ('Starbucks', 'Starbucks'),
     ('Amazon', 'Amazon'),
-    ('Indigo', 'Indigo'),
-    ('Shoppers', 'Shoppers'),
 )
 
 
@@ -45,6 +43,7 @@ class Order(models.Model):
     fulfilled = models.BooleanField(default=False)
     payment_intent_id = models.CharField(max_length=300, null=True, blank=True)
     payment_method_id = models.CharField(max_length=300, null=True, blank=True)
+    public_id = models.CharField(max_length=150, null=True, blank=True)
 
     def __str__(self):
         return (self.name)
@@ -52,6 +51,23 @@ class Order(models.Model):
     def get_absolute_url(self):
         view_name = "profiles:orders:detail"
         return reverse(view_name, kwargs={"id": self.id})
+
+
+    def generate_public_id(self):
+        while True:
+            public_id = get_random_string(length=32)
+            try:
+                Order.objects.get(public_id=public_id)
+            except:
+                break
+        self.public_id = public_id
+
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.generate_public_id()
+
+        super().save(*args, **kwargs)
 
 
 
@@ -80,13 +96,6 @@ class LineOrder(models.Model):
 
     # replace with address model --------
     sender_address = models.ForeignKey(Address, on_delete=models.CASCADE, blank=True, null=True)
-    address = models.CharField(max_length=200, null=True, blank=True)
-    apt_number = models.CharField(max_length=20, null=True, blank=True)
-    street_number = models.CharField(max_length=20, null=True, blank=True)
-    route = models.CharField(max_length=100, null=True, blank=True)
-    locality = models.CharField(max_length=100, null=True, blank=True)
-    administrative_area_level_1 = models.CharField(max_length=4, null=True, blank=True)
-    postal_code = models.CharField(max_length=10, null=True, blank=True)
     # replace with address model --------
 
     message_to_recipient = models.TextField(blank=True, null=True)
@@ -115,3 +124,7 @@ class LineOrder(models.Model):
     def get_order_url(self):
         view_name = "profiles:orders:detail"
         return reverse(view_name, kwargs={"id": self.order.id})
+
+    def get_edit_url(self):
+        view_name = "profiles:orders:edit"
+        return reverse(view_name, kwargs={"id": self.order.id, "line_order_id": self.id})

@@ -93,7 +93,7 @@ class AddRecipient(LoginRequiredMixin, CreateView):
         profile = self.get_profile()
         form.instance.profile = profile
         self.object = form.save()
-        messages.success(request, "Recipient Created")
+        # messages.success(request, "Recipient Created")
         valid_data = super(AddRecipient, self).form_valid(form)
         return valid_data
 

@@ -81,8 +81,6 @@ class Profile(AbstractUser):
     postal_code = models.CharField(max_length=10, null=True, blank=True)
     
     country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=False, null=True)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=False, null=True)
-    city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=True)
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=True)
     subscribed_houses = models.ManyToManyField(House, blank=True, related_name="subscribed_houses")
     stripe_customer_id = models.CharField(max_length=200, null=True, blank=True)

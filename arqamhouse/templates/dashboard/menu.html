@@ -36,24 +36,28 @@ Menu
 
                 <div class="row">
                     <div class="col-6" style="padding-right: 5px;padding-left: 5px;padding-bottom: 20px;">
-                        <a href="{% url 'profiles:orders:list' %}" class="btn btn-primary btn-lg btn-block"><i class="fas fa-file-invoice-dollar"></i> Orders</a>
+                        <a href="{% url 'postcards:list' %}" class="btn btn-primary btn-lg btn-block"> Postcards</a>
                     </div>
 
                     <div class="col-6" style="padding-right: 5px;padding-left: 5px;padding-bottom: 20px;">
-                        <a href="{% url 'profiles:recipients:list' %}" class="btn btn-primary btn-lg btn-block"><i class="fas fa-user-friends"></i> Recipients</a>
+                        <a href="{% url 'profiles:orders:list' %}" class="btn btn-primary btn-lg btn-block"> Orders</a>
                     </div>
 
                     <div class="col-6" style="padding-right: 5px;padding-left: 5px;padding-bottom: 20px;">
-                        <a class="btn btn-primary btn-lg btn-block" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a href="{% url 'profiles:recipients:list' %}" class="btn btn-primary btn-lg btn-block"> Recipients</a>
                     </div>
 
                     <div class="col-6" style="padding-right: 5px;padding-left: 5px;padding-bottom: 20px;">
-                        <a class="btn btn-primary btn-lg btn-block" href="{% url 'profiles:logout' %}"><i class="fas fa-power-off"></i> Logout</a>
+                        <a class="btn btn-primary btn-lg btn-block" href="{% url 'dashboard' %}">Dashboard</a>
                     </div>
 
                     <div class="col-6" style="padding-right: 5px;padding-left: 5px;padding-bottom: 20px;">
-                        <a class="btn btn-primary btn-lg btn-block" href="#"><i class="fas fa-user"></i> Profile</a>
+                        <a class="btn btn-primary btn-lg btn-block" href="{% url 'profiles:logout' %}"> Logout</a>
                     </div>
+
+                    <!-- <div class="col-6" style="padding-right: 5px;padding-left: 5px;padding-bottom: 20px;">
+                        <a class="btn btn-primary btn-lg btn-block" href="#"> Profile</a>
+                    </div> -->
 
                 </div>
 

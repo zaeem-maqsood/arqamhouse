@@ -64,6 +64,7 @@ function StripePayment() {
 
     document.getElementById("ready_to_pay").style.display = 'none';
     document.getElementById("id_gift_card_amount").readOnly = true;
+    document.getElementById("gift_card_switch").disabled = true;
 
     var donation = 0;
     var promo_code = "";
@@ -598,6 +599,88 @@ function stripeClientSecretHandler(intent_id) {
 
 </script>
 
+
+{% if profile and default_address %}
+{% else %}
+
+<script>
+    
+    function revealPasswordField() {
+
+        name = document.getElementById("id_name").value;
+        email = document.getElementById("id_email").value;
+        console.log(name);
+        console.log(email);
+
+        if (name && email){
+
+            profileExists(email);
+            
+        }
+        
+
+    }
+</script>
+
+
+
+<script>
+
+    function profileExists(email) {
+
+        var token = '{{ csrf_token }}';
+
+        const url = "{% url 'postcards:profile_exists' %}";
+
+        let data = {
+            email: email,
+        }
+
+        let fetchData = {
+            method: 'POST',
+            body: JSON.stringify(data),
+            credentials: 'include',
+            headers: {
+                'X-CSRFToken': token,
+                'Content-Type': 'application/json; charset=utf-8',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+
+        }
+
+        fetch(url, fetchData)
+            .then(
+                function (response) {
+                    if (response.status !== 200) {
+                        console.log('Looks like there was a problem. Status Code: ' +
+                            response.status);
+                        return;
+                    }
+
+                    // Examine the text in the response
+                    response.json().then(function (data) {
+                        console.log(data)
+
+                        if (data['exists']) {
+                            document.getElementById("password_row").style.display = 'none';
+                        }
+
+                        else {
+                            document.getElementById("password_row").style.display = 'block';
+                        }
+
+                    });
+                }
+            )
+            .catch(function (err) {
+                console.log('Fetch Error :-S', err);
+            });
+
+    }
+
+</script>
+{% endif %}
+
 {% if profile and default_address %}
 {% else %}
 <script type="text/javascript"
@@ -612,23 +695,58 @@ function stripeClientSecretHandler(intent_id) {
 <section style="padding-top: 30px;">
     <div class="container">
 
-        <form id="donationForm" method="POST" onSubmit="document.getElementById('customButton').disabled = true;">{% csrf_token %}
+        <form id="donationForm" method="POST" onSubmit="document.getElementById('customButton').disabled = true;document.getElementById('gift_card_switch').disabled=false;">{% csrf_token %}
 
             <input id="quantity" name="quantity" type="hidden" value="{{ quantity_str }}">
             
-            <div class="row justify-content-center text-center" style="padding-bottom: 30px;">
+            <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
                 <div class="col-lg-6 col-md-10 col-sm-12 col-10">
-                    {% if postcard.non_profit %}
-                    <a class="btn btn-primary btn-sm btn-block" href="{{ postcard.non_profit.get_absolute_url }}">
-                        <span class="btn__text">All {{ postcard.non_profit.name }}'s Postcards</span>
-                    </a>
+                    {% if request.user.is_authenticated %}
+                    <div class="row justify-content-center text-center" style="padding-bottom: 10px;">
+                        <div class="col-10" style="padding-right: 5px;padding-left: 5px;">
+                            <a href="{% url 'menu' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 3em;"></a>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center text-center">
+                        <div class="col-6" style="padding-right: 5px;padding-left: 5px;">
+                            <a class="btn btn-primary btn-block btn-sm" href="{% url 'menu' %}">Menu</a>
+                        </div>
+                        <div class="col-6">
+                            {% if postcard.non_profit %}
+                            <a class="btn btn-primary btn-sm btn-block" href="{{ postcard.non_profit.get_absolute_url }}">
+                                <span class="btn__text">{{ postcard.non_profit.name }}</span>
+                            </a>
+                            {% else %}
+                            <a class="btn btn-primary btn-sm btn-block" href="{% url 'postcards:list' %}">
+                                <span class="btn__text">Postcards</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
                     {% else %}
-                    <a class="btn btn-primary btn-sm btn-block" href="{% url 'postcards:list' %}">
-                        <span class="btn__text">All Postcards</span>
-                    </a>
+                    <div class="row justify-content-center text-center" style="padding-bottom: 10px;">
+                        <div class="col-10" style="padding-right: 5px;padding-left: 5px;">
+                            <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 3em;"></a>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center text-center" style="padding-bottom: 10px;">
+                        <div class="col-10">
+                            {% if postcard.non_profit %}
+                            <a class="btn btn-primary btn-sm btn-block" href="{{ postcard.non_profit.get_absolute_url }}">
+                                <span class="btn__text">All {{ postcard.non_profit.name }}'s Postcards</span>
+                            </a>
+                            {% else %}
+                            <a class="btn btn-primary btn-sm btn-block" href="{% url 'postcards:list' %}">
+                                <span class="btn__text">All Postcards</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
                     {% endif %}
                 </div>
             </div>
+
 
             <div class="row justify-content-around">
                 <div class="col-lg-6 col-10">
@@ -692,72 +810,38 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 20px;">
                         <div class="col-6 col-md-4 col-lg-4" style="padding-bottom: 20px;">
                             <div class="form-check">
-                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="Apple"
-                                    value="Apple"/>
-                                
-                                <img src="{% static 'images/app-store-gift-card.png' %}"
-                                    style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
-                                    id="front_cover" class="img-fluid"/>
-                                <p style="margin-bottom: 0px;margin-top:5px;" class="text-center">Apple Store</p>
-                                
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-4 col-lg-4" style="padding-bottom: 20px;">
-                            <div class="form-check">
-                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="Google"
-                                    value="Google">
-                                
-                                <img src="{% static 'images/googleplaywhite.png' %}"
-                                    style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
-                                    id="front_cover" class="img-fluid">
-                                <p style="margin-bottom: 0px;margin-top:5px;" class="text-center">Google Play</p>
-                                
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-4 col-lg-4" style="padding-bottom: 20px;">
-                            <div class="form-check">
                                 <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="Amazon"
                                     value="Amazon">
-                                
+                        
+                                <label style="margin-bottom: 0px;margin-top:5px;" for="Amazon" class="text-center">
                                 <img src="{% static 'images/ca-generic-black.png' %}"
                                     style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
                                     id="front_cover" class="img-fluid">
-                                <p style="margin-bottom: 0px;margin-top:5px;" class="text-center">Amazon</p>
+                                Amazon</label>
                             </div>
                         </div>
                         <div class="col-6 col-md-4 col-lg-4" style="padding-bottom: 20px;">
                             <div class="form-check">
-                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="Indigo"
-                                    value="Indigo">
-                                
-                                <img src="{% static 'images/indigo.png' %}"
+                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="Tim Hortons"
+                                    value="Tim Hortons"/>
+                                <label style="margin-bottom: 0px;margin-top:5px;" for="Tim Hortons" class="text-center">
+                                <img src="{% static 'images/tim-hortons.jpg' %}"
                                     style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
-                                    id="front_cover" class="img-fluid">
-                                <p style="margin-bottom: 0px;margin-top:5px;" class="text-center">Indigo</p>
-                                
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-4 col-lg-4" style="padding-bottom: 20px;">
-                            <div class="form-check">
-                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="Shoppers"
-                                    value="Shoppers" checked>
-                                
-                                <img src="{% static 'images/shoppers_drug_mart.png' %}"
-                                    style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
-                                    id="front_cover" class="img-fluid">
-                                <p style="margin-bottom: 0px;margin-top:5px;" class="text-center">Shoppers</p>
+                                    id="front_cover" class="img-fluid"/>
+                                Tim Hortons</label>
                                 
                             </div>
                         </div>
                         <div class="col-6 col-md-4 col-lg-4" style="padding-bottom: 20px;">
                             <div class="form-check">
-                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="HomeSense"
-                                    value="HomeSense" checked>
+                                <input class="form-check-input" style="display: block;" type="radio" name="giftCards" id="Starbucks"
+                                    value="Starbucks">
                                 
-                                <img src="{% static 'images/homesense_genericgiftcard-01.png' %}"
+                                <label style="margin-bottom: 0px;margin-top:5px;" for="Starbucks" class="text-center">
+                                <img src="{% static 'images/starbucks_giftcard.jpg' %}"
                                     style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;"
                                     id="front_cover" class="img-fluid">
-                                <p style="margin-bottom: 0px;margin-top:5px;" class="text-center">Homesense</p>
+                                Starbucks</label>
                                 
                             </div>
                         </div>
@@ -818,6 +902,7 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-12">
                             <p style="margin-bottom: 0px;font-weight: 700;color: #093f7d;">{{ chosen_sender.name }}</p>
+                            <p style="margin-bottom: 0px;">{{ profile.email }}</p>
                             <p style="margin-bottom: 0px;font-weight: 500;color: #4a90e2;">
                                 {% if chosen_sender.apt_number %}{{ chosen_sender.apt_number }}-{% else %}{% endif %}
                                 {{ chosen_sender.street_number }}
@@ -830,6 +915,7 @@ function stripeClientSecretHandler(intent_id) {
                     <div class="row" style="padding-bottom: 10px;">
                         <div class="col-12">
                             <p style="margin-bottom: 0px;font-weight: 700;color: #093f7d;">{{ default_address.name }}</p>
+                            <p style="margin-bottom: 0px;">{{ profile.email }}</p>
                             <p style="margin-bottom: 0px;font-weight: 500;color: #4a90e2;">{% if default_address.apt_number %}{{ default_address.apt_number }}-{% else %}{% endif %} {{ default_address.street_number }}
                             {{ default_address.route }}
                             {{ default_address.locality }}
@@ -855,6 +941,15 @@ function stripeClientSecretHandler(intent_id) {
                             <p style="margin-bottom: 0px;">Email <i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
                                 data-tooltip="We'll send you a confirmation email of your purchase here."></i></p> 
                             {{ form.email }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding-bottom: 10px;display: none;" id="password_row">
+                        <div class="col-12" style="padding-bottom: 10px;">
+                            <p style="margin-bottom: 0px;">Password <span style="font-size: 0.8em;color: #4399d5;">optional</span><i style="color: #4399d5;font-size: 0.8em;" class="fa fa-info-circle"
+                                    data-tooltip="Who is the card from?"></i></p>
+                            {{ form.password }}
+                            <p style="font-size: 0.8em;color: #4399d5;margin-bottom: 0px;">Enter a password and we'll make you an account! It's easier to keep track of orders and checkout faster.</p>
                         </div>
                     </div>
 
@@ -957,7 +1052,7 @@ function stripeClientSecretHandler(intent_id) {
                         
                         <div class="row" style="padding-bottom: 30px;">
                             
-                            <div class="col-6">
+                            <div class="col-12 col-lg-6">
                                 <a class="btn btn-primary btn-sm btn-block" href="{% url 'profiles:recipients:new_recipient' %}?postcard_order={{ postcard.slug }}">Add New Recipient</a>
                             </div>
                         </div>

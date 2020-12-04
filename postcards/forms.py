@@ -138,6 +138,7 @@ class PostcardOrderForm(forms.Form):
 
         self.authenticated = authenticated
         self.profile = profile
+        self.quantity = quantity
 
         print(f"The quantity is {quantity}")
 
@@ -146,10 +147,13 @@ class PostcardOrderForm(forms.Form):
         else:
 
             self.fields["name"] = forms.CharField(widget=forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Full Name"}), required=True, max_length=30)
+                attrs={"class": "form-control", "placeholder": "Full Name", "oninput": "revealPasswordField();"}), required=True, max_length=30)
 
             self.fields["email"] = forms.EmailField(widget=forms.EmailInput(
-                attrs={"class": "form-control", "placeholder": "someone@example.com"}), required=True, max_length=200)
+                attrs={"class": "form-control", "placeholder": "someone@example.com", "oninput": "revealPasswordField();"}), required=True, max_length=200)
+
+            self.fields["password"] = forms.CharField(max_length=100, required=False, widget=forms.PasswordInput(
+                attrs={'class': 'form-control', 'placeholder': 'Password', "autocomplete": "off"}))
         
             self.fields["address"] = forms.CharField(label="Address", widget=forms.TextInput(
                 attrs={"class": "form-control", "autocomplete": "off", "placeholder": "123 Main Street", "id": "main_address"}), required=False)
@@ -241,6 +245,12 @@ class PostcardOrderForm(forms.Form):
             pass
 
         else:
+            
+            # Name Validation
+            name = self.cleaned_data.get('name')
+            if len(name) > 25 or len(name) < 4:
+                raise forms.ValidationError('Name must be between 4 and 25 characters.')
+
             # Email Validation
             email = self.cleaned_data.get('email')
             if len(email) > 300:
@@ -249,7 +259,7 @@ class PostcardOrderForm(forms.Form):
             # Apt number validation
             apt_number = self.cleaned_data.get("apt_number")
             if apt_number:
-                if len(apt_number) > 20:
+                if len(apt_number) > 10:
                     raise forms.ValidationError("Please keep your apt/suite number under 20 characters long.")
             
             # Street Number Validation
@@ -278,6 +288,43 @@ class PostcardOrderForm(forms.Form):
                 raise forms.ValidationError("Please keep the postal code under 10 characters long.")
 
 
+            for x in range(int(self.quantity)):
+
+                # Recipient Name Validation
+                recipient_name = self.cleaned_data.get(f'{x}_recipient_name')
+                if len(recipient_name) > 25 or len(recipient_name) < 4:
+                    raise forms.ValidationError('Recipient name must be between 4 and 25 characters.')
+
+                # Recipient Apt number validation
+                recipient_apt_number = self.cleaned_data.get(f"apt_number_{x}")
+                if recipient_apt_number:
+                    if len(recipient_apt_number) > 10:
+                        raise forms.ValidationError("Please keep recipient apt/suite number under 10 characters long.")
+
+                # Recipient Street Number Validation
+                recipient_street_number = self.cleaned_data.get(f"street_number_{x}")
+                if len(recipient_street_number) > 10:
+                    raise forms.ValidationError("Please keep recipient street number under 10 characters long.")
+
+                # Recipient Route Validation
+                recipient_route = self.cleaned_data.get(f"route_{x}")
+                if len(recipient_route) > 100:
+                    raise forms.ValidationError("Please keep recipient route under 100 characters long.")
+
+                # Recipient Locality Validation
+                recipient_locality = self.cleaned_data.get(f"locality_{x}")
+                if len(recipient_locality) > 100:
+                    raise forms.ValidationError("Please keep recipient locality under 100 characters long.")
+
+                # Recipient admin area 1 validation
+                recipient_administrative_area_level_1 = self.cleaned_data.get(f"administrative_area_level_1_{x}")
+                if len(recipient_administrative_area_level_1) >= 4:
+                    raise forms.ValidationError("Please use a 2 digit province code i.e. 'ON'.")
+
+                # Recipient Postal Code validation
+                recipient_postal_code = self.cleaned_data.get(f"postal_code_{x}")
+                if len(recipient_postal_code) > 7:
+                    raise forms.ValidationError("Please keep recipient postal code under 10 characters long.")
 
 
 

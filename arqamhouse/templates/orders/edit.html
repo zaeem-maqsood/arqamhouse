@@ -1,0 +1,218 @@
+{% extends "frontend/basic_base.html" %}
+
+{% block title %}
+Orders
+{% endblock title %}
+
+{% load static %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block top_page_scripts %}
+{% endblock top_page_scripts %}
+
+{% block scripts %}
+<script>
+
+    function cleanInput(object) {
+        object.value = object.value.replace(/[^.!<>,a-zA-Z0-9 ]/gm, '');
+    }
+
+</script>
+{% endblock scripts %}
+
+{% block content %}
+<section style="padding-top:1rem;">
+    <div class="container" onload="enableVerifyPhoneButton();">
+
+        <form id="lineOrderForm" method="POST"
+            onSubmit="document.getElementById('customButton').disabled = true;">
+            {% csrf_token %}
+
+        {% if messages %}
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <div class="row">
+                    <div class="col-12" style="padding-right: 5px;padding-left: 5px;">
+                        <h4 style="margin-bottom: 5px;">Edit Line Order</h4>
+                        <p style="font-size: 0.8em;margin-bottom: 10px;">Placed on {{ line_order.created_at }}</p>
+                        <a class="btn btn-primary btn-sm" href="{{ line_order.order.get_absolute_url }}">Back to order overview</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="padding-bottom: 30px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10"
+                style="box-shadow: rgba(0, 0, 0, 0.1) -5px -5px 20px 5px;border-radius: 15px;align-self: center;padding: 20px;">
+
+                <div class="row text-center">
+                    <div class="col-12" style="padding-right: 5px;padding-left: 5px;">
+                        <h5>{{ line_order.postcard.name }}</h5>
+                    </div>
+                </div>
+
+
+                <div class="row justify-content-center img-center-phone">
+                    <div class="col-12 col-lg-8 col-md-10" style="padding-bottom: 20px;">
+                        <img style="border: 0.1px solid #f6f0f0;" src="{{ line_order.postcard.image_1.url }}" class="img-fluid">
+                    </div>
+                </div>
+
+                <div class="row justify-content-center text-center" style="padding-bottom: 40px;">
+                    <div class="col-10 col-lg-8 col-md-10" style="padding-right: 5px;padding-left: 5px;">
+                        <a class="btn btn-primary btn-sm btn-block" href="{% url 'menu' %}">Change Postcard</a>
+                    </div>
+                </div>
+
+                {% if line_order.add_gift_card %}
+
+                {% if line_order.gift_card == 'Amazon' %}
+                <div class="row justify-content-center img-center-phone">
+                    <div class="col-8 col-lg-4 col-md-6" style="padding-bottom: 20px;">
+                        <img style="border: 0.1px solid #f6f0f0;" src="{% static 'images/ca-generic-black.png' %}" class="img-fluid">
+                    </div>
+                </div>
+                {% elif line_order.gift_card == 'Tim Hortons' %}
+                <div class="row justify-content-center img-center-phone">
+                    <div class="col-8 col-lg-4 col-md-6" style="padding-bottom: 20px;">
+                        <img style="border: 0.1px solid #f6f0f0;" src="{% static 'images/tim-hortons.jpg' %}" class="img-fluid">
+                    </div>
+                </div>
+                {% else %}
+                <div class="row justify-content-center img-center-phone">
+                    <div class="col-8 col-lg-4 col-md-6" style="padding-bottom: 20px;">
+                        <img style="border: 0.1px solid #f6f0f0;" src="{% static 'images/starbucks_giftcard.jpg' %}" class="img-fluid">
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="row justify-content-center text-center" style="padding-bottom: 40px;">
+                    <div class="col-8 col-lg-4 col-md-6" style="padding-right: 5px;padding-left: 5px;">
+                        <a class="btn btn-primary btn-sm btn-block" href="{% url 'menu' %}">Change Gift Card</a>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <div class="row justify-content-center" style="padding-bottom: 10px;">
+                    <div class="col-10" style="padding-bottom: 10px;">
+                        <p style="margin-bottom: 0px;">Message To Recipient <i style="color: #4399d5;font-size: 0.8em;"
+                                class="fa fa-info-circle" data-tooltip="We'll write this on the back of the card for you."></i></p>
+                        <textarea oninput="cleanInput(this);" required name="message_to_recipient" cols="40"
+                            rows="3" class="form-control" placeholder="Write your personalized message for the recipient here"
+                            maxlength="280"
+                            id="id_message_to_recipient">{{ line_order.message_to_recipient }}</textarea>
+                        
+                    </div>
+                </div>
+
+                <div class="row justify-content-center text-center" style="padding-bottom: 40px;">
+                    <div class="col-10" style="padding-right: 5px;padding-left: 5px;">
+                        <button class="btn btn-primary btn-sm btn-block" type="submit">Update Message</button>
+                    </div>
+                </div>
+
+
+                <div class="row justify-content-center text-center" style="padding-bottom: 10px;">
+                    <div class="col-12" style="padding-right: 5px;padding-left: 5px;">
+                        <h5 style="margin-bottom: 5px;">Sender Address</h5>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="padding-bottom: 10px;">
+                    <div class="col-10" style="padding-right: 5px;padding-left: 5px;">
+                        {% for sender_address in sender_addresses %}
+                        <div class="form-check" style="margin-bottom: 10px;">
+                            <input class="form-check-input" type="radio" name="sender_address" id="{{ sender_address.id }}" value="{{ sender_address.id }}" 
+                            {% if line_order.sender_address_id == sender_address.id %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ sender_address.id }}">
+                                {{ sender_address.name }}
+                            </label>
+                            <br>
+                            <label class="form-check-label" for="{{ sender_address.id }}">
+                                {% if sender_address.apt_number %}{{ sender_address.apt_number }}-{% else %}{% endif %}
+                                {{ sender_address.street_number }}
+                                {{ sender_address.route }}
+                                {{ sender_address.locality }}
+                                {{ sender_address.administrative_area_level_1 }} {{ sender_address.postal_code }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row justify-content-center text-center" style="padding-bottom: 40px;">
+                    <div class="col-10" style="padding-right: 5px;padding-left: 5px;">
+                        <a class="btn btn-primary btn-block btn-sm" href="#">Update Sender Address</a>
+                    </div>
+                </div>
+
+
+
+                <div class="row justify-content-center text-center" style="padding-bottom: 10px;">
+                    <div class="col-12" style="padding-right: 5px;padding-left: 5px;">
+                        <h5 style="margin-bottom: 5px;">Recipient Address</h5>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="padding-bottom: 10px;">
+                    <div class="col-10" style="padding-right: 5px;padding-left: 5px;">
+                        {% for sender_address in sender_addresses %}
+                        <div class="form-check" style="margin-bottom: 10px;">
+                            <input class="form-check-input" type="radio" name="sender_address" id="{{ sender_address.id }}" value="{{ sender_address.id }}" 
+                            {% if line_order.sender_address_id == sender_address.id %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ sender_address.id }}">
+                                {{ sender_address.name }}
+                            </label>
+                            <br>
+                            <label class="form-check-label" for="{{ sender_address.id }}">
+                                {% if sender_address.apt_number %}{{ sender_address.apt_number }}-{% else %}{% endif %}
+                                {{ sender_address.street_number }}
+                                {{ sender_address.route }}
+                                {{ sender_address.locality }}
+                                {{ sender_address.administrative_area_level_1 }} {{ sender_address.postal_code }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+                    <div class="col-10" style="padding-right: 5px;padding-left: 5px;">
+                        <a class="btn btn-primary btn-block btn-sm" href="#">Update Recipient Address</a>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+        <div class="row justify-content-center text-center" style="padding-bottom: 20px;">
+            <div class="col-lg-6 col-md-10 col-sm-12 col-10">
+                <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" style="max-height: 4em;"></a>
+            </div>
+        </div>
+
+        </form>
+
+    </div>
+</section>
+{% endblock content %}

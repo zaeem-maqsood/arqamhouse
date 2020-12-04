@@ -130,7 +130,10 @@ Orders
                             <tr>
                                 <th>Select</th>
                                 <th>Buyer</th>
+                                <th>Recipient</th>
                                 <th>Postcard</th>
+                                <th>Gift Card</th>
+                                <th>Anonymous</th>
                                 <th>Envelope</th>
                                 <th>Front</th>
                                 <th>Message</th>
@@ -144,7 +147,15 @@ Orders
                             <tr>
                                 <td><input type="checkbox" id="{{ order.id }}" name="{{ order.id }}" value="{{ order.id }}"></td>
                                 <td><a href="{{ order.get_order_view }}">{{ order.order.name|title }}</a></td>
+                                <td>{{ order.recipient.name }}</td>
                                 <td>{{ order.postcard.name }}</td>
+                                
+                                <td>{% if order.add_gift_card%}<span style="color: green;">Yes</span>{% else %}<span
+                                    style="color: red;">No</span>{% endif %}</td>
+
+                                <td>{% if order.anonymous %}<span style="color: green;">Yes</span>{% else %}<span
+                                    style="color: red;">No</span>{% endif %}</td>
+
                                 <td>{% if order.envelope_printed %}<span style="color: green;">Yes</span>{% else %}<span style="color: red;">No</span>{% endif %}</td>
                                 <td>{% if order.front_printed %}<span style="color: green;">Yes</span>{% else %}<span
                                         style="color: red;">No</span>{% endif %}</td>
