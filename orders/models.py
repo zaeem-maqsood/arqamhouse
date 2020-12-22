@@ -53,6 +53,11 @@ class Order(models.Model):
         return reverse(view_name, kwargs={"id": self.id})
 
 
+    def get_public_order_url(self):
+        view_name = "profiles:public_detail"
+        return reverse(view_name, kwargs={"public_id": self.public_id})
+
+
     def generate_public_id(self):
         while True:
             public_id = get_random_string(length=32)

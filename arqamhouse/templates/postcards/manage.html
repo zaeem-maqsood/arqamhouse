@@ -146,7 +146,7 @@ Orders
                             {% for order in orders %}
                             <tr>
                                 <td><input type="checkbox" id="{{ order.id }}" name="{{ order.id }}" value="{{ order.id }}"></td>
-                                <td><a href="{{ order.get_order_url }}">{{ order.order.name|title }}</a></td>
+                                <td><a href="{{ order.order.get_public_order_url }}">{{ order.order.name|title }}</a></td>
                                 <td>{{ order.recipient.name }}</td>
                                 <td>{{ order.postcard.name }}</td>
                                 
