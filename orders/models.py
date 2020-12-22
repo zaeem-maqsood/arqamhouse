@@ -54,7 +54,7 @@ class Order(models.Model):
 
 
     def get_public_order_url(self):
-        view_name = "profiles:public_detail"
+        view_name = "profiles:orders:public_detail"
         return reverse(view_name, kwargs={"public_id": self.public_id})
 
 
