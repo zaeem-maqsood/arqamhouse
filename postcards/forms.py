@@ -156,7 +156,7 @@ class PostcardOrderForm(forms.Form):
                 attrs={'class': 'form-control', 'placeholder': 'Password', "autocomplete": "off"}))
         
             self.fields["address"] = forms.CharField(label="Address", widget=forms.TextInput(
-                attrs={"class": "form-control", "autocomplete": "off", "placeholder": "123 Main Street", "id": "main_address"}), required=False)
+                attrs={"class": "form-control", "autocomplete": "off", "placeholder": "123 Main Street", "id": "main_address", "onfocusout": "hideMainAddressOnInput();"}), required=False)
 
             # Fields
             self.fields["apt_number"] = forms.CharField(label="Apt Number", widget=forms.TextInput(

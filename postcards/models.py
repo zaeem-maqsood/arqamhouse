@@ -57,6 +57,7 @@ class NonProfit(models.Model):
     description = models.TextField(blank=True, null=True)
     amount = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=2)
     website = models.URLField(max_length=300, blank=True, null=True)
+    button_text = models.CharField(max_length=100, null=True, blank=True)
     featured = models.BooleanField(default=False)
     logo = models.ImageField(upload_to=non_profit_logo_location, validators=[validate_file_size], null=True, blank=True)
 

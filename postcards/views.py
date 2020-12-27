@@ -468,7 +468,7 @@ def stripePayment(request):
         code_used = False
         if code:
             try:
-                promo_code = PromoCode.objects.get(code=code.lower())
+                promo_code = PromoCode.objects.get(code=code.lower().strip())
                 reduction = promo_code.fixed_amount
                 code_used = True
             except Exception as e:
