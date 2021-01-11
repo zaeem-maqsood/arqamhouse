@@ -67,5 +67,5 @@ urlpatterns = [
     path('orders/<public_id>/', OrderPublicDetailView.as_view(), name='order_detail_public'),
     path('.well-known/apple-developer-merchantid-domain-association', ApplePayVerificationView.as_view(), name='apple_verification'),
 
-    path('<slug:slug>/', include('houses.public_urls')),
+    # path('<slug:slug>/', include('houses.public_urls')),
 ]

@@ -1,0 +1,118 @@
+{% extends "frontend/basic_base.html" %}
+{% load tz %}
+{% load static %}
+
+{% block title %}
+{% endblock title %}
+
+{% block page_title %}
+Orders
+{% endblock page_title %}
+
+{% block styles %}
+{% endblock styles %}
+
+
+{% block scripts %}
+<script>
+
+    function FocusOnInput() {
+        
+        document.getElementById("order-search").focus();
+
+    }
+</script>
+{% endblock scripts %}
+
+
+
+{% block content %}
+<div class="row justify-content-center" style="padding: 3rem 0px 3rem 0px;">
+    <div class="col-lg-10 col-md-12 col-12">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+
+                <div class="row" style="padding-bottom:20px;">
+                    <div class="col-12" style="padding-bottom: 10px;">
+                        <h4>Postcard Orders For {{ non_profit.name }}<span style="font-size: 0.8em;font-weight: 200;"> | {{ line_orders.count }}</span></h4>
+                    </div>
+                </div>
+
+                {% if line_orders %}
+                <div class="row" style="padding-bottom:10px;">
+                    <div class="col-12">
+                        <input type="search" placeholder="Search for an order" id="order-search"
+                            class="form-control m-input" onkeyup="GetOrders(this)">
+                        <br>
+                    </div>
+                </div>
+
+                <form id="donationForm" method="POST">{% csrf_token %}
+
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-md-3">
+                        <a class="btn btn-primary btn-block" href="{% url 'postcards:manage' %}?show_all=True"> All PostCards</a>
+                    </div>
+                
+                    <div class="col-md-3">
+                        <a class="btn btn-danger btn-block" href="{% url 'postcards:manage' %}">Pending Payouts</a>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Buyer</th>
+                                <th>Recipient</th>
+                                <th>Postcard</th>
+                                <th>Donation Amount</th>
+                                <th>Payout</th>
+                                <th class="d-none d-sm-none d-md-table-cell">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dynamic">
+                            {% for order in line_orders %}
+                            <tr>
+                                <td><input type="checkbox" id="{{ order.id }}" name="{{ order.id }}" value="{{ order.id }}"></td>
+                                <td>{{ order.order.name|title }}</td>
+                                <td>{{ order.recipient.name }}</td>
+                                <td>{{ order.postcard.name }}</td>
+                                <td>${{ order.donation_amount }}</td>
+                                <td>{% if order.sent_to_recipient %}<span style="color: green;">Complete</span>{% else %}<span
+                                        style="color: red;">Processing</span>{% endif %}</td>
+                                <td class="d-none d-sm-none d-md-table-cell">{{ order.created_at|localtime }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                </form>
+                {% else %}
+                <div class="row justify-content-center text-center" style="padding-bottom:30px;">
+                    <div class="col-12">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                            style="width: 150px;height: 150px;" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                <rect x="0" y="0" width="24" height="24" />
+                                <path
+                                    d="M3.95709826,8.41510662 L11.47855,3.81866389 C11.7986624,3.62303967 12.2013376,3.62303967 12.52145,3.81866389 L20.0429,8.41510557 C20.6374094,8.77841684 21,9.42493654 21,10.1216692 L21,19.0000642 C21,20.1046337 20.1045695,21.0000642 19,21.0000642 L4.99998155,21.0000673 C3.89541205,21.0000673 2.99998155,20.1046368 2.99998155,19.0000673 C2.99998155,19.0000663 2.99998155,19.0000652 2.99998155,19.0000642 L2.99999828,10.1216672 C2.99999935,9.42493561 3.36258984,8.77841732 3.95709826,8.41510662 Z"
+                                    fill="#000000" opacity="0.3" />
+                                <path
+                                    d="M13.8,12 C13.1562,12 12.4033,12.7298529 12,13.2 C11.5967,12.7298529 10.8438,12 10.2,12 C9.0604,12 8.4,12.8888719 8.4,14.0201635 C8.4,15.2733878 9.6,16.6 12,18 C14.4,16.6 15.6,15.3 15.6,14.1 C15.6,12.9687084 14.9396,12 13.8,12 Z"
+                                    fill="#000000" opacity="0.3" />
+                            </g>
+                        </svg>
+                        <br>
+                        <h3 style="font-weight: 300;">No Orders Yet!</h3>
+                </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock content %}

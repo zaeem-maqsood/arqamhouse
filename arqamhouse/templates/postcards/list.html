@@ -242,8 +242,8 @@ function bulkOrder(increment, url) {
                     style="border-radius: 15px;align-self: center;">
                     <a href="{{ postcard.get_absolute_url }}" style="text-decoration: none;">
                         <img style="border: 0.1px solid #f6f0f0;" src="{{ postcard.image_1.thumbnail.url }}" class="arrow img-fluid">
-                        <p style="margin-bottom: 0px;margin-top: 10px;">{{ postcard.name }}</p>
-                        <a href="javascript:;" id="{{ forloop.counter }}_anchor" onclick="bulkOrder({{ forloop.counter }}, '{{ postcard.get_absolute_url }}');" style="text-decoration: none;font-size: small;font-weight: 400;">Need more than 1?</a>
+                        <p style="margin-bottom: 0px;margin-top: 10px;{% if postcard.non_profit %}color: green;{% endif %}">{{ postcard.name }}</p>
+                        <a href="javascript:;" id="{{ forloop.counter }}_anchor" onclick="bulkOrder({{ forloop.counter }}, '{{ postcard.get_absolute_url }}');" style="text-decoration: none;font-size: small;font-weight: 400;{% if postcard.non_profit %}color: green;{% endif %}">Need more than 1?</a>
                         <select id="{{ forloop.counter }}_quantity" name="{{ forloop.counter }}_quantity" onchange="bulkOrder({{ forloop.counter }}, '{{ postcard.get_absolute_url }}');" style="display: none;margin-top: 10px;">
                             <option value="2">2</option>
                             <option value="3">3</option>

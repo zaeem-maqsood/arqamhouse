@@ -20,7 +20,7 @@ from django.urls import path, include
 
 from postcards.views import (
     PostCardListView, PostCardOrderView, PostCardManageOrdersView, PostCardBusinessListView, PostCardBusinessOrderViewStepOne, stripePayment, NonProfitPostCardListView,
-    PostCardViewAllRecipients, PostcardSenderAddressList, profile_exists)
+    PostCardViewAllRecipients, PostcardSenderAddressList, profile_exists, NonprofitAccounting)
 
 app_name = "postcards"
 
@@ -29,6 +29,8 @@ urlpatterns = [
     path('business', PostCardBusinessListView.as_view(), name='business_list'),
     path('manage', PostCardManageOrdersView.as_view(), name='manage'),
     path('org/<slug:slug>', NonProfitPostCardListView.as_view(), name='non_profit_list'),
+    path('org/<slug:slug>/accounting', NonprofitAccounting.as_view(), name='non_profit_accounting'),
+
     path('<slug:slug>', PostCardOrderView.as_view(), name='detail'),
     path('<slug:slug>/sender-change', PostcardSenderAddressList.as_view(), name='order_view_senders'),
     path('<slug:slug>/recipients/', PostCardViewAllRecipients.as_view(), name='order_view_recipients'),

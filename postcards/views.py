@@ -53,6 +53,44 @@ from core.mixins import SuperUserRequiredMixin
 # Create your views here.
 
 
+class NonprofitAccounting(LoginRequiredMixin, View):
+
+    template_name = "postcards/non_profit_accounting.html"
+
+    def get_profile(self):
+        try:
+            profile = Profile.objects.get(email=str(self.request.user))
+            return profile
+        except:
+            return None
+
+
+    def get_non_profit(self):
+        slug = self.kwargs['slug']
+        try:
+            non_profit = NonProfit.objects.get(slug=slug)
+            return non_profit
+        except Exception as e:
+            raise Http404
+
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        data = request.GET
+        profile = self.get_profile()
+        non_profit = self.get_non_profit()
+
+        line_orders = LineOrder.objects.filter(postcard__non_profit=non_profit).order_by("-created_at")
+        
+        context["non_profit"] = non_profit
+        context["line_orders"] = line_orders
+        context["profile"] = profile
+        return render(request, self.template_name, context)
+
+
+
+
+
 class PostCardManageOrdersView(View, SuperUserRequiredMixin):
 
     template_name = "postcards/manage.html"
