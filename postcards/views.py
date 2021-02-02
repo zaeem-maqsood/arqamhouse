@@ -97,6 +97,10 @@ class NonprofitAccounting(LoginRequiredMixin, View):
             postcard__non_profit=non_profit, created_at__gte="2021-01-01"
         ).order_by("-created_at")
 
+        # line_orders = LineOrder.objects.filter(
+        #     postcard__non_profit=non_profit
+        # ).order_by("-created_at")
+
         context["non_profit"] = non_profit
         context["line_orders"] = line_orders
         context["profile"] = profile
