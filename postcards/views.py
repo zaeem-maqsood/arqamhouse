@@ -93,14 +93,18 @@ class NonprofitAccounting(LoginRequiredMixin, View):
         if not allow_access:
             raise Http404
 
-        line_orders = LineOrder.objects.filter(
-            postcard__non_profit=non_profit, created_at__gte="2021-01-01"
-        ).order_by("-created_at")
-
         # line_orders = LineOrder.objects.filter(
-        #     postcard__non_profit=non_profit
+        #     postcard__non_profit=non_profit, created_at__gte="2021-01-01"
         # ).order_by("-created_at")
 
+        line_orders = LineOrder.objects.filter(
+            postcard__non_profit=non_profit
+        ).order_by("-created_at")
+
+        total_payout = line_orders.aggregate(Sum("amount"))["amount__sum"]
+        print(total_payout)
+
+        context["total_payout"] = total_payout
         context["non_profit"] = non_profit
         context["line_orders"] = line_orders
         context["profile"] = profile
