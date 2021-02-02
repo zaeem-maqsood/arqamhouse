@@ -42,6 +42,7 @@ ics = "*"
 beautifulsoup4 = "*"
 django-stdimage = "*"
 opentok = "*"
+discord-py = "*"
 
 [requires]
 python_version = "3.7"
