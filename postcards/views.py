@@ -104,7 +104,11 @@ class NonprofitAccounting(LoginRequiredMixin, View):
         total_donation = line_orders.aggregate(Sum("donation_amount"))[
             "donation_amount__sum"
         ]
-        total_payout = (line_orders.count() * non_profit.amount) + total_donation
+
+        try:
+            total_payout = (line_orders.count() * non_profit.amount) + total_donation
+        except:
+            total_payout = 0.00
         print(total_payout)
 
         context["total_payout"] = total_payout
