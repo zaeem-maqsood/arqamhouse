@@ -201,7 +201,11 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
                         json_data["sender_line_2"] = line_2
 
                     json_data["recipient_name"] = postcard_order.recipient.name
-                    line_1 = f"{postcard_order.recipient.street_number} {postcard_order.recipient.route}"
+                    if postcard_order.recipient.apt_number:
+                        line_1 = f"{postcard_order.recipient.apt_number} - {postcard_order.recipient.street_number} {postcard_order.recipient.route}"
+                    else:
+                        line_1 = f"{postcard_order.recipient.street_number} {postcard_order.recipient.route}"
+
                     json_data["recipient_line_1"] = line_1
                     postal_code = postcard_order.recipient.postal_code.replace(" ", "")
                     cleaned_postal_code = postal_code[:3] + " " + postal_code[3:]
