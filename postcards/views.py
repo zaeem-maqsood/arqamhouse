@@ -188,7 +188,10 @@ class PostCardManageOrdersView(View, SuperUserRequiredMixin):
 
                     else:
                         json_data["sender_name"] = postcard_order.order.name
-                        line_1 = f"{postcard_order.sender_address.street_number} {postcard_order.sender_address.route}"
+                        if postcard_order.sender_address.apt_number:
+                            line_1 = f"{postcard_order.sender_address.apt_number} - {postcard_order.sender_address.street_number} {postcard_order.sender_address.route}"
+                        else:
+                            line_1 = f"{postcard_order.sender_address.street_number} {postcard_order.sender_address.route}"
                         json_data["sender_line_1"] = line_1
                         postal_code = postcard_order.sender_address.postal_code.replace(
                             " ", ""
