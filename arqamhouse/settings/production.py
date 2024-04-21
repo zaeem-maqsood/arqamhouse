@@ -27,8 +27,8 @@ ALLOWED_HOSTS = ['arqam.herokuapp.com', 'arqamhouse.com', 'www.arqamhouse.com', 
 
 
 # Production Keys
-STRIPE_SECRET_KEY = 'sk_live_4FvrAHAiKVjvUYouYDUAuT63'
-STRIPE_PUBLIC_KEY = 'pk_live_HV9p4w8uuKQelYHckqDC1m0d'
+STRIPE_SECRET_KEY = 'sk_test'
+STRIPE_PUBLIC_KEY = 'pk_live'
 
 
 DATABASES = {}
