@@ -26,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '1e-5=g=*(e*&%yy0atewsxk$mz#og$x@o_x!yxwvmzaecsv-r1'
+SECRET_KEY = 'Django_secret'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -142,7 +142,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 # Sendgrid Email Backend
 
 # SENDGRID_API_KEY = os.environ["SENDGRID_API_KEY"]
-SENDGRID_API_KEY = "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"
+SENDGRID_API_KEY = "SG_SECRET"
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = 'apikey'
@@ -159,17 +159,17 @@ SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 
 
 # Twilio Credentials
-ACCOUNT_SID = 'AC2e694b2462cf0c084a26c99445b0ae31'
-AUTH_TOKEN = 'f0ca4ed931e73f3ddefb62e3cb105f96'
+ACCOUNT_SID = 'TWILIO'
+AUTH_TOKEN = 'AUTH'
 
 
 # Google Maps API
-GOOGLE_MAPS_API = 'AIzaSyDtDBaUdChaO8Br25g14tY8W3bzXPtHqys'
+GOOGLE_MAPS_API = 'GOOGLEMAPSAPI'
 
 
 # OpenTok Credentials
-OPEN_TOK_API_KEY = '46593362'
-OPEN_TOK_SECRECT_KEY = 'd5717bdaa23dd3c54f102b2f7f1952eae485d857'
+OPEN_TOK_API_KEY = 'OPENTOK'
+OPEN_TOK_SECRECT_KEY = 'OPENTOK'
 
 
 # Password validation
@@ -224,6 +224,6 @@ FROALA_EDITOR_PLUGINS = ('align', 'char_counter', 'colors', 'emoticons', 'file',
 
 
 FROALA_EDITOR_OPTIONS = {
-    'key': 'PYC4mB3B15B11A7C4A5dxhjA-21pvpurgH3gjkD-17D2E2F2C1E4F1A1B8D7E6==',
+    'key': 'FROALA',
 }
 
